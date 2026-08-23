@@ -1,21 +1,57 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { BodyweightEntry, Exercise, Workout } from '../lib/types'
+import type {
+  BodyweightEntry,
+  DayOfWeek,
+  Exercise,
+  PlannedExercise,
+  ProgressionRule,
+  WeeklyPlan,
+  Workout,
+} from '../lib/types'
 import { generatedExercises } from '../data/exercises-generated'
 import { populateByIdCache } from '../lib/exercises'
+
+export const DAYS: DayOfWeek[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
+export const DAY_LABELS: Record<DayOfWeek, string> = {
+  mon: 'Mon',
+  tue: 'Tue',
+  wed: 'Wed',
+  thu: 'Thu',
+  fri: 'Fri',
+  sat: 'Sat',
+  sun: 'Sun',
+}
+
+function createEmptyDays(): WeeklyPlan['days'] {
+  return DAYS.map((d) => ({ day: d, exercises: [] }))
+}
 
 interface GymState {
   customExercises: Exercise[]
   workouts: Workout[]
   bodyweight: BodyweightEntry[]
   activeWorkout: Workout | null
+  plans: WeeklyPlan[]
   addExercise: (e: Exercise) => void
   startWorkout: () => void
+  startWorkoutFromPlan: (planId: string, day: DayOfWeek) => void
   discardWorkout: () => void
   addSet: (exerciseId: string, weight: number, reps: number) => void
   finishWorkout: () => void
   logBodyweight: (kg: number) => void
   importData: (json: unknown) => boolean
+  createPlan: (name: string) => string
+  renamePlan: (id: string, name: string) => void
+  deletePlan: (id: string) => void
+  addExerciseToDay: (planId: string, day: DayOfWeek, exerciseId: string) => void
+  removeExerciseFromDay: (planId: string, day: DayOfWeek, exerciseId: string) => void
+  updateExerciseProgression: (
+    planId: string,
+    day: DayOfWeek,
+    exerciseId: string,
+    rule: ProgressionRule,
+  ) => void
 }
 
 const today = () => new Date().toISOString().slice(0, 10)
@@ -29,6 +65,7 @@ export const useGym = create<GymState>()(
       workouts: [],
       bodyweight: [],
       activeWorkout: null,
+      plans: [],
 
       addExercise: (e) =>
         set((s) => {
@@ -41,6 +78,17 @@ export const useGym = create<GymState>()(
 
       startWorkout: () =>
         set({ activeWorkout: { id: crypto.randomUUID(), date: today(), exercises: [] } }),
+
+      startWorkoutFromPlan: (planId, day) =>
+        set((s) => {
+          const plan = s.plans.find((p) => p.id === planId)
+          const planned = plan?.days.find((d) => d.day === day)
+          const exercises = (planned?.exercises ?? []).map((pe) => ({
+            exerciseId: pe.exerciseId,
+            sets: [] as { weight: number; reps: number }[],
+          }))
+          return { activeWorkout: { id: crypto.randomUUID(), date: today(), exercises } }
+        }),
 
       discardWorkout: () => set({ activeWorkout: null }),
 
@@ -78,6 +126,7 @@ export const useGym = create<GymState>()(
             bodyweight?: unknown
             customExercises?: unknown
             exercises?: unknown
+            plans?: unknown
           }
           if (!Array.isArray(d.workouts)) return false
           const customs = Array.isArray(d.customExercises)
@@ -93,12 +142,78 @@ export const useGym = create<GymState>()(
             workouts: d.workouts as Workout[],
             ...(customs ? { customExercises: customs } : {}),
             ...(Array.isArray(d.bodyweight) ? { bodyweight: d.bodyweight as BodyweightEntry[] } : {}),
+            ...(Array.isArray(d.plans) ? { plans: d.plans as WeeklyPlan[] } : {}),
           })
           return true
         } catch {
           return false
         }
       },
+
+      createPlan: (name) => {
+        const id = `plan-${Date.now()}`
+        const plan: WeeklyPlan = {
+          id,
+          name: name.trim() || 'My Plan',
+          days: createEmptyDays(),
+          createdAt: new Date().toISOString(),
+        }
+        set((s) => ({ plans: [...s.plans, plan] }))
+        return id
+      },
+
+      renamePlan: (id, name) =>
+        set((s) => ({
+          plans: s.plans.map((p) => (p.id === id ? { ...p, name: name.trim() || p.name } : p)),
+        })),
+
+      deletePlan: (id) => set((s) => ({ plans: s.plans.filter((p) => p.id !== id) })),
+
+      addExerciseToDay: (planId, day, exerciseId) =>
+        set((s) => ({
+          plans: s.plans.map((p) => {
+            if (p.id !== planId) return p
+            return {
+              ...p,
+              days: p.days.map((d) => {
+                if (d.day !== day) return d
+                if (d.exercises.some((e) => e.exerciseId === exerciseId)) return d
+                const next: PlannedExercise = { exerciseId, progression: 'none' }
+                return { ...d, exercises: [...d.exercises, next] }
+              }),
+            }
+          }),
+        })),
+
+      removeExerciseFromDay: (planId, day, exerciseId) =>
+        set((s) => ({
+          plans: s.plans.map((p) => {
+            if (p.id !== planId) return p
+            return {
+              ...p,
+              days: p.days.map((d) =>
+                d.day !== day ? d : { ...d, exercises: d.exercises.filter((e) => e.exerciseId !== exerciseId) },
+              ),
+            }
+          }),
+        })),
+
+      updateExerciseProgression: (planId, day, exerciseId, rule) =>
+        set((s) => ({
+          plans: s.plans.map((p) => {
+            if (p.id !== planId) return p
+            return {
+              ...p,
+              days: p.days.map((d) => {
+                if (d.day !== day) return d
+                return {
+                  ...d,
+                  exercises: d.exercises.map((e) => (e.exerciseId === exerciseId ? { ...e, progression: rule } : e)),
+                }
+              }),
+            }
+          }),
+        })),
     }),
     {
       name: 'gynproxd-v2',
@@ -107,6 +222,7 @@ export const useGym = create<GymState>()(
         workouts: s.workouts,
         bodyweight: s.bodyweight,
         activeWorkout: s.activeWorkout,
+        plans: s.plans,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
@@ -124,6 +240,7 @@ export const useGym = create<GymState>()(
           workouts: p?.workouts ?? current.workouts,
           bodyweight: p?.bodyweight ?? current.bodyweight,
           activeWorkout: p?.activeWorkout ?? current.activeWorkout,
+          plans: (p?.plans as WeeklyPlan[] | undefined) ?? current.plans,
         }
         populateByIdCache([...generatedExercises, ...merged.customExercises])
         return merged

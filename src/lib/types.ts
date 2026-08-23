@@ -50,3 +50,24 @@ export interface BodyweightEntry {
   date: string
   kg: number
 }
+
+export type DayOfWeek = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun'
+
+export type ProgressionRule = 'none' | 'linear' | 'double'
+
+export interface PlannedExercise {
+  exerciseId: string
+  progression: ProgressionRule
+}
+
+export interface PlannedDay {
+  day: DayOfWeek
+  exercises: PlannedExercise[]
+}
+
+export interface WeeklyPlan {
+  id: string
+  name: string
+  days: PlannedDay[]
+  createdAt: string
+}

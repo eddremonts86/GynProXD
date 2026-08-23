@@ -8,11 +8,12 @@ export function SettingsPage() {
   const workouts = useGym((s) => s.workouts)
   const bodyweight = useGym((s) => s.bodyweight)
   const customExercises = useGym((s) => s.customExercises)
+  const plans = useGym((s) => s.plans)
   const importData = useGym((s) => s.importData)
   const [msg, setMsg] = useState('')
 
   const exportJson = () => {
-    const blob = new Blob([JSON.stringify({ version: 2, customExercises, workouts, bodyweight }, null, 2)], {
+    const blob = new Blob([JSON.stringify({ version: 3, customExercises, workouts, bodyweight, plans }, null, 2)], {
       type: 'application/json',
     })
     const url = URL.createObjectURL(blob)
@@ -39,8 +40,9 @@ export function SettingsPage() {
       <Card>
         <h2 className="text-sm font-semibold text-zinc-100">Your data</h2>
         <p className="mt-1 text-sm leading-5 text-muted">
-          {workouts.length} workouts · {bodyweight.length} weigh-ins · {customExercises.length} custom exercises.
-          Everything lives in this browser (localStorage, key <span className="font-mono text-zinc-300">gynproxd-v2</span>).
+          {workouts.length} workouts · {bodyweight.length} weigh-ins · {customExercises.length} custom exercises ·{' '}
+          {plans.length} plan{plans.length === 1 ? '' : 's'}. Everything lives in this browser (localStorage, key{' '}
+          <span className="font-mono text-zinc-300">gynproxd-v2</span>).
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Button onClick={exportJson}>Export JSON</Button>

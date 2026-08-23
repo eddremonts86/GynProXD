@@ -3,6 +3,7 @@ import { TodayPage } from './routes/Today'
 import { LibraryPage } from './routes/Library'
 import { HistoryPage } from './routes/History'
 import { SettingsPage } from './routes/Settings'
+import { PlannerPage } from './routes/Planner'
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -14,6 +15,7 @@ const rootRoute = createRootRoute({
         <div className="mx-auto flex w-full max-w-3xl items-stretch justify-around px-2 py-1 md:py-2">
           {[
             ['/', 'Today'],
+            ['/planner', 'Planner'],
             ['/library', 'Library'],
             ['/history', 'History'],
             ['/settings', 'Settings'],
@@ -35,12 +37,13 @@ const rootRoute = createRootRoute({
 })
 
 const todayRoute = createRoute({ getParentRoute: () => rootRoute, path: '/', component: TodayPage })
+const plannerRoute = createRoute({ getParentRoute: () => rootRoute, path: '/planner', component: PlannerPage })
 const libraryRoute = createRoute({ getParentRoute: () => rootRoute, path: '/library', component: LibraryPage })
 const historyRoute = createRoute({ getParentRoute: () => rootRoute, path: '/history', component: HistoryPage })
 const settingsRoute = createRoute({ getParentRoute: () => rootRoute, path: '/settings', component: SettingsPage })
 
 export const router = createRouter({
-  routeTree: rootRoute.addChildren([todayRoute, libraryRoute, historyRoute, settingsRoute]),
+  routeTree: rootRoute.addChildren([todayRoute, plannerRoute, libraryRoute, historyRoute, settingsRoute]),
 })
 
 declare module '@tanstack/react-router' {

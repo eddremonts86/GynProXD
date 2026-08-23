@@ -1,7 +1,7 @@
-import type { Exercise, SetEntry, Workout } from './types'
+import type { Exercise, ProgressionRule, SetEntry, Workout } from './types'
 import { bestE1rm, epley1rm, isBodyweight, lastPerformance } from './exercises'
 
-export type ProgressionRule = 'none' | 'linear' | 'double'
+export type { ProgressionRule }
 
 export const DEFAULT_REP_RANGE: [number, number] = [8, 12]
 
