@@ -8,10 +8,12 @@ import { Badge } from '../ui/Badge'
 import { Illustration } from '../ui/Illustration'
 import { estimatePlan } from '../lib/plan-estimate'
 import { mergeWithDefaults, parseOnboarding } from '../lib/onboarding-parse'
+import { useGym } from '../store/useGym'
 import type { DurationKey, Goal, Level } from '../lib/types'
 
 export function OnboardingPage() {
   const navigate = useNavigate()
+  const createGeneratedPlan = useGym((s) => s.createGeneratedPlan)
   const [text, setText] = useState(
     'soy hombre 40 años, peso 140kg quiero adelgazar a 80kg, puedo ir 3 veces por semana 2h, gym, esfuerzo medio',
   )
@@ -34,15 +36,15 @@ export function OnboardingPage() {
     const merged = mergeWithDefaults({
       age: parsed.partial.age ?? (Number(age) || 30),
       sex: (parsed.partial.sex as never) ?? sex,
-      weightKg: parsed.partial.weightKg ?? Number(weight) ?? 75,
+      weightKg: parsed.partial.weightKg ?? (Number(weight) || 75),
       targetWeightKg: parsed.partial.targetWeightKg ?? (Number(target) || undefined),
-      heightCm: parsed.partial.heightCm ?? Number(height) ?? 175,
+      heightCm: parsed.partial.heightCm ?? (Number(height) || 175),
       goal: (parsed.partial.goal as Goal) ?? goal,
       level: (parsed.partial.level as Level) ?? level,
-      daysPerWeek: parsed.partial.daysPerWeek ?? Number(days) ?? 3,
-      minsPerSession: parsed.partial.minsPerSession ?? Number(mins) ?? 60,
+      daysPerWeek: parsed.partial.daysPerWeek ?? (Number(days) || 3),
+      minsPerSession: parsed.partial.minsPerSession ?? (Number(mins) || 60),
       equipment: (parsed.partial.equipment as never) ?? (equipment as never),
-      effort: (parsed.partial.effort as never) ?? (Number(effort) as never) ?? 3,
+      effort: (parsed.partial.effort as never) ?? ((Number(effort) as never) || 3),
     })
     return merged
   }, [parsed, age, sex, weight, target, height, goal, level, days, mins, equipment, effort])
@@ -243,24 +245,11 @@ export function OnboardingPage() {
           </Button>
           <Button
             onClick={() => {
-              const q = new URLSearchParams({
-                age: String(input.age),
-                sex: input.sex,
-                weight: String(input.weightKg),
-                target: String(input.targetWeightKg ?? ''),
-                goal: input.goal,
-                level: input.level,
-                days: String(input.daysPerWeek),
-                mins: String(input.minsPerSession),
-                equip: input.equipment,
-                effort: String(input.effort),
-                dur: duration,
-              }).toString()
-              navigate({ to: '/planner' })
-              console.log('generate query', q)
+              const id = createGeneratedPlan(input, duration)
+              navigate({ to: '/generated/$id', params: { id } })
             }}
           >
-            Generar plan (próximo paso)
+            Generar plan
           </Button>
         </div>
       </Card>

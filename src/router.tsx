@@ -5,6 +5,7 @@ import { HistoryPage } from './routes/History'
 import { SettingsPage } from './routes/Settings'
 import { PlannerPage } from './routes/Planner'
 import { OnboardingPage } from './routes/Onboarding'
+import { GeneratedPlanPage } from './routes/GeneratedPlan'
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -59,9 +60,18 @@ const libraryRoute = createRoute({ getParentRoute: () => rootRoute, path: '/libr
 const historyRoute = createRoute({ getParentRoute: () => rootRoute, path: '/history', component: HistoryPage })
 const settingsRoute = createRoute({ getParentRoute: () => rootRoute, path: '/settings', component: SettingsPage })
 const onboardingRoute = createRoute({ getParentRoute: () => rootRoute, path: '/onboarding', component: OnboardingPage })
+const generatedRoute = createRoute({ getParentRoute: () => rootRoute, path: '/generated/$id', component: GeneratedPlanPage })
 
 export const router = createRouter({
-  routeTree: rootRoute.addChildren([todayRoute, plannerRoute, libraryRoute, historyRoute, settingsRoute, onboardingRoute]),
+  routeTree: rootRoute.addChildren([
+    todayRoute,
+    plannerRoute,
+    libraryRoute,
+    historyRoute,
+    settingsRoute,
+    onboardingRoute,
+    generatedRoute,
+  ]),
 })
 
 declare module '@tanstack/react-router' {

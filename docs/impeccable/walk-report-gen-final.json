@@ -1,0 +1,168 @@
+{
+  "base": "http://localhost:3010",
+  "startedAt": "2026-08-23T15:03:24.401Z",
+  "viewports": [
+    "mobile-375",
+    "desktop"
+  ],
+  "routes": [
+    "/",
+    "/onboarding",
+    "/planner",
+    "/library",
+    "/history",
+    "/settings"
+  ],
+  "pages": [
+    {
+      "viewport": "mobile-375",
+      "route": "/",
+      "url": "http://localhost:3010/",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/gen-final-mobile-375-today.png",
+      "durationMs": 1674
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/onboarding",
+      "url": "http://localhost:3010/onboarding",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/gen-final-mobile-375-onboarding.png",
+      "durationMs": 1468
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/planner",
+      "url": "http://localhost:3010/planner",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/gen-final-mobile-375-planner.png",
+      "durationMs": 1377
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/library",
+      "url": "http://localhost:3010/library",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/gen-final-mobile-375-library.png",
+      "durationMs": 1863
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/history",
+      "url": "http://localhost:3010/history",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/gen-final-mobile-375-history.png",
+      "durationMs": 1359
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/settings",
+      "url": "http://localhost:3010/settings",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/gen-final-mobile-375-settings.png",
+      "durationMs": 1501
+    },
+    {
+      "viewport": "desktop",
+      "route": "/",
+      "url": "http://localhost:3010/",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/gen-final-desktop-today.png",
+      "durationMs": 1355
+    },
+    {
+      "viewport": "desktop",
+      "route": "/onboarding",
+      "url": "http://localhost:3010/onboarding",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/gen-final-desktop-onboarding.png",
+      "durationMs": 1376
+    },
+    {
+      "viewport": "desktop",
+      "route": "/planner",
+      "url": "http://localhost:3010/planner",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/gen-final-desktop-planner.png",
+      "durationMs": 1351
+    },
+    {
+      "viewport": "desktop",
+      "route": "/library",
+      "url": "http://localhost:3010/library",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/gen-final-desktop-library.png",
+      "durationMs": 1687
+    },
+    {
+      "viewport": "desktop",
+      "route": "/history",
+      "url": "http://localhost:3010/history",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/gen-final-desktop-history.png",
+      "durationMs": 1380
+    },
+    {
+      "viewport": "desktop",
+      "route": "/settings",
+      "url": "http://localhost:3010/settings",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/gen-final-desktop-settings.png",
+      "durationMs": 1344
+    }
+  ],
+  "summary": {
+    "total": 12,
+    "errors": 0,
+    "failedRequests": 0
+  },
+  "finishedAt": "2026-08-23T15:03:42.619Z"
+}

@@ -3,7 +3,10 @@ import { persist } from 'zustand/middleware'
 import type {
   BodyweightEntry,
   DayOfWeek,
+  DurationKey,
   Exercise,
+  GeneratedPlan,
+  OnboardingInput,
   PlannedExercise,
   ProgressionRule,
   WeeklyPlan,
@@ -11,6 +14,7 @@ import type {
 } from '../lib/types'
 import { generatedExercises } from '../data/exercises-generated'
 import { populateByIdCache } from '../lib/exercises'
+import { generatePlan } from '../lib/plan-generator'
 
 export const DAYS: DayOfWeek[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
 export const DAY_LABELS: Record<DayOfWeek, string> = {
@@ -33,6 +37,7 @@ interface GymState {
   bodyweight: BodyweightEntry[]
   activeWorkout: Workout | null
   plans: WeeklyPlan[]
+  generatedPlans: GeneratedPlan[]
   addExercise: (e: Exercise) => void
   startWorkout: () => void
   startWorkoutFromPlan: (planId: string, day: DayOfWeek) => void
@@ -52,6 +57,9 @@ interface GymState {
     exerciseId: string,
     rule: ProgressionRule,
   ) => void
+  createGeneratedPlan: (input: OnboardingInput, requested: DurationKey) => string
+  deleteGeneratedPlan: (id: string) => void
+  saveGeneratedAsPlan: (generatedId: string) => string | null
 }
 
 const today = () => new Date().toISOString().slice(0, 10)
@@ -60,12 +68,13 @@ populateByIdCache(generatedExercises)
 
 export const useGym = create<GymState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       customExercises: [],
       workouts: [],
       bodyweight: [],
       activeWorkout: null,
       plans: [],
+      generatedPlans: [],
 
       addExercise: (e) =>
         set((s) => {
@@ -127,6 +136,7 @@ export const useGym = create<GymState>()(
             customExercises?: unknown
             exercises?: unknown
             plans?: unknown
+            generatedPlans?: unknown
           }
           if (!Array.isArray(d.workouts)) return false
           const customs = Array.isArray(d.customExercises)
@@ -143,6 +153,7 @@ export const useGym = create<GymState>()(
             ...(customs ? { customExercises: customs } : {}),
             ...(Array.isArray(d.bodyweight) ? { bodyweight: d.bodyweight as BodyweightEntry[] } : {}),
             ...(Array.isArray(d.plans) ? { plans: d.plans as WeeklyPlan[] } : {}),
+            ...(Array.isArray(d.generatedPlans) ? { generatedPlans: d.generatedPlans as GeneratedPlan[] } : {}),
           })
           return true
         } catch {
@@ -214,6 +225,27 @@ export const useGym = create<GymState>()(
             }
           }),
         })),
+
+      createGeneratedPlan: (input, requested) => {
+        const plan = generatePlan(input, requested)
+        set((s) => ({ generatedPlans: [plan, ...s.generatedPlans] }))
+        return plan.id
+      },
+
+      deleteGeneratedPlan: (id) => set((s) => ({ generatedPlans: s.generatedPlans.filter((p) => p.id !== id) })),
+
+      saveGeneratedAsPlan: (generatedId) => {
+        const state = get()
+        const gen = state.generatedPlans.find((g) => g.id === generatedId)
+        if (!gen) return null
+        const newPlan: WeeklyPlan = {
+          ...gen.weeklyTemplate,
+          id: `plan-${Date.now()}`,
+          name: gen.weeklyTemplate.name,
+        }
+        set((s) => ({ plans: [newPlan, ...s.plans] }))
+        return newPlan.id
+      },
     }),
     {
       name: 'gynproxd-v2',
@@ -223,6 +255,7 @@ export const useGym = create<GymState>()(
         bodyweight: s.bodyweight,
         activeWorkout: s.activeWorkout,
         plans: s.plans,
+        generatedPlans: s.generatedPlans,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
@@ -241,6 +274,7 @@ export const useGym = create<GymState>()(
           bodyweight: p?.bodyweight ?? current.bodyweight,
           activeWorkout: p?.activeWorkout ?? current.activeWorkout,
           plans: (p?.plans as WeeklyPlan[] | undefined) ?? current.plans,
+          generatedPlans: (p?.generatedPlans as GeneratedPlan[] | undefined) ?? current.generatedPlans,
         }
         populateByIdCache([...generatedExercises, ...merged.customExercises])
         return merged

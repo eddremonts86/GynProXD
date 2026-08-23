@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { useGym, DAY_LABELS } from '../store/useGym'
 import { exerciseById, exerciseLookup } from '../lib/exercises'
 import { isPersonalRecord, suggestNext } from '../lib/progression'
@@ -16,6 +17,7 @@ function weekdayToDay(d: number): DayOfWeek {
 }
 
 export function TodayPage() {
+  const navigate = useNavigate()
   const activeWorkout = useGym((s) => s.activeWorkout)
   const customExercises = useGym((s) => s.customExercises)
   const plans = useGym((s) => s.plans)
@@ -138,6 +140,14 @@ export function TodayPage() {
         />
 
         <Illustration variant="hero" className="h-36 w-full md:h-40" />
+
+        <Card className="border-accent/20 bg-accent-soft">
+          <h3 className="font-display text-base text-ink">¿Nuevo aquí?</h3>
+          <p className="mt-1 text-sm text-muted">Di 4–6 cosas y te genero un plan mensual/trimestral/semestral/anual realista.</p>
+          <Button size="md" className="mt-3 w-full" onClick={() => navigate({ to: '/onboarding' })}>
+            Generar mi plan en 30s
+          </Button>
+        </Card>
 
         {todayPlans.length > 0 && (
           <Card className="border-accent/20 bg-card">
