@@ -14,6 +14,7 @@ const REPORT_MD = join(ROOT, `docs/impeccable/walk-report-${PREFIX}.md`)
 
 const ROUTES = [
   { path: '/', name: 'today' },
+  { path: '/planner', name: 'planner' },
   { path: '/library', name: 'library' },
   { path: '/history', name: 'history' },
   { path: '/settings', name: 'settings' },
