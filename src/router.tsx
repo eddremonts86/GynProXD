@@ -4,6 +4,7 @@ import { LibraryPage } from './routes/Library'
 import { HistoryPage } from './routes/History'
 import { SettingsPage } from './routes/Settings'
 import { PlannerPage } from './routes/Planner'
+import { OnboardingPage } from './routes/Onboarding'
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -57,9 +58,10 @@ const plannerRoute = createRoute({ getParentRoute: () => rootRoute, path: '/plan
 const libraryRoute = createRoute({ getParentRoute: () => rootRoute, path: '/library', component: LibraryPage })
 const historyRoute = createRoute({ getParentRoute: () => rootRoute, path: '/history', component: HistoryPage })
 const settingsRoute = createRoute({ getParentRoute: () => rootRoute, path: '/settings', component: SettingsPage })
+const onboardingRoute = createRoute({ getParentRoute: () => rootRoute, path: '/onboarding', component: OnboardingPage })
 
 export const router = createRouter({
-  routeTree: rootRoute.addChildren([todayRoute, plannerRoute, libraryRoute, historyRoute, settingsRoute]),
+  routeTree: rootRoute.addChildren([todayRoute, plannerRoute, libraryRoute, historyRoute, settingsRoute, onboardingRoute]),
 })
 
 declare module '@tanstack/react-router' {
