@@ -1,12 +1,15 @@
+import * as React from 'react'
 import { createRootRoute, createRoute, createRouter, Link, Outlet, useRouterState } from '@tanstack/react-router'
 import { Home, CalendarRange, Library, History, Settings, WandSparkles, Dumbbell, ChartColumn } from 'lucide-react'
-import { TodayPage } from './routes/Today'
-import { LibraryPage } from './routes/Library'
-import { HistoryPage } from './routes/History'
-import { SettingsPage } from './routes/Settings'
-import { PlannerPage } from './routes/Planner'
-import { OnboardingPage } from './routes/Onboarding'
-import { GeneratedPlanPage } from './routes/GeneratedPlan'
+import { Skeleton } from '@/components/ui/skeleton'
+
+const TodayPage = React.lazy(() => import('./routes/Today').then((m) => ({ default: m.TodayPage })))
+const LibraryPage = React.lazy(() => import('./routes/Library').then((m) => ({ default: m.LibraryPage })))
+const HistoryPage = React.lazy(() => import('./routes/History').then((m) => ({ default: m.HistoryPage })))
+const SettingsPage = React.lazy(() => import('./routes/Settings').then((m) => ({ default: m.SettingsPage })))
+const PlannerPage = React.lazy(() => import('./routes/Planner').then((m) => ({ default: m.PlannerPage })))
+const OnboardingPage = React.lazy(() => import('./routes/Onboarding').then((m) => ({ default: m.OnboardingPage })))
+const GeneratedPlanPage = React.lazy(() => import('./routes/GeneratedPlan').then((m) => ({ default: m.GeneratedPlanPage })))
 import {
   Sidebar,
   SidebarContent,
@@ -125,13 +128,69 @@ const rootRoute = createRootRoute({
   ),
 })
 
-const todayRoute = createRoute({ getParentRoute: () => rootRoute, path: '/', component: TodayPage })
-const plannerRoute = createRoute({ getParentRoute: () => rootRoute, path: '/planner', component: PlannerPage })
-const libraryRoute = createRoute({ getParentRoute: () => rootRoute, path: '/library', component: LibraryPage })
-const historyRoute = createRoute({ getParentRoute: () => rootRoute, path: '/history', component: HistoryPage })
-const settingsRoute = createRoute({ getParentRoute: () => rootRoute, path: '/settings', component: SettingsPage })
-const onboardingRoute = createRoute({ getParentRoute: () => rootRoute, path: '/onboarding', component: OnboardingPage })
-const generatedRoute = createRoute({ getParentRoute: () => rootRoute, path: '/generated/$id', component: GeneratedPlanPage })
+const todayRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/',
+  component: () => (
+    <React.Suspense fallback={<Skeleton className="h-64 w-full" />}>
+      <TodayPage />
+    </React.Suspense>
+  ),
+})
+const plannerRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/planner',
+  component: () => (
+    <React.Suspense fallback={<Skeleton className="h-64 w-full" />}>
+      <PlannerPage />
+    </React.Suspense>
+  ),
+})
+const libraryRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/library',
+  component: () => (
+    <React.Suspense fallback={<Skeleton className="h-64 w-full" />}>
+      <LibraryPage />
+    </React.Suspense>
+  ),
+})
+const historyRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/history',
+  component: () => (
+    <React.Suspense fallback={<Skeleton className="h-64 w-full" />}>
+      <HistoryPage />
+    </React.Suspense>
+  ),
+})
+const settingsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/settings',
+  component: () => (
+    <React.Suspense fallback={<Skeleton className="h-64 w-full" />}>
+      <SettingsPage />
+    </React.Suspense>
+  ),
+})
+const onboardingRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/onboarding',
+  component: () => (
+    <React.Suspense fallback={<Skeleton className="h-64 w-full" />}>
+      <OnboardingPage />
+    </React.Suspense>
+  ),
+})
+const generatedRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/generated/$id',
+  component: () => (
+    <React.Suspense fallback={<Skeleton className="h-64 w-full" />}>
+      <GeneratedPlanPage />
+    </React.Suspense>
+  ),
+})
 
 export const router = createRouter({
   routeTree: rootRoute.addChildren([

@@ -115,8 +115,13 @@ export function LibraryPage() {
               {e.image ? (
                 <img
                   src={e.image}
+                  srcSet={`${e.image} 1x, ${e.image} 2x`}
+                  sizes="56px"
                   alt={`${e.name} — ${e.muscle} ${e.equipment}`}
                   loading="lazy"
+                  decoding="async"
+                  width={56}
+                  height={56}
                   className="h-14 w-14 shrink-0 rounded-[var(--radius-md)] bg-surface-2 object-cover border border-line/40"
                   onError={(ev) => {
                     ;(ev.target as HTMLImageElement).style.display = 'none'
