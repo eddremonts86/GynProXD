@@ -71,3 +71,43 @@ export interface WeeklyPlan {
   days: PlannedDay[]
   createdAt: string
 }
+
+export type Goal = 'adelgazar' | 'musculo' | 'recomp' | 'fuerza' | 'general' | 'hibrido'
+export type Level = 'principiante' | 'intermedio' | 'avanzado'
+export type DurationKey = 'mensual' | 'trimestral' | 'semestral' | 'anual'
+
+export interface OnboardingInput {
+  age: number
+  sex: 'hombre' | 'mujer' | 'otro'
+  weightKg: number
+  targetWeightKg?: number
+  heightCm?: number
+  goal: Goal
+  level: Level
+  daysPerWeek: number
+  minsPerSession: number
+  equipment: Equipment | 'hibrido'
+  effort: 1 | 2 | 3 | 4 | 5
+  constraints?: string
+}
+
+export interface GeneratedDay {
+  date: string
+  day: DayOfWeek
+  exercises: PlannedExercise[]
+}
+
+export interface GeneratedPlan {
+  id: string
+  createdAt: string
+  input: OnboardingInput
+  estimatedWeeks: number
+  estimatedMonths: number
+  rateKgPerWeek: number
+  requestedDuration: DurationKey
+  approvedDuration: DurationKey
+  weeks: { weekIndex: number; days: GeneratedDay[] }[]
+  weeklyTemplate: WeeklyPlan
+  milestones: { week: number; weight?: number; note: string }[]
+  warnings: string[]
+}
