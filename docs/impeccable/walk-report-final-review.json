@@ -1,0 +1,168 @@
+{
+  "base": "http://localhost:3010",
+  "startedAt": "2026-08-23T16:33:24.932Z",
+  "viewports": [
+    "mobile-375",
+    "desktop"
+  ],
+  "routes": [
+    "/",
+    "/onboarding",
+    "/planner",
+    "/library",
+    "/history",
+    "/settings"
+  ],
+  "pages": [
+    {
+      "viewport": "mobile-375",
+      "route": "/",
+      "url": "http://localhost:3010/",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/final-review-mobile-375-today.png",
+      "durationMs": 1616
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/onboarding",
+      "url": "http://localhost:3010/onboarding",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/final-review-mobile-375-onboarding.png",
+      "durationMs": 1688
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/planner",
+      "url": "http://localhost:3010/planner",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/final-review-mobile-375-planner.png",
+      "durationMs": 1600
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/library",
+      "url": "http://localhost:3010/library",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/final-review-mobile-375-library.png",
+      "durationMs": 2103
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/history",
+      "url": "http://localhost:3010/history",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/final-review-mobile-375-history.png",
+      "durationMs": 1614
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/settings",
+      "url": "http://localhost:3010/settings",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/final-review-mobile-375-settings.png",
+      "durationMs": 1590
+    },
+    {
+      "viewport": "desktop",
+      "route": "/",
+      "url": "http://localhost:3010/",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/final-review-desktop-today.png",
+      "durationMs": 1325
+    },
+    {
+      "viewport": "desktop",
+      "route": "/onboarding",
+      "url": "http://localhost:3010/onboarding",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/final-review-desktop-onboarding.png",
+      "durationMs": 1387
+    },
+    {
+      "viewport": "desktop",
+      "route": "/planner",
+      "url": "http://localhost:3010/planner",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/final-review-desktop-planner.png",
+      "durationMs": 1333
+    },
+    {
+      "viewport": "desktop",
+      "route": "/library",
+      "url": "http://localhost:3010/library",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/final-review-desktop-library.png",
+      "durationMs": 1873
+    },
+    {
+      "viewport": "desktop",
+      "route": "/history",
+      "url": "http://localhost:3010/history",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/final-review-desktop-history.png",
+      "durationMs": 1499
+    },
+    {
+      "viewport": "desktop",
+      "route": "/settings",
+      "url": "http://localhost:3010/settings",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/final-review-desktop-settings.png",
+      "durationMs": 1486
+    }
+  ],
+  "summary": {
+    "total": 12,
+    "errors": 0,
+    "failedRequests": 0
+  },
+  "finishedAt": "2026-08-23T16:33:44.433Z"
+}
