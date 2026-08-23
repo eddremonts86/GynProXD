@@ -19,6 +19,7 @@ export function Card({ children, className = '', hover = false, padding = 'md' }
     <div
       className={[
         'rounded-[var(--radius-lg)] border border-line bg-card shadow-[var(--shadow-card)]',
+        'backdrop-blur-[1px]',
         paddingMap[padding],
         hover ? 'transition-colors hover:border-line-strong hover:bg-card-hover' : '',
         className,

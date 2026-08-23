@@ -9,7 +9,8 @@ export function Input({ label, className = '', id, ...props }: InputProps) {
     <input
       id={id}
       className={[
-        'w-full rounded-[var(--radius-md)] border border-line bg-surface px-4 py-3 text-sm text-zinc-100 outline-none placeholder:text-zinc-600',
+        'w-full rounded-[var(--radius-md)] border border-line bg-surface px-4 py-3 text-sm outline-none',
+        'text-ink-soft placeholder:text-muted/70',
         'transition-colors focus:border-accent focus:bg-surface-2',
         'disabled:opacity-40 disabled:cursor-not-allowed',
         className,
@@ -20,7 +21,7 @@ export function Input({ label, className = '', id, ...props }: InputProps) {
   if (!label) return input
   return (
     <label htmlFor={id} className="flex flex-col gap-1.5">
-      <span className="text-xs font-medium tracking-wide text-muted uppercase">{label}</span>
+      <span className="text-xs font-medium tracking-widest text-muted uppercase">{label}</span>
       {input}
     </label>
   )

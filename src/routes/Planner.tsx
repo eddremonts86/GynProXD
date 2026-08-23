@@ -7,6 +7,7 @@ import { Card } from '../ui/Card'
 import { EmptyState } from '../ui/EmptyState'
 import { Input } from '../ui/Input'
 import { PageHeader } from '../ui/PageHeader'
+import { Illustration } from '../ui/Illustration'
 import type { DayOfWeek, ProgressionRule } from '../lib/types'
 
 const DAY_ORDER = DAYS
@@ -50,18 +51,20 @@ export function PlannerPage() {
     return (
       <div className="flex flex-col gap-6">
         <PageHeader
-          title="Planner"
-          description="Build a weekly routine. Each day holds a list of exercises with optional progression rules."
+          eyebrow="Forma · Planner"
+          title="Weekly rhythm"
+          description="Hybrid calisthenics + barbell, planned around your week. Each day is a quiet promise."
         />
+        <Illustration variant="hero" className="h-36 w-full" />
         <EmptyState
           title="No plans yet"
-          description="Create your first weekly plan. You can add exercises for each day and start guided workouts from them."
+          description="Create your first weekly plan. Add exercises per day, pick progression, and start guided sessions from Today."
           action={
             <div className="flex w-full max-w-sm gap-2">
               <Input
                 value={newPlanName}
                 onChange={(e) => setNewPlanName(e.target.value)}
-                placeholder="Plan name — e.g. Push/Pull/Legs"
+                placeholder="Plan name — e.g. Push / Pull / Legs"
                 className="flex-1"
               />
               <Button onClick={handleCreate}>Create</Button>
@@ -75,20 +78,21 @@ export function PlannerPage() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
-        title="Planner"
-        description={`Plan: ${selectedPlan.name} · ${plans.length} plan${plans.length === 1 ? '' : 's'} total`}
+        eyebrow="Forma · Planner"
+        title={selectedPlan.name}
+        description="Warm data, offline. Tap a day to add movements — 3D plate is your rest between sets."
         action={
-          <div className="flex gap-2">
-            <Button variant="secondary" size="sm" onClick={() => deletePlan(selectedPlan.id)} disabled={plans.length === 0}>
-              Delete plan
-            </Button>
-          </div>
+          <Button variant="secondary" size="sm" onClick={() => deletePlan(selectedPlan.id)} disabled={plans.length === 0}>
+            Delete plan
+          </Button>
         }
       />
 
+      <Illustration variant="orb" className="h-20 w-full" />
+
       <Card className="flex flex-col gap-3">
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium tracking-wide text-muted uppercase">Plans</label>
+          <label className="text-xs font-medium tracking-widest text-muted uppercase">Plans</label>
           <div className="flex gap-1.5 overflow-x-auto pb-1">
             {plans.map((p) => (
               <button
@@ -97,8 +101,8 @@ export function PlannerPage() {
                 className={[
                   'shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
                   selectedPlanId === p.id || (!selectedPlanId && p.id === plans[0].id)
-                    ? 'border-accent bg-accent text-surface'
-                    : 'border-line bg-card text-zinc-400 hover:border-line-strong hover:text-zinc-200',
+                    ? 'border-accent bg-accent text-accent-contrast'
+                    : 'border-line bg-card text-muted hover:border-line-strong hover:text-ink-soft',
                 ].join(' ')}
               >
                 {p.name}
@@ -144,8 +148,8 @@ export function PlannerPage() {
           return (
             <Card key={day} className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-zinc-100">
-                  {DAY_LABELS[day]} <span className="font-normal text-muted">· {dayExercises.length}</span>
+                <h3 className="font-display text-base text-ink">
+                  {DAY_LABELS[day]} <span className="font-sans text-xs font-normal tracking-wide text-muted uppercase">· {dayExercises.length}</span>
                 </h3>
                 <Button
                   variant="ghost"
@@ -164,10 +168,10 @@ export function PlannerPage() {
                     return (
                       <li
                         key={pe.exerciseId}
-                        className="flex items-center justify-between gap-2 rounded-[var(--radius-md)] bg-surface-2 px-3 py-2"
+                        className="flex items-center justify-between gap-2 rounded-[var(--radius-md)] bg-surface-2 px-3 py-2 border border-line/40"
                       >
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium text-zinc-100">{ex?.name ?? pe.exerciseId}</p>
+                          <p className="truncate text-sm font-medium text-ink-soft">{ex?.name ?? pe.exerciseId}</p>
                           {ex && (
                             <span className="text-xs text-muted">
                               {ex.muscle} · {ex.equipment}
@@ -184,7 +188,7 @@ export function PlannerPage() {
                               e.target.value as ProgressionRule,
                             )
                           }
-                          className="rounded-full border border-line bg-surface px-2 py-1 text-xs outline-none focus:border-accent"
+                          className="rounded-full border border-line bg-surface px-2 py-1 text-xs text-ink-soft outline-none focus:border-accent"
                         >
                           <option value="none">none</option>
                           <option value="linear">linear</option>
@@ -192,7 +196,7 @@ export function PlannerPage() {
                         </select>
                         <button
                           onClick={() => removeExerciseFromDay(selectedPlan.id, day, pe.exerciseId)}
-                          className="rounded-full p-1 text-zinc-500 hover:bg-surface hover:text-zinc-300"
+                          className="rounded-full p-1 text-muted hover:bg-surface hover:text-ink-soft"
                           aria-label="Remove"
                         >
                           ×
@@ -202,8 +206,8 @@ export function PlannerPage() {
                   })}
                 </ul>
               ) : (
-                <p className="rounded-[var(--radius-md)] border border-dashed border-line/60 bg-transparent px-3 py-3 text-center text-xs text-muted">
-                  No exercises
+                <p className="rounded-[var(--radius-md)] border border-dashed border-line/60 bg-transparent px-3 py-4 text-center text-xs text-muted">
+                  No exercises — warm, human, offline
                 </p>
               )}
 
@@ -221,8 +225,8 @@ export function PlannerPage() {
                         className="flex items-center justify-between gap-2 rounded-[var(--radius-md)] border border-transparent bg-surface px-3 py-2 hover:border-line"
                       >
                         <div className="min-w-0">
-                          <p className="truncate text-xs font-medium text-zinc-200">{e.name}</p>
-                          <div className="flex gap-1">
+                          <p className="truncate text-xs font-medium text-ink-soft">{e.name}</p>
+                          <div className="flex gap-1 mt-1">
                             <Badge>{e.muscle}</Badge>
                             <Badge variant="muted">{e.equipment}</Badge>
                           </div>

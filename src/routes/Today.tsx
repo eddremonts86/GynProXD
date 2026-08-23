@@ -7,6 +7,7 @@ import { Card } from '../ui/Card'
 import { Input } from '../ui/Input'
 import { PageHeader } from '../ui/PageHeader'
 import { Badge } from '../ui/Badge'
+import { Illustration } from '../ui/Illustration'
 import type { DayOfWeek, ProgressionRule } from '../lib/types'
 
 function weekdayToDay(d: number): DayOfWeek {
@@ -37,7 +38,7 @@ export function TodayPage() {
   const [filter, setFilter] = useState('')
   const [restLeft, setRestLeft] = useState<number | null>(null)
   const [wakeActive, setWakeActive] = useState(false)
-  const wakeRef = useRef<WakeLockSentinel | null>(null)
+  const wakeRef = useRef<{ release: () => Promise<void>; addEventListener: (t: string, cb: () => void) => void } | null>(null)
 
   const todayDay: DayOfWeek = weekdayToDay(new Date().getDay())
   const todayPlans = useMemo(() => {
@@ -83,14 +84,14 @@ export function TodayPage() {
     let cancelled = false
     const req = async () => {
       try {
-        const nav = navigator as unknown as { wakeLock?: { request: (t: string) => Promise<WakeLockSentinel> } }
+        const nav = navigator as unknown as { wakeLock?: { request: (t: string) => Promise<never> } }
         if (nav.wakeLock) {
-          const sentinel = await nav.wakeLock.request('screen')
-          if (!cancelled) {
+          const sentinel = (await (nav.wakeLock.request as unknown as (t: string) => Promise<typeof wakeRef.current>)('screen')) as typeof wakeRef.current
+          if (!cancelled && sentinel) {
             wakeRef.current = sentinel
             setWakeActive(true)
             sentinel.addEventListener('release', () => setWakeActive(false))
-          } else {
+          } else if (sentinel) {
             await sentinel.release().catch(() => {})
           }
         }
@@ -118,14 +119,9 @@ export function TodayPage() {
     const w = Number(weight)
     const r = Number(reps)
     const exerciseId = selectedId
-    const currentSets = activeWorkout?.exercises.find((e) => e.exerciseId === exerciseId)?.sets ?? []
-    const pr = isPersonalRecord(exerciseId, { weight: w, reps: r }, workouts, currentSets)
     addSet(exerciseId, w, r)
     setReps('')
     setRestLeft(90)
-    if (pr) {
-      setTimeout(() => {}, 0)
-    }
   }
 
   const selectedExercise = selectedId ? exerciseById(selectedId) : undefined
@@ -136,88 +132,87 @@ export function TodayPage() {
     return (
       <div className="flex flex-col gap-6">
         <PageHeader
-          title="Today"
-          description="Start a workout or log your bodyweight. Everything stays on this device."
+          eyebrow="Forma · Today"
+          title="Train, locally."
+          description="Hybrid calisthenics + gym, no cloud. Your plan, your data, your form."
         />
 
+        <Illustration variant="hero" className="h-36 w-full md:h-40" />
+
         {todayPlans.length > 0 && (
-          <Card className="border-accent/20 bg-accent-soft">
+          <Card className="border-accent/20 bg-card">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="text-sm font-semibold text-zinc-100">
-                  Today · {DAY_LABELS[todayDay]} {todayPlans[0].planName && `· ${todayPlans[0].planName}`}
-                </h2>
-                <p className="mt-1 text-xs leading-4 text-muted">
-                  {todayPlans[0].exercises.length} planned exercise{todayPlans[0].exercises.length === 1 ? '' : 's'}
+                <p className="font-display text-lg leading-none text-ink">{DAY_LABELS[todayDay]} · {todayPlans[0].planName}</p>
+                <p className="mt-1 text-xs tracking-wide text-muted uppercase">
+                  {todayPlans[0].exercises.length} exercises · progression aware
                 </p>
               </div>
               <Badge variant="accent">{DAY_LABELS[todayDay]}</Badge>
             </div>
-            <ul className="mt-3 flex flex-col gap-1.5">
+            <ul className="mt-4 flex flex-col gap-1.5">
               {todayPlans[0].exercises.slice(0, 6).map((pe) => {
                 const ex = exerciseById(pe.exerciseId)
                 return (
-                  <li key={pe.exerciseId} className="flex items-center justify-between rounded-[var(--radius-md)] bg-surface px-3 py-2">
-                    <span className="truncate text-sm font-medium text-zinc-200">{ex?.name ?? pe.exerciseId}</span>
+                  <li key={pe.exerciseId} className="flex items-center justify-between rounded-[var(--radius-md)] bg-surface-2 px-3 py-2 border border-line/40">
+                    <span className="truncate text-sm font-medium text-ink-soft">{ex?.name ?? pe.exerciseId}</span>
                     {pe.progression !== 'none' && <Badge variant="muted">{pe.progression}</Badge>}
                   </li>
                 )
               })}
             </ul>
-            <Button
-              size="md"
-              onClick={() => startWorkoutFromPlan(todayPlans[0].planId, todayPlans[0].day)}
-              className="mt-4 w-full"
-            >
+            <Button size="md" onClick={() => startWorkoutFromPlan(todayPlans[0].planId, todayPlans[0].day)} className="mt-4 w-full">
               Start planned workout
             </Button>
           </Card>
         )}
 
-        <Card>
-          <h2 className="text-sm font-semibold text-zinc-100">Bodyweight</h2>
-          <p className="mt-1 text-xs leading-4 text-muted">Quick log — used for progress tracking.</p>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              const v = Number(kg)
-              if (v > 0) logBodyweight(v)
-              setKg('')
-            }}
-            className="mt-4 flex gap-2"
-          >
-            <Input
-              value={kg}
-              onChange={(e) => setKg(e.target.value)}
-              inputMode="decimal"
-              placeholder="kg — e.g. 78.5"
-              aria-label="Bodyweight in kg"
-              className="flex-1"
-            />
-            <Button type="submit" disabled={!kg || Number(kg) <= 0}>
-              Log
-            </Button>
-          </form>
-        </Card>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card>
+            <h2 className="font-display text-lg text-ink">Bodyweight</h2>
+            <p className="mt-1 text-sm leading-5 text-muted">Quick log — feeds progress & e1RM.</p>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                const v = Number(kg)
+                if (v > 0) logBodyweight(v)
+                setKg('')
+              }}
+              className="mt-4 flex gap-2"
+            >
+              <Input
+                value={kg}
+                onChange={(e) => setKg(e.target.value)}
+                inputMode="decimal"
+                placeholder="78.5"
+                aria-label="Bodyweight in kg"
+                className="flex-1"
+              />
+              <Button type="submit" disabled={!kg || Number(kg) <= 0}>
+                Log
+              </Button>
+            </form>
+          </Card>
 
-        <Card className="flex flex-col gap-3 bg-gradient-to-br from-card to-surface-2">
-          <div>
-            <h2 className="text-base font-semibold text-zinc-100">Ready to train?</h2>
-            <p className="mt-1 text-sm leading-5 text-muted">Start a fresh session — add exercises and log sets as you go.</p>
-          </div>
-          <Button size="lg" onClick={startWorkout} className="w-full">
-            Start empty workout
-          </Button>
-          <p className="text-center text-xs text-zinc-500">{exercises.length} exercises in library</p>
-        </Card>
+          <Card className="flex flex-col justify-between bg-gradient-to-br from-card to-surface-2">
+            <div>
+              <h2 className="font-display text-lg text-ink">Ready to train?</h2>
+              <p className="mt-1 text-sm leading-5 text-muted">No plan? Start empty and add as you go. Warm data, offline.</p>
+            </div>
+            <Button size="lg" onClick={startWorkout} className="mt-6 w-full">
+              Start empty workout
+            </Button>
+            <p className="mt-3 text-center text-xs tracking-wide text-muted uppercase">{exercises.length} exercises · CDN images</p>
+          </Card>
+        </div>
 
         {todayPlans.length > 1 && (
           <Card>
-            <h3 className="text-sm font-semibold text-zinc-100">Other plans for today</h3>
+            <h3 className="font-display text-base text-ink">Other plans for today</h3>
             <div className="mt-3 flex flex-col gap-2">
               {todayPlans.slice(1).map((tp) => (
-                <div key={tp.planId} className="flex items-center justify-between rounded-[var(--radius-md)] bg-surface-2 px-3 py-2">
-                  <span className="text-sm text-zinc-200">{tp.planName}</span>
+                <div key={tp.planId} className="flex items-center justify-between rounded-[var(--radius-md)] bg-surface-2 px-3 py-2 border border-line/40">
+                  <span className="text-sm text-ink-soft">{tp.planName}</span>
                   <Button size="sm" variant="secondary" onClick={() => startWorkoutFromPlan(tp.planId, tp.day)}>
                     Start
                   </Button>
@@ -235,8 +230,9 @@ export function TodayPage() {
   return (
     <div className="flex flex-col gap-5">
       <PageHeader
-        title="Workout in progress"
-        description={`${logged.length} exercise${logged.length === 1 ? '' : 's'} · ${activeWorkout.date}${wakeActive ? ' · screen awake' : ''}`}
+        eyebrow={`In progress${wakeActive ? ' · screen awake' : ''}`}
+        title="Workout"
+        description={`${logged.length} exercise${logged.length === 1 ? '' : 's'} · ${activeWorkout.date}`}
         action={
           <Button variant="ghost" size="sm" onClick={discardWorkout}>
             Discard
@@ -247,8 +243,8 @@ export function TodayPage() {
       {restLeft !== null && (
         <Card className="flex items-center justify-between gap-3 border-accent/30 bg-accent-soft">
           <div>
-            <p className="text-xs font-semibold tracking-wide text-accent uppercase">Rest</p>
-            <p className="text-2xl font-bold tabular-nums text-zinc-100">
+            <p className="text-xs font-semibold tracking-widest text-accent uppercase">Rest</p>
+            <p className="font-mono text-2xl font-bold tabular-nums text-ink">
               {Math.floor(restLeft / 60)}:{String(restLeft % 60).padStart(2, '0')}
             </p>
           </div>
@@ -273,7 +269,7 @@ export function TodayPage() {
               <Card key={le.exerciseId} padding="md">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-sm font-semibold text-zinc-100">{ex?.name ?? le.exerciseId}</p>
+                    <p className="font-display text-base text-ink">{ex?.name ?? le.exerciseId}</p>
                     {ex && (
                       <div className="mt-1.5 flex gap-1.5">
                         <Badge>{ex.muscle}</Badge>
@@ -282,7 +278,7 @@ export function TodayPage() {
                       </div>
                     )}
                   </div>
-                  <span className="text-xs font-medium text-muted">{le.sets.length} sets</span>
+                  <span className="text-xs font-medium tracking-wide text-muted uppercase">{le.sets.length} sets</span>
                 </div>
                 {suggestion && (
                   <div className="mt-3 rounded-[var(--radius-md)] border border-accent/20 bg-accent-soft px-3 py-2">
@@ -302,7 +298,7 @@ export function TodayPage() {
                     </Button>
                   </div>
                 )}
-                <p className="mt-3 flex flex-wrap gap-1.5">
+                <div className="mt-3 flex flex-wrap gap-1.5">
                   {le.sets.map((s, i) => {
                     const earlier = le.sets.slice(0, i)
                     const pr = isPersonalRecord(le.exerciseId, s, workouts, earlier)
@@ -310,8 +306,8 @@ export function TodayPage() {
                       <span
                         key={`${s.weight}-${s.reps}-${i}`}
                         className={[
-                          'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium',
-                          pr ? 'bg-accent text-surface' : 'bg-surface-2 text-zinc-300',
+                          'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium border',
+                          pr ? 'bg-accent text-accent-contrast border-accent' : 'bg-surface-2 text-ink-soft border-line',
                         ].join(' ')}
                       >
                         {s.weight}kg × {s.reps}
@@ -319,21 +315,22 @@ export function TodayPage() {
                       </span>
                     )
                   })}
-                </p>
+                </div>
               </Card>
             )
           })}
         </div>
       ) : (
-        <Card className="border-dashed bg-transparent py-8 text-center shadow-none">
-          <p className="text-sm font-medium text-zinc-300">No sets yet</p>
-          <p className="mt-1 text-xs text-muted">Pick an exercise below and add your first set.</p>
+        <Card className="border-dashed bg-transparent py-10 text-center shadow-none">
+          <Illustration variant="plate" className="mx-auto h-16 w-16" />
+          <p className="mt-3 font-display text-base text-ink">No sets yet</p>
+          <p className="mt-1 text-sm text-muted">Pick an exercise below and add your first set.</p>
         </Card>
       )}
 
       <Card className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
-          <label htmlFor="exercise-filter" className="text-xs font-medium tracking-wide text-muted uppercase">
+          <label htmlFor="exercise-filter" className="text-xs font-medium tracking-widest text-muted uppercase">
             Exercise
           </label>
           <Input
@@ -345,7 +342,7 @@ export function TodayPage() {
           <select
             value={selectedId}
             onChange={(e) => setSelectedId(e.target.value)}
-            className="w-full rounded-[var(--radius-md)] border border-line bg-surface px-3 py-3 text-sm text-zinc-100 outline-none transition-colors focus:border-accent focus:bg-surface-2"
+            className="w-full rounded-[var(--radius-md)] border border-line bg-surface px-3 py-3 text-sm text-ink-soft outline-none transition-colors focus:border-accent focus:bg-surface-2"
           >
             <option value="">Choose exercise…</option>
             {filteredExercises.map((e) => (
@@ -368,9 +365,6 @@ export function TodayPage() {
               </p>
               <p className="text-xs leading-4 text-muted">{selectedSuggestion.reason}</p>
             </div>
-          )}
-          {filter && filteredExercises.length === 0 && (
-            <p className="text-xs text-muted">No matches. Try another keyword.</p>
           )}
         </div>
 

@@ -1,33 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-surface: #0a0a0a;
-  --color-surface-2: #141416;
-  --color-card: #161618;
-  --color-card-hover: #1c1c1f;
-  --color-line: #26262a;
-  --color-line-strong: #2e2e32;
-  --color-accent: #22d3ee;
-  --color-accent-soft: #22d3ee14;
-  --color-accent-hover: #06b6d4;
-  --color-muted: #71717a;
-  --color-muted-strong: #a1a1aa;
+  --color-surface: #1a1816;
+  --color-surface-2: #1f1d1b;
+  --color-card: #26231f;
+  --color-card-hover: #2e2a26;
+  --color-line: #3a3632;
+  --color-line-strong: #4a4642;
+  --color-accent: #d98e3f;
+  --color-accent-soft: #d98e3f14;
+  --color-accent-hover: #c07a2e;
+  --color-accent-contrast: #1a1816;
+  --color-muted: #b8afa6;
+  --color-muted-strong: #e8e0d8;
+  --color-ink: #f5ede4;
+  --color-ink-soft: #e8e0d8;
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-2xl: 24px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 22px;
+  --radius-2xl: 28px;
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
   --text-lg: 1.125rem;
   --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 1.875rem;
+  --text-2xl: 1.6rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.4rem;
 
-  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 4px 12px rgb(0 0 0 / 0.25);
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.35), 0 8px 24px rgb(0 0 0 / 0.35);
+  --shadow-soft: 0 4px 24px rgb(0 0 0 / 0.25);
+
+  --font-display: "Instrument Serif", ui-serif, Georgia, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
 html {
@@ -36,9 +46,20 @@ html {
 }
 
 body {
-  @apply bg-surface text-zinc-100 antialiased;
-  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+  @apply bg-surface antialiased;
+  font-family: var(--font-sans);
+  color: var(--color-ink-soft);
   text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  background: radial-gradient(1200px 600px at 20% -10%, #2a2520 0%, transparent 60%),
+    radial-gradient(800px 400px at 90% 0%, #2e2216 0%, transparent 50%), var(--color-surface);
+  background-attachment: fixed;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
 }
 
 * {
