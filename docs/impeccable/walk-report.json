@@ -1,0 +1,118 @@
+{
+  "base": "http://localhost:3010",
+  "startedAt": "2026-08-23T12:47:06.827Z",
+  "viewports": [
+    "mobile-375",
+    "desktop"
+  ],
+  "routes": [
+    "/",
+    "/library",
+    "/history",
+    "/settings"
+  ],
+  "pages": [
+    {
+      "viewport": "mobile-375",
+      "route": "/",
+      "url": "http://localhost:3010/",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/before-mobile-375-today.png",
+      "durationMs": 1094
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/library",
+      "url": "http://localhost:3010/library",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/before-mobile-375-library.png",
+      "durationMs": 2449
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/history",
+      "url": "http://localhost:3010/history",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/before-mobile-375-history.png",
+      "durationMs": 1091
+    },
+    {
+      "viewport": "mobile-375",
+      "route": "/settings",
+      "url": "http://localhost:3010/settings",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/before-mobile-375-settings.png",
+      "durationMs": 1087
+    },
+    {
+      "viewport": "desktop",
+      "route": "/",
+      "url": "http://localhost:3010/",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/before-desktop-today.png",
+      "durationMs": 1076
+    },
+    {
+      "viewport": "desktop",
+      "route": "/library",
+      "url": "http://localhost:3010/library",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/before-desktop-library.png",
+      "durationMs": 2007
+    },
+    {
+      "viewport": "desktop",
+      "route": "/history",
+      "url": "http://localhost:3010/history",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/before-desktop-history.png",
+      "durationMs": 1077
+    },
+    {
+      "viewport": "desktop",
+      "route": "/settings",
+      "url": "http://localhost:3010/settings",
+      "status": "ok",
+      "error": null,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "failedResponses": [],
+      "screenshot": "shots/before-desktop-settings.png",
+      "durationMs": 1079
+    }
+  ],
+  "summary": {
+    "total": 8,
+    "errors": 0,
+    "failedRequests": 0
+  },
+  "finishedAt": "2026-08-23T12:47:18.080Z"
+}
