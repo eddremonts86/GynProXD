@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { createRootRoute, createRoute, createRouter, Link, Outlet, useRouterState } from '@tanstack/react-router'
 import { Home, CalendarRange, Library, History, Settings, WandSparkles, Dumbbell, ChartColumn } from 'lucide-react'
-import { Skeleton } from '@/components/ui/skeleton'
+import { RouteFallback } from '@/components/route-skeleton'
 
 const TodayPage = React.lazy(() => import('./routes/Today').then((m) => ({ default: m.TodayPage })))
 const LibraryPage = React.lazy(() => import('./routes/Library').then((m) => ({ default: m.LibraryPage })))
@@ -132,7 +132,7 @@ const todayRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
   component: () => (
-    <React.Suspense fallback={<Skeleton className="h-64 w-full" />}>
+    <React.Suspense fallback={<RouteFallback />}>
       <TodayPage />
     </React.Suspense>
   ),
@@ -141,7 +141,7 @@ const plannerRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/planner',
   component: () => (
-    <React.Suspense fallback={<Skeleton className="h-64 w-full" />}>
+    <React.Suspense fallback={<RouteFallback />}>
       <PlannerPage />
     </React.Suspense>
   ),
@@ -150,7 +150,7 @@ const libraryRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/library',
   component: () => (
-    <React.Suspense fallback={<Skeleton className="h-64 w-full" />}>
+    <React.Suspense fallback={<RouteFallback />}>
       <LibraryPage />
     </React.Suspense>
   ),
@@ -159,7 +159,7 @@ const historyRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/history',
   component: () => (
-    <React.Suspense fallback={<Skeleton className="h-64 w-full" />}>
+    <React.Suspense fallback={<RouteFallback />}>
       <HistoryPage />
     </React.Suspense>
   ),
@@ -168,7 +168,7 @@ const settingsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/settings',
   component: () => (
-    <React.Suspense fallback={<Skeleton className="h-64 w-full" />}>
+    <React.Suspense fallback={<RouteFallback />}>
       <SettingsPage />
     </React.Suspense>
   ),
@@ -177,7 +177,7 @@ const onboardingRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/onboarding',
   component: () => (
-    <React.Suspense fallback={<Skeleton className="h-64 w-full" />}>
+    <React.Suspense fallback={<RouteFallback />}>
       <OnboardingPage />
     </React.Suspense>
   ),
@@ -186,7 +186,7 @@ const generatedRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/generated/$id',
   component: () => (
-    <React.Suspense fallback={<Skeleton className="h-64 w-full" />}>
+    <React.Suspense fallback={<RouteFallback />}>
       <GeneratedPlanPage />
     </React.Suspense>
   ),
