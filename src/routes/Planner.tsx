@@ -9,6 +9,7 @@ import { EmptyState } from '../ui/EmptyState'
 import { Input } from '../ui/Input'
 import { PageHeader } from '../ui/PageHeader'
 import { Illustration } from '../ui/Illustration'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import type { DayOfWeek, ProgressionRule } from '../lib/types'
 
 const DAY_ORDER = DAYS
@@ -190,22 +191,25 @@ export function PlannerPage() {
       <Card className="flex flex-col gap-3">
         <div className="flex flex-col gap-2">
           <label className="text-xs font-medium tracking-widest text-muted uppercase">Plans</label>
-          <div className="flex gap-1.5 overflow-x-auto pb-1">
-            {plans.map((p) => (
-              <button
-                key={p.id}
-                onClick={() => setSelectedPlanId(p.id)}
-                className={[
-                  'shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
-                  selectedPlanId === p.id || (!selectedPlanId && p.id === plans[0].id)
-                    ? 'border-accent bg-accent text-accent-contrast'
-                    : 'border-line bg-card text-muted hover:border-line-strong hover:text-ink-soft',
-                ].join(' ')}
-              >
-                {p.name}
-              </button>
-            ))}
-          </div>
+          <ScrollArea>
+            <div className="flex gap-1.5 pb-1">
+              {plans.map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => setSelectedPlanId(p.id)}
+                  className={[
+                    'shrink-0 rounded-full border px-4 py-2.5 text-xs font-medium transition-colors min-h-11',
+                    selectedPlanId === p.id || (!selectedPlanId && p.id === plans[0].id)
+                      ? 'border-accent bg-accent text-accent-contrast'
+                      : 'border-line bg-card text-muted hover:border-line-strong hover:text-ink-soft',
+                  ].join(' ')}
+                >
+                  {p.name}
+                </button>
+              ))}
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
         </div>
         <form
           onSubmit={(e) => {
@@ -227,7 +231,7 @@ export function PlannerPage() {
         </form>
       </Card>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {DAY_ORDER.map((day) => {
           const plannedDay = selectedPlan.days.find((d) => d.day === day)
           const dayExercises = plannedDay?.exercises ?? []

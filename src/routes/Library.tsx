@@ -9,6 +9,7 @@ import { EmptyState } from '../ui/EmptyState'
 import { Input } from '../ui/Input'
 import { PageHeader } from '../ui/PageHeader'
 import { Illustration } from '../ui/Illustration'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 
 const MUSCLE_FILTERS: (MuscleGroup | 'all')[] = [
   'all',
@@ -76,26 +77,29 @@ export function LibraryPage() {
           placeholder={`Search ${exercises.length} movements…`}
           aria-label="Search exercises"
         />
-        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none" role="group" aria-label="Filter by muscle">
-          {MUSCLE_FILTERS.map((m) => (
-            <button
-              key={m}
-              onClick={() => {
-                setMuscle(m)
-                setVisible(50)
-              }}
-              aria-pressed={muscle === m}
-              className={[
-                'shrink-0 rounded-full border px-4 py-2.5 text-xs font-medium capitalize transition-colors tracking-wide min-h-11',
-                muscle === m
-                  ? 'border-accent bg-accent text-accent-contrast'
-                  : 'border-line bg-card text-muted hover:border-line-strong hover:text-ink-soft',
-              ].join(' ')}
-            >
-              {m}
-            </button>
-          ))}
-        </div>
+        <ScrollArea>
+          <div className="flex gap-1.5 pb-1" role="group" aria-label="Filter by muscle">
+            {MUSCLE_FILTERS.map((m) => (
+              <button
+                key={m}
+                onClick={() => {
+                  setMuscle(m)
+                  setVisible(50)
+                }}
+                aria-pressed={muscle === m}
+                className={[
+                  'shrink-0 rounded-full border px-4 py-2.5 text-xs font-medium capitalize transition-colors tracking-wide min-h-11',
+                  muscle === m
+                    ? 'border-accent bg-accent text-accent-contrast'
+                    : 'border-line bg-card text-muted hover:border-line-strong hover:text-ink-soft',
+                ].join(' ')}
+              >
+                {m}
+              </button>
+            ))}
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
         <p className="text-xs tracking-wide text-muted uppercase">
           Showing {sliced.length} of {filtered.length}
           {query || muscle !== 'all' ? ` · filtered` : ''} · hybrid calisthenics
@@ -105,7 +109,7 @@ export function LibraryPage() {
       {sliced.length === 0 ? (
         <EmptyState title="No matches" description="Try a different keyword or muscle. Warm, human, offline." />
       ) : (
-        <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
           {sliced.map((e) => (
             <Card key={e.id} padding="sm" className="flex gap-3">
               {e.image ? (
