@@ -7,20 +7,20 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --color-surface: #1a1816;
-  --color-surface-2: #1f1d1b;
-  --color-card: #26231f;
-  --color-card-hover: #2e2a26;
-  --color-line: #3a3632;
-  --color-line-strong: #4a4642;
-  --color-accent: #d98e3f;
-  --color-accent-soft: #d98e3f14;
-  --color-accent-hover: #c07a2e;
-  --color-accent-contrast: #1a1816;
-  --color-muted: #b8afa6;
-  --color-muted-strong: #e8e0d8;
-  --color-ink: #fff7ee;
-  --color-ink-soft: #e8e0d8;
+  --color-surface: var(--background);
+  --color-surface-2: var(--muted);
+  --color-card: var(--card);
+  --color-card-hover: var(--secondary);
+  --color-line: var(--border);
+  --color-line-strong: var(--input);
+  --color-accent: var(--primary);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-hover: var(--primary);
+  --color-accent-contrast: var(--primary-foreground);
+  --color-muted: var(--muted-foreground);
+  --color-muted-strong: var(--card-foreground);
+  --color-ink: var(--foreground);
+  --color-ink-soft: var(--card-foreground);
 
   --radius-sm: 10px;
   --radius-md: 14px;
@@ -46,7 +46,7 @@
 }
 
 html {
-  color-scheme: dark;
+  color-scheme: light dark;
   scrollbar-gutter: stable;
 }
 
@@ -56,8 +56,8 @@ body {
   color: var(--color-ink-soft);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  background: radial-gradient(1200px 600px at 20% -10%, #2a2520 0%, transparent 60%),
-    radial-gradient(800px 400px at 90% 0%, #2e2216 0%, transparent 50%), var(--color-surface);
+  background: radial-gradient(1200px 600px at 20% -10%, var(--bg-gradient-1) 0%, transparent 60%),
+    radial-gradient(800px 400px at 90% 0%, var(--bg-gradient-2) 0%, transparent 50%), var(--color-surface);
   background-attachment: fixed;
 }
 
@@ -144,38 +144,42 @@ h1, h2, h3 {
 }
 
 :root {
-  --background: #1a1816;
-  --foreground: #fff7ee;
-  --card: #26231f;
-  --card-foreground: #fff7ee;
-  --popover: #26231f;
-  --popover-foreground: #fff7ee;
-  --primary: #d98e3f;
-  --primary-foreground: #1a1816;
-  --secondary: #3a3632;
-  --secondary-foreground: #fff7ee;
-  --muted: #26231f;
-  --muted-foreground: #b8afa6;
-  --accent: #d98e3f;
-  --accent-foreground: #1a1816;
-  --destructive: #ef4444;
-  --border: #3a3632;
-  --input: #3a3632;
-  --ring: #d98e3f;
-  --chart-1: #d98e3f;
-  --chart-2: #e8e0d8;
-  --chart-3: #b8afa6;
-  --chart-4: #3a3632;
-  --chart-5: #1f1d1b;
+  --background: #faf9f6;
+  --foreground: #1a1816;
+  --card: #ffffff;
+  --card-foreground: #1a1816;
+  --popover: #ffffff;
+  --popover-foreground: #1a1816;
+  --primary: #e07a5f;
+  --primary-foreground: #ffffff;
+  --secondary: #f2efe9;
+  --secondary-foreground: #1a1816;
+  --muted: #f2efe9;
+  --muted-foreground: #7a736b;
+  --accent: #e07a5f;
+  --accent-foreground: #ffffff;
+  --accent-soft: #e07a5f14;
+  --destructive: #dc2626;
+  --border: #e5e0d6;
+  --input: #e5e0d6;
+  --ring: #e07a5f;
+  --chart-1: #e07a5f;
+  --chart-2: #3a3632;
+  --chart-3: #7a736b;
+  --chart-4: #e5e0d6;
+  --chart-5: #f2efe9;
   --radius: 0.875rem;
-  --sidebar: #1f1d1b;
-  --sidebar-foreground: #fff7ee;
-  --sidebar-primary: #d98e3f;
-  --sidebar-primary-foreground: #1a1816;
-  --sidebar-accent: #26231f;
-  --sidebar-accent-foreground: #fff7ee;
-  --sidebar-border: #3a3632;
-  --sidebar-ring: #d98e3f;
+  --sidebar: #f2efe9;
+  --sidebar-foreground: #1a1816;
+  --sidebar-primary: #e07a5f;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #ffffff;
+  --sidebar-accent-foreground: #1a1816;
+  --sidebar-border: #e5e0d6;
+  --sidebar-ring: #e07a5f;
+  --bg-gradient-1: #f2efe9;
+  --bg-gradient-2: #e5e0d6;
+  color-scheme: light;
 }
 
 .dark {
@@ -193,6 +197,7 @@ h1, h2, h3 {
   --muted-foreground: #b8afa6;
   --accent: #d98e3f;
   --accent-foreground: #1a1816;
+  --accent-soft: #d98e3f14;
   --destructive: #ef4444;
   --border: #3a3632;
   --input: #3a3632;
@@ -210,6 +215,9 @@ h1, h2, h3 {
   --sidebar-accent-foreground: #fff7ee;
   --sidebar-border: #3a3632;
   --sidebar-ring: #d98e3f;
+  --bg-gradient-1: #2a2520;
+  --bg-gradient-2: #2e2216;
+  color-scheme: dark;
 }
 
 @media (prefers-reduced-motion: reduce) {

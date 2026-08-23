@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/sidebar'
 import { Separator } from '@/components/ui/separator'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 const navMain = [
   { title: 'Today', url: '/', icon: Home },
@@ -115,6 +116,7 @@ const rootRoute = createRootRoute({
             </div>
             <div className="ml-auto flex items-center gap-2">
               <span className="hidden rounded-full border bg-card px-2.5 py-1 text-xs font-medium tracking-wide text-muted-foreground md:inline">873 movements</span>
+              <ThemeToggle />
             </div>
           </header>
           <div className="flex flex-1 flex-col bg-gradient-to-b from-background to-muted/20">
