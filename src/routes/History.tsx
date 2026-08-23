@@ -1,14 +1,29 @@
+import { useMemo } from 'react'
 import { useGym } from '../store/useGym'
-import { exerciseById } from '../lib/exercises'
+import { e1rmSeries, exerciseById } from '../lib/exercises'
 import { Badge } from '../ui/Badge'
 import { Card } from '../ui/Card'
 import { EmptyState } from '../ui/EmptyState'
 import { PageHeader } from '../ui/PageHeader'
 import { Illustration } from '../ui/Illustration'
+import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from 'recharts'
 
 export function HistoryPage() {
   const workouts = useGym((s) => s.workouts)
   const bodyweight = useGym((s) => s.bodyweight)
+
+  const topExerciseId = useMemo(() => {
+    const counts: Record<string, number> = {}
+    for (const w of workouts) for (const e of w.exercises) counts[e.exerciseId] = (counts[e.exerciseId] ?? 0) + 1
+    let best: string | null = null
+    let max = 0
+    for (const [id, c] of Object.entries(counts)) if (c > max) { max = c; best = id }
+    return best
+  }, [workouts])
+
+  const series = useMemo(() => (topExerciseId ? e1rmSeries(workouts, topExerciseId) : []), [workouts, topExerciseId])
+  const topName = topExerciseId ? (exerciseById(topExerciseId)?.name ?? topExerciseId) : null
+  const bwSeries = useMemo(() => [...bodyweight].sort((a, b) => a.date.localeCompare(b.date)).slice(-12), [bodyweight])
 
   return (
     <div className="flex flex-col gap-5">
@@ -23,6 +38,45 @@ export function HistoryPage() {
       />
 
       <Illustration variant="orb" className="h-20 w-full" />
+
+      {workouts.length > 0 && topExerciseId && series.length >= 2 && (
+        <Card>
+          <h3 className="font-display text-base text-ink">Progreso — {topName}</h3>
+          <p className="text-xs tracking-wide text-muted uppercase">e1RM estimado · {series.length} sesiones</p>
+          <div className="mt-3 h-40 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={series}>
+                <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" opacity={0.4} />
+                <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }} axisLine={false} tickLine={false} width={40} />
+                <Tooltip
+                  contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '12px' }}
+                  labelStyle={{ color: 'var(--muted-foreground)', fontSize: 12 }}
+                />
+                <Line type="monotone" dataKey="e1rm" stroke="var(--chart-1)" strokeWidth={2} dot={{ r: 2 }} activeDot={{ r: 4 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+      )}
+
+      {bodyweight.length >= 2 && (
+        <Card>
+          <h3 className="font-display text-base text-ink">Peso corporal</h3>
+          <p className="text-xs tracking-wide text-muted uppercase">Últimos {bwSeries.length} registros</p>
+          <div className="mt-3 h-32 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={bwSeries}>
+                <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" opacity={0.4} />
+                <XAxis dataKey="date" tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }} axisLine={false} tickLine={false} width={40} domain={['auto', 'auto']} />
+                <Tooltip contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '12px' }} />
+                <Line type="monotone" dataKey="kg" stroke="var(--chart-2)" strokeWidth={2} dot={{ r: 2 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+      )}
 
       {workouts.length === 0 ? (
         <EmptyState

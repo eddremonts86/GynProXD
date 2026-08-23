@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Exercise, Workout } from './types'
-import { bestE1rm, epley1rm, lastPerformance } from './exercises'
+import { bestE1rm, e1rmSeries, epley1rm, lastPerformance } from './exercises'
 import { isPersonalRecord, suggestNext } from './progression'
 
 const ex: Exercise = { id: 'bench-press', name: 'Bench Press', muscle: 'chest', equipment: 'barbell' }
@@ -89,5 +89,23 @@ describe('bestE1rm', () => {
   it('takes the max across sessions', () => {
     const ws = [workout('2026-08-01', [[80, 5]]), workout('2026-08-08', [[75, 8]])]
     expect(bestE1rm(ws, 'bench-press')).toBeCloseTo(Math.max(epley1rm(80, 5), epley1rm(75, 8)), 5)
+  })
+})
+
+describe('e1rmSeries', () => {
+  it('produces chronological series', () => {
+    const ws = [workout('2026-08-08', [[75, 8]]), workout('2026-08-01', [[80, 5]])]
+    expect(e1rmSeries(ws, 'bench-press')).toEqual([
+      { date: '2026-08-01', e1rm: Math.round(epley1rm(80, 5) * 10) / 10 },
+      { date: '2026-08-08', e1rm: Math.round(epley1rm(75, 8) * 10) / 10 },
+    ])
+  })
+
+  it('skips empty', () => {
+    const ws = [
+      workout('2026-08-01', [[80, 5]]),
+      { id: 'x', date: '2026-08-02', exercises: [{ exerciseId: 'bench-press', sets: [] }] } as Workout,
+    ]
+    expect(e1rmSeries(ws, 'bench-press')).toHaveLength(1)
   })
 })

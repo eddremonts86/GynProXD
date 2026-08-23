@@ -53,6 +53,19 @@ export function bestE1rm(workouts: Workout[], exerciseId: string): number {
   return best
 }
 
+export function e1rmSeries(workouts: Workout[], exerciseId: string): { date: string; e1rm: number }[] {
+  const sorted = [...workouts].sort((a, b) => a.date.localeCompare(b.date))
+  const series: { date: string; e1rm: number }[] = []
+  for (const w of sorted) {
+    const le = w.exercises.find((e) => e.exerciseId === exerciseId)
+    if (!le || le.sets.length === 0) continue
+    let best = 0
+    for (const s of le.sets) best = Math.max(best, epley1rm(s.weight, s.reps))
+    if (best > 0) series.push({ date: w.date, e1rm: Math.round(best * 10) / 10 })
+  }
+  return series
+}
+
 export const BODYWEIGHT_EQUIPMENT = new Set(['bodyweight'])
 
 export function isBodyweight(exercise: Exercise | undefined): boolean {
