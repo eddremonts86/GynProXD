@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { useGym, DAY_LABELS, DAYS } from '../store/useGym'
 import { exerciseById, exerciseLookup } from '../lib/exercises'
 import { Badge } from '../ui/Badge'
@@ -13,7 +14,9 @@ import type { DayOfWeek, ProgressionRule } from '../lib/types'
 const DAY_ORDER = DAYS
 
 export function PlannerPage() {
+  const navigate = useNavigate()
   const plans = useGym((s) => s.plans)
+  const generatedPlans = useGym((s) => s.generatedPlans)
   const customExercises = useGym((s) => s.customExercises)
   const createPlan = useGym((s) => s.createPlan)
   const deletePlan = useGym((s) => s.deletePlan)
@@ -21,6 +24,8 @@ export function PlannerPage() {
   const removeExerciseFromDay = useGym((s) => s.removeExerciseFromDay)
   const updateExerciseProgression = useGym((s) => s.updateExerciseProgression)
   const startWorkoutFromPlan = useGym((s) => s.startWorkoutFromPlan)
+  const deleteGeneratedPlan = useGym((s) => s.deleteGeneratedPlan)
+  const saveGeneratedAsPlan = useGym((s) => s.saveGeneratedAsPlan)
 
   const exercises = useMemo(
     () => Array.from(exerciseLookup(customExercises).values()).sort((a, b) => a.name.localeCompare(b.name)),
@@ -56,6 +61,13 @@ export function PlannerPage() {
           description="Hybrid calisthenics + barbell, planned around your week. Each day is a quiet promise."
         />
         <Illustration variant="hero" className="h-36 w-full" />
+        <Card className="border-accent/20 bg-accent-soft">
+          <h3 className="font-display text-base text-ink">¿Nuevo aquí?</h3>
+          <p className="mt-1 text-sm text-muted">Genera un plan mensual/trimestral/semestral/anual en 30s desde onboarding.</p>
+          <Button className="mt-3 w-full" onClick={() => navigate({ to: '/onboarding' })}>
+            Generar mi plan automático
+          </Button>
+        </Card>
         <EmptyState
           title="No plans yet"
           description="Create your first weekly plan. Add exercises per day, pick progression, and start guided sessions from Today."
@@ -71,6 +83,38 @@ export function PlannerPage() {
             </div>
           }
         />
+        {generatedPlans.length > 0 && (
+          <Card>
+            <h3 className="font-display text-base text-ink">Planes generados</h3>
+            <div className="mt-3 flex flex-col gap-2">
+              {generatedPlans.slice(0, 5).map((g) => (
+                <div key={g.id} className="flex items-center justify-between rounded-[var(--radius-md)] bg-surface-2 border border-line/40 px-3 py-2">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-ink-soft">{g.weeklyTemplate.name}</p>
+                    <p className="text-xs text-muted">
+                      {g.approvedDuration} · {g.weeks.length} sem · {g.input.goal} · {g.input.daysPerWeek}×
+                    </p>
+                  </div>
+                  <div className="flex gap-1">
+                    <Button size="sm" variant="ghost" onClick={() => navigate({ to: '/generated/$id', params: { id: g.id } })}>
+                      Ver
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => {
+                        const pid = saveGeneratedAsPlan(g.id)
+                        if (pid) setSelectedPlanId(pid)
+                      }}
+                    >
+                      Guardar
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
       </div>
     )
   }
@@ -89,6 +133,59 @@ export function PlannerPage() {
       />
 
       <Illustration variant="orb" className="h-20 w-full" />
+
+      <Card className="border-accent/20 bg-accent-soft">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h3 className="font-display text-base text-ink">¿Sin plan?</h3>
+            <p className="text-sm text-muted">Genera mensual/trimestral/semestral/anual en 30s.</p>
+          </div>
+          <Button size="sm" onClick={() => navigate({ to: '/onboarding' })}>
+            Generar
+          </Button>
+        </div>
+      </Card>
+
+      {generatedPlans.length > 0 && (
+        <Card>
+          <h3 className="font-display text-base text-ink">Planes generados</h3>
+          <p className="mt-1 text-xs tracking-wide text-muted uppercase">Local — toca Ver o Guardar en Planner</p>
+          <div className="mt-3 flex flex-col gap-2">
+            {generatedPlans.slice(0, 6).map((g) => (
+              <div key={g.id} className="flex items-center justify-between rounded-[var(--radius-md)] bg-surface-2 border border-line/40 px-3 py-2">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-ink-soft">{g.weeklyTemplate.name}</p>
+                  <p className="text-xs text-muted">
+                    {g.approvedDuration} · {g.weeks.length} sem · {g.input.goal} · {g.input.daysPerWeek}×{g.input.minsPerSession}min · eff {g.input.effort}
+                  </p>
+                </div>
+                <div className="flex gap-1">
+                  <Button size="sm" variant="ghost" onClick={() => navigate({ to: '/generated/$id', params: { id: g.id } })}>
+                    Ver
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => {
+                      const pid = saveGeneratedAsPlan(g.id)
+                      if (pid) setSelectedPlanId(pid)
+                    }}
+                  >
+                    Guardar
+                  </Button>
+                  <button
+                    onClick={() => deleteGeneratedPlan(g.id)}
+                    className="rounded-full p-1 text-muted hover:text-ink-soft"
+                    aria-label="Eliminar"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
 
       <Card className="flex flex-col gap-3">
         <div className="flex flex-col gap-2">
