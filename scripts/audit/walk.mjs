@@ -8,8 +8,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '../..')
 const BASE = process.env.BASE_URL ?? 'http://localhost:3010'
 const OUT_DIR = join(ROOT, 'docs/impeccable/shots')
-const REPORT = join(ROOT, 'docs/impeccable/walk-report.json')
-const REPORT_MD = join(ROOT, 'docs/impeccable/walk-report.md')
+const PREFIX = process.env.SHOT_PREFIX ?? 'before'
+const REPORT = join(ROOT, `docs/impeccable/walk-report-${PREFIX}.json`)
+const REPORT_MD = join(ROOT, `docs/impeccable/walk-report-${PREFIX}.md`)
 
 const ROUTES = [
   { path: '/', name: 'today' },
@@ -53,10 +54,11 @@ for (const vp of VIEWPORTS) {
       if (msg.type() === 'error') consoleErrors.push(msg.text())
     })
     page.on('response', (res) => {
-      if (!res.ok()) {
+      const status = res.status()
+      if (status >= 400) {
         const req = res.request()
-        if (req.resourceType() !== 'image' || res.status() >= 500) {
-          failedResponses.push(`${res.status()} ${res.url()}`)
+        if (req.resourceType() !== 'image' || status >= 500) {
+          failedResponses.push(`${status} ${res.url()}`)
         }
       }
     })
@@ -69,7 +71,7 @@ for (const vp of VIEWPORTS) {
         status = `http-${response?.status() ?? 'no-response'}`
       }
       await page.waitForTimeout(500)
-      const shotName = `before-${vp.name}-${route.name}.png`
+      const shotName = `${PREFIX}-${vp.name}-${route.name}.png`
       const shotPath = join(OUT_DIR, shotName)
       await page.screenshot({ path: shotPath, fullPage: true })
       console.log(`[walk] ${vp.name} ${route.path} -> ${shotName} (${Date.now() - start}ms)`)
@@ -87,7 +89,7 @@ for (const vp of VIEWPORTS) {
       pageErrors,
       consoleErrors,
       failedResponses,
-      screenshot: `shots/before-${vp.name}-${route.name}.png`,
+      screenshot: `shots/${PREFIX}-${vp.name}-${route.name}.png`,
       durationMs: Date.now() - start,
     })
     findings.summary.total += 1
@@ -137,7 +139,7 @@ if (findings.pages.some((p) => p.pageErrors.length || p.consoleErrors.length || 
   md += `No console/page errors detected.\n`
 }
 md += `\n---\n`
-md += `Screenshots: \`docs/impeccable/shots/before-*.png\`\n`
+md += `Screenshots: \`docs/impeccable/shots/${PREFIX}-*.png\`\n`
 await writeFile(REPORT_MD, md)
 console.log(`[walk] markdown written to ${REPORT_MD}`)
 

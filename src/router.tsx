@@ -6,12 +6,12 @@ import { SettingsPage } from './routes/Settings'
 
 const rootRoute = createRootRoute({
   component: () => (
-    <div className="mx-auto flex min-h-dvh max-w-md flex-col">
-      <main className="flex-1 px-4 pb-24 pt-6">
+    <div className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col">
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 pb-28 pt-6 md:px-6 md:pt-8 lg:px-8">
         <Outlet />
       </main>
-      <nav className="fixed inset-x-0 bottom-0 border-t border-line bg-surface/95 backdrop-blur">
-        <div className="mx-auto flex max-w-md items-stretch justify-around py-2">
+      <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-surface/90 backdrop-blur supports-[backdrop-filter]:bg-surface/80 pb-[env(safe-area-inset-bottom)]">
+        <div className="mx-auto flex w-full max-w-3xl items-stretch justify-around px-2 py-1 md:py-2">
           {[
             ['/', 'Today'],
             ['/library', 'Library'],
@@ -22,8 +22,9 @@ const rootRoute = createRootRoute({
               key={to}
               to={to}
               activeOptions={{ exact: to === '/' }}
-              className="px-3 py-2 text-sm text-zinc-400 data-[status=active]:font-semibold data-[status=active]:text-accent"
+              className="relative flex flex-col items-center gap-1 rounded-[var(--radius-md)] px-4 py-2 text-xs font-medium tracking-wide text-zinc-500 transition-colors hover:bg-surface-2 hover:text-zinc-300 focus-visible:outline-none data-[status=active]:text-accent"
             >
+              <span className="hidden data-[status=active]:block absolute -top-1 left-1/2 h-1 w-6 -translate-x-1/2 rounded-full bg-accent" />
               {label}
             </Link>
           ))}

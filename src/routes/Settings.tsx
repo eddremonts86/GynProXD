@@ -1,5 +1,8 @@
 import { useState } from 'react'
 import { useGym } from '../store/useGym'
+import { Button } from '../ui/Button'
+import { Card } from '../ui/Card'
+import { PageHeader } from '../ui/PageHeader'
 
 export function SettingsPage() {
   const workouts = useGym((s) => s.workouts)
@@ -9,10 +12,9 @@ export function SettingsPage() {
   const [msg, setMsg] = useState('')
 
   const exportJson = () => {
-    const blob = new Blob(
-      [JSON.stringify({ version: 2, customExercises, workouts, bodyweight }, null, 2)],
-      { type: 'application/json' },
-    )
+    const blob = new Blob([JSON.stringify({ version: 2, customExercises, workouts, bodyweight }, null, 2)], {
+      type: 'application/json',
+    })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
@@ -31,22 +33,18 @@ export function SettingsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">Settings</h1>
-      <section className="rounded-xl border border-line bg-card p-4">
-        <h2 className="mb-2 font-semibold">Your data</h2>
-        <p className="mb-3 text-sm text-zinc-500">
+    <div className="flex flex-col gap-5">
+      <PageHeader title="Settings" description="Manage your local data. No account, no server." />
+
+      <Card>
+        <h2 className="text-sm font-semibold text-zinc-100">Your data</h2>
+        <p className="mt-1 text-sm leading-5 text-muted">
           {workouts.length} workouts · {bodyweight.length} weigh-ins · {customExercises.length} custom exercises.
-          Everything lives in this browser.
+          Everything lives in this browser (localStorage, key <span className="font-mono text-zinc-300">gynproxd-v2</span>).
         </p>
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={exportJson}
-            className="rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-surface"
-          >
-            Export JSON
-          </button>
-          <label className="cursor-pointer rounded-xl border border-line px-4 py-2 text-sm">
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Button onClick={exportJson}>Export JSON</Button>
+          <label className="inline-flex cursor-pointer items-center justify-center rounded-[var(--radius-md)] border border-line bg-card px-4 py-2.5 text-sm font-semibold text-zinc-100 transition-colors hover:border-line-strong hover:bg-card-hover focus-visible:outline-none">
             Import JSON
             <input
               type="file"
@@ -60,9 +58,16 @@ export function SettingsPage() {
             />
           </label>
         </div>
-        {msg && <p className="mt-2 text-sm text-accent">{msg}</p>}
-      </section>
-      <p className="px-1 text-xs text-zinc-600">GynProXD v0.1.0 — local-first, no account.</p>
+        {msg && <p className="mt-3 rounded-[var(--radius-md)] bg-accent-soft px-3 py-2 text-sm font-medium text-accent">{msg}</p>}
+      </Card>
+
+      <Card className="border-dashed bg-transparent shadow-none">
+        <h3 className="text-sm font-semibold text-zinc-300">About</h3>
+        <p className="mt-1 text-sm leading-5 text-muted">
+          GynProXD v0.1.0 — local-first gym tracker. Clean-room rebuild, public-domain exercise data, images via jsDelivr CDN only.
+        </p>
+        <p className="mt-3 text-xs text-zinc-500">No copy of openGym code/UI strings/CSS/GIFs. Media stays public-domain/CDN.</p>
+      </Card>
     </div>
   )
 }
