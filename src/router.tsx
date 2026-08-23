@@ -1,4 +1,5 @@
-import { createRootRoute, createRoute, createRouter, Link, Outlet } from '@tanstack/react-router'
+import { createRootRoute, createRoute, createRouter, Link, Outlet, useRouterState } from '@tanstack/react-router'
+import { Home, CalendarRange, Library, History, Settings, WandSparkles, Dumbbell, ChartColumn } from 'lucide-react'
 import { TodayPage } from './routes/Today'
 import { LibraryPage } from './routes/Library'
 import { HistoryPage } from './routes/History'
@@ -6,51 +7,121 @@ import { SettingsPage } from './routes/Settings'
 import { PlannerPage } from './routes/Planner'
 import { OnboardingPage } from './routes/Onboarding'
 import { GeneratedPlanPage } from './routes/GeneratedPlan'
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarTrigger,
+} from '@/components/ui/sidebar'
+import { Separator } from '@/components/ui/separator'
+import { TooltipProvider } from '@/components/ui/tooltip'
+
+const navMain = [
+  { title: 'Today', url: '/', icon: Home },
+  { title: 'Onboarding', url: '/onboarding', icon: WandSparkles },
+  { title: 'Planner', url: '/planner', icon: CalendarRange },
+  { title: 'Library', url: '/library', icon: Library },
+  { title: 'History', url: '/history', icon: History },
+  { title: 'Settings', url: '/settings', icon: Settings },
+]
+
+const navSecondary = [
+  { title: 'Generated', url: '/generated', icon: ChartColumn, disabled: true },
+]
+
+function AppSidebar() {
+  const routerState = useRouterState()
+  const pathname = routerState.location.pathname
+  return (
+    <Sidebar variant="inset" collapsible="icon">
+      <SidebarHeader>
+        <div className="flex items-center gap-2 px-2 py-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+            <Dumbbell className="h-4 w-4" />
+          </div>
+          <div className="grid flex-1 text-left text-sm leading-tight">
+            <span className="font-display truncate text-base font-semibold tracking-tight">Forma</span>
+            <span className="truncate text-xs tracking-widest text-muted-foreground uppercase">local training</span>
+          </div>
+        </div>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Training</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {navMain.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton tooltip={item.title} isActive={pathname === item.url} render={<Link to={item.url} />}>
+                    <item.icon />
+                    <span>{item.title}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>System</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {navSecondary.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton tooltip={item.title} isActive={false} className="opacity-60">
+                    <item.icon />
+                    <span>{item.title}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+      <SidebarFooter>
+        <div className="rounded-lg border bg-card p-3">
+          <p className="font-display text-sm font-medium">Noir Warm · 3D</p>
+          <p className="text-xs leading-4 text-muted-foreground">Hybrid calisthenics + gym. Offline.</p>
+        </div>
+      </SidebarFooter>
+    </Sidebar>
+  )
+}
 
 const rootRoute = createRootRoute({
   component: () => (
-    <div className="mx-auto flex min-h-dvh w-full max-w-6xl flex-col">
-      <header className="sticky top-0 z-10 border-b border-line/60 bg-surface/70 backdrop-blur supports-[backdrop-filter]:bg-surface/60">
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-4 py-3 md:px-6 lg:px-8">
-          <Link to="/" className="flex items-center gap-3 focus-visible:outline-none">
-            <span className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)] bg-gradient-to-br from-accent to-[#8B5E2E] text-sm font-bold tracking-tight text-accent-contrast shadow-sm">
-              F
-            </span>
-            <span className="flex flex-col">
-              <span className="font-display text-[22px] leading-none tracking-tight text-ink">Forma</span>
-              <span className="text-[10px] font-medium tracking-[0.16em] text-muted uppercase">local training</span>
-            </span>
-          </Link>
-          <span className="hidden md:inline-flex rounded-full border border-line bg-card px-2.5 py-1 text-[10px] font-medium tracking-widest text-muted uppercase">
-            Noir Warm · 3D
-          </span>
-        </div>
-      </header>
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 pb-28 pt-6 md:px-6 md:pt-8 lg:px-8">
-        <Outlet />
-      </main>
-      <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-surface/90 backdrop-blur supports-[backdrop-filter]:bg-surface/80 pb-[env(safe-area-inset-bottom)]">
-        <div className="mx-auto flex w-full max-w-3xl items-stretch justify-around px-2 py-1 md:py-2">
-          {[
-            ['/', 'Today'],
-            ['/planner', 'Planner'],
-            ['/library', 'Library'],
-            ['/history', 'History'],
-            ['/settings', 'Settings'],
-          ].map(([to, label]) => (
-            <Link
-              key={to}
-              to={to}
-              activeOptions={{ exact: to === '/' }}
-              className="relative flex flex-col items-center gap-1 rounded-[var(--radius-md)] px-4 py-2 text-xs font-medium tracking-wide text-muted transition-colors hover:bg-surface-2 hover:text-ink-soft focus-visible:outline-none data-[status=active]:text-accent"
-            >
-              <span className="hidden data-[status=active]:block absolute -top-1 left-1/2 h-1 w-6 -translate-x-1/2 rounded-full bg-accent" />
-              {label}
-            </Link>
-          ))}
-        </div>
-      </nav>
-    </div>
+    <TooltipProvider>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
+          <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center gap-2 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 md:px-6">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mr-2 h-4" />
+            <div className="flex items-center gap-2 text-sm">
+              <span className="hidden font-display text-base md:inline">Forma</span>
+              <span className="hidden text-xs tracking-widest text-muted-foreground uppercase md:inline">· desktop-first · shadcn</span>
+              <span className="text-xs tracking-widest text-muted-foreground uppercase md:hidden">Forma</span>
+            </div>
+            <div className="ml-auto flex items-center gap-2">
+              <span className="hidden rounded-full border bg-card px-2.5 py-1 text-xs font-medium tracking-wide text-muted-foreground md:inline">873 movements</span>
+            </div>
+          </header>
+          <div className="flex flex-1 flex-col bg-gradient-to-b from-background to-muted/20">
+            <div className="mx-auto w-full max-w-7xl flex-1 p-4 md:p-6 lg:p-8">
+              <Outlet />
+            </div>
+          </div>
+        </SidebarInset>
+      </SidebarProvider>
+    </TooltipProvider>
   ),
 })
 

@@ -275,7 +275,11 @@ export function PlannerPage() {
                             </span>
                           )}
                         </div>
+                        <label htmlFor={`prog-${day}-${pe.exerciseId}`} className="sr-only">
+                          Progression for {exerciseById(pe.exerciseId)?.name ?? pe.exerciseId}
+                        </label>
                         <select
+                          id={`prog-${day}-${pe.exerciseId}`}
                           value={pe.progression}
                           onChange={(e) =>
                             updateExerciseProgression(
@@ -285,7 +289,7 @@ export function PlannerPage() {
                               e.target.value as ProgressionRule,
                             )
                           }
-                          className="rounded-full border border-line bg-surface px-2 py-1 text-xs text-ink-soft outline-none focus:border-accent"
+                          className="rounded-full border border-line bg-surface px-2 py-1 text-xs text-ink-soft outline-none focus:border-accent min-h-8"
                         >
                           <option value="none">none</option>
                           <option value="linear">linear</option>
@@ -293,8 +297,8 @@ export function PlannerPage() {
                         </select>
                         <button
                           onClick={() => removeExerciseFromDay(selectedPlan.id, day, pe.exerciseId)}
-                          className="rounded-full p-1 text-muted hover:bg-surface hover:text-ink-soft"
-                          aria-label="Remove"
+                          className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-surface hover:text-ink-soft shrink-0"
+                          aria-label={`Remove ${exerciseById(pe.exerciseId)?.name ?? pe.exerciseId}`}
                         >
                           ×
                         </button>

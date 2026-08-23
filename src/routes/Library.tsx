@@ -63,7 +63,11 @@ export function LibraryPage() {
       <Illustration variant="orb" className="h-20 w-full" />
 
       <div className="flex flex-col gap-3">
+        <label htmlFor="library-search" className="sr-only">
+          Search movements
+        </label>
         <Input
+          id="library-search"
           value={query}
           onChange={(e) => {
             setQuery(e.target.value)
@@ -72,7 +76,7 @@ export function LibraryPage() {
           placeholder={`Search ${exercises.length} movements…`}
           aria-label="Search exercises"
         />
-        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none" role="group" aria-label="Filter by muscle">
           {MUSCLE_FILTERS.map((m) => (
             <button
               key={m}
@@ -80,8 +84,9 @@ export function LibraryPage() {
                 setMuscle(m)
                 setVisible(50)
               }}
+              aria-pressed={muscle === m}
               className={[
-                'shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium capitalize transition-colors tracking-wide',
+                'shrink-0 rounded-full border px-4 py-2.5 text-xs font-medium capitalize transition-colors tracking-wide min-h-11',
                 muscle === m
                   ? 'border-accent bg-accent text-accent-contrast'
                   : 'border-line bg-card text-muted hover:border-line-strong hover:text-ink-soft',
@@ -106,7 +111,7 @@ export function LibraryPage() {
               {e.image ? (
                 <img
                   src={e.image}
-                  alt=""
+                  alt={`${e.name} — ${e.muscle} ${e.equipment}`}
                   loading="lazy"
                   className="h-14 w-14 shrink-0 rounded-[var(--radius-md)] bg-surface-2 object-cover border border-line/40"
                   onError={(ev) => {
