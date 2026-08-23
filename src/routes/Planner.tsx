@@ -255,7 +255,10 @@ export function PlannerPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => startWorkoutFromPlan(selectedPlan.id, day)}
+                  onClick={() => {
+                    startWorkoutFromPlan(selectedPlan.id, day)
+                    navigate({ to: '/' })
+                  }}
                   disabled={dayExercises.length === 0}
                 >
                   Start

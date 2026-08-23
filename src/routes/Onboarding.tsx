@@ -109,7 +109,7 @@ export function OnboardingPage() {
 
       <Card>
         <h3 className="font-display text-base text-ink">Ajuste fino (6 campos)</h3>
-        <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3">
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
           <Input label="Edad" value={age} onChange={(e) => setAge(e.target.value)} inputMode="numeric" />
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-medium tracking-widest text-muted uppercase">Sexo</span>
@@ -189,7 +189,7 @@ export function OnboardingPage() {
         <p className="mt-1 text-sm text-muted">
           {input.weightKg}kg → {input.targetWeightKg ?? '—'}kg · {input.daysPerWeek}× {input.minsPerSession}min · esfuerzo {input.effort}
         </p>
-        <div className="mt-3 grid grid-cols-3 gap-3">
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
           <div className="rounded-[var(--radius-md)] bg-surface-2 border border-line/40 px-3 py-2 text-center">
             <p className="text-xs tracking-widest text-muted uppercase">Estimado</p>
             <p className="font-display text-xl text-ink">{estimate.estimatedMonths} meses</p>
@@ -215,7 +215,7 @@ export function OnboardingPage() {
             ))}
           </div>
         )}
-        <div className="mt-3 flex gap-2">
+        <div className="mt-3 flex flex-wrap gap-2">
           <span className="text-xs tracking-widest text-muted uppercase">Duración</span>
           {(['mensual', 'trimestral', 'semestral', 'anual'] as DurationKey[]).map((d) => (
             <button

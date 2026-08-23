@@ -120,10 +120,24 @@ const rootRoute = createRootRoute({
             </div>
           </header>
           <div className="flex flex-1 flex-col bg-gradient-to-b from-background to-muted/20">
-            <div className="mx-auto w-full max-w-7xl flex-1 p-4 md:p-6 lg:p-8">
+            <div className="mx-auto w-full max-w-7xl flex-1 p-4 pb-24 md:p-6 lg:p-8 md:pb-8">
               <Outlet />
             </div>
           </div>
+          <nav className="fixed inset-x-0 bottom-0 z-10 flex border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 pb-[env(safe-area-inset-bottom)] md:hidden">
+            <div className="flex w-full justify-around px-1 py-1">
+              {navMain.slice(0, 5).map((item) => (
+                <Link
+                  key={item.title}
+                  to={item.url}
+                  className="flex flex-col items-center gap-1 rounded-md px-3 py-2 text-xs font-medium text-muted-foreground data-[status=active]:text-primary"
+                >
+                  <item.icon className="h-4 w-4" />
+                  <span className="text-[10px]">{item.title}</span>
+                </Link>
+              ))}
+            </div>
+          </nav>
         </SidebarInset>
       </SidebarProvider>
     </TooltipProvider>

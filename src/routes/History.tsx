@@ -42,28 +42,26 @@ export function HistoryPage() {
 
       <Illustration variant="orb" className="h-20 w-full" />
 
-      {workouts.length > 0 && (
-        <Card>
-          <h3 className="font-display text-base text-ink">Muscle heatmap — last 4 weeks</h3>
-          <p className="text-xs tracking-wide text-muted uppercase">Volumen reps×kg · intensity = amber</p>
-          <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-            {Object.entries(vol).map(([muscle, v]) => {
-              const pct = Math.round((v / volMax) * 100)
-              return (
-                <div key={muscle} className="rounded-lg border bg-card p-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium capitalize text-ink-soft">{muscle}</span>
-                    <span className="font-mono text-xs text-muted">{v}</span>
-                  </div>
-                  <div className="mt-1.5 h-1.5 w-full rounded-full bg-muted">
-                    <div className="h-1.5 rounded-full bg-primary transition-all" style={{ width: `${pct}%` }} />
-                  </div>
+      <Card>
+        <h3 className="font-display text-base text-ink">Muscle heatmap — last 4 weeks</h3>
+        <p className="text-xs tracking-wide text-muted uppercase">Volumen reps×kg · intensity = amber · {workouts.length === 0 ? 'no data yet — start training' : `${workouts.length} sessions`}</p>
+        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+          {Object.entries(vol).map(([muscle, v]) => {
+            const pct = workouts.length === 0 ? 0 : Math.round((v / volMax) * 100)
+            return (
+              <div key={muscle} className="rounded-lg border bg-card p-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium capitalize text-ink-soft">{muscle}</span>
+                  <span className="font-mono text-xs text-muted">{v}</span>
                 </div>
-              )
-            })}
-          </div>
-        </Card>
-      )}
+                <div className="mt-1.5 h-1.5 w-full rounded-full bg-muted">
+                  <div className="h-1.5 rounded-full bg-primary transition-all" style={{ width: `${pct}%` }} />
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </Card>
 
       {workouts.length > 0 && topExerciseId && series.length >= 2 && (
         <Card>
