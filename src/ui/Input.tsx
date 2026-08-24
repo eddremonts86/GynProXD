@@ -1,28 +1,29 @@
 import type { InputHTMLAttributes } from 'react'
+import { Input as ShadcnInput } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { cn } from '@/lib/utils'
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
   label?: string
+  id?: string
 }
 
 export function Input({ label, className = '', id, ...props }: InputProps) {
+  const inputId = id ?? (label ? `in-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}` : undefined)
   const input = (
-    <input
-      id={id}
-      className={[
-        'w-full rounded-[var(--radius-md)] border border-line bg-surface px-4 py-3 text-sm outline-none',
-        'text-ink-soft placeholder:text-muted/70',
-        'transition-colors focus:border-accent focus:bg-surface-2',
-        'disabled:opacity-40 disabled:cursor-not-allowed',
-        className,
-      ].join(' ')}
+    <ShadcnInput
+      id={inputId}
+      className={cn('min-h-11 bg-surface px-4 py-2.5 text-sm', className)}
       {...props}
     />
   )
   if (!label) return input
   return (
-    <label htmlFor={id} className="flex flex-col gap-1.5">
-      <span className="text-xs font-medium tracking-widest text-muted uppercase">{label}</span>
+    <div className="flex flex-col gap-1.5">
+      <Label htmlFor={inputId} className="text-xs font-medium tracking-widest text-muted uppercase">
+        {label}
+      </Label>
       {input}
-    </label>
+    </div>
   )
 }

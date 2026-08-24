@@ -7,9 +7,11 @@ import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
 import { EmptyState } from '../ui/EmptyState'
 import { Input } from '../ui/Input'
+import { FormSelect } from '../ui/FormSelect'
 import { PageHeader } from '../ui/PageHeader'
 import { Illustration } from '../ui/Illustration'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { Switch } from '@/components/ui/switch'
 import type { DayOfWeek, ProgressionRule } from '../lib/types'
 
 const DAY_ORDER = DAYS
@@ -300,57 +302,39 @@ export function PlannerPage() {
                           </button>
                         </div>
                         <div className="flex flex-wrap items-center gap-1.5">
-                          <label htmlFor={`prog-${day}-${pe.exerciseId}`} className="sr-only">
-                            Progression for {exerciseById(pe.exerciseId)?.name ?? pe.exerciseId}
-                          </label>
-                          <select
-                            id={`prog-${day}-${pe.exerciseId}`}
+                          <FormSelect
+                            ariaLabel={`Progression for ${exerciseById(pe.exerciseId)?.name ?? pe.exerciseId}`}
                             value={pe.progression}
-                            onChange={(e) =>
-                              updateExerciseProgression(
-                                selectedPlan.id,
-                                day,
-                                pe.exerciseId,
-                                e.target.value as ProgressionRule,
-                              )
+                            onValueChange={(v) =>
+                              updateExerciseProgression(selectedPlan.id, day, pe.exerciseId, v as ProgressionRule)
                             }
-                            className="rounded-full border border-line bg-surface px-2 py-1 text-xs text-ink-soft outline-none focus:border-accent min-h-8"
-                          >
-                            <option value="none">none</option>
-                            <option value="linear">linear</option>
-                            <option value="double">double</option>
-                          </select>
-                          <button
-                            onClick={() => updateExerciseOptions(selectedPlan.id, day, pe.exerciseId, { timed: !pe.timed })}
-                            className={[
-                              'rounded-full border px-2 py-1 text-xs min-h-8',
-                              pe.timed ? 'border-accent bg-accent text-accent-contrast' : 'border-line bg-surface text-muted',
-                            ].join(' ')}
-                            title="Timed set (duration vs reps)"
-                          >
+                            options={[
+                              { value: 'none', label: 'none' },
+                              { value: 'linear', label: 'linear' },
+                              { value: 'double', label: 'double' },
+                            ]}
+                            className="min-h-8 w-auto py-1 text-xs"
+                          />
+                          <label className="flex cursor-pointer items-center gap-1.5 rounded-full border border-line bg-surface px-2 py-1 text-xs text-muted min-h-8" title="Timed set (duration vs reps)">
+                            <Switch size="sm" checked={!!pe.timed} onCheckedChange={(checked) => updateExerciseOptions(selectedPlan.id, day, pe.exerciseId, { timed: checked === true })} aria-label={`Timed ${exerciseById(pe.exerciseId)?.name ?? pe.exerciseId}`} />
                             ⏱ {pe.timed ? 'timed' : 'reps'}
-                          </button>
-                          <button
-                            onClick={() => updateExerciseOptions(selectedPlan.id, day, pe.exerciseId, { unilateral: !pe.unilateral })}
-                            className={[
-                              'rounded-full border px-2 py-1 text-xs min-h-8',
-                              pe.unilateral ? 'border-accent bg-accent text-accent-contrast' : 'border-line bg-surface text-muted',
-                            ].join(' ')}
-                            title="Unilateral (L/R per set)"
-                          >
+                          </label>
+                          <label className="flex cursor-pointer items-center gap-1.5 rounded-full border border-line bg-surface px-2 py-1 text-xs text-muted min-h-8" title="Unilateral (L/R per set)">
+                            <Switch size="sm" checked={!!pe.unilateral} onCheckedChange={(checked) => updateExerciseOptions(selectedPlan.id, day, pe.exerciseId, { unilateral: checked === true })} aria-label={`Unilateral ${exerciseById(pe.exerciseId)?.name ?? pe.exerciseId}`} />
                             ⇄ {pe.unilateral ? 'L/R' : 'bilateral'}
-                          </button>
-                          <select
+                          </label>
+                          <FormSelect
+                            ariaLabel="Superset group"
                             value={pe.supersetGroup ?? ''}
-                            onChange={(e) => updateExerciseOptions(selectedPlan.id, day, pe.exerciseId, { supersetGroup: e.target.value || null })}
-                            className="rounded-full border border-line bg-surface px-2 py-1 text-xs text-ink-soft outline-none focus:border-accent min-h-8"
-                            title="Superset group"
-                          >
-                            <option value="">— superset</option>
-                            <option value="A">A</option>
-                            <option value="B">B</option>
-                            <option value="C">C</option>
-                          </select>
+                            onValueChange={(v) => updateExerciseOptions(selectedPlan.id, day, pe.exerciseId, { supersetGroup: v || null })}
+                            options={[
+                              { value: '', label: '— superset' },
+                              { value: 'A', label: 'A' },
+                              { value: 'B', label: 'B' },
+                              { value: 'C', label: 'C' },
+                            ]}
+                            className="min-h-8 w-auto py-1 text-xs"
+                          />
                         </div>
                       </li>
                     )

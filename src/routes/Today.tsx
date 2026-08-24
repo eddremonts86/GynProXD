@@ -6,6 +6,7 @@ import { isPersonalRecord, suggestNext } from '../lib/progression'
 import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
 import { Input } from '../ui/Input'
+import { FormSelect } from '../ui/FormSelect'
 import { PageHeader } from '../ui/PageHeader'
 import { Badge } from '../ui/Badge'
 import { Illustration } from '../ui/Illustration'
@@ -428,18 +429,16 @@ export function TodayPage() {
             onChange={(e) => setFilter(e.target.value)}
             placeholder="Filter — e.g. bench, squat"
           />
-          <select
+          <FormSelect
+            ariaLabel="Choose exercise"
             value={selectedId}
-            onChange={(e) => setSelectedId(e.target.value)}
-            className="w-full rounded-[var(--radius-md)] border border-line bg-surface px-3 py-3 text-sm text-ink-soft outline-none transition-colors focus:border-accent focus:bg-surface-2"
-          >
-            <option value="">Choose exercise…</option>
-            {filteredExercises.map((e) => (
-              <option key={e.id} value={e.id}>
-                {e.name}
-              </option>
-            ))}
-          </select>
+            onValueChange={setSelectedId}
+            placeholder="Choose exercise…"
+            options={[
+              { value: '', label: 'Choose exercise…' },
+              ...filteredExercises.map((e) => ({ value: e.id, label: e.name })),
+            ]}
+          />
           {selectedExercise && (
             <div className="flex gap-1.5">
               <Badge variant="accent">{selectedExercise.muscle}</Badge>

@@ -9,6 +9,7 @@ import { EmptyState } from '../ui/EmptyState'
 import { PageHeader } from '../ui/PageHeader'
 import { Illustration } from '../ui/Illustration'
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from 'recharts'
+import { FormSelect } from '../ui/FormSelect'
 
 export function HistoryPage() {
   const workouts = useGym((s) => s.workouts)
@@ -74,20 +75,14 @@ export function HistoryPage() {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h3 className="font-display text-base text-ink">Progreso — {chartName}</h3>
             {exerciseOptions.length > 1 && (
-              <label className="flex items-center gap-2">
-                <span className="sr-only">Ejercicio de la gráfica</span>
-                <select
+              <div className="w-56">
+                <FormSelect
+                  ariaLabel="Ejercicio de la gráfica"
                   value={chartId}
-                  onChange={(e) => setChartExerciseId(e.target.value)}
-                  className="rounded-full border border-line bg-surface px-3 py-1.5 text-xs text-ink-soft outline-none focus:border-accent min-h-8 max-w-52"
-                >
-                  {exerciseOptions.map((o) => (
-                    <option key={o.id} value={o.id}>
-                      {o.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
+                  onValueChange={setChartExerciseId}
+                  options={exerciseOptions.map((o) => ({ value: o.id, label: o.name }))}
+                />
+              </div>
             )}
           </div>
           <p className="text-xs tracking-wide text-muted uppercase">e1RM estimado · {series.length} sesiones</p>

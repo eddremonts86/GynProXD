@@ -3,6 +3,8 @@ import { useNavigate } from '@tanstack/react-router'
 import { PageHeader } from '../ui/PageHeader'
 import { Card } from '../ui/Card'
 import { Input } from '../ui/Input'
+import { FormSelect } from '../ui/FormSelect'
+import { Textarea } from '@/components/ui/textarea'
 import { Button } from '../ui/Button'
 import { Badge } from '../ui/Badge'
 import { Illustration } from '../ui/Illustration'
@@ -78,12 +80,13 @@ export function OnboardingPage() {
       <Card>
         <h2 className="font-display text-lg text-ink">Cuéntame</h2>
         <p className="mt-1 text-sm text-muted">Ejemplo: “hombre 40a, 140→80kg, 3×/sem 2h, gym, esfuerzo medio, quiero adelgazar”</p>
-        <textarea
+        <Textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
           rows={3}
           placeholder="Escribe aquí…"
-          className="mt-3 w-full rounded-[var(--radius-md)] border border-line bg-surface px-4 py-3 text-sm text-ink-soft placeholder:text-muted/60 outline-none focus:border-accent focus:bg-surface-2"
+          aria-label="Describe tu caso"
+          className="mt-3 min-h-24 w-full bg-surface px-4 py-3 text-sm"
         />
         <div className="mt-3 flex flex-wrap gap-1.5">
           <Badge variant={parsed.confidence > 0.6 ? 'accent' : 'muted'}>confianza {Math.round(parsed.confidence * 100)}%</Badge>
@@ -111,76 +114,69 @@ export function OnboardingPage() {
         <h3 className="font-display text-base text-ink">Ajuste fino (6 campos)</h3>
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
           <Input label="Edad" value={age} onChange={(e) => setAge(e.target.value)} inputMode="numeric" />
-          <label className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5">
             <span className="text-xs font-medium tracking-widest text-muted uppercase">Sexo</span>
-            <select
+            <FormSelect
+              ariaLabel="Sexo"
               value={sex}
-              onChange={(e) => setSex(e.target.value as never)}
-              className="rounded-[var(--radius-md)] border border-line bg-surface px-3 py-3 text-sm text-ink-soft outline-none focus:border-accent"
-            >
-              <option value="hombre">hombre</option>
-              <option value="mujer">mujer</option>
-              <option value="otro">otro</option>
-            </select>
-          </label>
+              onValueChange={(v) => setSex(v as never)}
+              options={[
+                { value: 'hombre', label: 'hombre' },
+                { value: 'mujer', label: 'mujer' },
+                { value: 'otro', label: 'otro' },
+              ]}
+            />
+          </div>
           <Input label="Peso kg" value={weight} onChange={(e) => setWeight(e.target.value)} inputMode="decimal" />
           <Input label="Objetivo kg" value={target} onChange={(e) => setTarget(e.target.value)} inputMode="decimal" />
           <Input label="Altura cm" value={height} onChange={(e) => setHeight(e.target.value)} inputMode="numeric" />
-          <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium tracking-widest text-muted uppercase">Meta</span>
-            <select
-              value={goal}
-              onChange={(e) => setGoal(e.target.value as Goal)}
-              className="rounded-[var(--radius-md)] border border-line bg-surface px-3 py-3 text-sm text-ink-soft outline-none focus:border-accent"
-            >
-              <option value="adelgazar">adelgazar</option>
-              <option value="musculo">músculo</option>
-              <option value="recomp">recomp</option>
-              <option value="fuerza">fuerza</option>
-              <option value="general">general</option>
-              <option value="hibrido">híbrido</option>
-            </select>
-          </label>
-          <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium tracking-widest text-muted uppercase">Nivel</span>
-            <select
-              value={level}
-              onChange={(e) => setLevel(e.target.value as Level)}
-              className="rounded-[var(--radius-md)] border border-line bg-surface px-3 py-3 text-sm text-ink-soft outline-none focus:border-accent"
-            >
-              <option value="principiante">principiante</option>
-              <option value="intermedio">intermedio</option>
-              <option value="avanzado">avanzado</option>
-            </select>
-          </label>
+          <FormSelect
+            ariaLabel="Meta"
+            value={goal}
+            onValueChange={(v) => setGoal(v as Goal)}
+            options={[
+              { value: 'adelgazar', label: 'adelgazar' },
+              { value: 'musculo', label: 'músculo' },
+              { value: 'recomp', label: 'recomp' },
+              { value: 'fuerza', label: 'fuerza' },
+              { value: 'general', label: 'general' },
+              { value: 'hibrido', label: 'híbrido' },
+            ]}
+          />
+          <FormSelect
+            ariaLabel="Nivel"
+            value={level}
+            onValueChange={(v) => setLevel(v as Level)}
+            options={[
+              { value: 'principiante', label: 'principiante' },
+              { value: 'intermedio', label: 'intermedio' },
+              { value: 'avanzado', label: 'avanzado' },
+            ]}
+          />
           <Input label="Días/sem" value={days} onChange={(e) => setDays(e.target.value)} inputMode="numeric" />
           <Input label="Min/sesión" value={mins} onChange={(e) => setMins(e.target.value)} inputMode="numeric" />
-          <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium tracking-widest text-muted uppercase">Material</span>
-            <select
-              value={equipment}
-              onChange={(e) => setEquipment(e.target.value)}
-              className="rounded-[var(--radius-md)] border border-line bg-surface px-3 py-3 text-sm text-ink-soft outline-none focus:border-accent"
-            >
-              <option value="hibrido">híbrido</option>
-              <option value="barbell">gym</option>
-              <option value="bodyweight">casa/calistenia</option>
-            </select>
-          </label>
-          <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium tracking-widest text-muted uppercase">Esfuerzo 1–5</span>
-            <select
-              value={effort}
-              onChange={(e) => setEffort(e.target.value)}
-              className="rounded-[var(--radius-md)] border border-line bg-surface px-3 py-3 text-sm text-ink-soft outline-none focus:border-accent"
-            >
-              <option value="1">1 — suave (2h/sem)</option>
-              <option value="2">2</option>
-              <option value="3">3 — medio (5h/sem)</option>
-              <option value="4">4</option>
-              <option value="5">5 — alto (9h/sem)</option>
-            </select>
-          </label>
+          <FormSelect
+            ariaLabel="Material"
+            value={equipment}
+            onValueChange={(v) => setEquipment(v)}
+            options={[
+              { value: 'hibrido', label: 'híbrido' },
+              { value: 'barbell', label: 'gym' },
+              { value: 'bodyweight', label: 'casa/calistenia' },
+            ]}
+          />
+          <FormSelect
+            ariaLabel="Esfuerzo 1 a 5"
+            value={effort}
+            onValueChange={(v) => setEffort(v)}
+            options={[
+              { value: '1', label: '1 — suave (2h/sem)' },
+              { value: '2', label: '2' },
+              { value: '3', label: '3 — medio (5h/sem)' },
+              { value: '4', label: '4' },
+              { value: '5', label: '5 — alto (9h/sem)' },
+            ]}
+          />
         </div>
       </Card>
 
