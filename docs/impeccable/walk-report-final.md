@@ -1,7 +1,7 @@
 # Walk Report — GynProXD
 
-- Base: http://localhost:3010
-- Date: 2026-08-23T15:06:26.320Z
+- Base: http://localhost:3015
+- Date: 2026-08-24T18:38:55.665Z
 - Viewports: mobile-375 (375x812), desktop (1440x900)
 - Routes: /, /onboarding, /planner, /library, /history, /settings
 

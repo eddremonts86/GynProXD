@@ -1,6 +1,6 @@
 {
-  "base": "http://localhost:3010",
-  "startedAt": "2026-08-23T15:06:26.320Z",
+  "base": "http://localhost:3015",
+  "startedAt": "2026-08-24T18:38:55.665Z",
   "viewports": [
     "mobile-375",
     "desktop"
@@ -17,146 +17,146 @@
     {
       "viewport": "mobile-375",
       "route": "/",
-      "url": "http://localhost:3010/",
+      "url": "http://localhost:3015/",
       "status": "ok",
       "error": null,
       "pageErrors": [],
       "consoleErrors": [],
       "failedResponses": [],
       "screenshot": "shots/final-mobile-375-today.png",
-      "durationMs": 1431
+      "durationMs": 1605
     },
     {
       "viewport": "mobile-375",
       "route": "/onboarding",
-      "url": "http://localhost:3010/onboarding",
+      "url": "http://localhost:3015/onboarding",
       "status": "ok",
       "error": null,
       "pageErrors": [],
       "consoleErrors": [],
       "failedResponses": [],
       "screenshot": "shots/final-mobile-375-onboarding.png",
-      "durationMs": 1436
+      "durationMs": 1711
     },
     {
       "viewport": "mobile-375",
       "route": "/planner",
-      "url": "http://localhost:3010/planner",
+      "url": "http://localhost:3015/planner",
       "status": "ok",
       "error": null,
       "pageErrors": [],
       "consoleErrors": [],
       "failedResponses": [],
       "screenshot": "shots/final-mobile-375-planner.png",
-      "durationMs": 1389
+      "durationMs": 1593
     },
     {
       "viewport": "mobile-375",
       "route": "/library",
-      "url": "http://localhost:3010/library",
+      "url": "http://localhost:3015/library",
       "status": "ok",
       "error": null,
       "pageErrors": [],
       "consoleErrors": [],
       "failedResponses": [],
       "screenshot": "shots/final-mobile-375-library.png",
-      "durationMs": 1817
+      "durationMs": 1971
     },
     {
       "viewport": "mobile-375",
       "route": "/history",
-      "url": "http://localhost:3010/history",
+      "url": "http://localhost:3015/history",
       "status": "ok",
       "error": null,
       "pageErrors": [],
       "consoleErrors": [],
       "failedResponses": [],
       "screenshot": "shots/final-mobile-375-history.png",
-      "durationMs": 1376
+      "durationMs": 1581
     },
     {
       "viewport": "mobile-375",
       "route": "/settings",
-      "url": "http://localhost:3010/settings",
+      "url": "http://localhost:3015/settings",
       "status": "ok",
       "error": null,
       "pageErrors": [],
       "consoleErrors": [],
       "failedResponses": [],
       "screenshot": "shots/final-mobile-375-settings.png",
-      "durationMs": 1364
+      "durationMs": 1598
     },
     {
       "viewport": "desktop",
       "route": "/",
-      "url": "http://localhost:3010/",
+      "url": "http://localhost:3015/",
       "status": "ok",
       "error": null,
       "pageErrors": [],
       "consoleErrors": [],
       "failedResponses": [],
       "screenshot": "shots/final-desktop-today.png",
-      "durationMs": 1325
+      "durationMs": 1356
     },
     {
       "viewport": "desktop",
       "route": "/onboarding",
-      "url": "http://localhost:3010/onboarding",
+      "url": "http://localhost:3015/onboarding",
       "status": "ok",
       "error": null,
       "pageErrors": [],
       "consoleErrors": [],
       "failedResponses": [],
       "screenshot": "shots/final-desktop-onboarding.png",
-      "durationMs": 1380
+      "durationMs": 1378
     },
     {
       "viewport": "desktop",
       "route": "/planner",
-      "url": "http://localhost:3010/planner",
+      "url": "http://localhost:3015/planner",
       "status": "ok",
       "error": null,
       "pageErrors": [],
       "consoleErrors": [],
       "failedResponses": [],
       "screenshot": "shots/final-desktop-planner.png",
-      "durationMs": 1350
+      "durationMs": 1369
     },
     {
       "viewport": "desktop",
       "route": "/library",
-      "url": "http://localhost:3010/library",
+      "url": "http://localhost:3015/library",
       "status": "ok",
       "error": null,
       "pageErrors": [],
       "consoleErrors": [],
       "failedResponses": [],
       "screenshot": "shots/final-desktop-library.png",
-      "durationMs": 1557
+      "durationMs": 1640
     },
     {
       "viewport": "desktop",
       "route": "/history",
-      "url": "http://localhost:3010/history",
+      "url": "http://localhost:3015/history",
       "status": "ok",
       "error": null,
       "pageErrors": [],
       "consoleErrors": [],
       "failedResponses": [],
       "screenshot": "shots/final-desktop-history.png",
-      "durationMs": 1314
+      "durationMs": 1491
     },
     {
       "viewport": "desktop",
       "route": "/settings",
-      "url": "http://localhost:3010/settings",
+      "url": "http://localhost:3015/settings",
       "status": "ok",
       "error": null,
       "pageErrors": [],
       "consoleErrors": [],
       "failedResponses": [],
       "screenshot": "shots/final-desktop-settings.png",
-      "durationMs": 1329
+      "durationMs": 1489
     }
   ],
   "summary": {
@@ -164,5 +164,5 @@
     "errors": 0,
     "failedRequests": 0
   },
-  "finishedAt": "2026-08-23T15:06:43.789Z"
+  "finishedAt": "2026-08-24T18:39:14.831Z"
 }
