@@ -1,8 +1,9 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useGym } from '../store/useGym'
 import { e1rmSeries, exerciseById } from '../lib/exercises'
 import { muscleMaxVolume, muscleVolume } from '../lib/muscle-volume'
 import { Badge } from '../ui/Badge'
+import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
 import { EmptyState } from '../ui/EmptyState'
 import { PageHeader } from '../ui/PageHeader'
@@ -12,6 +13,8 @@ import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianG
 export function HistoryPage() {
   const workouts = useGym((s) => s.workouts)
   const bodyweight = useGym((s) => s.bodyweight)
+  const deleteWorkout = useGym((s) => s.deleteWorkout)
+  const [confirmId, setConfirmId] = useState<string | null>(null)
 
   const topExerciseId = useMemo(() => {
     const counts: Record<string, number> = {}
@@ -111,9 +114,30 @@ export function HistoryPage() {
         <div className="flex flex-col gap-3">
           {workouts.map((w) => (
             <Card key={w.id} padding="md">
-              <header className="flex items-center justify-between">
+              <header className="flex items-center justify-between gap-2">
                 <time className="font-display text-base text-ink">{w.date}</time>
-                <Badge variant="muted">{w.exercises.length} movements</Badge>
+                <div className="flex items-center gap-2">
+                  <Badge variant="muted">{w.exercises.length} movements</Badge>
+                  {confirmId === w.id ? (
+                    <span className="flex items-center gap-1.5">
+                      <Button variant="ghost" size="sm" onClick={() => setConfirmId(null)}>
+                        Cancel
+                      </Button>
+                      <Button size="sm" onClick={() => { deleteWorkout(w.id); setConfirmId(null) }}>
+                        Confirm
+                      </Button>
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => setConfirmId(w.id)}
+                      className="flex h-9 w-9 items-center justify-center rounded-full text-muted hover:bg-surface-2 hover:text-ink-soft"
+                      aria-label={`Delete workout ${w.date}`}
+                      title="Delete"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
               </header>
               <ul className="mt-3 flex flex-col gap-2">
                 {w.exercises.map((le) => {

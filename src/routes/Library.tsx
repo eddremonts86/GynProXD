@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useGym } from '../store/useGym'
 import { exerciseLookup } from '../lib/exercises'
-import type { MuscleGroup } from '../lib/types'
+import type { Exercise, MuscleGroup } from '../lib/types'
 import { Badge } from '../ui/Badge'
 import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
@@ -10,6 +10,7 @@ import { Input } from '../ui/Input'
 import { PageHeader } from '../ui/PageHeader'
 import { Illustration } from '../ui/Illustration'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { getExerciseImage, REPDB_COUNT } from '@/lib/images'
 
 const MUSCLE_FILTERS: (MuscleGroup | 'all')[] = [
@@ -38,6 +39,7 @@ export function LibraryPage() {
   const [muscle, setMuscle] = useState<(typeof MUSCLE_FILTERS)[number]>('all')
   const [name, setName] = useState('')
   const [visible, setVisible] = useState(50)
+  const [detail, setDetail] = useState<Exercise | null>(null)
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -114,7 +116,13 @@ export function LibraryPage() {
           {sliced.map((e) => {
             const img = getExerciseImage(e.id, e.image)
             return (
-              <Card key={e.id} padding="sm" className="flex gap-3">
+              <Card key={e.id} padding="sm" hover className="flex gap-3 cursor-pointer text-left"
+                onClick={() => setDetail(e)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); setDetail(e) } }}
+                aria-label={`Ver detalle de ${e.name}`}
+              >
                 {img ? (
                   <img
                     src={img}
@@ -155,6 +163,46 @@ export function LibraryPage() {
           )}
         </div>
       )}
+
+      <Dialog open={!!detail} onOpenChange={(open) => { if (!open) setDetail(null) }}>
+        <DialogContent className="sm:max-w-md">
+          {detail && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="font-display text-xl">{detail.name}</DialogTitle>
+                <DialogDescription className="flex flex-wrap gap-1.5 pt-1">
+                  <Badge>{detail.muscle}</Badge>
+                  <Badge variant="muted">{detail.equipment}</Badge>
+                </DialogDescription>
+              </DialogHeader>
+              {(() => {
+                const img = getExerciseImage(detail.id, detail.image)
+                return img ? (
+                  <img
+                    src={img}
+                    alt={`${detail.name} — ${detail.muscle} ${detail.equipment}`}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-48 w-full rounded-[var(--radius-md)] bg-surface-2 object-contain border border-line/40"
+                  />
+                ) : null
+              })()}
+              {detail.instructions && detail.instructions.length > 0 ? (
+                <ol className="flex flex-col gap-2 overflow-y-auto max-h-64 pr-1">
+                  {detail.instructions.map((step, i) => (
+                    <li key={i} className="flex gap-2.5 text-sm leading-5 text-ink-soft">
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent-soft text-[10px] font-bold text-accent">{i + 1}</span>
+                      {step}
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <p className="text-sm text-muted">Sin instrucciones disponibles para este movimiento.</p>
+              )}
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <Card>
         <h2 className="font-display text-lg text-ink">Add custom movement</h2>

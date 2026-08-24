@@ -11,7 +11,11 @@ export function SettingsPage() {
   const customExercises = useGym((s) => s.customExercises)
   const plans = useGym((s) => s.plans)
   const importData = useGym((s) => s.importData)
+  const clearAllData = useGym((s) => s.clearAllData)
   const [msg, setMsg] = useState('')
+  const [confirmClear, setConfirmClear] = useState(false)
+
+  const hasData = workouts.length > 0 || bodyweight.length > 0 || customExercises.length > 0 || plans.length > 0
 
   const exportJson = () => {
     const blob = new Blob([JSON.stringify({ version: 3, customExercises, workouts, bodyweight, plans }, null, 2)], {
@@ -65,8 +69,36 @@ export function SettingsPage() {
         {msg && <p className="mt-3 rounded-[var(--radius-md)] bg-accent-soft px-3 py-2 text-sm font-medium text-accent border border-accent/20">{msg}</p>}
         <p className="mt-3 text-xs leading-4 text-muted">Includes 873 public-domain movements via jsDelivr, your customs, and weekly plans. No server.</p>
         <p className="mt-2 text-xs leading-4 text-muted">
-          Exercise data by <a href="https://repdb.co/free-exercise-dataset" target="_blank" rel="noreferrer" className="underline text-accent">RepDB (repdb.co)</a> — 250 flat WebP (free tier, attribution) + yuhonas fallback. Images in <span className="font-mono">public/repdb</span> cached offline.
+          Exercise data by <a href="https://repdb.co/free-exercise-dataset" target="_blank" rel="noreferrer" className="underline text-accent">RepDB (repdb.co)</a> — 250 flat WebP (free tier, attribution) + generated flat SVG. Images in <span className="font-mono">public/repdb</span> and <span className="font-mono">public/generated</span> cached offline.
         </p>
+      </Card>
+
+      <Card className="border-destructive/30">
+        <h2 className="font-display text-lg text-ink">Danger zone</h2>
+        <p className="mt-1 text-sm leading-5 text-muted">
+          Deletes sessions, weigh-ins, custom movements, weekly plans and generated plans from this browser. Export first if you want a backup — this cannot be undone.
+        </p>
+        {confirmClear ? (
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="text-sm font-semibold text-destructive">¿Seguro? Se borra todo.</span>
+            <Button variant="ghost" size="sm" onClick={() => setConfirmClear(false)}>
+              Cancel
+            </Button>
+            <Button size="sm" onClick={() => { clearAllData(); setConfirmClear(false); setMsg('All data cleared.') }}>
+              Yes, delete everything
+            </Button>
+          </div>
+        ) : (
+          <Button
+            variant="ghost"
+            size="sm"
+            disabled={!hasData}
+            onClick={() => setConfirmClear(true)}
+            className="mt-4 border border-destructive/40 text-destructive hover:bg-destructive/10"
+          >
+            Clear all data
+          </Button>
+        )}
       </Card>
 
       <Card className="border-dashed bg-transparent shadow-none">

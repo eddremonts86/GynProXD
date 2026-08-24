@@ -5,6 +5,11 @@ interface CardProps {
   className?: string
   hover?: boolean
   padding?: 'none' | 'sm' | 'md' | 'lg'
+  onClick?: () => void
+  role?: string
+  tabIndex?: number
+  onKeyDown?: (ev: React.KeyboardEvent) => void
+  'aria-label'?: string
 }
 
 const paddingMap = {
@@ -14,7 +19,17 @@ const paddingMap = {
   lg: 'p-5',
 } as const
 
-export function Card({ children, className = '', hover = false, padding = 'md' }: CardProps) {
+export function Card({
+  children,
+  className = '',
+  hover = false,
+  padding = 'md',
+  onClick,
+  role,
+  tabIndex,
+  onKeyDown,
+  'aria-label': ariaLabel,
+}: CardProps) {
   return (
     <div
       className={[
@@ -26,6 +41,11 @@ export function Card({ children, className = '', hover = false, padding = 'md' }
       ]
         .filter(Boolean)
         .join(' ')}
+      onClick={onClick}
+      role={role}
+      tabIndex={tabIndex}
+      onKeyDown={onKeyDown}
+      aria-label={ariaLabel}
     >
       {children}
     </div>

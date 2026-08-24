@@ -44,6 +44,8 @@ interface GymState {
   discardWorkout: () => void
   addSet: (exerciseId: string, weight: number, reps: number, opts?: { durationSec?: number; side?: 'L' | 'R' }) => void
   finishWorkout: () => void
+  deleteWorkout: (id: string) => void
+  clearAllData: () => void
   logBodyweight: (kg: number) => void
   importData: (json: unknown) => boolean
   createPlan: (name: string) => string
@@ -131,6 +133,19 @@ export const useGym = create<GymState>()(
             workouts: [s.activeWorkout, ...s.workouts],
             activeWorkout: null,
           }
+        }),
+
+      deleteWorkout: (id) =>
+        set((s) => ({ workouts: s.workouts.filter((w) => w.id !== id) })),
+
+      clearAllData: () =>
+        set({
+          customExercises: [],
+          workouts: [],
+          bodyweight: [],
+          activeWorkout: null,
+          plans: [],
+          generatedPlans: [],
         }),
 
       logBodyweight: (kg) =>
