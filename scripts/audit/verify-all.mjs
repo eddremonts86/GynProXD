@@ -1,6 +1,6 @@
 import { chromium } from 'playwright'
 
-const BASE = process.env.BASE_URL ?? 'http://localhost:3010'
+const BASE = process.env.BASE_URL ?? 'http://localhost:3015'
 const viewports = [
   { name: 'desktop', width: 1440, height: 900 },
   { name: 'mobile', width: 375, height: 812 },

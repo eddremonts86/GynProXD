@@ -5,6 +5,15 @@ import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  server: {
+    port: 3015,
+    strictPort: true,
+    host: '127.0.0.1',
+  },
+  preview: {
+    port: 3015,
+    strictPort: true,
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

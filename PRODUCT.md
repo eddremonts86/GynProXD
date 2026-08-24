@@ -46,7 +46,7 @@ Local-first, realistic, hybrid. Unlike cloud trackers that promise miracles, For
 
 ## Evidence on Hand
 
-- Live app at `http://localhost:3010` (dev) and `dist` with PWA manifest `Forma` theme `#1a1816`.
+- Live app at `http://localhost:3015` (dev, strictPort) and `dist` with PWA manifest `Forma` theme `#1a1816`.
 - Dataset `src/data/exercises-generated.ts` 873, lib `src/lib/exercises.ts`, `progression.ts`, `plan-estimate.ts`, `plan-generator.ts`, `onboarding-parse.ts` with tests 26/26.
 - Screenshots `docs/impeccable/shots/*` before/after/radical/final/gen-final, walk reports.
 
