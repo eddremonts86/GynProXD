@@ -10,6 +10,7 @@ import { Input } from '../ui/Input'
 import { PageHeader } from '../ui/PageHeader'
 import { Illustration } from '../ui/Illustration'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { getExerciseImage, REPDB_COUNT } from '@/lib/images'
 
 const MUSCLE_FILTERS: (MuscleGroup | 'all')[] = [
   'all',
@@ -58,7 +59,7 @@ export function LibraryPage() {
       <PageHeader
         eyebrow="Forma · Library"
         title="Movements"
-        description={`Offline collection · ${exercises.length} public-domain · ${customExercises.length} custom · warm, human, 3D plate`}
+        description={`Offline collection · ${exercises.length} public-domain · ${customExercises.length} custom · ${REPDB_COUNT} RepDB flat WebP · warm, human, 3D plate`}
       />
 
       <Illustration variant="orb" className="h-20 w-full" />
@@ -110,24 +111,25 @@ export function LibraryPage() {
         <EmptyState title="No matches" description="Try a different keyword or muscle. Warm, human, offline." />
       ) : (
         <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
-          {sliced.map((e) => (
-            <Card key={e.id} padding="sm" className="flex gap-3">
-              {e.image ? (
-                <img
-                  src={e.image}
-                  srcSet={`${e.image} 1x, ${e.image} 2x`}
-                  sizes="56px"
-                  alt={`${e.name} — ${e.muscle} ${e.equipment}`}
-                  loading="lazy"
-                  decoding="async"
-                  width={56}
-                  height={56}
-                  className="h-14 w-14 shrink-0 rounded-[var(--radius-md)] bg-surface-2 object-cover border border-line/40"
-                  onError={(ev) => {
-                    ;(ev.target as HTMLImageElement).style.display = 'none'
-                  }}
-                />
-              ) : (
+          {sliced.map((e) => {
+            const img = getExerciseImage(e.id, e.image)
+            return (
+              <Card key={e.id} padding="sm" className="flex gap-3">
+                {img ? (
+                  <img
+                    src={img}
+                    sizes="56px"
+                    alt={`${e.name} — ${e.muscle} ${e.equipment}`}
+                    loading="lazy"
+                    decoding="async"
+                    width={56}
+                    height={56}
+                    className="h-14 w-14 shrink-0 rounded-[var(--radius-md)] bg-surface-2 object-cover border border-line/40"
+                    onError={(ev) => {
+                      ;(ev.target as HTMLImageElement).style.display = 'none'
+                    }}
+                  />
+                ) : (
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-surface-2 text-[10px] font-bold tracking-widest text-muted border border-line/40">
                   {e.muscle.slice(0, 3).toUpperCase()}
                 </div>
@@ -140,7 +142,8 @@ export function LibraryPage() {
                 </div>
               </div>
             </Card>
-          ))}
+            )
+          })}
           {hasMore && (
             <Button
               variant="secondary"

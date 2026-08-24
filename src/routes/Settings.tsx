@@ -64,6 +64,9 @@ export function SettingsPage() {
         </div>
         {msg && <p className="mt-3 rounded-[var(--radius-md)] bg-accent-soft px-3 py-2 text-sm font-medium text-accent border border-accent/20">{msg}</p>}
         <p className="mt-3 text-xs leading-4 text-muted">Includes 873 public-domain movements via jsDelivr, your customs, and weekly plans. No server.</p>
+        <p className="mt-2 text-xs leading-4 text-muted">
+          Exercise data by <a href="https://repdb.co/free-exercise-dataset" target="_blank" rel="noreferrer" className="underline text-accent">RepDB (repdb.co)</a> — 250 flat WebP (free tier, attribution) + yuhonas fallback. Images in <span className="font-mono">public/repdb</span> cached offline.
+        </p>
       </Card>
 
       <Card className="border-dashed bg-transparent shadow-none">
