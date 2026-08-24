@@ -10,10 +10,4 @@ export function getExerciseImage(exerciseId: string, fallback?: string | null): 
   return null
 }
 
-export function hasRepdbImage(exerciseId: string): boolean {
-  return !!repdb[exerciseId]
-}
-
 export const REPDB_COUNT = Object.keys(repdb).length
-export const GENERATED_COUNT = 489
-export const TOTAL_MAPPED = Object.keys(map).length

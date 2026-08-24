@@ -10,10 +10,6 @@ export function exerciseLookup(custom: Exercise[]): Map<string, Exercise> {
   return map
 }
 
-export function cachedExercise(id: string, lookup: Map<string, Exercise>): Exercise | undefined {
-  return lookup.get(id)
-}
-
 export function populateByIdCache(exercises: Exercise[]) {
   for (const e of exercises) byIdCache.set(e.id, e)
 }

@@ -8,6 +8,7 @@ import { Badge } from '../ui/Badge'
 import { PageHeader } from '../ui/PageHeader'
 import { Illustration } from '../ui/Illustration'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import type { DurationKey } from '../lib/types'
 
 export function GeneratedPlanPage() {
   const params = useParams({ strict: false }) as { id?: string }
@@ -15,6 +16,7 @@ export function GeneratedPlanPage() {
   const plan = useGym((s) => s.generatedPlans.find((g) => g.id === id))
   const saveAsPlan = useGym((s) => s.saveGeneratedAsPlan)
   const deleteGen = useGym((s) => s.deleteGeneratedPlan)
+  const createGeneratedPlan = useGym((s) => s.createGeneratedPlan)
   const navigate = useNavigate()
   const [activeWeek, setActiveWeek] = useState(0)
   const todayStr = new Date().toISOString().slice(0, 10)
@@ -44,6 +46,11 @@ export function GeneratedPlanPage() {
     a.download = `forma-generated-${plan.id}.json`
     a.click()
     URL.revokeObjectURL(url)
+  }
+  const handleRegenerate = (d: DurationKey) => {
+    const newId = createGeneratedPlan(plan.input, d)
+    setActiveWeek(0)
+    navigate({ to: '/generated/$id', params: { id: newId } })
   }
 
   return (
@@ -103,6 +110,23 @@ export function GeneratedPlanPage() {
               s{m.week}: {m.weight ?? '·'}kg
             </span>
           ))}
+        </div>
+        <div className="mt-4 border-t border-line pt-3">
+          <p className="text-xs font-medium tracking-widest text-muted uppercase">Regenerar con otra duración</p>
+          <p className="mt-0.5 text-xs text-muted">Mismos datos, nuevo calendario. El plan actual se conserva.</p>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {(['mensual', 'trimestral', 'semestral', 'anual'] as DurationKey[]).map((d) => (
+              <Button
+                key={d}
+                size="sm"
+                variant={d === plan.approvedDuration ? 'secondary' : 'ghost'}
+                onClick={() => handleRegenerate(d)}
+                className={d === plan.approvedDuration ? 'border-accent/40' : ''}
+              >
+                {d}{d === plan.approvedDuration ? ' ✓' : ''}
+              </Button>
+            ))}
+          </div>
         </div>
       </Card>
 

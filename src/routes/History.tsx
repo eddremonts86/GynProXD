@@ -151,7 +151,8 @@ export function HistoryPage() {
                             key={`${s.weight}-${s.reps}-${i}`}
                             className="rounded-full bg-surface px-2.5 py-1 text-xs font-medium text-ink-soft border border-line/40"
                           >
-                            {s.weight}kg × {s.reps}
+                            {s.durationSec ? `${s.weight}kg × ${s.durationSec}s` : `${s.weight}kg × ${s.reps}`}
+                            {s.side ? ` ${s.side}` : ''}
                           </span>
                         ))}
                       </p>
@@ -162,21 +163,6 @@ export function HistoryPage() {
             </Card>
           ))}
         </div>
-      )}
-
-      {bodyweight.length > 0 && (
-        <Card>
-          <h2 className="font-display text-lg text-ink">Bodyweight</h2>
-          <p className="mt-1 text-xs tracking-wide text-muted uppercase">Last {Math.min(bodyweight.length, 10)} weigh-ins · warm trend</p>
-          <ul className="mt-3 divide-y divide-line/60">
-            {bodyweight.slice(0, 10).map((b) => (
-              <li key={`${b.date}-${b.kg}`} className="flex justify-between py-2.5 text-sm">
-                <span className="font-mono text-xs tracking-wide text-muted uppercase">{b.date}</span>
-                <span className="font-mono tabular-nums text-ink-soft">{b.kg} kg</span>
-              </li>
-            ))}
-          </ul>
-        </Card>
       )}
     </div>
   )
