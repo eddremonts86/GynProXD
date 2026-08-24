@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react'
 import { useParams, useNavigate } from '@tanstack/react-router'
 import { useGym } from '../store/useGym'
 import { exerciseById } from '../lib/exercises'
@@ -6,6 +7,7 @@ import { Button } from '../ui/Button'
 import { Badge } from '../ui/Badge'
 import { PageHeader } from '../ui/PageHeader'
 import { Illustration } from '../ui/Illustration'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 
 export function GeneratedPlanPage() {
   const params = useParams({ strict: false }) as { id?: string }
@@ -14,8 +16,12 @@ export function GeneratedPlanPage() {
   const saveAsPlan = useGym((s) => s.saveGeneratedAsPlan)
   const deleteGen = useGym((s) => s.deleteGeneratedPlan)
   const navigate = useNavigate()
+  const [activeWeek, setActiveWeek] = useState(0)
+  const todayStr = new Date().toISOString().slice(0, 10)
 
-  if (!plan) {
+  const activeWeekData = useMemo(() => plan?.weeks[activeWeek] ?? plan?.weeks[0], [plan, activeWeek])
+
+  if (!plan || !activeWeekData) {
     return (
       <div className="flex flex-col gap-4">
         <PageHeader eyebrow="Forma · Plan" title="No encontrado" description="Este plan no existe o fue eliminado." />
@@ -30,6 +36,15 @@ export function GeneratedPlanPage() {
     const planId = saveAsPlan(plan.id)
     if (planId) navigate({ to: '/planner' })
   }
+  const handleExport = () => {
+    const blob = new Blob([JSON.stringify(plan, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `forma-generated-${plan.id}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -39,6 +54,9 @@ export function GeneratedPlanPage() {
         description={`${plan.weeks.length} semanas · ${plan.input.daysPerWeek}× ${plan.input.minsPerSession}min · esfuerzo ${plan.input.effort} · ${plan.input.weightKg}kg → ${plan.input.targetWeightKg ?? '—'}kg`}
         action={
           <div className="flex gap-2">
+            <Button variant="ghost" size="sm" onClick={handleExport}>
+              Exportar
+            </Button>
             <Button variant="ghost" size="sm" onClick={() => deleteGen(plan.id)}>
               Eliminar
             </Button>
@@ -88,40 +106,74 @@ export function GeneratedPlanPage() {
         </div>
       </Card>
 
-      <div className="flex flex-col gap-4">
-        {plan.weeks.map((week) => (
-          <Card key={week.weekIndex} padding="md">
-            <div className="flex items-center justify-between">
-              <h4 className="font-display text-base text-ink">
-                Semana {week.weekIndex + 1}
-                {(week.weekIndex + 1) % 4 === 0 && <span className="ml-2 text-xs font-sans tracking-wide text-accent uppercase">deload</span>}
-              </h4>
-              <Badge variant="muted">{week.days.length} días</Badge>
-            </div>
-            <div className="mt-3 grid gap-3 md:grid-cols-2">
-              {week.days.map((d) => (
-                <div key={d.date} className="rounded-[var(--radius-md)] bg-surface-2 border border-line/40 p-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold tracking-widest text-accent uppercase">{d.day}</span>
-                    <span className="font-mono text-xs text-muted">{d.date}</span>
-                  </div>
-                  <ul className="mt-2 flex flex-col gap-1.5">
-                    {d.exercises.map((pe) => {
-                      const ex = exerciseById(pe.exerciseId)
-                      return (
-                        <li key={pe.exerciseId} className="flex items-center justify-between gap-2">
-                          <span className="truncate text-sm text-ink-soft">{ex?.name ?? pe.exerciseId}</span>
-                          {pe.progression !== 'none' && <Badge variant="muted">{pe.progression}</Badge>}
-                        </li>
-                      )
-                    })}
-                  </ul>
+      <Card>
+        <div className="flex items-center justify-between gap-2">
+          <h4 className="font-display text-base text-ink">Semanas</h4>
+          <Badge variant="muted">{plan.weeks.length} total</Badge>
+        </div>
+        <ScrollArea className="mt-3">
+          <div className="flex gap-1.5 pb-1">
+            {plan.weeks.map((w) => (
+              <button
+                key={w.weekIndex}
+                onClick={() => setActiveWeek(w.weekIndex)}
+                className={[
+                  'shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium min-h-9',
+                  activeWeek === w.weekIndex ? 'border-accent bg-accent text-accent-contrast' : 'border-line bg-card text-muted',
+                  w.days.some((d) => d.date === todayStr) ? 'ring-1 ring-accent' : '',
+                ].join(' ')}
+              >
+                {w.weekIndex + 1}
+                {(w.weekIndex + 1) % 4 === 0 ? ' • deload' : ''}
+              </button>
+            ))}
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+        <div className="mt-2 flex gap-2">
+          <Button variant="secondary" size="sm" disabled={activeWeek === 0} onClick={() => setActiveWeek((v) => Math.max(0, v - 1))}>
+            ← Anterior
+          </Button>
+          <Button variant="secondary" size="sm" disabled={activeWeek === plan.weeks.length - 1} onClick={() => setActiveWeek((v) => Math.min(plan.weeks.length - 1, v + 1))}>
+            Siguiente →
+          </Button>
+          <span className="ml-auto self-center text-xs text-muted">Semana {activeWeek + 1} de {plan.weeks.length}</span>
+        </div>
+      </Card>
+
+      <Card key={activeWeekData.weekIndex} padding="md">
+        <div className="flex items-center justify-between">
+          <h4 className="font-display text-base text-ink">
+            Semana {activeWeekData.weekIndex + 1}
+            {(activeWeekData.weekIndex + 1) % 4 === 0 && <span className="ml-2 text-xs font-sans tracking-wide text-accent uppercase">deload</span>}
+          </h4>
+          <Badge variant="muted">{activeWeekData.days.length} días</Badge>
+        </div>
+        <div className="mt-3 grid gap-3 md:grid-cols-2">
+          {activeWeekData.days.map((d) => {
+            const isToday = d.date === todayStr
+            return (
+              <div key={d.date} className={['rounded-[var(--radius-md)] p-3 border', isToday ? 'bg-accent/10 border-accent/40 ring-1 ring-accent' : 'bg-surface-2 border-line/40'].join(' ')}>
+                <div className="flex items-center justify-between">
+                  <span className={['text-xs font-semibold tracking-widest uppercase', isToday ? 'text-accent' : 'text-accent'].join(' ')}>{d.day}{isToday ? ' • hoy' : ''}</span>
+                  <span className="font-mono text-xs text-muted">{d.date}</span>
                 </div>
-              ))}
-            </div>
-          </Card>
-        ))}
-      </div>
+                <ul className="mt-2 flex flex-col gap-1.5">
+                  {d.exercises.map((pe) => {
+                    const ex = exerciseById(pe.exerciseId)
+                    return (
+                      <li key={pe.exerciseId} className="flex items-center justify-between gap-2">
+                        <span className="truncate text-sm text-ink-soft">{ex?.name ?? pe.exerciseId}</span>
+                        {pe.progression !== 'none' && <Badge variant="muted">{pe.progression}</Badge>}
+                      </li>
+                    )
+                  })}
+                </ul>
+              </div>
+            )
+          })}
+        </div>
+      </Card>
 
       <div className="flex gap-2">
         <Button variant="secondary" onClick={() => navigate({ to: '/planner' })}>
