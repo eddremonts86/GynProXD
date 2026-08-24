@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { createRootRoute, createRoute, createRouter, Link, Outlet, useRouterState } from '@tanstack/react-router'
-import { Home, CalendarRange, Library, History, Settings, WandSparkles, Dumbbell, ChartColumn } from 'lucide-react'
+import { Home, CalendarRange, Library, History, Settings, WandSparkles, Dumbbell } from 'lucide-react'
 import { RouteFallback } from '@/components/route-skeleton'
 
 const TodayPage = React.lazy(() => import('./routes/Today').then((m) => ({ default: m.TodayPage })))
@@ -38,10 +38,6 @@ const navMain = [
   { title: 'Settings', url: '/settings', icon: Settings },
 ]
 
-const navSecondary = [
-  { title: 'Generated', url: '/generated', icon: ChartColumn, disabled: true },
-]
-
 function AppSidebar() {
   const routerState = useRouterState()
   const pathname = routerState.location.pathname
@@ -66,21 +62,6 @@ function AppSidebar() {
               {navMain.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton tooltip={item.title} isActive={pathname === item.url} render={<Link to={item.url} />}>
-                    <item.icon />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel>System</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {navSecondary.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton tooltip={item.title} isActive={false} className="opacity-60">
                     <item.icon />
                     <span>{item.title}</span>
                   </SidebarMenuButton>

@@ -4,6 +4,7 @@ import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
 import { PageHeader } from '../ui/PageHeader'
 import { Illustration } from '../ui/Illustration'
+import { InstallAppButton } from '@/components/install-app-button'
 
 export function SettingsPage() {
   const workouts = useGym((s) => s.workouts)
@@ -52,6 +53,7 @@ export function SettingsPage() {
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <Button onClick={exportJson}>Export JSON</Button>
+          <InstallAppButton />
           <label className="inline-flex cursor-pointer items-center justify-center rounded-[var(--radius-md)] border border-line bg-card px-4 py-2.5 text-sm font-semibold text-ink-soft transition-colors hover:border-line-strong hover:bg-card-hover focus-visible:outline-none">
             Import JSON
             <input
