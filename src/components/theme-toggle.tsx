@@ -2,15 +2,16 @@ import { Moon, Sun } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 
+function initialTheme(): 'light' | 'dark' {
+  return (localStorage.getItem('forma-theme') as 'light' | 'dark' | null) ?? 'dark'
+}
+
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark')
+  const [theme, setTheme] = useState<'light' | 'dark'>(initialTheme)
 
   useEffect(() => {
-    const stored = localStorage.getItem('forma-theme') as 'light' | 'dark' | null
-    const initial = stored ?? 'dark'
-    setTheme(initial)
-    document.documentElement.classList.toggle('dark', initial === 'dark')
-  }, [])
+    document.documentElement.classList.toggle('dark', theme === 'dark')
+  }, [theme])
 
   const toggle = () => {
     const next = theme === 'dark' ? 'light' : 'dark'

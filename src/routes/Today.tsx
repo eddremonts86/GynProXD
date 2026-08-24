@@ -95,25 +95,22 @@ export function TodayPage() {
 
   useEffect(() => {
     if (restLeft === null) return
-    if (restLeft <= 0) {
-      playRestEndBeep()
-      setRestLeft(null)
-      return
-    }
-    const id = window.setTimeout(() => setRestLeft((v) => (v === null ? null : v - 1)), 1000)
+    const id = window.setTimeout(() => {
+      setRestLeft((v) => {
+        if (v === null) return null
+        const next = v - 1
+        if (next <= 0) {
+          playRestEndBeep()
+          return null
+        }
+        return next
+      })
+    }, 1000)
     return () => window.clearTimeout(id)
   }, [restLeft])
 
   useEffect(() => {
-    if (!activeWorkout) {
-      setRestLeft(null)
-      if (wakeRef.current) {
-        void wakeRef.current.release().catch(() => {})
-        wakeRef.current = null
-        setWakeActive(false)
-      }
-      return
-    }
+    if (!activeWorkout) return
     let cancelled = false
     const req = async () => {
       try {
@@ -291,7 +288,7 @@ export function TodayPage() {
         title="Workout"
         description={`${logged.length} exercise${logged.length === 1 ? '' : 's'} · ${activeWorkout.date}`}
         action={
-          <Button variant="ghost" size="sm" onClick={discardWorkout}>
+          <Button variant="ghost" size="sm" onClick={() => { discardWorkout(); setRestLeft(null) }}>
             Discard
           </Button>
         }
@@ -537,7 +534,7 @@ export function TodayPage() {
       <Button
         variant="secondary"
         size="lg"
-        onClick={finishWorkout}
+        onClick={() => { finishWorkout(); setRestLeft(null) }}
         disabled={logged.length === 0}
         className="w-full border-accent/30 text-accent hover:border-accent hover:bg-accent-soft disabled:opacity-40"
       >

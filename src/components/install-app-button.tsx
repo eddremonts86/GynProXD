@@ -22,7 +22,9 @@ export function InstallAppButton() {
     }
     window.addEventListener('beforeinstallprompt', onPrompt)
     window.addEventListener('appinstalled', onInstalled)
-    if (window.matchMedia('(display-mode: standalone)').matches) setInstalled(true)
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      queueMicrotask(() => setInstalled(true))
+    }
     return () => {
       window.removeEventListener('beforeinstallprompt', onPrompt)
       window.removeEventListener('appinstalled', onInstalled)
