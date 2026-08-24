@@ -1,6 +1,6 @@
 {
   "base": "http://localhost:3015",
-  "startedAt": "2026-08-24T19:22:25.174Z",
+  "startedAt": "2026-08-24T19:58:09.423Z",
   "viewports": [
     "mobile-375",
     "desktop"
@@ -24,7 +24,7 @@
       "consoleErrors": [],
       "failedResponses": [],
       "screenshot": "shots/final-mobile-375-today.png",
-      "durationMs": 1625
+      "durationMs": 1885
     },
     {
       "viewport": "mobile-375",
@@ -36,7 +36,7 @@
       "consoleErrors": [],
       "failedResponses": [],
       "screenshot": "shots/final-mobile-375-onboarding.png",
-      "durationMs": 1731
+      "durationMs": 1728
     },
     {
       "viewport": "mobile-375",
@@ -48,7 +48,7 @@
       "consoleErrors": [],
       "failedResponses": [],
       "screenshot": "shots/final-mobile-375-planner.png",
-      "durationMs": 1607
+      "durationMs": 1614
     },
     {
       "viewport": "mobile-375",
@@ -60,7 +60,7 @@
       "consoleErrors": [],
       "failedResponses": [],
       "screenshot": "shots/final-mobile-375-library.png",
-      "durationMs": 2001
+      "durationMs": 2089
     },
     {
       "viewport": "mobile-375",
@@ -72,7 +72,7 @@
       "consoleErrors": [],
       "failedResponses": [],
       "screenshot": "shots/final-mobile-375-history.png",
-      "durationMs": 1607
+      "durationMs": 1617
     },
     {
       "viewport": "mobile-375",
@@ -84,7 +84,7 @@
       "consoleErrors": [],
       "failedResponses": [],
       "screenshot": "shots/final-mobile-375-settings.png",
-      "durationMs": 1619
+      "durationMs": 1637
     },
     {
       "viewport": "desktop",
@@ -96,7 +96,7 @@
       "consoleErrors": [],
       "failedResponses": [],
       "screenshot": "shots/final-desktop-today.png",
-      "durationMs": 1330
+      "durationMs": 1348
     },
     {
       "viewport": "desktop",
@@ -108,7 +108,7 @@
       "consoleErrors": [],
       "failedResponses": [],
       "screenshot": "shots/final-desktop-onboarding.png",
-      "durationMs": 1372
+      "durationMs": 1388
     },
     {
       "viewport": "desktop",
@@ -120,7 +120,7 @@
       "consoleErrors": [],
       "failedResponses": [],
       "screenshot": "shots/final-desktop-planner.png",
-      "durationMs": 1357
+      "durationMs": 1360
     },
     {
       "viewport": "desktop",
@@ -132,7 +132,7 @@
       "consoleErrors": [],
       "failedResponses": [],
       "screenshot": "shots/final-desktop-library.png",
-      "durationMs": 1634
+      "durationMs": 1667
     },
     {
       "viewport": "desktop",
@@ -144,7 +144,7 @@
       "consoleErrors": [],
       "failedResponses": [],
       "screenshot": "shots/final-desktop-history.png",
-      "durationMs": 1497
+      "durationMs": 1477
     },
     {
       "viewport": "desktop",
@@ -156,7 +156,7 @@
       "consoleErrors": [],
       "failedResponses": [],
       "screenshot": "shots/final-desktop-settings.png",
-      "durationMs": 1494
+      "durationMs": 1497
     }
   ],
   "summary": {
@@ -164,5 +164,5 @@
     "errors": 0,
     "failedRequests": 0
   },
-  "finishedAt": "2026-08-24T19:22:44.483Z"
+  "finishedAt": "2026-08-24T19:58:29.147Z"
 }
