@@ -1,6 +1,8 @@
+import fullMap from '../data/images-generated.json'
 import repdbMap from '../data/repdb-images.json'
 
-const map = repdbMap as Record<string, string>
+const map = fullMap as Record<string, string>
+const repdb = repdbMap as Record<string, string>
 
 export function getExerciseImage(exerciseId: string, fallback?: string | null): string | null {
   if (map[exerciseId]) return map[exerciseId]
@@ -9,7 +11,9 @@ export function getExerciseImage(exerciseId: string, fallback?: string | null): 
 }
 
 export function hasRepdbImage(exerciseId: string): boolean {
-  return !!map[exerciseId]
+  return !!repdb[exerciseId]
 }
 
-export const REPDB_COUNT = Object.keys(map).length
+export const REPDB_COUNT = Object.keys(repdb).length
+export const GENERATED_COUNT = 489
+export const TOTAL_MAPPED = Object.keys(map).length
