@@ -11,6 +11,7 @@ export function SettingsPage() {
   const bodyweight = useGym((s) => s.bodyweight)
   const customExercises = useGym((s) => s.customExercises)
   const plans = useGym((s) => s.plans)
+  const generatedPlans = useGym((s) => s.generatedPlans)
   const importData = useGym((s) => s.importData)
   const clearAllData = useGym((s) => s.clearAllData)
   const [msg, setMsg] = useState('')
@@ -19,7 +20,7 @@ export function SettingsPage() {
   const hasData = workouts.length > 0 || bodyweight.length > 0 || customExercises.length > 0 || plans.length > 0
 
   const exportJson = () => {
-    const blob = new Blob([JSON.stringify({ version: 3, customExercises, workouts, bodyweight, plans }, null, 2)], {
+    const blob = new Blob([JSON.stringify({ version: 3, customExercises, workouts, bodyweight, plans, generatedPlans }, null, 2)], {
       type: 'application/json',
     })
     const url = URL.createObjectURL(blob)

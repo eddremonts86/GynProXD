@@ -16,6 +16,28 @@ function weekdayToDay(d: number): DayOfWeek {
   return map[d] ?? 'mon'
 }
 
+function playRestEndBeep() {
+  try {
+    const Ctx = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
+    if (!Ctx) return
+    const ctx = new Ctx()
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(880, ctx.currentTime)
+    osc.frequency.setValueAtTime(1320, ctx.currentTime + 0.15)
+    gain.gain.setValueAtTime(0.001, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.02)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4)
+    osc.connect(gain).connect(ctx.destination)
+    osc.start(ctx.currentTime)
+    osc.stop(ctx.currentTime + 0.45)
+    setTimeout(() => void ctx.close(), 600)
+  } catch {
+    // audio unavailable — silent fallback
+  }
+}
+
 export function TodayPage() {
   const navigate = useNavigate()
   const activeWorkout = useGym((s) => s.activeWorkout)
@@ -73,6 +95,7 @@ export function TodayPage() {
   useEffect(() => {
     if (restLeft === null) return
     if (restLeft <= 0) {
+      playRestEndBeep()
       setRestLeft(null)
       return
     }

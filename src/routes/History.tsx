@@ -15,18 +15,21 @@ export function HistoryPage() {
   const bodyweight = useGym((s) => s.bodyweight)
   const deleteWorkout = useGym((s) => s.deleteWorkout)
   const [confirmId, setConfirmId] = useState<string | null>(null)
+  const [chartExerciseId, setChartExerciseId] = useState<string | null>(null)
 
-  const topExerciseId = useMemo(() => {
+  const exerciseOptions = useMemo(() => {
     const counts: Record<string, number> = {}
     for (const w of workouts) for (const e of w.exercises) counts[e.exerciseId] = (counts[e.exerciseId] ?? 0) + 1
-    let best: string | null = null
-    let max = 0
-    for (const [id, c] of Object.entries(counts)) if (c > max) { max = c; best = id }
-    return best
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([id]) => ({ id, name: exerciseById(id)?.name ?? id }))
   }, [workouts])
 
-  const series = useMemo(() => (topExerciseId ? e1rmSeries(workouts, topExerciseId) : []), [workouts, topExerciseId])
-  const topName = topExerciseId ? (exerciseById(topExerciseId)?.name ?? topExerciseId) : null
+  const topExerciseId = exerciseOptions[0]?.id ?? null
+  const chartId = chartExerciseId ?? topExerciseId
+
+  const series = useMemo(() => (chartId ? e1rmSeries(workouts, chartId) : []), [workouts, chartId])
+  const chartName = chartId ? (exerciseById(chartId)?.name ?? chartId) : null
   const bwSeries = useMemo(() => [...bodyweight].sort((a, b) => a.date.localeCompare(b.date)).slice(-12), [bodyweight])
   const vol = useMemo(() => muscleVolume(workouts, 4), [workouts])
   const volMax = useMemo(() => muscleMaxVolume(vol), [vol])
@@ -66,9 +69,27 @@ export function HistoryPage() {
         </div>
       </Card>
 
-      {workouts.length > 0 && topExerciseId && series.length >= 2 && (
+      {workouts.length > 0 && chartId && series.length >= 2 && (
         <Card>
-          <h3 className="font-display text-base text-ink">Progreso — {topName}</h3>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h3 className="font-display text-base text-ink">Progreso — {chartName}</h3>
+            {exerciseOptions.length > 1 && (
+              <label className="flex items-center gap-2">
+                <span className="sr-only">Ejercicio de la gráfica</span>
+                <select
+                  value={chartId}
+                  onChange={(e) => setChartExerciseId(e.target.value)}
+                  className="rounded-full border border-line bg-surface px-3 py-1.5 text-xs text-ink-soft outline-none focus:border-accent min-h-8 max-w-52"
+                >
+                  {exerciseOptions.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+          </div>
           <p className="text-xs tracking-wide text-muted uppercase">e1RM estimado · {series.length} sesiones</p>
           <div className="mt-3 h-40 w-full">
             <ResponsiveContainer width="100%" height="100%">
