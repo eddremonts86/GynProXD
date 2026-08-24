@@ -42,7 +42,7 @@ interface GymState {
   startWorkout: () => void
   startWorkoutFromPlan: (planId: string, day: DayOfWeek) => void
   discardWorkout: () => void
-  addSet: (exerciseId: string, weight: number, reps: number) => void
+  addSet: (exerciseId: string, weight: number, reps: number, opts?: { durationSec?: number; side?: 'L' | 'R' }) => void
   finishWorkout: () => void
   logBodyweight: (kg: number) => void
   importData: (json: unknown) => boolean
@@ -57,6 +57,13 @@ interface GymState {
     exerciseId: string,
     rule: ProgressionRule,
   ) => void
+  updateExerciseOptions: (
+    planId: string,
+    day: DayOfWeek,
+    exerciseId: string,
+    patch: Partial<Pick<PlannedExercise, 'timed' | 'unilateral' | 'supersetGroup'>>,
+  ) => void
+  setSupersetGroup: (planId: string, day: DayOfWeek, exerciseIds: string[], groupId: string | null) => void
   createGeneratedPlan: (input: OnboardingInput, requested: DurationKey) => string
   deleteGeneratedPlan: (id: string) => void
   saveGeneratedAsPlan: (generatedId: string) => string | null
@@ -94,14 +101,15 @@ export const useGym = create<GymState>()(
           const planned = plan?.days.find((d) => d.day === day)
           const exercises = (planned?.exercises ?? []).map((pe) => ({
             exerciseId: pe.exerciseId,
-            sets: [] as { weight: number; reps: number }[],
+            sets: [] as { weight: number; reps: number; durationSec?: number; side?: 'L' | 'R' }[],
+            supersetGroup: pe.supersetGroup ?? undefined,
           }))
           return { activeWorkout: { id: crypto.randomUUID(), date: today(), exercises } }
         }),
 
       discardWorkout: () => set({ activeWorkout: null }),
 
-      addSet: (exerciseId, weight, reps) =>
+      addSet: (exerciseId, weight, reps, opts) =>
         set((s) => {
           if (!s.activeWorkout) return s
           const w = structuredClone(s.activeWorkout)
@@ -110,7 +118,7 @@ export const useGym = create<GymState>()(
             ex = { exerciseId, sets: [] }
             w.exercises.push(ex)
           }
-          ex.sets.push({ weight, reps })
+          ex.sets.push({ weight, reps, durationSec: opts?.durationSec, side: opts?.side })
           return { activeWorkout: w }
         }),
 
@@ -220,6 +228,42 @@ export const useGym = create<GymState>()(
                 return {
                   ...d,
                   exercises: d.exercises.map((e) => (e.exerciseId === exerciseId ? { ...e, progression: rule } : e)),
+                }
+              }),
+            }
+          }),
+        })),
+
+      updateExerciseOptions: (planId, day, exerciseId, patch) =>
+        set((s) => ({
+          plans: s.plans.map((p) => {
+            if (p.id !== planId) return p
+            return {
+              ...p,
+              days: p.days.map((d) => {
+                if (d.day !== day) return d
+                return {
+                  ...d,
+                  exercises: d.exercises.map((e) => (e.exerciseId === exerciseId ? { ...e, ...patch } : e)),
+                }
+              }),
+            }
+          }),
+        })),
+
+      setSupersetGroup: (planId, day, exerciseIds, groupId) =>
+        set((s) => ({
+          plans: s.plans.map((p) => {
+            if (p.id !== planId) return p
+            return {
+              ...p,
+              days: p.days.map((d) => {
+                if (d.day !== day) return d
+                return {
+                  ...d,
+                  exercises: d.exercises.map((e) =>
+                    exerciseIds.includes(e.exerciseId) ? { ...e, supersetGroup: groupId } : e,
+                  ),
                 }
               }),
             }

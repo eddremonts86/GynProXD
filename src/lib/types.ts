@@ -33,11 +33,14 @@ export interface Exercise {
 export interface SetEntry {
   weight: number
   reps: number
+  durationSec?: number
+  side?: 'L' | 'R'
 }
 
 export interface LoggedExercise {
   exerciseId: string
   sets: SetEntry[]
+  supersetGroup?: string
 }
 
 export interface Workout {
@@ -58,6 +61,9 @@ export type ProgressionRule = 'none' | 'linear' | 'double'
 export interface PlannedExercise {
   exerciseId: string
   progression: ProgressionRule
+  supersetGroup?: string | null
+  timed?: boolean
+  unilateral?: boolean
 }
 
 export interface PlannedDay {

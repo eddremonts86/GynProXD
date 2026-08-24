@@ -24,6 +24,7 @@ export function PlannerPage() {
   const addExerciseToDay = useGym((s) => s.addExerciseToDay)
   const removeExerciseFromDay = useGym((s) => s.removeExerciseFromDay)
   const updateExerciseProgression = useGym((s) => s.updateExerciseProgression)
+  const updateExerciseOptions = useGym((s) => s.updateExerciseOptions)
   const startWorkoutFromPlan = useGym((s) => s.startWorkoutFromPlan)
   const deleteGeneratedPlan = useGym((s) => s.deleteGeneratedPlan)
   const saveGeneratedAsPlan = useGym((s) => s.saveGeneratedAsPlan)
@@ -269,46 +270,88 @@ export function PlannerPage() {
                 <ul className="flex flex-col gap-2">
                   {dayExercises.map((pe) => {
                     const ex = exerciseById(pe.exerciseId)
+                    const isSuperset = !!pe.supersetGroup
                     return (
                       <li
                         key={pe.exerciseId}
-                        className="flex items-center justify-between gap-2 rounded-[var(--radius-md)] bg-surface-2 px-3 py-2 border border-line/40"
+                        className={[
+                          'flex flex-col gap-1.5 rounded-[var(--radius-md)] px-3 py-2 border',
+                          isSuperset ? 'bg-accent/5 border-accent/30' : 'bg-surface-2 border-line/40',
+                        ].join(' ')}
                       >
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium text-ink-soft">{ex?.name ?? pe.exerciseId}</p>
-                          {ex && (
-                            <span className="text-xs text-muted">
-                              {ex.muscle} · {ex.equipment}
-                            </span>
-                          )}
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-medium text-ink-soft flex items-center gap-1.5">
+                              {isSuperset && <Badge variant="accent" className="px-1.5 py-0 text-[10px]">{pe.supersetGroup}</Badge>}
+                              {ex?.name ?? pe.exerciseId}
+                            </p>
+                            {ex && (
+                              <span className="text-xs text-muted">
+                                {ex.muscle} · {ex.equipment}
+                              </span>
+                            )}
+                          </div>
+                          <button
+                            onClick={() => removeExerciseFromDay(selectedPlan.id, day, pe.exerciseId)}
+                            className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-surface hover:text-ink-soft shrink-0"
+                            aria-label={`Remove ${exerciseById(pe.exerciseId)?.name ?? pe.exerciseId}`}
+                          >
+                            ×
+                          </button>
                         </div>
-                        <label htmlFor={`prog-${day}-${pe.exerciseId}`} className="sr-only">
-                          Progression for {exerciseById(pe.exerciseId)?.name ?? pe.exerciseId}
-                        </label>
-                        <select
-                          id={`prog-${day}-${pe.exerciseId}`}
-                          value={pe.progression}
-                          onChange={(e) =>
-                            updateExerciseProgression(
-                              selectedPlan.id,
-                              day,
-                              pe.exerciseId,
-                              e.target.value as ProgressionRule,
-                            )
-                          }
-                          className="rounded-full border border-line bg-surface px-2 py-1 text-xs text-ink-soft outline-none focus:border-accent min-h-8"
-                        >
-                          <option value="none">none</option>
-                          <option value="linear">linear</option>
-                          <option value="double">double</option>
-                        </select>
-                        <button
-                          onClick={() => removeExerciseFromDay(selectedPlan.id, day, pe.exerciseId)}
-                          className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-surface hover:text-ink-soft shrink-0"
-                          aria-label={`Remove ${exerciseById(pe.exerciseId)?.name ?? pe.exerciseId}`}
-                        >
-                          ×
-                        </button>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <label htmlFor={`prog-${day}-${pe.exerciseId}`} className="sr-only">
+                            Progression for {exerciseById(pe.exerciseId)?.name ?? pe.exerciseId}
+                          </label>
+                          <select
+                            id={`prog-${day}-${pe.exerciseId}`}
+                            value={pe.progression}
+                            onChange={(e) =>
+                              updateExerciseProgression(
+                                selectedPlan.id,
+                                day,
+                                pe.exerciseId,
+                                e.target.value as ProgressionRule,
+                              )
+                            }
+                            className="rounded-full border border-line bg-surface px-2 py-1 text-xs text-ink-soft outline-none focus:border-accent min-h-8"
+                          >
+                            <option value="none">none</option>
+                            <option value="linear">linear</option>
+                            <option value="double">double</option>
+                          </select>
+                          <button
+                            onClick={() => updateExerciseOptions(selectedPlan.id, day, pe.exerciseId, { timed: !pe.timed })}
+                            className={[
+                              'rounded-full border px-2 py-1 text-xs min-h-8',
+                              pe.timed ? 'border-accent bg-accent text-accent-contrast' : 'border-line bg-surface text-muted',
+                            ].join(' ')}
+                            title="Timed set (duration vs reps)"
+                          >
+                            ⏱ {pe.timed ? 'timed' : 'reps'}
+                          </button>
+                          <button
+                            onClick={() => updateExerciseOptions(selectedPlan.id, day, pe.exerciseId, { unilateral: !pe.unilateral })}
+                            className={[
+                              'rounded-full border px-2 py-1 text-xs min-h-8',
+                              pe.unilateral ? 'border-accent bg-accent text-accent-contrast' : 'border-line bg-surface text-muted',
+                            ].join(' ')}
+                            title="Unilateral (L/R per set)"
+                          >
+                            ⇄ {pe.unilateral ? 'L/R' : 'bilateral'}
+                          </button>
+                          <select
+                            value={pe.supersetGroup ?? ''}
+                            onChange={(e) => updateExerciseOptions(selectedPlan.id, day, pe.exerciseId, { supersetGroup: e.target.value || null })}
+                            className="rounded-full border border-line bg-surface px-2 py-1 text-xs text-ink-soft outline-none focus:border-accent min-h-8"
+                            title="Superset group"
+                          >
+                            <option value="">— superset</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                          </select>
+                        </div>
                       </li>
                     )
                   })}

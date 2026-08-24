@@ -36,6 +36,8 @@ export function TodayPage() {
   const [selectedId, setSelectedId] = useState('')
   const [weight, setWeight] = useState('')
   const [reps, setReps] = useState('')
+  const [duration, setDuration] = useState('')
+  const [side, setSide] = useState<'L' | 'R'>('L')
   const [kg, setKg] = useState('')
   const [filter, setFilter] = useState('')
   const [restLeft, setRestLeft] = useState<number | null>(null)
@@ -61,6 +63,11 @@ export function TodayPage() {
   const getProgressionFor = (exerciseId: string): ProgressionRule => {
     for (const p of plans) for (const d of p.days) for (const pe of d.exercises) if (pe.exerciseId === exerciseId) return pe.progression
     return 'none'
+  }
+
+  const getOptionsFor = (exerciseId: string) => {
+    for (const p of plans) for (const d of p.days) for (const pe of d.exercises) if (pe.exerciseId === exerciseId) return pe
+    return null
   }
 
   useEffect(() => {
@@ -117,13 +124,29 @@ export function TodayPage() {
   }, [activeWorkout])
 
   const handleAddSet = () => {
-    if (!selectedId || !(Number(weight) >= 0) || !(Number(reps) > 0)) return
+    const opts = getOptionsFor(selectedId)
+    const isTimed = !!opts?.timed
+    const isUnilateral = !!opts?.unilateral
     const w = Number(weight)
-    const r = Number(reps)
-    const exerciseId = selectedId
-    addSet(exerciseId, w, r)
-    setReps('')
-    setRestLeft(90)
+    if (!selectedId || !(w >= 0)) return
+    if (isTimed) {
+      if (!(Number(duration) > 0)) return
+      addSet(selectedId, w, 1, { durationSec: Number(duration), side: isUnilateral ? side : undefined })
+      setDuration('')
+    } else {
+      if (!(Number(reps) > 0)) return
+      addSet(selectedId, w, Number(reps), { side: isUnilateral ? side : undefined })
+      setReps('')
+    }
+    // superset: only rest after the group completes — check if next exercise in same superset is pending
+    const superset = opts?.supersetGroup
+    if (superset) {
+      const group = activeWorkout?.exercises.filter((e) => getOptionsFor(e.exerciseId)?.supersetGroup === superset) ?? []
+      const isLastInGroup = group.length === 0 || selectedId === group[group.length - 1]?.exerciseId
+      if (isLastInGroup) setRestLeft(90)
+    } else {
+      setRestLeft(90)
+    }
   }
 
   const selectedExercise = selectedId ? exerciseById(selectedId) : undefined
@@ -271,64 +294,97 @@ export function TodayPage() {
 
       {logged.length > 0 ? (
         <div className="flex flex-col gap-3">
-          {logged.map((le) => {
-            const ex = exerciseById(le.exerciseId)
-            const rule = getProgressionFor(le.exerciseId)
-            const suggestion = suggestNext(rule as ProgressionRule, ex, workouts)
-            return (
-              <Card key={le.exerciseId} padding="md">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-display text-base text-ink">{ex?.name ?? le.exerciseId}</p>
-                    {ex && (
-                      <div className="mt-1.5 flex gap-1.5">
-                        <Badge>{ex.muscle}</Badge>
-                        <Badge variant="muted">{ex.equipment}</Badge>
-                        {rule !== 'none' && <Badge variant="accent">{rule}</Badge>}
-                      </div>
-                    )}
+          {(() => {
+            const groups = new Map<string | symbol, typeof logged>()
+            const singles: typeof logged = []
+            for (const le of logged) {
+              const opts = getOptionsFor(le.exerciseId)
+              if (opts?.supersetGroup) {
+                const g = opts.supersetGroup
+                if (!groups.has(g)) groups.set(g, [])
+                groups.get(g)!.push(le)
+              } else {
+                singles.push(le)
+              }
+            }
+            const renderExercise = (le: (typeof logged)[number]) => {
+              const ex = exerciseById(le.exerciseId)
+              const rule = getProgressionFor(le.exerciseId)
+              const opts = getOptionsFor(le.exerciseId)
+              const suggestion = suggestNext(rule as ProgressionRule, ex, workouts)
+              return (
+                <Card key={le.exerciseId} padding="md" className={opts?.supersetGroup ? 'border-accent/20' : ''}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-display text-base text-ink flex items-center gap-1.5">
+                        {opts?.supersetGroup && <Badge variant="accent" className="px-1.5 py-0 text-[10px]">{opts.supersetGroup}</Badge>}
+                        {ex?.name ?? le.exerciseId}
+                      </p>
+                      {ex && (
+                        <div className="mt-1.5 flex flex-wrap gap-1.5">
+                          <Badge>{ex.muscle}</Badge>
+                          <Badge variant="muted">{ex.equipment}</Badge>
+                          {rule !== 'none' && <Badge variant="accent">{rule}</Badge>}
+                          {opts?.timed && <Badge variant="muted">timed</Badge>}
+                          {opts?.unilateral && <Badge variant="muted">L/R</Badge>}
+                        </div>
+                      )}
+                    </div>
+                    <span className="text-xs font-medium tracking-wide text-muted uppercase">{le.sets.length} sets</span>
                   </div>
-                  <span className="text-xs font-medium tracking-wide text-muted uppercase">{le.sets.length} sets</span>
-                </div>
-                {suggestion && (
-                  <div className="mt-3 rounded-[var(--radius-md)] border border-accent/20 bg-accent-soft px-3 py-2">
-                    <p className="text-xs font-semibold text-accent">Up next: {suggestion.weight}kg × {suggestion.reps}</p>
-                    <p className="mt-0.5 text-xs leading-4 text-muted">{suggestion.reason}</p>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="mt-2 h-7 px-2 text-xs text-accent hover:bg-accent-soft"
-                      onClick={() => {
-                        setSelectedId(le.exerciseId)
-                        setWeight(String(suggestion.weight))
-                        setReps(String(suggestion.reps))
-                      }}
-                    >
-                      Use suggestion
-                    </Button>
-                  </div>
-                )}
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {le.sets.map((s, i) => {
-                    const earlier = le.sets.slice(0, i)
-                    const pr = isPersonalRecord(le.exerciseId, s, workouts, earlier)
-                    return (
-                      <span
-                        key={`${s.weight}-${s.reps}-${i}`}
-                        className={[
-                          'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium border',
-                          pr ? 'bg-accent text-accent-contrast border-accent' : 'bg-surface-2 text-ink-soft border-line',
-                        ].join(' ')}
+                  {suggestion && (
+                    <div className="mt-3 rounded-[var(--radius-md)] border border-accent/20 bg-accent-soft px-3 py-2">
+                      <p className="text-xs font-semibold text-accent">Up next: {suggestion.weight}kg × {suggestion.reps}</p>
+                      <p className="mt-0.5 text-xs leading-4 text-muted">{suggestion.reason}</p>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="mt-2 h-7 px-2 text-xs text-accent hover:bg-accent-soft"
+                        onClick={() => {
+                          setSelectedId(le.exerciseId)
+                          setWeight(String(suggestion.weight))
+                          if (opts?.timed) setDuration(String(suggestion.reps * 3))
+                          else setReps(String(suggestion.reps))
+                        }}
                       >
-                        {s.weight}kg × {s.reps}
-                        {pr && <span className="rounded-full bg-surface px-1 py-0.5 text-[10px] font-bold leading-none text-accent">PR</span>}
-                      </span>
-                    )
-                  })}
-                </div>
-              </Card>
+                        Use suggestion
+                      </Button>
+                    </div>
+                  )}
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {le.sets.map((s, i) => {
+                      const earlier = le.sets.slice(0, i)
+                      const pr = isPersonalRecord(le.exerciseId, s, workouts, earlier)
+                      const label = s.durationSec ? `${s.weight}kg × ${s.durationSec}s${s.side ? ` ${s.side}` : ''}` : `${s.weight}kg × ${s.reps}${s.side ? ` ${s.side}` : ''}`
+                      return (
+                        <span
+                          key={`${s.weight}-${s.reps}-${s.durationSec}-${s.side}-${i}`}
+                          className={[
+                            'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium border',
+                            pr ? 'bg-accent text-accent-contrast border-accent' : 'bg-surface-2 text-ink-soft border-line',
+                          ].join(' ')}
+                        >
+                          {label}
+                          {pr && <span className="rounded-full bg-surface px-1 py-0.5 text-[10px] font-bold leading-none text-accent">PR</span>}
+                        </span>
+                      )
+                    })}
+                  </div>
+                </Card>
+              )
+            }
+            return (
+              <>
+                {Array.from(groups.entries()).map(([g, exs]) => (
+                  <div key={String(g)} className="rounded-[var(--radius-lg)] border border-accent/30 bg-accent/5 p-2 flex flex-col gap-3">
+                    <p className="px-1 text-xs font-semibold tracking-widest text-accent uppercase">Superset {String(g)}</p>
+                    {exs.map(renderExercise)}
+                  </div>
+                ))}
+                {singles.map(renderExercise)}
+              </>
             )
-          })}
+          })()}
         </div>
       ) : (
         <Card className="border-dashed bg-transparent py-10 text-center shadow-none">
@@ -378,41 +434,82 @@ export function TodayPage() {
           )}
         </div>
 
-        <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
-          <Input
-            value={weight}
-            onChange={(e) => setWeight(e.target.value)}
-            inputMode="decimal"
-            placeholder="kg"
-            aria-label="Weight in kg"
-          />
-          <Input
-            value={reps}
-            onChange={(e) => setReps(e.target.value)}
-            inputMode="numeric"
-            placeholder="reps"
-            aria-label="Reps"
-          />
-          <Button
-            disabled={!selectedId || !(Number(weight) >= 0) || !(Number(reps) > 0)}
-            onClick={handleAddSet}
-            className="px-6"
-          >
-            Add
-          </Button>
-        </div>
-        {selectedId && selectedSuggestion && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setWeight(String(selectedSuggestion.weight))
-              setReps(String(selectedSuggestion.reps))
-            }}
-          >
-            Fill suggestion
-          </Button>
-        )}
+        {(() => {
+          const opts = selectedId ? getOptionsFor(selectedId) : null
+          const isTimed = !!opts?.timed
+          const isUnilateral = !!opts?.unilateral
+          return (
+            <>
+              <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
+                <Input
+                  value={weight}
+                  onChange={(e) => setWeight(e.target.value)}
+                  inputMode="decimal"
+                  placeholder="kg"
+                  aria-label="Weight in kg"
+                />
+                {isTimed ? (
+                  <Input
+                    value={duration}
+                    onChange={(e) => setDuration(e.target.value)}
+                    inputMode="numeric"
+                    placeholder="sec"
+                    aria-label="Duration in seconds"
+                  />
+                ) : (
+                  <Input
+                    value={reps}
+                    onChange={(e) => setReps(e.target.value)}
+                    inputMode="numeric"
+                    placeholder="reps"
+                    aria-label="Reps"
+                  />
+                )}
+                <Button
+                  disabled={
+                    !selectedId ||
+                    !(Number(weight) >= 0) ||
+                    (isTimed ? !(Number(duration) > 0) : !(Number(reps) > 0))
+                  }
+                  onClick={handleAddSet}
+                  className="px-6"
+                >
+                  Add
+                </Button>
+              </div>
+              {isUnilateral && (
+                <div className="flex gap-1.5">
+                  <button
+                    onClick={() => setSide('L')}
+                    className={['rounded-full border px-3 py-1 text-xs min-h-8', side === 'L' ? 'border-accent bg-accent text-accent-contrast' : 'border-line bg-surface text-muted'].join(' ')}
+                  >
+                    L
+                  </button>
+                  <button
+                    onClick={() => setSide('R')}
+                    className={['rounded-full border px-3 py-1 text-xs min-h-8', side === 'R' ? 'border-accent bg-accent text-accent-contrast' : 'border-line bg-surface text-muted'].join(' ')}
+                  >
+                    R
+                  </button>
+                  <span className="self-center text-xs text-muted">per side</span>
+                </div>
+              )}
+              {selectedId && selectedSuggestion && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setWeight(String(selectedSuggestion.weight))
+                    if (isTimed) setDuration(String(selectedSuggestion.reps * 3))
+                    else setReps(String(selectedSuggestion.reps))
+                  }}
+                >
+                  Fill suggestion
+                </Button>
+              )}
+            </>
+          )
+        })()}
       </Card>
 
       <Button
