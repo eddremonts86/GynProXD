@@ -50,7 +50,7 @@ console.log('ok: programme generated at', page.url())
 await page.getByRole('button', { name: 'Copy to planner' }).first().click()
 await page.waitForURL(/\/planner$/, { timeout: 5000 })
 await page
-  .getByRole('button', { name: /^Monday, \d+ movements?$/ })
+  .getByRole('button', { name: /^Monday \d{4}-\d{2}-\d{2}.*movements?$/ })
   .waitFor({ timeout: 5000 })
   .catch(() => fail('planner did not receive the plan'))
 console.log('ok: copied into the planner')
