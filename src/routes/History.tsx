@@ -176,7 +176,8 @@ function StrengthChart() {
             onValueChange={setSelectedId}
             options={options}
             ariaLabel="Movement to chart"
-            className="h-9 w-52 text-xs"
+            size="sm"
+            className="w-52 text-xs"
           />
         ) : undefined
       }

@@ -18,6 +18,8 @@ interface FormSelectProps {
   label?: string
   placeholder?: string
   ariaLabel?: string
+  /** md matches Input (44px); sm matches the small button row (36px). */
+  size?: 'md' | 'sm'
   className?: string
   contentClassName?: string
 }
@@ -29,6 +31,7 @@ export function FormSelect({
   label,
   placeholder = 'Select',
   ariaLabel,
+  size = 'md',
   className,
   contentClassName,
 }: FormSelectProps) {
@@ -38,8 +41,9 @@ export function FormSelect({
     <ShadcnSelectRoot value={value || null} onValueChange={(v) => onValueChange(String(v ?? ''))}>
       <SelectTrigger
         aria-label={ariaLabel ?? label}
+        size={size === 'sm' ? 'sm' : 'default'}
         className={cn(
-          'h-11 w-full rounded-md border-line bg-surface px-3 text-sm text-ink',
+          'w-full rounded-md border-line bg-surface px-3 text-sm text-ink',
           'hover:border-line-strong focus:border-brand',
           className,
         )}

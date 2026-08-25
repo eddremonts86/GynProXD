@@ -124,7 +124,7 @@ export function OnboardingPage() {
                 rows={3}
                 placeholder="40 years old, 140kg, want to get down to 80kg, gym 3 times a week for 2 hours"
                 aria-label="Describe your situation"
-                className="min-h-20 w-full resize-none border-0 bg-transparent p-0 text-sm shadow-none focus:ring-0 focus-visible:outline-none"
+                className="min-h-20 w-full resize-none border-0 bg-transparent px-0.5 py-0 text-sm leading-relaxed shadow-none focus-visible:border-0 focus-visible:ring-0 focus-visible:outline-none dark:bg-transparent"
               />
 
               {text.trim().length > 0 && (
