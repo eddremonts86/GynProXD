@@ -6,12 +6,12 @@ const viewports = [
   { name: 'mobile', width: 375, height: 812 },
 ]
 const routes = [
-  { path: '/', name: 'Today', check: 'Train, locally' },
-  { path: '/onboarding', name: 'Onboarding', check: 'Tu plan' },
-  { path: '/planner', name: 'Planner', check: 'Weekly rhythm' },
-  { path: '/library', name: 'Library', check: 'Movements' },
-  { path: '/history', name: 'History', check: 'Traces' },
-  { path: '/settings', name: 'Settings', check: 'Local-first' },
+  { path: '/', name: 'Today', check: 'Today' },
+  { path: '/onboarding', name: 'Onboarding', check: 'Build a plan' },
+  { path: '/planner', name: 'Planner', check: 'Planner' },
+  { path: '/library', name: 'Library', check: 'Library' },
+  { path: '/history', name: 'History', check: 'History' },
+  { path: '/settings', name: 'Settings', check: 'Settings' },
 ]
 
 const browser = await chromium.launch()
@@ -42,7 +42,7 @@ for (const vp of viewports) {
       if (await trigger.count() > 0) console.log('  sidebar trigger ok')
     }
     // check theme toggle
-    const toggle = page.locator('button[aria-label*="Switch to"]')
+    const toggle = page.locator('button[aria-label*="Switch to"]:visible')
     if (await toggle.count() > 0) console.log('  theme toggle ok')
     // check for console errors
     // take screenshot for evidence
@@ -52,9 +52,8 @@ for (const vp of viewports) {
   console.log('-> testing onboarding generate flow')
   await page.goto(`${BASE}/onboarding`, { waitUntil: 'networkidle' })
   const ta = page.locator('textarea')
-  await ta.fill('hombre 30 años 80kg objetivo 75kg 4 veces 60min esfuerzo 3')
-  const genBtn = page.getByRole('button', { name: 'Generar plan' })
-  await genBtn.click()
+  await ta.fill('male 30 years old 80kg target 75kg 4 times a week 60min effort 3')
+  await page.getByRole('button', { name: 'Generate plan' }).click()
   await page.waitForURL(/\/generated\/.+/, { timeout: 5000 }).catch(() => console.log('  no nav to generated (maybe still on onboarding)'))
   console.log('  onboarding flow ok, url:', page.url())
   // test library search
@@ -65,15 +64,24 @@ for (const vp of viewports) {
   console.log('  library search ok')
   // test planner create
   await page.goto(`${BASE}/planner`, { waitUntil: 'networkidle' })
-  const createInput = page.locator('input[placeholder*="Push"]')
-  if (await createInput.count() > 0) {
-    await createInput.fill('Test Plan')
-    const createBtn = page.getByRole('button', { name: 'Create' }).first()
-    await createBtn.click()
+  // A fresh context starts with no weekly plan, so cover both entry points.
+  const emptyWeek = page.getByRole('button', { name: 'Start an empty week' })
+  if (await emptyWeek.count() > 0) {
+    await emptyWeek.click()
+  } else {
+    await page.getByRole('button', { name: 'New plan' }).first().click()
+    await page.locator('input#f-name').fill('Test Plan')
+    await page.getByRole('button', { name: 'Create' }).first().click()
+  }
+  await page.waitForTimeout(400)
+  if (!(await page.textContent('body'))?.includes('Add movement')) {
+    console.error('  planner did not open a week')
+    failed += 1
+  } else {
     console.log('  planner create ok')
   }
   // test theme toggle
-  const toggleBtn = page.locator('button[aria-label*="Switch to"]')
+  const toggleBtn = page.locator('button[aria-label*="Switch to"]:visible')
   if (await toggleBtn.count() > 0) {
     await toggleBtn.click()
     await page.waitForTimeout(500)

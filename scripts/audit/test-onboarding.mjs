@@ -1,3 +1,7 @@
+/**
+ * End-to-end smoke test of the plan flow: describe a situation in free text,
+ * fill the form from it, generate a programme, and copy it into the planner.
+ */
 import { chromium } from 'playwright'
 
 const BASE = process.env.BASE_URL ?? 'http://localhost:3015'
@@ -5,52 +9,55 @@ const browser = await chromium.launch()
 const ctx = await browser.newContext({ viewport: { width: 375, height: 812 } })
 const page = await ctx.newPage()
 
-page.on('console', (m) => { if (m.type()==='error') console.log('console error', m.text()) })
-page.on('pageerror', (e) => console.log('pageerror', e))
+const errors = []
+page.on('console', (m) => {
+  if (m.type() === 'error') errors.push(m.text())
+})
+page.on('pageerror', (e) => errors.push(String(e)))
 
-console.log('goto onboarding')
+const fail = (message) => {
+  console.error(`FAIL ${message}`)
+  process.exitCode = 1
+}
+
 await page.goto(`${BASE}/onboarding`, { waitUntil: 'networkidle' })
-await page.waitForTimeout(500)
-console.log('fill textarea')
-const ta = page.locator('textarea')
-await ta.fill('soy hombre 40 años, peso 140kg quiero adelgazar a 80kg, puedo ir 3 veces por semana 2h, gym, esfuerzo medio')
-await page.waitForTimeout(500)
-const apply = page.getByRole('button', { name: 'Aplicar a formulario' })
-if (await apply.isVisible()) await apply.click()
-await page.waitForTimeout(500)
-const estimateText = await page.textContent('body')
-if (!estimateText?.includes('Estimado') && !estimateText?.includes('meses')) {
-  console.error('estimate not found')
-  process.exit(1)
+
+await page
+  .locator('textarea')
+  .fill('male, 40 years old, 140kg, want to get down to 80kg, gym 3 times a week for 2 hours')
+await page.getByRole('button', { name: 'Fill the form' }).click()
+await page.waitForTimeout(300)
+
+if ((await page.locator('input#f-current-weight').inputValue()) !== '140') {
+  fail('free text did not populate the form')
 }
-console.log('estimation visible')
-const genBtn = page.getByRole('button', { name: 'Generar plan' })
-await genBtn.click()
+if (!(await page.textContent('body'))?.includes('Realistic timeline')) {
+  fail('estimate panel missing')
+}
+console.log('ok: free text parsed and estimate shown')
+
+await page.getByRole('button', { name: 'Generate plan' }).click()
 await page.waitForURL(/\/generated\/.+/, { timeout: 5000 })
-console.log('navigated to', page.url())
-await page.waitForTimeout(1000)
-const cal = await page.textContent('body')
-if (!cal?.includes('Semana 1') && !cal?.includes('Semana')) {
-  console.error('calendar not found')
-  process.exit(1)
+// The route is lazy, so wait for its content rather than the navigation alone.
+await page
+  .getByRole('heading', { name: /^Week 1$/ })
+  .waitFor({ timeout: 5000 })
+  .catch(() => fail('generated calendar missing'))
+console.log('ok: programme generated at', page.url())
+
+await page.getByRole('button', { name: 'Copy to planner' }).first().click()
+await page.waitForURL(/\/planner$/, { timeout: 5000 })
+await page
+  .getByRole('button', { name: /^Monday, \d+ movements?$/ })
+  .waitFor({ timeout: 5000 })
+  .catch(() => fail('planner did not receive the plan'))
+console.log('ok: copied into the planner')
+
+if (errors.length > 0) {
+  console.error(`FAIL ${errors.length} console errors:`)
+  for (const e of errors.slice(0, 5)) console.error(`  ${e}`)
+  process.exitCode = 1
 }
-console.log('calendar ok')
-const saveBtn = page.getByRole('button', { name: 'Guardar en Planner' }).first()
-if (await saveBtn.isVisible()) {
-  await saveBtn.click()
-  await page.waitForTimeout(500)
-  console.log('saved to planner')
-}
-await page.goto(`${BASE}/planner`, { waitUntil: 'networkidle' })
-await page.waitForTimeout(500)
-const plannerText = await page.textContent('body')
-if (!plannerText?.includes('Forma') && !plannerText?.includes('Planes')) {
-  console.error('planner not ok')
-  process.exit(1)
-}
-console.log('planner ok, checking generated list')
-if (plannerText?.includes('Planes generados') || plannerText?.includes('generados')) {
-  console.log('generated list visible')
-}
+
 await browser.close()
-console.log('TEST PASS')
+if (!process.exitCode) console.log('\nplan flow ok')
