@@ -25,9 +25,9 @@ Local-first, realistic, hybrid. Unlike cloud trackers that promise miracles, For
 ## Operating Context
 
 - Web SPA: Vite 8 + React 19 + TypeScript + TanStack Router/Query + Zustand persist (localStorage key `gynproxd-v2`) + Tailwind v4. No backend, no auth. PWA via vite-plugin-pwa (Workbox, jsDelivr image cache).
-- Routes: `/` Today (guided workout), `/onboarding` (generative), `/generated/$id` (calendar), `/planner` (weekly), `/library` (873), `/history`, `/settings`. Desktop-first requested (current is mobile-first, to be inverted).
+- Routes: `/` Today and the live session, `/onboarding` (plan builder), `/generated/$id` (calendar), `/planner` (weekly), `/library` (873), `/history`, `/settings`. Onboarding is reached from empty states and Settings rather than from the navigation, because it is a setup flow rather than a destination.
 - Workflows: onboarding → estimation card → generate → calendar → save to planner → start workout from plan → log sets → finish → history.
-- Materials: exercise data `yuhonas/free-exercise-db` via jsDelivr CDN, images lazy, 3D abstract illustrations (amber sphere).
+- Materials: exercise data from `yuhonas/free-exercise-db` via jsDelivr, RepDB flat illustrations bundled locally, both lazy-loaded. No decorative illustration is generated to stand in for a movement that has none.
 - Rituals: weekly planning, mid-workout logging with rest timer 90s and wake lock.
 
 ## Capabilities and Constraints
@@ -40,9 +40,9 @@ Local-first, realistic, hybrid. Unlike cloud trackers that promise miracles, For
 
 ## Brand Commitments
 
-- Name: Forma (evolved from GynProXD). Wordmark `F` amber gradient, `Forma` Instrument Serif, `local training` 10px uppercase. Theme Noir Warm: `#1a1816` surface, `#26231f` card, `#d98e3f` amber accent, `#b8afa6` muted, `#f5ede4` ink. Display serif + Inter + JetBrains Mono.
-- Voice: editorial warm human, not clinical. 3D abstract hero/plate/orb, not stock gym photos. References Strava/Whoop/Hevy for warm data.
-- Asset: hero.png 343×361, pwa icons 192/512 via sips, favicon.svg.
+- Name: Forma (evolved from GynProXD). The mark is four rules of decreasing length read as a measuring scale, set in cobalt; the wordmark is Geist 600. Theme "Instrument": cool graphite and chalk neutrals with one cobalt signal (`#1d47d6` light, `#6c8cff` dark), red reserved for destructive and green for personal records. Geist Variable throughout, Geist Mono for every figure.
+- Voice: plain and factual, never motivational. The product's claim is that it refuses to lie about timelines, so the interface shows its arithmetic instead of dressing it up. No decorative imagery: the only pictures are real movement illustrations and photographs.
+- Assets: favicon.svg plus PWA icons 180/192/512, all generated from the mark by `scripts/generate-icons.mjs`.
 
 ## Evidence on Hand
 
@@ -60,4 +60,4 @@ Local-first, realistic, hybrid. Unlike cloud trackers that promise miracles, For
 
 ## Accessibility & Inclusion
 
-Mobile web is phone-first mid-workout, but redesign is desktop-first as requested. Must keep touch targets ≥44px, focus-visible amber ring, keyboard navigable, safe-area inset, reduced motion respected. Color contrast on amber/ink must meet AA.
+Phone-first mid-session, calm on desktop for planning. Touch targets 44px or more, focus-visible cobalt ring, keyboard navigable, safe-area inset on the bottom navigation, reduced motion respected. Every text and accent pair meets WCAG AA in both themes; the theme follows the system preference until the user chooses explicitly.

@@ -1,203 +1,234 @@
 ---
 name: Forma
-description: Hybrid calisthenics + gym, local-first, Noir Warm editorial with 3D plate.
+description: Local-first hybrid training tracker. Graphite and chalk, one cobalt signal, every number tabular.
 colors:
-  amber: "#d98e3f"
-  amber-deep: "#c07a2e"
-  amber-soft: "#d98e3f14"
-  noir: "#1a1816"
-  noir-2: "#1f1d1b"
-  card: "#26231f"
-  card-hover: "#2e2a26"
-  line: "#3a3632"
-  line-strong: "#4a4642"
-  ink: "#f5ede4"
-  ink-soft: "#e8e0d8"
-  muted: "#b8afa6"
+  brand: "#1d47d6"
+  brand-dark: "#6c8cff"
+  bg-light: "#f2f3f5"
+  bg-dark: "#0f1114"
+  surface-light: "#ffffff"
+  surface-dark: "#171a1f"
+  ink-light: "#14161a"
+  ink-dark: "#f0f2f5"
+  danger: "#c2321f"
+  good: "#0f7a4a"
 typography:
   display:
-    fontFamily: "Instrument Serif, Georgia, serif"
-    fontSize: "clamp(1.8rem, 4vw, 2.4rem)"
-    fontWeight: 400
-    lineHeight: 1.1
-    letterSpacing: "-0.02em"
-  headline:
-    fontFamily: "Instrument Serif, Georgia, serif"
-    fontSize: "1.5rem"
-    fontWeight: 400
+    fontFamily: "Geist Variable, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "1.75rem"
+    fontWeight: 600
     lineHeight: 1.2
+    letterSpacing: "-0.015em"
   title:
-    fontFamily: "Inter, ui-sans-serif, sans-serif"
+    fontFamily: "Geist Variable, ui-sans-serif, sans-serif"
     fontSize: "1.125rem"
     fontWeight: 600
-    lineHeight: 1.4
+    lineHeight: 1.2
   body:
-    fontFamily: "Inter, ui-sans-serif, sans-serif"
+    fontFamily: "Geist Variable, ui-sans-serif, sans-serif"
     fontSize: "0.875rem"
     fontWeight: 400
-    lineHeight: 1.6
+    lineHeight: 1.55
+  data:
+    fontFamily: "Geist Mono Variable, ui-monospace, monospace"
+    fontVariantNumeric: "tabular-nums"
+    fontWeight: 600
   label:
-    fontFamily: "Inter, ui-sans-serif, sans-serif"
-    fontSize: "0.75rem"
+    fontFamily: "Geist Variable, ui-sans-serif, sans-serif"
+    fontSize: "0.6875rem"
     fontWeight: 500
-    lineHeight: 1.4
-    letterSpacing: "0.08em"
 rounded:
-  sm: "10px"
-  md: "14px"
-  lg: "18px"
-  xl: "22px"
-  2xl: "28px"
+  sm: "6px"
+  md: "8px"
+  lg: "12px"
+  xl: "16px"
 spacing:
-  xs: "8px"
+  xs: "6px"
   sm: "12px"
   md: "16px"
   lg: "24px"
   xl: "32px"
-components:
-  button-primary:
-    backgroundColor: "{colors.amber}"
-    textColor: "{colors.noir}"
-    rounded: "{rounded.md}"
-    padding: "10px 16px"
-  button-primary-hover:
-    backgroundColor: "{colors.amber-deep}"
-  button-secondary:
-    backgroundColor: "{colors.card}"
-    textColor: "{colors.ink-soft}"
-    rounded: "{rounded.md}"
-    padding: "10px 16px"
-  button-ghost:
-    backgroundColor: "transparent"
-    textColor: "{colors.muted}"
-    rounded: "{rounded.md}"
-    padding: "8px 12px"
-  card:
-    backgroundColor: "{colors.card}"
-    textColor: "{colors.ink-soft}"
-    rounded: "{rounded.lg}"
-    padding: "16px"
-  input:
-    backgroundColor: "{colors.noir}"
-    textColor: "{colors.ink-soft}"
-    rounded: "{rounded.md}"
-    padding: "12px 16px"
-  badge:
-    backgroundColor: "{colors.noir-2}"
-    textColor: "{colors.muted}"
-    rounded: "{rounded.sm}"
-    padding: "4px 10px"
 ---
 
 # Design System: Forma
 
 ## Overview
 
-**Creative North Star: "Noir Warm Plate"**
+**Creative north star: "Instrument".**
 
-Forma is a warm editorial tool for cold iron. Hybrid calisthenics + barbell, local-first, offline — it treats training as a quiet, human ritual rather than a neon dashboard. The amber plate (3D sphere with soft shadow) is the signature: a single warm object on a noir field, blurred orbs behind, grain subtle. Density is calm on desktop (sidebar + 7xl grid, generous whitespace) and compact on phone (bottom nav, 44px touch). Motion is restrained: 200ms ease for state, no layout thrash.
+Forma is a measuring device, not a motivational poster. Its promise is that it
+refuses to lie about how long a goal takes, so the interface is built to look
+like something calibrated: cool graphite and chalk neutrals, hairline rules, one
+saturated cobalt used only where a decision is being made, and every number set
+in tabular mono so columns of data never shift.
 
-**Key Characteristics:**
-- Warm dark, not cold dark — stone text on noir, amber as only warm accent
-- Editorial serif (Instrument) for display, Inter for UI, mono for data
-- 3D plate hero/orb/plate illustrations, no stock gym photos
-- Desktop-first sidebar + topbar, mobile drawer + bottom nav fallback removed
+The app is used with a raised heart rate on a phone between sets, and calmly on
+a desktop while planning a week. Both cases want the same thing: large legible
+numbers, generous touch targets, and nothing decorative competing for attention.
 
-## Colors
+**Key characteristics**
 
-Warm dark editorial. One warm accent, one ink, one muted — rest is tonal layering.
+- Cool neutrals, never warm cream or beige. Off-black and off-white, never pure.
+- Exactly one accent. Cobalt marks the primary action and the current selection.
+- No gradients, no glows, no blurred blobs. Depth comes from hairlines and one
+  tonal step between page and surface.
+- Numbers are content. They get mono, tabular figures, and the largest type on
+  the screen.
+- Real photography carries the imagery. Nothing is invented to fill space.
 
-### Primary
-- **Amber** (#d98e3f / oklch): Primary action, active nav dot, PR badge, rest timer, progression. Used on ≤10% of any screen.
+## Colours
 
-### Neutral
-- **Noir** (#1a1816): Background, radial gradients #2a2520 + #2e2216
-- **Noir 2** (#1f1d1b): Surface 2, muted card
-- **Card** (#26231f): Card background, sidebar
-- **Line** (#3a3632): Border, divider
-- **Line Strong** (#4a4642): Hover border
-- **Ink** (#f5ede4): Headings, primary text
-- **Ink Soft** (#e8e0d8): Body text
-- **Muted** (#b8afa6): Secondary text, labels
+Two themes, one palette structure. Every value is a CSS custom property in
+`src/index.css`; components only ever reference the semantic name.
 
-**The Amber Rarity Rule.** Amber appears only for primary CTA, active state, PR, and rest. Its rarity is the point — if everything is amber, nothing is.
+| Token | Light | Dark | Use |
+|---|---|---|---|
+| `--bg` | `#f2f3f5` | `#0f1114` | Page ground |
+| `--surface` | `#ffffff` | `#171a1f` | Panels, rail, dialogs |
+| `--surface-2` | `#e8eaee` | `#1f232a` | Inset areas, thumbnails, chips |
+| `--line` | `#d9dce2` | `#2a2f37` | Hairline borders and dividers |
+| `--line-strong` | `#c2c7d0` | `#3a404a` | Hover borders, scrollbars |
+| `--ink` | `#14161a` | `#f0f2f5` | Headings, numbers, primary text |
+| `--ink-2` | `#3d434d` | `#c3c8d0` | Body text |
+| `--ink-3` | `#5e646e` | `#8a919d` | Labels, secondary text |
+| `--brand` | `#1d47d6` | `#6c8cff` | Primary action, selection, progression |
+| `--danger` | `#c2321f` | `#ff7a6b` | Destructive actions only |
+| `--good` | `#0f7a4a` | `#4ade9a` | Personal records only |
 
-**The Warm Not Neon Rule.** No pure white, no neon cyan. Warm stone on noir, never #fff on #000.
+**The one-accent rule.** Cobalt means "this is the thing to press, or the thing
+currently selected". It is never decoration. If a screen has two cobalt regions
+that are not both actionable, one of them is wrong.
+
+**The semantic-colour rule.** Red is destructive, green is a record. Neither is
+ever used for emphasis. That is why the brand is blue: it leaves both free.
+
+**Contrast.** Every text and accent pair is verified against WCAG AA in both
+themes. Body text clears 4.5:1 on every surface it can land on, and the accent
+clears 4.5:1 as text and as a fill.
 
 ## Typography
 
-**Display Font:** Instrument Serif (with Georgia) — warm, editorial, for h1–h3
-**Body Font:** Inter (with ui-sans-serif) — neutral, for UI and data
-**Label/Mono Font:** JetBrains Mono — for dates, kg×reps, tabular data
+**Geist Variable** for everything, **Geist Mono Variable** for data. Both are
+self-hosted through `@fontsource-variable`, so there is no render-blocking
+request to a font CDN. There is no serif anywhere in this app.
 
-**Character:** Serif for story, sans for system, mono for data. Serif never for buttons or labels.
+| Role | Size | Weight | Notes |
+|---|---|---|---|
+| Page title | `text-3xl` | 600 | One per route |
+| Section title | `text-lg` | 600 | Sits on a hairline rule |
+| Body | `text-base` (0.875rem) | 400 | Capped at 58ch |
+| Label | `text-2xs` (0.6875rem) | 500 | `--ink-3` |
+| Data | mono, `text-lg` to `text-3xl` | 600 | Always `.num` |
 
-### Hierarchy
-- **Display** (400, clamp 1.8–2.4rem, 1.1): PageHeader title, hero
-- **Headline** (400, 1.5rem, 1.2): Card titles, day labels (MON)
-- **Title** (600, 1.125rem, 1.4): Section titles
-- **Body** (400, 0.875rem, 1.6): Descriptions, max 65ch
-- **Label** (500, 0.75rem, 1.4, 0.08em uppercase): Eyebrow, field labels, badges
+**The `.num` rule.** Any figure a user compares against another figure gets the
+`.num` class: mono family, tabular figures, tightened tracking. Elapsed time,
+weights, reps, volume, dates, week indices. This is what stops a ticking clock
+from jittering its own layout.
 
-**The Serif For Story Rule.** Instrument Serif only for display/headline. Buttons, inputs, badges stay Inter.
+**No eyebrows.** There are no small uppercase labels above headings anywhere in
+this app. A section's position on the page already says what it is.
 
 ## Layout
 
-Desktop-first. Sidebar 16rem (icon 3rem when collapsed) + SidebarInset `max-w-7xl` centered. Header 56px sticky with backdrop-blur, `bg-background/80`. Main `p-4 md:p-6 lg:p-8` with `pb-28` for mobile safe-area. Grid: Today 2-col, Planner 7 days `grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4`, Library `grid-cols-1 lg:grid-cols-2`. Spacing rhythm 8/12/16/24/32.
+Desktop is a fixed 240px rail plus a `76rem` content column. Below `lg` the rail
+becomes a 56px top bar plus a five-item bottom navigation with a safe-area inset.
+Content padding is `px-4 py-6` on phones and `px-8 py-10` from `md`.
 
-## Elevation & Depth
+Sections stack with `gap-8`. Within a section, `gap-3` to `gap-4`. Stat rows use
+a `gap-px` grid over a `--line` background, so the dividers are real hairlines
+rather than borders that double up.
 
-Flat with tonal layering, not lifted shadows. Depth comes from warm tonal steps (surface → surface-2 → card) and one soft shadow.
-
-### Shadow Vocabulary
-- **Card** (`0 1px 2px rgba(0,0,0,.35), 0 8px 24px rgba(0,0,0,.35)`): Cards at rest
-- **Soft** (`0 4px 24px rgba(0,0,0,.25)`): Hover orbs
-
-**The Flat-By-Default Rule.** Surfaces are flat at rest. Shadows appear only for cards and hover orbs, never for inputs or nav.
+Full-height surfaces use `min-h-[100dvh]`, never `h-screen`.
 
 ## Shapes
 
-Gently curved, not pill nor sharp. Radius 10/14/18/22/28, always warm. Cards `lg` (18px), inputs/buttons `md` (14px), badges `sm` (10px) pill `rounded-full`, sidebar `inset` variant `xl`. Borders 1px `line`, never 2px.
+One radius system, applied without exception:
+
+- Panels, cards and dialogs: `lg` (12px)
+- Controls (buttons, inputs, selects, steppers): `md` (8px)
+- Small tags and thumbnails: `sm` (6px)
+- Chips and pills that represent a selection: `rounded-full`
+
+Borders are always 1px `--line`. There are no 2px borders.
+
+## Elevation
+
+Surfaces are flat. In light mode a panel carries a single 1px 5% shadow; in dark
+mode it carries none and relies on the tonal step alone. Shadows exist only for
+things that float above the page: dialogs (`--shadow-overlay`) and sticky bars
+(`--shadow-raised`).
 
 ## Components
 
 ### Buttons
-- **Shape:** `md` (14px), `h-8` default, `h-9` lg, `h-7` sm
-- **Primary:** `bg-amber` `#d98e3f` + `text-noir` `#1a1816`, `hover:bg-amber-deep`
-- **Hover / Focus:** 200ms ease, `focus-visible:ring-ring` 3px amber/50, `active:translate-y-px`
-- **Secondary / Ghost:** Secondary `bg-card` hover `bg-card-hover`, Ghost `hover:bg-muted/50`
 
-### Chips (Filter)
-- **Style:** `rounded-full` `border` `px-4 py-2.5` `text-xs` `min-h-11`
-- **State:** Unselected `border-line bg-card text-muted`, Selected `border-amber bg-amber text-noir`
+`primary` cobalt fill with `--brand-ink` text, `secondary` surface with a
+hairline, `ghost` text-only, `danger` filled red, `dangerQuiet` red outline.
+Heights: `xs` 32, `sm` 36, `md` 44 (default), `lg` 52. Anything a thumb hits
+mid-session uses `md` or `lg`. Every button presses down 1px on `:active`.
 
-### Cards / Containers
-- **Corner Style:** `lg` 18px
-- **Background:** `card` `#26231f`
-- **Shadow Strategy:** Card shadow, flat otherwise
-- **Border:** `1px line` `#3a3632`
-- **Internal Padding:** `p-4` md, `p-3` sm, `p-5` lg
+### NumberField
 
-### Inputs / Fields
-- **Style:** `bg-surface` `#1a1816` `border-line` `rounded-md` `px-4 py-3` `text-sm`
-- **Focus:** `border-accent` amber + `bg-surface-2`
-- **Error / Disabled:** `opacity-40` `cursor-not-allowed`
+The mid-session logging control. Two 44px steppers flank a large mono readout
+that stays directly editable. Holding a stepper repeats after 380ms, so a 40kg
+change is one gesture. Weight steps by 2.5, reps by 1, seconds by 5.
 
-### Navigation
-- **Sidebar:** `variant=inset` `collapsible=icon`, `16rem` / `3rem` icon, `bg-sidebar` `#1f1d1b`, `border-r` line, `Tooltip` on collapsed, `SidebarTrigger` in header, mobile `Sheet` drawer. Active `isActive` → `bg-sidebar-accent` amber soft.
+### Panel
 
-## Do's and Don'ts
+`raised` (surface plus hairline plus shadow), `quiet` (hairline only), `inset`
+(`--surface-2`). Panels group things that belong together. Where a hairline or
+whitespace would do the job, there is no panel.
 
-### Do:
-- **Do** use amber on ≤10% of screen — primary CTA, active dot, PR, rest timer.
-- **Do** keep line length ≤65ch (`max-w-[52ch]` for descriptions).
-- **Do** use `ScrollArea` for horizontal chip rows, not `overflow-x-auto` raw.
-- **Do** lazy `Today`/`Planner` etc. via `React.lazy` + `Skeleton h-64`.
-- **Do** keep touch targets ≥44px (`min-h-11` `h-11`).
+### Tag
 
-### Don't:
-- **Don't** use `text-zinc-*` — use `text-ink`/`text-muted`/`text-ink-soft`.
-- **Don't** put `max-w-3xl` on desktop — use `max-w-7xl` + grid.
-- **Don't** use bottom nav on desktop — sidebar is primary.
-- **Don't** add neon or pure white — stay warm noir.
-- **Don't** invent new radius — use 10/14/18/22/28.
+Factual labels only: muscle group, equipment, progression rule, superset group.
+Tones map to meaning, never to decoration.
+
+### ExerciseThumb
+
+Photography first. Every movement in the dataset ships two real photographs, so
+the catalogue reads as one consistent set rather than a mix of drawings and
+photos. The bundled RepDB illustration is the fallback when the photo cannot be
+fetched, and a typographic three-letter muscle tile is the last resort. The tile
+is rendered in CSS, so it follows the theme and ships no assets.
+
+The detail view shows both frames, labelled start and end. A single still cannot
+explain a movement.
+
+## Motion
+
+`MOTION_INTENSITY 4`: motion confirms state changes and nothing else.
+
+- Colour and border transitions at 150ms.
+- A logged set scales in at 180ms with `cubic-bezier(0.16, 1, 0.3, 1)`.
+- The rest countdown bar shrinks linearly over one second per tick.
+- The personal-record confirmation fades in once and clears itself.
+
+Everything above is wrapped in `useReducedMotion`, and the global reduced-motion
+media query collapses all durations to zero. There are no infinite loops, no
+parallax and no scroll hijacking.
+
+## Copy
+
+- English throughout. The free-text intake parses English and Spanish, because
+  the parser has always understood both and the box should not pretend otherwise.
+- The persisted domain vocabulary is Spanish (`adelgazar`, `trimestral`). It is
+  never rendered raw; `src/lib/labels.ts` maps every value to a display string.
+- No em-dashes. No implementation detail in the interface: no framework names,
+  no storage keys, no asset counts, no version stamps.
+- Plain sentences. "Rest day", not "recovery is a quiet promise".
+
+## Do
+
+- Do put every comparable figure in `.num`.
+- Do keep touch targets at 44px or more.
+- Do state what a disabled control is waiting for.
+- Do test both themes before calling a screen done.
+
+## Don't
+
+- Don't add a second accent colour.
+- Don't use red or green for anything other than destructive and record.
+- Don't invent imagery for a movement that has none.
+- Don't put an uppercase label above a heading.
+- Don't reach for a panel when a hairline would do.
