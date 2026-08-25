@@ -48,6 +48,16 @@ describe('generatePlan', () => {
     expect(plan.milestones.at(-1)?.weight).toBe(80)
   })
 
+  it('rotates movements between 4-week blocks and anchors staples', () => {
+    const plan = generatePlan(base, 'trimestral', new Date('2026-01-05'))
+    const week0 = plan.weeks[0].days[0].exercises.map((e) => e.exerciseId)
+    const week4 = plan.weeks[4].days[0].exercises.map((e) => e.exerciseId)
+    expect(week4).not.toEqual(week0)
+    // A beginner's first block leads with classics, not alphabet accidents.
+    const all = new Set(plan.weeks[0].days.flatMap((d) => d.exercises.map((e) => e.exerciseId)))
+    expect(all.has('Barbell_Bench_Press_-_Medium_Grip') || all.has('Pushups')).toBe(true)
+  })
+
   it('weeklyTemplate syncable to planner', () => {
     const plan = generatePlan({ ...base, weightKg: 70, targetWeightKg: 75, goal: 'musculo' }, 'trimestral')
     expect(plan.weeklyTemplate.id).toMatch(/plan-gen-/)

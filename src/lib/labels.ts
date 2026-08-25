@@ -98,6 +98,13 @@ export const PROGRESSION_LABELS: Record<ProgressionRule, string> = {
   double: 'Double',
 }
 
+/** Plain-language explanations, shown wherever a progression rule is offered. */
+export const PROGRESSION_HELP: Record<ProgressionRule, string> = {
+  none: 'Repeat what you did last time. Nothing is added automatically.',
+  linear: 'Add 2.5 kg every session at the same reps.',
+  double: 'Keep the weight and build reps to the top of the range, then add 2.5 kg and start again.',
+}
+
 export const DAY_FULL_LABELS: Record<DayOfWeek, string> = {
   mon: 'Monday',
   tue: 'Tuesday',

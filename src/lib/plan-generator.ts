@@ -1,14 +1,8 @@
 import { generatedExercises } from '../data/exercises-generated'
 import { estimatePlan, DURATION_WEEKS } from './plan-estimate'
 import { toLocalIso } from './dates'
+import { DURATION_LABELS } from './labels'
 import type { DurationKey, GeneratedDay, GeneratedPlan, OnboardingInput, WeeklyPlan, PlannedDay, DayOfWeek } from './types'
-
-const DURATION_MONTHS: Record<DurationKey, number> = {
-  mensual: 1,
-  trimestral: 3,
-  semestral: 6,
-  anual: 12,
-}
 
 /** Plan names are shown in the UI, so they use the English vocabulary. */
 const GOAL_PLAN_NAMES: Record<OnboardingInput['goal'], string> = {
@@ -58,18 +52,58 @@ const SPLITS: Record<number, SplitDay[]> = {
   ],
 }
 
-function pickExercise(muscle: string, equipment: OnboardingInput['equipment'], level: string): string {
-  const pool = generatedExercises.filter((e) => {
+/**
+ * Proven staples per muscle, in teaching order. Alphabetical picking used to
+ * hand beginners "Anti-Gravity Press" as a chest opener; the classics come
+ * first now, and the alphabetical tail only serves the later blocks.
+ */
+const STAPLES: Record<string, string[]> = {
+  chest: ['Barbell_Bench_Press_-_Medium_Grip', 'Pushups', 'Dumbbell_Bench_Press', 'Incline_Dumbbell_Press'],
+  back: ['Bent_Over_Two-Dumbbell_Row', 'Pullups', 'Seated_Cable_Rows', 'Wide-Grip_Lat_Pulldown'],
+  shoulders: ['Barbell_Shoulder_Press', 'Dumbbell_Shoulder_Press', 'Side_Lateral_Raise'],
+  biceps: ['Barbell_Curl', 'Dumbbell_Bicep_Curl', 'Hammer_Curls'],
+  triceps: ['Triceps_Pushdown', 'Dips_-_Triceps_Version', 'Lying_Triceps_Press'],
+  quads: ['Barbell_Full_Squat', 'Goblet_Squat', 'Leg_Press', 'Bodyweight_Squat'],
+  hamstrings: ['Romanian_Deadlift', 'Lying_Leg_Curls', 'Glute_Ham_Raise'],
+  glutes: ['Barbell_Hip_Thrust', 'Barbell_Glute_Bridge', 'Butt_Lift_Bridge'],
+  calves: ['Standing_Calf_Raises', 'Seated_Calf_Raise', 'Standing_Dumbbell_Calf_Raise'],
+  core: ['Plank', 'Crunches', 'Hanging_Leg_Raise'],
+}
+
+function allowedPool(equipment: OnboardingInput['equipment']) {
+  return generatedExercises.filter((e) => {
     if (equipment === 'hibrido') return true
     if (equipment === 'bodyweight') return e.equipment === 'bodyweight'
     if (equipment === 'barbell') return ['barbell', 'dumbbell', 'machine', 'cable'].includes(e.equipment)
     return e.equipment === equipment
   })
-  const candidates = pool.filter((e) => e.muscle === muscle)
-  const chosen = candidates.length > 0 ? candidates : pool.filter((e) => e.muscle !== 'other')
-  const sorted = [...chosen].sort((a, b) => a.name.localeCompare(b.name))
-  const idx = level === 'principiante' ? 0 : level === 'intermedio' ? 1 % sorted.length : 2 % sorted.length
-  return sorted[idx]?.id ?? sorted[0]?.id ?? generatedExercises[0].id
+}
+
+/**
+ * `block` is the 4-week training block index. Each block walks one step down
+ * the candidate list, so a long programme rotates movements instead of
+ * repeating the same week for a year.
+ */
+function pickExercise(
+  muscle: string,
+  equipment: OnboardingInput['equipment'],
+  level: string,
+  block: number,
+): string {
+  const pool = allowedPool(equipment)
+  const poolIds = new Set(pool.map((e) => e.id))
+  const staples = (STAPLES[muscle] ?? []).filter((id) => poolIds.has(id))
+  const rest = pool
+    .filter((e) => e.muscle === muscle && !staples.includes(e.id))
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((e) => e.id)
+  const candidates = [...staples, ...rest]
+  if (candidates.length === 0) {
+    const fallback = pool.filter((e) => e.muscle !== 'other').sort((a, b) => a.name.localeCompare(b.name))
+    return fallback[0]?.id ?? generatedExercises[0].id
+  }
+  const levelOffset = level === 'principiante' ? 0 : level === 'intermedio' ? 1 : 2
+  return candidates[(levelOffset + block) % candidates.length]
 }
 
 function progressionFor(effort: number, equipment: string): 'none' | 'linear' | 'double' {
@@ -104,22 +138,29 @@ export function generatePlan(input: OnboardingInput, requested: DurationKey, sta
   const split = SPLITS[input.daysPerWeek] ?? SPLITS[3]
   const prog = progressionFor(input.effort, input.equipment)
 
-  const weeklyDays: PlannedDay[] = DAYS.map((d) => ({ day: d, exercises: [] }))
-  split.forEach((s, idx) => {
-    const dow = dayOfWeekForIndex(0, idx, input.daysPerWeek)
-    const target = weeklyDays.find((x) => x.day === dow)
-    if (!target) return
-    s.muscles.forEach((m) => {
-      const id = pickExercise(m, input.equipment, input.level)
-      if (!target.exercises.some((e) => e.exerciseId === id)) {
-        target.exercises.push({ exerciseId: id, progression: prog })
-      }
+  /** One weekly layout per 4-week block, so long programmes rotate movements. */
+  const blockCount = Math.max(1, Math.ceil(actualWeeks / 4))
+  const buildWeek = (block: number): PlannedDay[] => {
+    const days: PlannedDay[] = DAYS.map((d) => ({ day: d, exercises: [] }))
+    split.forEach((s, idx) => {
+      const dow = dayOfWeekForIndex(0, idx, input.daysPerWeek)
+      const target = days.find((x) => x.day === dow)
+      if (!target) return
+      s.muscles.forEach((m) => {
+        const id = pickExercise(m, input.equipment, input.level, block)
+        if (!target.exercises.some((e) => e.exerciseId === id)) {
+          target.exercises.push({ exerciseId: id, progression: prog })
+        }
+      })
     })
-  })
+    return days
+  }
+  const blocks = Array.from({ length: blockCount }, (_, b) => buildWeek(b))
+  const weeklyDays = blocks[0]
 
   const weeklyTemplate: WeeklyPlan = {
     id: `plan-gen-${Date.now()}`,
-    name: `${GOAL_PLAN_NAMES[input.goal]} · ${DURATION_MONTHS[approvedDuration]} months`,
+    name: `${GOAL_PLAN_NAMES[input.goal]} · ${DURATION_LABELS[approvedDuration]}`,
     days: weeklyDays,
     createdAt: new Date().toISOString(),
   }
@@ -132,7 +173,8 @@ export function generatePlan(input: OnboardingInput, requested: DurationKey, sta
 
   for (let w = 0; w < actualWeeks; w++) {
     const isDeload = (w + 1) % 4 === 0
-    const days: GeneratedDay[] = weeklyDays
+    const blockDays = blocks[Math.min(Math.floor(w / 4), blocks.length - 1)]
+    const days: GeneratedDay[] = blockDays
       .filter((d) => d.exercises.length > 0)
       .map((d) => {
         let exercises = d.exercises

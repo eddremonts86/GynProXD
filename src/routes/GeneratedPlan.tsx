@@ -1,25 +1,48 @@
 import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from '@tanstack/react-router'
-import { ArrowRight, CaretLeft, CaretRight, DownloadSimple, Trash, Warning } from '@phosphor-icons/react'
+import {
+  ArrowRight,
+  CaretDown,
+  CaretLeft,
+  CaretRight,
+  DownloadSimple,
+  Trash,
+  Warning,
+} from '@phosphor-icons/react'
 import { useGym } from '../store/useGym'
 import { exerciseById } from '../lib/exercises'
+import { todayIso } from '../lib/dates'
 import { Button, IconButton } from '../ui/Button'
 import { Panel } from '../ui/Panel'
 import { Tag } from '../ui/Tag'
-import { Stat } from '../ui/Stat'
+import { AuroraTile } from '../ui/AuroraTile'
+import { ExerciseThumb } from '../ui/ExerciseThumb'
 import { PageHeader, Section } from '../ui/PageHeader'
 import { EmptyState } from '../ui/EmptyState'
+import { MovementFrames } from '@/components/movement-frames'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog'
 import {
   DAY_FULL_LABELS,
   DURATION_KEYS,
   DURATION_LABELS,
+  EQUIPMENT_LABELS,
   GOAL_LABELS,
+  TRAINING_PLACE_OPTIONS,
+  MUSCLE_LABELS,
+  PROGRESSION_HELP,
   PROGRESSION_LABELS,
+  formatLongDate,
   formatShortDate,
   pluralize,
 } from '../lib/labels'
-import { todayIso } from '../lib/dates'
 import { cn } from '@/lib/utils'
+import type { DurationKey, GeneratedDay, ProgressionRule } from '../lib/types'
 
 function isDeloadWeek(weekIndex: number): boolean {
   return (weekIndex + 1) % 4 === 0
@@ -37,12 +60,11 @@ export function GeneratedPlanPage() {
 
   const [activeWeek, setActiveWeek] = useState(0)
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [openDay, setOpenDay] = useState<GeneratedDay | null>(null)
+  const [pendingDuration, setPendingDuration] = useState<DurationKey | null>(null)
   const today = todayIso()
 
-  const week = useMemo(
-    () => plan?.weeks[activeWeek] ?? plan?.weeks[0],
-    [plan, activeWeek],
-  )
+  const week = useMemo(() => plan?.weeks[activeWeek] ?? plan?.weeks[0], [plan, activeWeek])
 
   if (!plan || !week) {
     return (
@@ -51,9 +73,7 @@ export function GeneratedPlanPage() {
         <EmptyState
           title="This programme no longer exists"
           description="It was deleted, or the link points at a programme from a different browser."
-          action={
-            <Button onClick={() => navigate({ to: '/onboarding' })}>Build a new plan</Button>
-          }
+          action={<Button onClick={() => navigate({ to: '/onboarding' })}>Build a new plan</Button>}
         />
       </div>
     )
@@ -74,11 +94,13 @@ export function GeneratedPlanPage() {
     URL.revokeObjectURL(url)
   }
 
+  const weightCheckpoints = plan.milestones.filter((m) => m.weight !== undefined)
+
   return (
     <div className="flex flex-col gap-8">
       <PageHeader
         title={plan.weeklyTemplate.name}
-        description={`${GOAL_LABELS[plan.input.goal]} over ${plan.weeks.length} weeks, ${plan.input.daysPerWeek} sessions a week of ${plan.input.minsPerSession} minutes.`}
+        description={`${GOAL_LABELS[plan.input.goal]} over ${plan.weeks.length} weeks. Tap a day to see every movement in detail.`}
         action={
           <>
             <IconButton size="md" onClick={exportJson} aria-label="Export this programme as JSON">
@@ -116,28 +138,47 @@ export function GeneratedPlanPage() {
         }
       />
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <Panel padding="md">
-          <Stat label="Timeline" value={plan.estimatedMonths} unit="months" />
-        </Panel>
-        <Panel padding="md">
-          <Stat label="Rate" value={plan.rateKgPerWeek} unit="kg / week" />
-        </Panel>
-        <Panel padding="md">
-          <Stat label="Programme" value={plan.weeks.length} unit="weeks" />
-        </Panel>
-        <Panel padding="md">
-          <Stat
-            label="Starting weight"
-            value={plan.input.weightKg}
-            unit="kg"
-            hint={plan.input.targetWeightKg ? `Target ${plan.input.targetWeightKg} kg` : undefined}
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <AuroraTile
+          tone="green"
+          label="Programme"
+          value={plan.weeks.length}
+          unit="weeks"
+          sub={`${plan.input.daysPerWeek} sessions a week, with a lighter deload every 4th week`}
+        />
+        <Panel padding="lg" className="flex flex-col justify-center gap-3">
+          <FactRow label="Goal" value={GOAL_LABELS[plan.input.goal]} />
+          <FactRow
+            label="Schedule"
+            value={`${plan.input.daysPerWeek} × ${plan.input.minsPerSession} min`}
           />
+          <FactRow
+            label="Training at"
+            value={
+              TRAINING_PLACE_OPTIONS.find((o) => o.value === plan.input.equipment)?.label ??
+              EQUIPMENT_LABELS[plan.input.equipment]
+            }
+          />
+          {plan.input.targetWeightKg !== undefined && (
+            <FactRow
+              label="Weight"
+              value={`${plan.input.weightKg} to ${plan.input.targetWeightKg} kg`}
+            />
+          )}
+          {plan.rateKgPerWeek > 0 && (
+            <>
+              <FactRow label="Safe rate" value={`${plan.rateKgPerWeek} kg / week`} />
+              <FactRow
+                label="Realistic timeline"
+                value={`${plan.estimatedMonths} ${plan.estimatedMonths === 1 ? 'month' : 'months'}`}
+              />
+            </>
+          )}
         </Panel>
       </div>
 
       {plan.warnings.length > 0 && (
-        <Panel padding="md" className="flex gap-3 border-danger/30">
+        <Panel padding="md" className="flex gap-3">
           <Warning size={18} weight="fill" className="mt-0.5 shrink-0 text-danger" />
           <div className="flex flex-col gap-1">
             {plan.warnings.map((w) => (
@@ -162,9 +203,6 @@ export function GeneratedPlanPage() {
             >
               <CaretLeft size={16} weight="bold" />
             </IconButton>
-            <span className="num px-1 text-2xs text-ink-3">
-              {week.weekIndex + 1} / {plan.weeks.length}
-            </span>
             <IconButton
               size="sm"
               disabled={activeWeek >= plan.weeks.length - 1}
@@ -188,13 +226,13 @@ export function GeneratedPlanPage() {
                 aria-pressed={active}
                 aria-label={`Week ${w.weekIndex + 1}${isDeloadWeek(w.weekIndex) ? ', deload' : ''}`}
                 className={cn(
-                  'num flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-md border px-2.5 text-xs font-medium transition-colors duration-150',
+                  'num flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full px-3 text-xs font-medium transition-colors duration-150',
                   active
-                    ? 'border-brand bg-brand text-brand-ink'
+                    ? 'bg-brand text-brand-ink'
                     : isDeloadWeek(w.weekIndex)
-                      ? 'border-dashed border-line bg-surface text-ink-3 hover:border-line-strong'
-                      : 'border-line bg-surface text-ink-2 hover:border-line-strong',
-                  hasToday && !active && 'ring-1 ring-brand',
+                      ? 'border border-dashed border-line-strong bg-transparent text-ink-3 hover:text-ink'
+                      : 'bg-surface text-ink-2 shadow-[var(--shadow-panel)] hover:text-ink',
+                  hasToday && !active && 'ring-2 ring-brand/40',
                 )}
               >
                 {w.weekIndex + 1}
@@ -203,79 +241,270 @@ export function GeneratedPlanPage() {
           })}
         </div>
 
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {week.days.map((d) => {
-            const isToday = d.date === today
-            return (
-              <Panel
-                key={d.date}
-                padding="md"
-                className={cn('flex flex-col gap-3', isToday && 'border-brand/50 bg-brand-soft')}
-              >
-                <div className="flex items-baseline justify-between gap-2">
-                  <span className="text-sm font-semibold text-ink">{DAY_FULL_LABELS[d.day]}</span>
-                  <span className="num text-2xs text-ink-3">
-                    {isToday ? 'Today' : formatShortDate(d.date)}
-                  </span>
-                </div>
-                <ul className="flex flex-col gap-1.5">
-                  {d.exercises.map((pe) => (
-                    <li key={pe.exerciseId} className="flex items-center justify-between gap-2">
-                      <span className="truncate text-sm text-ink-2">
-                        {exerciseById(pe.exerciseId)?.name ?? pe.exerciseId}
-                      </span>
-                      {pe.progression !== 'none' && (
-                        <Tag tone="brand">{PROGRESSION_LABELS[pe.progression]}</Tag>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </Panel>
-            )
-          })}
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {week.days.map((d) => (
+            <DayCard
+              key={d.date}
+              day={d}
+              isToday={d.date === today}
+              onOpen={() => setOpenDay(d)}
+            />
+          ))}
         </div>
       </Section>
 
-      {plan.milestones.length > 0 && (
-        <Section title="Checkpoints" hint={pluralize(plan.milestones.length, 'checkpoint')}>
-          <ul className="flex flex-wrap gap-1.5">
-            {plan.milestones.map((m) => (
-              <li
+      {weightCheckpoints.length > 0 && (
+        <Section title="Checkpoints" hint={pluralize(weightCheckpoints.length, 'checkpoint')}>
+          <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-1 md:-mx-8 md:px-8">
+            {weightCheckpoints.map((m) => (
+              <span
                 key={m.week}
-                className="num rounded-full border border-line bg-surface px-2.5 py-1 text-2xs text-ink-2"
+                className="num shrink-0 rounded-full bg-surface px-3 py-1.5 text-2xs text-ink-2 shadow-[var(--shadow-panel)]"
               >
-                Week {m.week}
-                {m.weight !== undefined ? `, ${m.weight} kg` : ''}
-              </li>
+                Week {m.week}, {m.weight} kg
+              </span>
             ))}
-          </ul>
+          </div>
         </Section>
       )}
 
       <Section title="Try a different length">
         <div className="flex flex-wrap gap-2">
-          {DURATION_KEYS.map((d) => {
-            const current = d === plan.approvedDuration
-            return (
-              <Button
-                key={d}
-                variant={current ? 'primary' : 'secondary'}
-                disabled={current}
-                onClick={() => {
-                  const newId = createGeneratedPlan(plan.input, d)
-                  setActiveWeek(0)
-                  void navigate({ to: '/generated/$id', params: { id: newId } })
-                }}
-              >
-                {DURATION_LABELS[d]}
-              </Button>
-            )
-          })}
+          {DURATION_KEYS.filter((d) => d !== plan.approvedDuration).map((d) => (
+            <Button key={d} variant="secondary" onClick={() => setPendingDuration(d)}>
+              {DURATION_LABELS[d]}
+            </Button>
+          ))}
         </div>
         <p className="text-2xs text-ink-3">
-          Same details, a new calendar. This programme is kept either way.
+          Forma builds a fresh programme rather than editing this one.
         </p>
       </Section>
+
+      <DayDetailDialog day={openDay} onClose={() => setOpenDay(null)} />
+
+      <Dialog open={!!pendingDuration} onOpenChange={(open) => !open && setPendingDuration(null)}>
+        <DialogContent className="sm:max-w-sm">
+          {pendingDuration && (
+            <>
+              <DialogHeader>
+                <DialogTitle>Build a {DURATION_LABELS[pendingDuration]} programme?</DialogTitle>
+                <DialogDescription>
+                  A new programme is generated from the same details, with its own calendar and
+                  movement rotation. This one is kept, and anything you copied to the planner stays
+                  as it is.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex justify-end gap-2">
+                <Button variant="ghost" onClick={() => setPendingDuration(null)}>
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    const newId = createGeneratedPlan(plan.input, pendingDuration)
+                    setPendingDuration(null)
+                    setActiveWeek(0)
+                    void navigate({ to: '/generated/$id', params: { id: newId } })
+                  }}
+                >
+                  Generate programme
+                </Button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
+  )
+}
+
+function FactRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4">
+      <span className="text-2xs font-medium text-ink-3">{label}</span>
+      <span className="num text-right text-sm font-medium text-ink">{value}</span>
+    </div>
+  )
+}
+
+function DayCard({
+  day,
+  isToday,
+  onOpen,
+}: {
+  day: GeneratedDay
+  isToday: boolean
+  onOpen: () => void
+}) {
+  const movements = day.exercises
+    .map((pe) => ({ pe, ex: exerciseById(pe.exerciseId) }))
+    .filter((m) => m.ex !== undefined)
+
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      className={cn(
+        'group flex flex-col gap-4 rounded-xl bg-surface p-5 text-left',
+        'shadow-[var(--shadow-panel)] transition-shadow duration-150 hover:shadow-[var(--shadow-tile)]',
+        isToday && 'ring-2 ring-brand',
+      )}
+    >
+      <div className="flex w-full items-center justify-between gap-2">
+        <span className="text-lg font-semibold text-ink">{DAY_FULL_LABELS[day.day]}</span>
+        {isToday ? (
+          <span className="rounded-full bg-brand px-2.5 py-1 text-2xs font-medium text-brand-ink">
+            Today
+          </span>
+        ) : (
+          <span className="num text-2xs text-ink-3">{formatShortDate(day.date)}</span>
+        )}
+      </div>
+
+      <div className="flex items-center">
+        <span className="flex -space-x-3">
+          {movements.slice(0, 4).map(({ ex }) => (
+            <ExerciseThumb
+              key={ex!.id}
+              exercise={ex!}
+              size="md"
+              className="rounded-full ring-2 ring-surface"
+            />
+          ))}
+        </span>
+        {movements.length > 4 && (
+          <span className="num -ml-3 flex size-14 items-center justify-center rounded-full bg-surface-2 text-xs font-medium text-ink-2 ring-2 ring-surface">
+            +{movements.length - 4}
+          </span>
+        )}
+      </div>
+
+      <ul className="flex w-full flex-col gap-1">
+        {movements.slice(0, 3).map(({ ex }) => (
+          <li key={ex!.id} className="truncate text-sm text-ink-2">
+            {ex!.name}
+          </li>
+        ))}
+        {movements.length > 3 && (
+          <li className="text-2xs text-ink-3">and {movements.length - 3} more</li>
+        )}
+      </ul>
+
+      <span className="flex w-full items-center justify-between border-t border-line pt-3 text-2xs font-medium text-ink-3">
+        {pluralize(movements.length, 'movement')}
+        <span className="flex items-center gap-1 text-ink-2 transition-transform duration-150 group-hover:translate-x-0.5">
+          View day
+          <CaretRight size={12} weight="bold" />
+        </span>
+      </span>
+    </button>
+  )
+}
+
+function DayDetailDialog({ day, onClose }: { day: GeneratedDay | null; onClose: () => void }) {
+  const [expandedId, setExpandedId] = useState<string | null>(null)
+
+  const rules = useMemo(() => {
+    const present = new Set<ProgressionRule>()
+    for (const pe of day?.exercises ?? []) present.add(pe.progression)
+    return [...present]
+  }, [day])
+
+  return (
+    <Dialog
+      open={!!day}
+      onOpenChange={(open) => {
+        if (!open) {
+          onClose()
+          setExpandedId(null)
+        }
+      }}
+    >
+      <DialogContent className="flex max-h-[85dvh] flex-col gap-4 sm:max-w-xl">
+        {day && (
+          <>
+            <DialogHeader>
+              <DialogTitle>{DAY_FULL_LABELS[day.day]}</DialogTitle>
+              <DialogDescription>
+                {formatLongDate(day.date)}, {pluralize(day.exercises.length, 'movement')}. Tap a
+                movement for photos and instructions.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="-mx-1 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-1">
+              {day.exercises.map((pe) => {
+                const ex = exerciseById(pe.exerciseId)
+                if (!ex) return null
+                const open = expandedId === pe.exerciseId
+                return (
+                  <div key={pe.exerciseId} className="rounded-lg bg-surface-2">
+                    <button
+                      type="button"
+                      onClick={() => setExpandedId(open ? null : pe.exerciseId)}
+                      aria-expanded={open}
+                      className="flex w-full items-center gap-3 p-3 text-left"
+                    >
+                      <ExerciseThumb exercise={ex} size="md" />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-medium text-ink">
+                          {ex.name}
+                        </span>
+                        <span className="block text-2xs text-ink-3">
+                          {MUSCLE_LABELS[ex.muscle]} · {EQUIPMENT_LABELS[ex.equipment]}
+                        </span>
+                      </span>
+                      {pe.progression !== 'none' && (
+                        <Tag tone="brand">{PROGRESSION_LABELS[pe.progression]}</Tag>
+                      )}
+                      <CaretDown
+                        size={14}
+                        weight="bold"
+                        className={cn(
+                          'shrink-0 text-ink-3 transition-transform duration-150',
+                          open && 'rotate-180',
+                        )}
+                      />
+                    </button>
+
+                    {open && (
+                      <div className="flex flex-col gap-3 px-3 pb-3">
+                        <MovementFrames exercise={ex} />
+                        {ex.instructions && ex.instructions.length > 0 ? (
+                          <ol className="flex flex-col gap-2">
+                            {ex.instructions.map((step, i) => (
+                              <li key={i} className="flex gap-2.5 text-sm leading-relaxed text-ink-2">
+                                <span className="num flex size-5 shrink-0 items-center justify-center rounded-full bg-surface text-2xs font-semibold text-ink-3">
+                                  {i + 1}
+                                </span>
+                                {step}
+                              </li>
+                            ))}
+                          </ol>
+                        ) : (
+                          <p className="text-sm text-ink-3">
+                            No instructions available for this movement.
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+
+            {rules.length > 0 && (
+              <div className="flex flex-col gap-1.5 border-t border-line pt-3">
+                {rules.map((r) => (
+                  <p key={r} className="text-2xs leading-relaxed text-ink-3">
+                    <span className="font-semibold text-ink-2">{PROGRESSION_LABELS[r]}:</span>{' '}
+                    {PROGRESSION_HELP[r]}
+                  </p>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
   )
 }
