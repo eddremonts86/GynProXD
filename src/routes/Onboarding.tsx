@@ -112,14 +112,19 @@ export function OnboardingPage() {
       <div className="grid gap-8 lg:grid-cols-[1fr_22rem] lg:items-start">
         <div className="flex flex-col gap-8">
           <Section title="Describe it in your own words" hint="Optional">
-            <Panel padding="lg" className="flex flex-col gap-3">
+            <div
+              className={cn(
+                'flex flex-col gap-3 rounded-xl bg-surface p-4 shadow-[var(--shadow-panel)]',
+                'transition-shadow duration-150 focus-within:ring-2 focus-within:ring-brand',
+              )}
+            >
               <Textarea
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 rows={3}
                 placeholder="40 years old, 140kg, want to get down to 80kg, gym 3 times a week for 2 hours"
                 aria-label="Describe your situation"
-                className="min-h-24 w-full rounded-md border-line bg-surface px-3 py-2.5 text-sm"
+                className="min-h-20 w-full resize-none border-0 bg-transparent p-0 text-sm shadow-none focus:ring-0 focus-visible:outline-none"
               />
 
               {text.trim().length > 0 && (
@@ -147,7 +152,7 @@ export function OnboardingPage() {
                     </p>
                   ))}
 
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 border-t border-line pt-3">
                     <Button
                       variant="secondary"
                       size="sm"
@@ -163,94 +168,105 @@ export function OnboardingPage() {
                   </div>
                 </>
               )}
-
-              <p className="text-2xs text-ink-3">
-                English or Spanish both work. Anything it misses you can set below.
-              </p>
-            </Panel>
+            </div>
+            <p className="text-2xs text-ink-3">
+              English or Spanish both work. Anything it misses you can set below.
+            </p>
           </Section>
 
           <Section title="Your details">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              <Input
-                label="Age"
-                value={age}
-                onChange={(e) => setAge(e.target.value)}
-                inputMode="numeric"
-              />
-              <FormSelect
-                label="Sex"
-                value={sex}
-                onValueChange={(v) => setSex(v as typeof sex)}
-                options={(['hombre', 'mujer', 'otro'] as const).map((s) => ({
-                  value: s,
-                  label: SEX_LABELS[s],
-                }))}
-              />
-              <Input
-                label="Height"
-                value={height}
-                onChange={(e) => setHeight(e.target.value)}
-                inputMode="numeric"
-                hint="cm"
-              />
-              <Input
-                label="Current weight"
-                value={weight}
-                onChange={(e) => setWeight(e.target.value)}
-                inputMode="decimal"
-                hint="kg"
-              />
-              <Input
-                label="Target weight"
-                value={target}
-                onChange={(e) => setTarget(e.target.value)}
-                inputMode="decimal"
-                hint="kg, leave empty if you have no target"
-              />
-              <FormSelect
-                label="Goal"
-                value={goal}
-                onValueChange={(v) => setGoal(v as Goal)}
-                options={GOALS.map((g) => ({ value: g, label: GOAL_LABELS[g] }))}
-              />
-              <FormSelect
-                label="Experience"
-                value={level}
-                onValueChange={(v) => setLevel(v as Level)}
-                options={LEVELS.map((l) => ({ value: l, label: LEVEL_LABELS[l] }))}
-              />
-              <Input
-                label="Sessions per week"
-                value={days}
-                onChange={(e) => setDays(e.target.value)}
-                inputMode="numeric"
-              />
-              <Input
-                label="Minutes per session"
-                value={mins}
-                onChange={(e) => setMins(e.target.value)}
-                inputMode="numeric"
-              />
-              <FormSelect
-                label="Where you train"
-                value={place}
-                onValueChange={setPlace}
-                options={TRAINING_PLACE_OPTIONS}
-              />
-              <FormSelect
-                label="How hard you want to push"
-                value={effort}
-                onValueChange={setEffort}
-                options={[1, 2, 3, 4, 5].map((n) => ({
-                  value: String(n),
-                  label: EFFORT_LABELS[n],
-                }))}
-                className="sm:col-span-1"
-              />
-            </div>
-          </Section>
+            <Panel padding="lg" className="flex flex-col gap-6">
+              <fieldset className="flex flex-col gap-3">
+                <legend className="pb-3 text-sm font-semibold text-ink">About you</legend>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  <Input
+                    label="Age"
+                    value={age}
+                    onChange={(e) => setAge(e.target.value)}
+                    inputMode="numeric"
+                  />
+                  <FormSelect
+                    label="Sex"
+                    value={sex}
+                    onValueChange={(v) => setSex(v as typeof sex)}
+                    options={(['hombre', 'mujer', 'otro'] as const).map((s) => ({
+                      value: s,
+                      label: SEX_LABELS[s],
+                    }))}
+                  />
+                  <Input
+                    label="Height"
+                    value={height}
+                    onChange={(e) => setHeight(e.target.value)}
+                    inputMode="numeric"
+                    suffix="cm"
+                  />
+                  <Input
+                    label="Current weight"
+                    value={weight}
+                    onChange={(e) => setWeight(e.target.value)}
+                    inputMode="decimal"
+                    suffix="kg"
+                  />
+                  <Input
+                    label="Target weight"
+                    value={target}
+                    onChange={(e) => setTarget(e.target.value)}
+                    inputMode="decimal"
+                    suffix="kg"
+                    placeholder="Optional"
+                  />
+                  <FormSelect
+                    label="Goal"
+                    value={goal}
+                    onValueChange={(v) => setGoal(v as Goal)}
+                    options={GOALS.map((g) => ({ value: g, label: GOAL_LABELS[g] }))}
+                  />
+                </div>
+              </fieldset>
 
+              <fieldset className="flex flex-col gap-3 border-t border-line pt-5">
+                <legend className="float-left pb-3 text-sm font-semibold text-ink">Training</legend>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  <Input
+                    label="Sessions per week"
+                    value={days}
+                    onChange={(e) => setDays(e.target.value)}
+                    inputMode="numeric"
+                  />
+                  <Input
+                    label="Minutes per session"
+                    value={mins}
+                    onChange={(e) => setMins(e.target.value)}
+                    inputMode="numeric"
+                    suffix="min"
+                  />
+                  <FormSelect
+                    label="Experience"
+                    value={level}
+                    onValueChange={(v) => setLevel(v as Level)}
+                    options={LEVELS.map((l) => ({ value: l, label: LEVEL_LABELS[l] }))}
+                  />
+                  <FormSelect
+                    label="Where you train"
+                    value={place}
+                    onValueChange={setPlace}
+                    options={TRAINING_PLACE_OPTIONS}
+                  />
+                  <FormSelect
+                    label="How hard you want to push"
+                    value={effort}
+                    onValueChange={setEffort}
+                    options={[1, 2, 3, 4, 5].map((n) => ({
+                      value: String(n),
+                      label: EFFORT_LABELS[n],
+                    }))}
+                    className="xl:col-span-1"
+                  />
+                </div>
+              </fieldset>
+            </Panel>
+          </Section>
         </div>
 
         {/* The estimate updates as you type. Showing the maths is the product. */}

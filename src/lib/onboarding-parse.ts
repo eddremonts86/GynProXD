@@ -40,7 +40,7 @@ export function parseOnboarding(text: string): ParseResult {
 
   const ageM =
     t.match(/(\d{1,2})\s*(?:a[ñn]os|a[ñn]o)\b/i) ??
-    t.match(/(\d{1,2})\s*(?:years? old|yo|yrs?)\b/i) ??
+    t.match(/(\d{1,2})\s*(?:years?(?:\s+old)?|yo|yrs?)\b/i) ??
     t.match(/\bage[:\s]+(\d{1,2})\b/i)
   if (ageM) partial.age = clampInt(Number(ageM[1]), 12, 80)
 

@@ -5,15 +5,17 @@ interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'>
   label?: string
   hint?: string
   error?: string
+  /** Unit shown inside the field ("kg", "cm"), so rows keep one height. */
+  suffix?: string
   id?: string
 }
 
-export function Input({ label, hint, error, className, id, ...props }: InputProps) {
+export function Input({ label, hint, error, suffix, className, id, ...props }: InputProps) {
   const inputId =
     id ?? (label ? `f-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}` : undefined)
   const describedBy = error ? `${inputId}-err` : hint ? `${inputId}-hint` : undefined
 
-  const field = (
+  const control = (
     <input
       id={inputId}
       aria-invalid={error ? true : undefined}
@@ -24,10 +26,22 @@ export function Input({ label, hint, error, className, id, ...props }: InputProp
         'focus:border-brand focus:outline-none',
         'disabled:cursor-not-allowed disabled:opacity-45',
         error ? 'border-danger' : 'border-line hover:border-line-strong',
+        suffix && 'pr-10',
         className,
       )}
       {...props}
     />
+  )
+
+  const field = suffix ? (
+    <span className="relative block">
+      {control}
+      <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-xs text-ink-3">
+        {suffix}
+      </span>
+    </span>
+  ) : (
+    control
   )
 
   if (!label && !hint && !error) return field

@@ -43,6 +43,12 @@ describe('parseOnboarding', () => {
     expect(confidence).toBeGreaterThan(0.5)
   })
 
+  it('parses bare "years" without "old"', () => {
+    const { partial } = parseOnboarding('male 40 years 120kg target 90kg gym 4 times a week 60min')
+    expect(partial.age).toBe(40)
+    expect(partial.targetWeightKg).toBe(90)
+  })
+
   it('parses English bodyweight and beginner wording', () => {
     const { partial } = parseOnboarding(
       'beginner woman, 65kg, calisthenics at home, 4 days a week, 45 minutes, build muscle',
