@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { ArrowRight, CaretRight, PencilSimple, Plus, SlidersHorizontal, Trash, X } from '@phosphor-icons/react'
+import { ArrowRight, CaretLeft, CaretRight, Check, PencilSimple, Plus, SlidersHorizontal, Trash, X } from '@phosphor-icons/react'
 import { useGym, DAYS, DAY_LABELS } from '../store/useGym'
 import { exerciseById } from '../lib/exercises'
 import { Button, IconButton } from '../ui/Button'
@@ -23,14 +23,16 @@ import { Switch } from '@/components/ui/switch'
 import {
   DAY_FULL_LABELS,
   EQUIPMENT_LABELS,
+  formatShortDate,
   GOAL_LABELS,
   MUSCLE_LABELS,
   PROGRESSION_LABELS,
   pluralize,
 } from '../lib/labels'
 import { readPlannerSelection, writePlannerSelection } from '../lib/planner-selection'
+import { toLocalIso, todayIso } from '../lib/dates'
 import { cn } from '@/lib/utils'
-import type { DayOfWeek, PlannedExercise, ProgressionRule } from '../lib/types'
+import type { DayOfWeek, PlannedExercise, ProgressionRule, WeeklyPlan } from '../lib/types'
 
 const DAY_BY_INDEX: DayOfWeek[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
 
@@ -63,7 +65,23 @@ export function PlannerPage() {
     setSelectedPlanIdState(id)
     writePlannerSelection(id)
   }
-  const [selectedDay, setSelectedDay] = useState<DayOfWeek>(todayDow)
+  const [selectedDate, setSelectedDate] = useState<string>(todayIso)
+  const selectedDay: DayOfWeek = useMemo(() => {
+    const [y, m, d] = selectedDate.split('-').map(Number)
+    return MONTH_DOW[(new Date(y, m - 1, d).getDay() + 6) % 7]
+  }, [selectedDate])
+
+  /* The seven dates of the week holding the selection, Monday first. */
+  const weekDates = useMemo(() => {
+    const [y, m, d] = selectedDate.split('-').map(Number)
+    const base = new Date(y, m - 1, d)
+    base.setDate(base.getDate() - ((base.getDay() + 6) % 7))
+    return DAYS.map((_, i) => {
+      const dt = new Date(base)
+      dt.setDate(base.getDate() + i)
+      return toLocalIso(dt)
+    })
+  }, [selectedDate])
   const [newPlanName, setNewPlanName] = useState('')
   const [creating, setCreating] = useState<'choose' | 'name' | null>(null)
   const [renameValue, setRenameValue] = useState<string | null>(null)
@@ -287,19 +305,20 @@ export function PlannerPage() {
               }
             >
               <div className="grid grid-cols-7 gap-1.5">
-                {DAYS.map((d) => {
+                {DAYS.map((d, i) => {
+                  const iso = weekDates[i]
                   const count = selectedPlan.days.find((x) => x.day === d)?.exercises.length ?? 0
-                  const active = d === selectedDay
-                  const isToday = d === todayDow
+                  const active = iso === selectedDate
+                  const isToday = iso === todayIso()
                   return (
                     <button
                       key={d}
                       type="button"
-                      onClick={() => setSelectedDay(d)}
+                      onClick={() => setSelectedDate(iso)}
                       aria-pressed={active}
-                      aria-label={`${DAY_FULL_LABELS[d]}${isToday ? ', today' : ''}, ${pluralize(count, 'movement')}`}
+                      aria-label={`${DAY_FULL_LABELS[d]} ${iso}${isToday ? ', today' : ''}, ${pluralize(count, 'movement')}`}
                       className={cn(
-                        'flex min-h-16 flex-col items-center justify-center gap-1 rounded-md border transition-colors duration-150',
+                        'flex min-h-16 flex-col items-center justify-center gap-0.5 rounded-md border transition-colors duration-150',
                         active
                           ? 'border-brand bg-brand text-brand-ink'
                           : count > 0
@@ -308,7 +327,9 @@ export function PlannerPage() {
                         isToday && !active && 'ring-2 ring-brand/40',
                       )}
                     >
-                      <span className="text-2xs font-medium">{DAY_LABELS[d]}</span>
+                      <span className="text-2xs font-medium">
+                        {DAY_LABELS[d]} <span className="num">{Number(iso.slice(8))}</span>
+                      </span>
                       <span className="num text-lg leading-none font-semibold">{count}</span>
                     </button>
                   )
@@ -321,7 +342,8 @@ export function PlannerPage() {
                 <div className="flex min-w-0 flex-col gap-1">
                   <span className="flex items-center gap-2">
                     <h2 className="text-xl text-ink">{DAY_FULL_LABELS[selectedDay]}</h2>
-                    {selectedDay === todayDow && <Tag tone="brand">Today</Tag>}
+                    <span className="num text-sm text-ink-3">{formatShortDate(selectedDate)}</span>
+                    {selectedDate === todayIso() && <Tag tone="brand">Today</Tag>}
                   </span>
                   <p className="text-sm text-ink-3">{pluralize(dayExercises.length, 'movement')}</p>
                 </div>
@@ -394,6 +416,12 @@ export function PlannerPage() {
                 </ul>
               )}
             </Panel>
+
+            <MonthCalendar
+              plan={selectedPlan}
+              selectedDate={selectedDate}
+              onSelectDate={setSelectedDate}
+            />
 
             <ExercisePicker
               open={pickerOpen}
@@ -532,6 +560,196 @@ export function PlannerPage() {
         </DialogContent>
       </Dialog>
     </div>
+  )
+}
+
+const MONTH_DOW: DayOfWeek[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
+
+interface MonthCell {
+  iso: string
+  dayOfMonth: number
+  dow: DayOfWeek
+  inMonth: boolean
+}
+
+function buildMonthCells(anchor: Date): MonthCell[] {
+  const first = new Date(anchor.getFullYear(), anchor.getMonth(), 1)
+  const start = new Date(first)
+  start.setDate(first.getDate() - ((first.getDay() + 6) % 7))
+  const cells: MonthCell[] = []
+  for (let i = 0; i < 42; i++) {
+    const d = new Date(start)
+    d.setDate(start.getDate() + i)
+    cells.push({
+      iso: toLocalIso(d),
+      dayOfMonth: d.getDate(),
+      dow: MONTH_DOW[(d.getDay() + 6) % 7],
+      inMonth: d.getMonth() === anchor.getMonth(),
+    })
+  }
+  /* Drop a trailing all-outside week so short months stay five rows. */
+  while (cells.length > 35 && cells.slice(-7).every((c) => !c.inMonth)) cells.splice(-7)
+  return cells
+}
+
+/**
+ * The plan's week projected across a real month, with the movements' photos in
+ * each day and a mark on days that already have a recorded session. Tapping a
+ * day selects its weekday in the editor above.
+ */
+function MonthCalendar({
+  plan,
+  selectedDate,
+  onSelectDate,
+}: {
+  plan: WeeklyPlan
+  selectedDate: string
+  onSelectDate: (iso: string) => void
+}) {
+  const workouts = useGym((s) => s.workouts)
+  /* null means "follow the selection's month"; paging sets an explicit month
+     until the next selection snaps it back. */
+  const [browse, setBrowse] = useState<{ y: number; m: number } | null>(null)
+  const today = todayIso()
+
+  const anchor = useMemo(() => {
+    if (browse) return new Date(browse.y, browse.m, 1)
+    const [y, m] = selectedDate.split('-').map(Number)
+    return new Date(y, m - 1, 1)
+  }, [browse, selectedDate])
+
+  const page = (delta: number) =>
+    setBrowse({ y: anchor.getFullYear(), m: anchor.getMonth() + delta })
+
+  const cells = useMemo(() => buildMonthCells(anchor), [anchor])
+  const trainedDates = useMemo(() => new Set(workouts.map((w) => w.date)), [workouts])
+  const byDow = useMemo(() => {
+    const map = new Map<DayOfWeek, PlannedExercise[]>(
+      plan.days.map((d) => [d.day, d.exercises]),
+    )
+    return (dow: DayOfWeek): PlannedExercise[] => map.get(dow) ?? []
+  }, [plan])
+
+  const monthLabel = anchor.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
+
+  return (
+    <Section
+      title={monthLabel}
+      action={
+        <>
+          <IconButton size="sm" onClick={() => page(-1)} aria-label="Previous month">
+            <CaretLeft size={16} weight="bold" />
+          </IconButton>
+          {selectedDate !== today && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                setBrowse(null)
+                onSelectDate(today)
+              }}
+            >
+              Today
+            </Button>
+          )}
+          <IconButton size="sm" onClick={() => page(1)} aria-label="Next month">
+            <CaretRight size={16} weight="bold" />
+          </IconButton>
+        </>
+      }
+    >
+      <Panel padding="sm" className="flex flex-col gap-1.5">
+        <div className="grid grid-cols-7 gap-1">
+          {MONTH_DOW.map((d) => (
+            <span key={d} className="py-1 text-center text-2xs font-medium text-ink-3">
+              {DAY_LABELS[d]}
+            </span>
+          ))}
+        </div>
+        <div className="grid grid-cols-7 gap-1">
+          {cells.map((cell) => {
+            const planned = byDow(cell.dow)
+            const trained = trainedDates.has(cell.iso)
+            const isToday = cell.iso === today
+            const isSelected = cell.iso === selectedDate
+            return (
+              <button
+                key={cell.iso}
+                type="button"
+                onClick={() => {
+                  setBrowse(null)
+                  onSelectDate(cell.iso)
+                }}
+                aria-pressed={isSelected}
+                aria-label={`${cell.iso}, ${pluralize(planned.length, 'movement')} planned${trained ? ', session recorded' : ''}`}
+                className={cn(
+                  'flex min-h-16 flex-col gap-1 overflow-hidden rounded-sm p-1.5 text-left transition-colors duration-150 sm:min-h-20',
+                  isSelected
+                    ? 'bg-brand text-brand-ink'
+                    : cell.inMonth
+                      ? planned.length > 0
+                        ? 'bg-surface-2/70 hover:bg-surface-2'
+                        : 'hover:bg-surface-2/60'
+                      : 'opacity-40 hover:opacity-70',
+                  isToday && !isSelected && 'ring-2 ring-brand',
+                )}
+              >
+                <span className="flex w-full items-center justify-between">
+                  <span
+                    className={cn(
+                      'num text-2xs leading-none',
+                      isSelected
+                        ? 'font-semibold text-brand-ink'
+                        : isToday
+                          ? 'font-semibold text-ink'
+                          : 'text-ink-3',
+                    )}
+                  >
+                    {cell.dayOfMonth}
+                  </span>
+                  {trained && <Check size={11} weight="bold" className="text-good" />}
+                </span>
+                {planned.length > 0 && (
+                  <span className="flex items-center">
+                    <span className="flex -space-x-1.5">
+                      {planned.slice(0, 3).map(({ exerciseId }, i) => {
+                        const ex = exerciseById(exerciseId)
+                        if (!ex) return null
+                        return (
+                          <ExerciseThumb
+                            key={exerciseId}
+                            exercise={ex}
+                            size="sm"
+                            className={cn(
+                              'size-5 rounded-full ring-1 ring-surface sm:size-6',
+                              i >= 1 && 'hidden sm:block',
+                            )}
+                          />
+                        )
+                      })}
+                    </span>
+                    {planned.length > 1 && (
+                      <span className="num ml-1 text-2xs text-ink-3 sm:hidden">
+                        +{planned.length - 1}
+                      </span>
+                    )}
+                    {planned.length > 3 && (
+                      <span className="num ml-1 hidden text-2xs text-ink-3 sm:inline">
+                        +{planned.length - 3}
+                      </span>
+                    )}
+                  </span>
+                )}
+              </button>
+            )
+          })}
+        </div>
+        <p className="px-1 pt-1 text-2xs text-ink-3">
+          Your plan's week repeats across the month. A check marks a recorded session; tap a day
+          to move the week above onto it.
+        </p>
+      </Panel>
+    </Section>
   )
 }
 

@@ -109,7 +109,7 @@ export function GeneratedPlanPage() {
     <div className="flex flex-col gap-8">
       <PageHeader
         title={plan.weeklyTemplate.name}
-        description={`${GOAL_LABELS[plan.input.goal]} over ${plan.weeks.length} weeks. Tap a day to see every movement in detail.`}
+        description={`${GOAL_LABELS[plan.input.goal]} over ${plan.weeks.length} weeks. Tap a day for movement detail. Programmes are read-only: copy one to the planner and edit the copy.`}
         action={
           <>
             <IconButton size="md" onClick={exportJson} aria-label="Export this programme as JSON">

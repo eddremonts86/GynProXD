@@ -334,10 +334,12 @@ export const useGym = create<GymState>()(
         const state = get()
         const gen = state.generatedPlans.find((g) => g.id === generatedId)
         if (!gen) return null
+        /* Deep clone: the copy is yours to edit and must not share structure
+           with the programme it came from. */
         const newPlan: WeeklyPlan = {
-          ...gen.weeklyTemplate,
+          ...structuredClone(gen.weeklyTemplate),
           id: `plan-${Date.now()}`,
-          name: gen.weeklyTemplate.name,
+          createdAt: new Date().toISOString(),
         }
         set((s) => ({ plans: [newPlan, ...s.plans] }))
         return newPlan.id
