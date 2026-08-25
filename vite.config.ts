@@ -4,14 +4,19 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
+// 3015 is the documented default for humans and the audit scripts, but an
+// agent-managed run can hand us a free port through PORT so parallel sessions
+// do not collide. strictPort stays on: fail loudly rather than drift silently.
+const PORT = Number(process.env.PORT) || 3015
+
 export default defineConfig({
   server: {
-    port: 3015,
+    port: PORT,
     strictPort: true,
     host: '127.0.0.1',
   },
   preview: {
-    port: 3015,
+    port: PORT,
     strictPort: true,
   },
   resolve: {
