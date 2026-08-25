@@ -71,6 +71,8 @@ for (const vp of viewports) {
     await emptyWeek.click()
   } else {
     await page.getByRole('button', { name: 'New plan' }).first().click()
+    // The chooser offers coach vs manual; the audit takes the manual path.
+    await page.getByRole('button', { name: /Start an empty week/ }).click()
     await page.locator('input#f-name').fill('Test Plan')
     await page.getByRole('button', { name: 'Create' }).first().click()
   }

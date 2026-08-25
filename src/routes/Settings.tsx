@@ -131,14 +131,14 @@ export function SettingsPage() {
         </Panel>
       </Section>
 
-      <Section title="Plan">
+      <Section title="Programme">
         <Panel padding="lg" className="flex flex-wrap items-center justify-between gap-4">
           <p className="max-w-[46ch] text-sm text-ink-3">
-            Circumstances change. Run the planner again to recalculate the timeline from your
-            current weight and the time you have now.
+            Circumstances change. Design a new programme from your current weight and the time
+            you have now; the timeline is recalculated on the way.
           </p>
           <Button variant="secondary" onClick={() => navigate({ to: '/onboarding' })}>
-            Rebuild my plan
+            Design my programme
           </Button>
         </Panel>
       </Section>

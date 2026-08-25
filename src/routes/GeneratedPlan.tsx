@@ -77,7 +77,7 @@ export function GeneratedPlanPage() {
         <EmptyState
           title="This programme no longer exists"
           description="It was deleted, or the link points at a programme from a different browser."
-          action={<Button onClick={() => navigate({ to: '/onboarding' })}>Build a new plan</Button>}
+          action={<Button onClick={() => navigate({ to: '/onboarding' })}>Design my programme</Button>}
         />
       </div>
     )

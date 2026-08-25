@@ -368,7 +368,7 @@ function TodayOverview() {
       ) : (
         <Panel padding="lg" className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <h2 className="text-xl text-ink">Start with a plan</h2>
+            <h2 className="text-xl text-ink">Start with a programme</h2>
             <p className="max-w-[52ch] text-sm text-ink-3">
               Tell Forma your goal, your weight and how much time you actually have. It works out a
               realistic timeline and builds the weeks around it.
@@ -376,7 +376,7 @@ function TodayOverview() {
           </div>
           <div className="flex flex-wrap gap-2">
             <Button size="lg" onClick={() => navigate({ to: '/onboarding' })}>
-              Build my plan
+              Design my programme
               <ArrowRight size={18} weight="bold" />
             </Button>
             <Button size="lg" variant="secondary" onClick={startWorkout}>

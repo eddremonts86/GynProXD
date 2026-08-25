@@ -74,7 +74,7 @@ export function PlannerPage() {
   }
   const [selectedDay, setSelectedDay] = useState<DayOfWeek>(todayDow)
   const [newPlanName, setNewPlanName] = useState('')
-  const [creating, setCreating] = useState(false)
+  const [creating, setCreating] = useState<'choose' | 'name' | null>(null)
   const [renameValue, setRenameValue] = useState<string | null>(null)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [configuring, setConfiguring] = useState<PlannedExercise | null>(null)
@@ -114,7 +114,7 @@ export function PlannerPage() {
     if (!name) return
     setSelectedPlanId(createPlan(name))
     setNewPlanName('')
-    setCreating(false)
+    setCreating(null)
   }
 
   const dayExercises = useMemo(
@@ -135,7 +135,7 @@ export function PlannerPage() {
           action={
             <div className="flex flex-wrap items-center justify-center gap-2">
               <Button onClick={() => navigate({ to: '/onboarding' })}>
-                Build my plan
+                Design my programme
                 <ArrowRight size={16} weight="bold" />
               </Button>
               <Button variant="secondary" onClick={() => setSelectedPlanId(createPlan('My week'))}>
@@ -155,15 +155,10 @@ export function PlannerPage() {
         title="Planner"
         description="Lay out the week once. Today reads from it every morning."
         action={
-          <>
-            <Button variant="secondary" onClick={() => navigate({ to: '/onboarding' })}>
-              Generate a plan
-            </Button>
-            <Button onClick={() => setCreating(true)}>
-              <Plus size={16} weight="bold" />
-              New plan
-            </Button>
-          </>
+          <Button onClick={() => setCreating('choose')}>
+            <Plus size={16} weight="bold" />
+            New plan
+          </Button>
         }
       />
 
@@ -390,37 +385,73 @@ export function PlannerPage() {
         onClose={() => setConfiguring(null)}
       />
 
-      <Dialog open={creating} onOpenChange={setCreating}>
-        <DialogContent className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>New plan</DialogTitle>
-            <DialogDescription>
-              A plan is one week that repeats. You can keep more than one.
-            </DialogDescription>
-          </DialogHeader>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              handleCreate()
-            }}
-            className="flex flex-col gap-3"
-          >
-            <Input
-              label="Name"
-              value={newPlanName}
-              onChange={(e) => setNewPlanName(e.target.value)}
-              placeholder="Push pull legs"
-              autoFocus
-            />
-            <div className="flex justify-end gap-2">
-              <Button variant="ghost" onClick={() => setCreating(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={!newPlanName.trim()}>
-                Create
-              </Button>
-            </div>
-          </form>
+      <Dialog open={creating !== null} onOpenChange={(open) => !open && setCreating(null)}>
+        <DialogContent className="sm:max-w-md">
+          {creating === 'choose' ? (
+            <>
+              <DialogHeader>
+                <DialogTitle>New plan</DialogTitle>
+                <DialogDescription>
+                  A plan is one week that repeats. Start it two ways.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCreating(null)
+                    void navigate({ to: '/onboarding' })
+                  }}
+                  className="flex flex-col gap-1 rounded-lg bg-surface-2 p-4 text-left transition-colors hover:bg-line/60"
+                >
+                  <span className="text-sm font-semibold text-ink">Design my programme</span>
+                  <span className="text-2xs leading-relaxed text-ink-3">
+                    Tell Forma your goal and the time you have. The coach designs a periodised
+                    programme you can copy here as a plan.
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCreating('name')}
+                  className="flex flex-col gap-1 rounded-lg bg-surface-2 p-4 text-left transition-colors hover:bg-line/60"
+                >
+                  <span className="text-sm font-semibold text-ink">Start an empty week</span>
+                  <span className="text-2xs leading-relaxed text-ink-3">
+                    Name it and fill in each day yourself, movement by movement.
+                  </span>
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <DialogHeader>
+                <DialogTitle>Start an empty week</DialogTitle>
+              </DialogHeader>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  handleCreate()
+                }}
+                className="flex flex-col gap-3"
+              >
+                <Input
+                  label="Name"
+                  value={newPlanName}
+                  onChange={(e) => setNewPlanName(e.target.value)}
+                  placeholder="Push pull legs"
+                  autoFocus
+                />
+                <div className="flex justify-end gap-2">
+                  <Button variant="ghost" onClick={() => setCreating(null)}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={!newPlanName.trim()}>
+                    Create
+                  </Button>
+                </div>
+              </form>
+            </>
+          )}
         </DialogContent>
       </Dialog>
 

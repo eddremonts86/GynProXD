@@ -200,6 +200,11 @@ English throughout, plain sentences, no em-dashes, no implementation detail on
 screen. The persisted Spanish domain vocabulary is mapped to display strings in
 `src/lib/labels.ts` and never rendered raw.
 
+Two nouns, never mixed: a **programme** is designed (by the coach or the
+standard generator) and carries a dated calendar; a **plan** is the editable
+week that repeats in the planner. The intent "go design a programme" is always
+labelled "Design my programme", on every surface.
+
 ## Do
 
 - Do reserve the aurora material for hero data tiles.
