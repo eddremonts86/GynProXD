@@ -110,6 +110,10 @@ export interface GeneratedDay {
 export interface GeneratedPlan {
   id: string
   createdAt: string
+  /** Who designed the structure. Absent on plans stored before the AI coach. */
+  source?: 'coach' | 'standard'
+  /** One short paragraph from the coach about how the programme is built. */
+  coachNotes?: string
   input: OnboardingInput
   estimatedWeeks: number
   estimatedMonths: number

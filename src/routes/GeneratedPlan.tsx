@@ -3,15 +3,18 @@ import { useNavigate, useParams } from '@tanstack/react-router'
 import {
   ArrowRight,
   CaretDown,
+  CircleNotch,
   CaretLeft,
   CaretRight,
   DownloadSimple,
+  Sparkle,
   Trash,
   Warning,
 } from '@phosphor-icons/react'
 import { useGym } from '../store/useGym'
 import { exerciseById } from '../lib/exercises'
 import { todayIso } from '../lib/dates'
+import { buildProgramme } from '../lib/ai-plan'
 import { Button, IconButton } from '../ui/Button'
 import { Panel } from '../ui/Panel'
 import { Tag } from '../ui/Tag'
@@ -56,12 +59,13 @@ export function GeneratedPlanPage() {
   const plan = useGym((s) => s.generatedPlans.find((g) => g.id === id))
   const saveGeneratedAsPlan = useGym((s) => s.saveGeneratedAsPlan)
   const deleteGeneratedPlan = useGym((s) => s.deleteGeneratedPlan)
-  const createGeneratedPlan = useGym((s) => s.createGeneratedPlan)
+  const addGeneratedPlan = useGym((s) => s.addGeneratedPlan)
 
   const [activeWeek, setActiveWeek] = useState(0)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [openDay, setOpenDay] = useState<GeneratedDay | null>(null)
   const [pendingDuration, setPendingDuration] = useState<DurationKey | null>(null)
+  const [designing, setDesigning] = useState(false)
   const today = todayIso()
 
   const week = useMemo(() => plan?.weeks[activeWeek] ?? plan?.weeks[0], [plan, activeWeek])
@@ -174,8 +178,19 @@ export function GeneratedPlanPage() {
               />
             </>
           )}
+          <FactRow
+            label="Designed by"
+            value={plan.source === 'coach' ? 'AI coach' : 'Standard template'}
+          />
         </Panel>
       </div>
+
+      {plan.coachNotes && (
+        <Panel padding="md" className="flex gap-3">
+          <Sparkle size={18} className="mt-0.5 shrink-0 text-ink-3" />
+          <p className="max-w-[70ch] text-sm leading-relaxed text-ink-2">{plan.coachNotes}</p>
+        </Panel>
+      )}
 
       {plan.warnings.length > 0 && (
         <Panel padding="md" className="flex gap-3">
@@ -292,22 +307,38 @@ export function GeneratedPlanPage() {
                 <DialogDescription>
                   A new programme is generated from the same details, with its own calendar and
                   movement rotation. This one is kept, and anything you copied to the planner stays
-                  as it is.
+                  as it is. The coach usually takes a minute or two.
                 </DialogDescription>
               </DialogHeader>
               <div className="flex justify-end gap-2">
-                <Button variant="ghost" onClick={() => setPendingDuration(null)}>
+                <Button variant="ghost" disabled={designing} onClick={() => setPendingDuration(null)}>
                   Cancel
                 </Button>
                 <Button
+                  disabled={designing}
                   onClick={() => {
-                    const newId = createGeneratedPlan(plan.input, pendingDuration)
-                    setPendingDuration(null)
-                    setActiveWeek(0)
-                    void navigate({ to: '/generated/$id', params: { id: newId } })
+                    if (designing) return
+                    setDesigning(true)
+                    void buildProgramme(plan.input, pendingDuration)
+                      .then((next) => {
+                        addGeneratedPlan(next)
+                        setPendingDuration(null)
+                        setActiveWeek(0)
+                        if (window.location.pathname.startsWith('/generated/')) {
+                          void navigate({ to: '/generated/$id', params: { id: next.id } })
+                        }
+                      })
+                      .finally(() => setDesigning(false))
                   }}
                 >
-                  Generate programme
+                  {designing ? (
+                    <>
+                      <CircleNotch size={16} weight="bold" className="animate-spin" />
+                      Designing
+                    </>
+                  ) : (
+                    'Generate programme'
+                  )}
                 </Button>
               </div>
             </>

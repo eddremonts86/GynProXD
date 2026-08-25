@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv, type ProxyOptions } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -9,15 +9,45 @@ import { VitePWA } from 'vite-plugin-pwa'
 // do not collide. strictPort stays on: fail loudly rather than drift silently.
 const PORT = Number(process.env.PORT) || 3015
 
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+
+  /**
+   * The AI coach's key lives in .env.local (gitignored) and never reaches the
+   * browser: the dev/preview server proxies /api/minimax and injects the
+   * Authorization header on its side. Without a key the proxy is absent and
+   * the app falls back to the deterministic generator.
+   */
+  const aiProxy: Record<string, ProxyOptions> | undefined = env.MINIMAX_API_KEY
+    ? {
+        '/api/minimax': {
+          target: env.MINIMAX_BASE_URL || 'https://api.minimaxi.chat/v1',
+          changeOrigin: true,
+          rewrite: (p) => p.replace(/^\/api\/minimax/, ''),
+          configure: (proxy) => {
+            proxy.on('proxyReq', (proxyReq) => {
+              proxyReq.setHeader('Authorization', `Bearer ${env.MINIMAX_API_KEY}`)
+            })
+          },
+        },
+      }
+    : undefined
+
+  return {
+  define: {
+    __AI_COACH__: JSON.stringify(Boolean(env.MINIMAX_API_KEY)),
+    __AI_COACH_MODEL__: JSON.stringify(env.MINIMAX_MODEL || 'MiniMax-Text-01'),
+  },
   server: {
     port: PORT,
     strictPort: true,
     host: '127.0.0.1',
+    proxy: aiProxy,
   },
   preview: {
     port: PORT,
     strictPort: true,
+    proxy: aiProxy,
   },
   resolve: {
     alias: {
@@ -90,4 +120,5 @@ export default defineConfig({
       devOptions: { enabled: false },
     }),
   ],
+}
 })

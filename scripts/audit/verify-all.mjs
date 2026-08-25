@@ -19,6 +19,7 @@ let failed = 0
 for (const vp of viewports) {
   console.log(`\n=== ${vp.name} ${vp.width}x${vp.height} ===`)
   const ctx = await browser.newContext({ viewport: { width: vp.width, height: vp.height } })
+  await ctx.addInitScript(() => localStorage.setItem('forma-coach', 'off'))
   const page = await ctx.newPage()
   page.on('pageerror', (e) => console.log(`pageerror ${vp.name}:`, e))
   page.on('console', (m) => { if (m.type() === 'error') console.log(`console error ${vp.name}:`, m.text()) })
@@ -53,7 +54,7 @@ for (const vp of viewports) {
   await page.goto(`${BASE}/onboarding`, { waitUntil: 'networkidle' })
   const ta = page.locator('textarea')
   await ta.fill('male 30 years old 80kg target 75kg 4 times a week 60min effort 3')
-  await page.getByRole('button', { name: 'Generate plan' }).click()
+  await page.getByRole('button', { name: 'Design my programme' }).click()
   await page.waitForURL(/\/generated\/.+/, { timeout: 5000 }).catch(() => console.log('  no nav to generated (maybe still on onboarding)'))
   console.log('  onboarding flow ok, url:', page.url())
   // test library search

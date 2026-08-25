@@ -62,6 +62,13 @@ describe('estimatePlan', () => {
     expect(r.rateKgPerWeek).toBeCloseTo(0.35, 1)
   })
 
+  it('a weight target drives the timeline even for strength or general goals', () => {
+    const r = estimatePlan({ ...base, goal: 'general', weightKg: 95, targetWeightKg: 85 }, 'mensual')
+    expect(r.openEnded).toBe(false)
+    expect(r.rateKgPerWeek).toBeGreaterThan(0)
+    expect(r.estimatedWeeks).toBeGreaterThan(8)
+  })
+
   it('general goal without delta uses requested', () => {
     const input: OnboardingInput = {
       age: 30,
@@ -77,6 +84,8 @@ describe('estimatePlan', () => {
     const r = estimatePlan(input, 'mensual')
     expect(r.estimatedWeeks).toBe(4)
     expect(r.isUnrealistic).toBe(false)
+    expect(r.openEnded).toBe(true)
+    expect(r.milestones).toHaveLength(0)
   })
 
   it('milestones increase every 4 weeks', () => {

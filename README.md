@@ -24,13 +24,26 @@ pnpm dev        # http://localhost:3015 (strictPort)
 | `node scripts/build-image-map.mjs` | rebuild the movement image map from the RepDB files on disk |
 | `node scripts/generate-icons.mjs` | regenerate the favicon and PWA icons from the brand mark |
 
+## AI coach (optional)
+
+Plan generation can be designed by an LLM (MiniMax). Copy `.env.example` to
+`.env.local` and set `MINIMAX_API_KEY`; the dev server proxies the API and
+injects the key server-side, so it never reaches the browser bundle or this
+repository. The coach designs the split, movement selection, progression and
+supersets; timelines and safe rates stay computed locally and every movement id
+is validated against the catalogue. No key, a timeout or an invalid response
+all fall back to the built-in deterministic generator.
+
 ## Features
 
 - **Plan builder.** Describe your situation in free text ("40 years old, 140kg,
   want to get down to 80kg, gym 3 times a week for 2 hours") in English or
   Spanish. Forma works out a safe rate (0.4 to 1.0 kg/week for fat loss) and a
   realistic timeline, refuses to pretend a goal fits in less time than it takes,
-  and generates a periodised 1/3/6/12 month calendar with deload weeks.
+  and generates a periodised 1/3/6/12 month calendar with deload weeks and
+  movement rotation per 4-week block. With a target weight set, the maths run
+  regardless of the stated goal; without one, Forma says there is no clock
+  instead of inventing a timeline.
 - **Guided session.** The day's plan preloads, each movement's fields are
   prefilled from the progression engine, a 90s rest timer runs with +30s and
   skip, the screen stays awake, and personal records are detected via an Epley

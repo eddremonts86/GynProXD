@@ -13,6 +13,11 @@ export interface EstimateResult {
   rateKgPerWeek: number
   recommendedDuration: DurationKey
   isUnrealistic: boolean
+  /**
+   * True when there is no weight target to pace against: the timeline is the
+   * user's choice, and no "realistic timeline" exists to echo back at them.
+   */
+  openEnded: boolean
   warnings: string[]
   milestones: { week: number; weight?: number; note: string }[]
 }
@@ -53,37 +58,34 @@ export function estimatePlan(
   const deltaGain =
     input.targetWeightKg !== undefined ? Math.max(0, input.targetWeightKg - input.weightKg) : 0
 
-  if (input.goal === 'adelgazar' && deltaLoss > 0) {
-    rate = rateForWeightLoss(input)
+  /*
+   * A weight target drives the timeline regardless of the stated goal: the
+   * goal shapes the training split, not the arithmetic. Previously "strength"
+   * or "general fitness" silently ignored the target and echoed the requested
+   * length back as a "realistic timeline", which was circular nonsense.
+   */
+  const openEnded = deltaLoss === 0 && deltaGain === 0
+
+  if (deltaLoss > 0) {
+    rate = rateForWeightLoss(input) * (input.goal === 'recomp' ? 0.75 : 1)
+    rate = Math.round(rate * 100) / 100
     estimatedWeeks = Math.ceil(deltaLoss / rate)
-    if (input.targetWeightKg !== undefined) {
-      const bmiTarget = input.heightCm ? input.targetWeightKg / ((input.heightCm / 100) ** 2) : 0
-      if (bmiTarget > 0 && bmiTarget < 18.5) {
-        warnings.push('That target sits below a healthy BMI. Please talk to a professional first.')
-      }
-      if (deltaLoss > 30 && estimatedWeeks < 26) {
-        warnings.push('Losing this much safely takes longer than the plan you picked.')
-      }
+    const bmiTarget =
+      input.heightCm && input.targetWeightKg !== undefined
+        ? input.targetWeightKg / ((input.heightCm / 100) ** 2)
+        : 0
+    if (bmiTarget > 0 && bmiTarget < 18.5) {
+      warnings.push('That target sits below a healthy BMI. Please talk to a professional first.')
     }
-  } else if ((input.goal === 'musculo' || input.goal === 'hibrido') && deltaGain > 0) {
+    if (deltaLoss > 30 && estimatedWeeks < 26) {
+      warnings.push('Losing this much safely takes longer than the plan you picked.')
+    }
+  } else if (deltaGain > 0) {
     rate = rateForMuscleGain(input)
     estimatedWeeks = Math.ceil(deltaGain / rate)
-  } else if (input.goal === 'recomp' && deltaLoss > 0) {
-    rate = rateForWeightLoss(input) * 0.75
-    estimatedWeeks = Math.ceil(deltaLoss / rate)
-  } else if (input.goal === 'fuerza' || input.goal === 'general') {
+  } else {
     rate = 0
     estimatedWeeks = DURATION_WEEKS[requested] ?? 12
-  } else {
-    if (deltaLoss > 0) {
-      rate = rateForWeightLoss(input)
-      estimatedWeeks = Math.ceil(deltaLoss / rate)
-    } else if (deltaGain > 0) {
-      rate = rateForMuscleGain(input)
-      estimatedWeeks = Math.ceil(deltaGain / rate)
-    } else {
-      estimatedWeeks = DURATION_WEEKS[requested] ?? 12
-    }
   }
 
   estimatedWeeks = clamp(estimatedWeeks, 4, 104)
@@ -102,7 +104,7 @@ export function estimatePlan(
   }
 
   const requestedWeeks = DURATION_WEEKS[requested] ?? 12
-  const isUnrealistic = requestedWeeks < estimatedWeeks * 0.7
+  const isUnrealistic = !openEnded && requestedWeeks < estimatedWeeks * 0.7
 
   if (isUnrealistic) {
     const requestedMonths = Math.max(1, Math.round(requestedWeeks / 4.345))
@@ -126,8 +128,6 @@ export function estimatePlan(
       weight: input.targetWeightKg,
       note: 'Target',
     })
-  } else {
-    for (let w = 4; w <= estimatedWeeks; w += 4) milestones.push({ week: w, note: `Week ${w}` })
   }
 
   if (!warnings.length && estimatedWeeks > 52) {
@@ -135,6 +135,7 @@ export function estimatePlan(
   }
 
   return {
+    openEnded,
     estimatedWeeks,
     estimatedMonths,
     rateKgPerWeek: Math.round(rate * 100) / 100,

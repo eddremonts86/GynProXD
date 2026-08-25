@@ -130,11 +130,115 @@ function dayOfWeekForIndex(_week: number, dayIdx: number, daysPerWeek: number): 
   return order[dayIdx % 7] as DayOfWeek
 }
 
-export function generatePlan(input: OnboardingInput, requested: DurationKey, startDate = new Date()): GeneratedPlan {
+/** The duration maths shared by every plan designer, human-coded or not. */
+export function resolveDuration(input: OnboardingInput, requested: DurationKey) {
   const estimate = estimatePlan(input, requested)
-  const approvedDuration: DurationKey = estimate.isUnrealistic ? estimate.recommendedDuration : requested
-  const actualWeeks = DURATION_WEEKS[approvedDuration] ?? estimate.estimatedWeeks
+  const approvedDuration: DurationKey = estimate.isUnrealistic
+    ? estimate.recommendedDuration
+    : requested
+  const weeks = DURATION_WEEKS[approvedDuration] ?? estimate.estimatedWeeks
+  return { estimate, approvedDuration, weeks }
+}
 
+/**
+ * Grounding list for the AI coach: per muscle, the movements it is allowed to
+ * pick, staples first, filtered by the user's equipment.
+ */
+export function candidateIdsByMuscle(
+  equipment: OnboardingInput['equipment'],
+  perMuscle = 10,
+): Record<string, string[]> {
+  const pool = allowedPool(equipment)
+  const poolIds = new Set(pool.map((e) => e.id))
+  const result: Record<string, string[]> = {}
+  for (const muscle of Object.keys(STAPLES)) {
+    const staples = (STAPLES[muscle] ?? []).filter((id) => poolIds.has(id))
+    const rest = pool
+      .filter((e) => e.muscle === muscle && !staples.includes(e.id))
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((e) => e.id)
+    result[muscle] = [...staples, ...rest].slice(0, perMuscle)
+  }
+  return result
+}
+
+/** Every movement id the athlete's equipment allows; the coach may use no others. */
+export function allowedExerciseIds(equipment: OnboardingInput['equipment']): Set<string> {
+  return new Set(allowedPool(equipment).map((e) => e.id))
+}
+
+export interface ProgrammeStructure {
+  source: 'coach' | 'standard'
+  name?: string
+  coachNotes?: string
+  /** One weekly layout per training block, cycled across the calendar. */
+  blocks: PlannedDay[][]
+}
+
+/** Turns a designed structure into a dated calendar with deloads applied. */
+export function assemblePlan(
+  input: OnboardingInput,
+  requested: DurationKey,
+  structure: ProgrammeStructure,
+  startDate = new Date(),
+): GeneratedPlan {
+  const { estimate, approvedDuration, weeks: actualWeeks } = resolveDuration(input, requested)
+  const blocks = structure.blocks.length > 0 ? structure.blocks : [[]]
+  const weeklyDays = blocks[0]
+
+  const weeklyTemplate: WeeklyPlan = {
+    id: `plan-gen-${Date.now()}`,
+    name: structure.name ?? `${GOAL_PLAN_NAMES[input.goal]} · ${DURATION_LABELS[approvedDuration]}`,
+    days: weeklyDays,
+    createdAt: new Date().toISOString(),
+  }
+
+  const weeks: GeneratedPlan['weeks'] = []
+  const start = new Date(startDate)
+  start.setHours(0, 0, 0, 0)
+  const dayToOffset: Record<DayOfWeek, number> = { mon: 0, tue: 1, wed: 2, thu: 3, fri: 4, sat: 5, sun: 6 }
+  const startDay = (start.getDay() + 6) % 7
+
+  for (let w = 0; w < actualWeeks; w++) {
+    const isDeload = (w + 1) % 4 === 0
+    const blockDays = blocks[Math.floor(w / 4) % blocks.length]
+    const days: GeneratedDay[] = blockDays
+      .filter((d) => d.exercises.length > 0)
+      .map((d) => {
+        let exercises = d.exercises
+        if (isDeload) exercises = exercises.slice(0, Math.max(2, exercises.length - 2)).map((e) => ({ ...e, progression: 'none' as const }))
+        const offset = ((dayToOffset[d.day] ?? 0) - startDay + 7) % 7 + w * 7
+        const date = new Date(start)
+        date.setDate(start.getDate() + offset)
+        return {
+          date: toLocalIso(date),
+          day: d.day,
+          exercises,
+        }
+      })
+    weeks.push({ weekIndex: w, days })
+  }
+
+  return {
+    id: `gen-${Date.now()}`,
+    createdAt: new Date().toISOString(),
+    source: structure.source,
+    coachNotes: structure.coachNotes,
+    input,
+    estimatedWeeks: estimate.estimatedWeeks,
+    estimatedMonths: estimate.estimatedMonths,
+    rateKgPerWeek: estimate.rateKgPerWeek,
+    requestedDuration: requested,
+    approvedDuration,
+    weeks,
+    weeklyTemplate,
+    milestones: estimate.milestones,
+    warnings: estimate.warnings,
+  }
+}
+
+export function generatePlan(input: OnboardingInput, requested: DurationKey, startDate = new Date()): GeneratedPlan {
+  const { weeks: actualWeeks } = resolveDuration(input, requested)
   const split = SPLITS[input.daysPerWeek] ?? SPLITS[3]
   const prog = progressionFor(input.effort, input.equipment)
 
@@ -156,54 +260,6 @@ export function generatePlan(input: OnboardingInput, requested: DurationKey, sta
     return days
   }
   const blocks = Array.from({ length: blockCount }, (_, b) => buildWeek(b))
-  const weeklyDays = blocks[0]
 
-  const weeklyTemplate: WeeklyPlan = {
-    id: `plan-gen-${Date.now()}`,
-    name: `${GOAL_PLAN_NAMES[input.goal]} · ${DURATION_LABELS[approvedDuration]}`,
-    days: weeklyDays,
-    createdAt: new Date().toISOString(),
-  }
-
-  const weeks: GeneratedPlan['weeks'] = []
-  const start = new Date(startDate)
-  start.setHours(0, 0, 0, 0)
-  const dayToOffset: Record<DayOfWeek, number> = { mon: 0, tue: 1, wed: 2, thu: 3, fri: 4, sat: 5, sun: 6 }
-  const startDay = (start.getDay() + 6) % 7
-
-  for (let w = 0; w < actualWeeks; w++) {
-    const isDeload = (w + 1) % 4 === 0
-    const blockDays = blocks[Math.min(Math.floor(w / 4), blocks.length - 1)]
-    const days: GeneratedDay[] = blockDays
-      .filter((d) => d.exercises.length > 0)
-      .map((d) => {
-        let exercises = d.exercises
-        if (isDeload) exercises = exercises.slice(0, Math.max(2, exercises.length - 2)).map((e) => ({ ...e, progression: 'none' as const }))
-        const offset = ((dayToOffset[d.day] ?? 0) - startDay + 7) % 7 + w * 7
-        const date = new Date(start)
-        date.setDate(start.getDate() + offset)
-        return {
-          date: toLocalIso(date),
-          day: d.day,
-          exercises,
-        }
-      })
-    weeks.push({ weekIndex: w, days })
-  }
-
-  const id = `gen-${Date.now()}`
-  return {
-    id,
-    createdAt: new Date().toISOString(),
-    input,
-    estimatedWeeks: estimate.estimatedWeeks,
-    estimatedMonths: estimate.estimatedMonths,
-    rateKgPerWeek: estimate.rateKgPerWeek,
-    requestedDuration: requested,
-    approvedDuration,
-    weeks,
-    weeklyTemplate,
-    milestones: estimate.milestones,
-    warnings: estimate.warnings,
-  }
+  return assemblePlan(input, requested, { source: 'standard', blocks }, startDate)
 }

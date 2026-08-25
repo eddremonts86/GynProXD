@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { ArrowRight, MagicWand, Warning } from '@phosphor-icons/react'
+import { ArrowRight, CircleNotch, MagicWand, Sparkle, Warning } from '@phosphor-icons/react'
 import { PageHeader, Section } from '../ui/PageHeader'
 import { Panel } from '../ui/Panel'
 import { Button } from '../ui/Button'
@@ -9,6 +9,7 @@ import { Tag } from '../ui/Tag'
 import { FormSelect } from '../ui/FormSelect'
 import { Textarea } from '@/components/ui/textarea'
 import { estimatePlan } from '../lib/plan-estimate'
+import { aiCoachEnabled, buildProgramme } from '../lib/ai-plan'
 import { mergeWithDefaults, parseOnboarding } from '../lib/onboarding-parse'
 import { useGym } from '../store/useGym'
 import {
@@ -28,7 +29,8 @@ const LEVELS: Level[] = ['principiante', 'intermedio', 'avanzado']
 
 export function OnboardingPage() {
   const navigate = useNavigate()
-  const createGeneratedPlan = useGym((s) => s.createGeneratedPlan)
+  const addGeneratedPlan = useGym((s) => s.addGeneratedPlan)
+  const [designing, setDesigning] = useState(false)
 
   const [text, setText] = useState('')
   const [age, setAge] = useState('35')
@@ -85,9 +87,19 @@ export function OnboardingPage() {
     if (p.effort) setEffort(String(p.effort))
   }
 
-  const generate = () => {
-    const id = createGeneratedPlan(input, duration)
-    void navigate({ to: '/generated/$id', params: { id } })
+  const generate = async () => {
+    if (designing) return
+    setDesigning(true)
+    try {
+      const plan = await buildProgramme(input, duration)
+      addGeneratedPlan(plan)
+      /* Only pull the user to the result if they are still here waiting. */
+      if (window.location.pathname === '/onboarding') {
+        void navigate({ to: '/generated/$id', params: { id: plan.id } })
+      }
+    } finally {
+      setDesigning(false)
+    }
   }
 
   return (
@@ -239,65 +251,75 @@ export function OnboardingPage() {
             </div>
           </Section>
 
-          <Section title="How long do you want to plan for">
-            <div className="flex flex-wrap gap-2">
-              {DURATION_KEYS.map((d) => (
-                <button
-                  key={d}
-                  type="button"
-                  onClick={() => setDuration(d)}
-                  aria-pressed={duration === d}
-                  className={cn(
-                    'min-h-11 rounded-full border px-4 text-xs font-medium transition-colors duration-150',
-                    duration === d
-                      ? 'border-brand bg-brand text-brand-ink'
-                      : 'border-line bg-surface text-ink-3 hover:border-line-strong hover:text-ink',
-                  )}
-                >
-                  {DURATION_LABELS[d]}
-                </button>
-              ))}
-            </div>
-          </Section>
         </div>
 
         {/* The estimate updates as you type. Showing the maths is the product. */}
         <div className="lg:sticky lg:top-6">
           <Panel padding="lg" className="flex flex-col gap-5">
-            <div className="flex flex-col gap-1">
-              <h2 className="text-lg text-ink">What this actually takes</h2>
-              <p className="text-2xs text-ink-3">
-                {input.weightKg} kg
-                {input.targetWeightKg ? ` to ${input.targetWeightKg} kg` : ''}, {input.daysPerWeek}{' '}
-                sessions a week of {input.minsPerSession} min
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-4 border-y border-line py-4">
-              <div className="flex items-baseline justify-between gap-3">
-                <span className="text-sm text-ink-3">Realistic timeline</span>
-                <span className="num-dot text-4xl leading-none text-ink">
-                  {estimate.estimatedMonths}
-                  <span className="num ml-1.5 text-xs font-normal text-ink-3">
-                    {estimate.estimatedMonths === 1 ? 'month' : 'months'}
-                  </span>
-                </span>
+            {estimate.openEnded ? (
+              <div className="flex flex-col gap-1.5 border-b border-line pb-4">
+                <h2 className="text-lg text-ink">No clock on this one</h2>
+                <p className="text-sm text-ink-3">
+                  Without a target weight there is no timeline to hit. Pick the length you want to
+                  commit to and Forma will periodise it.
+                </p>
               </div>
-              {estimate.rateKgPerWeek > 0 && (
-                <div className="flex items-baseline justify-between gap-3">
-                  <span className="text-sm text-ink-3">Safe rate</span>
-                  <span className="num text-lg leading-none font-semibold text-ink">
-                    {estimate.rateKgPerWeek}
-                    <span className="ml-1 text-2xs font-normal text-ink-3">kg / week</span>
-                  </span>
+            ) : (
+              <>
+                <div className="flex flex-col gap-1">
+                  <h2 className="text-lg text-ink">What this actually takes</h2>
+                  <p className="text-2xs text-ink-3">
+                    {input.weightKg} kg
+                    {input.targetWeightKg ? ` to ${input.targetWeightKg} kg` : ''} at a safe pace
+                  </p>
                 </div>
-              )}
-              <div className="flex items-baseline justify-between gap-3">
-                <span className="text-sm text-ink-3">Recommended plan</span>
-                <span className="text-sm font-semibold text-brand">
-                  {DURATION_LABELS[estimate.recommendedDuration]}
-                </span>
+
+                <div className="flex flex-col gap-4 border-y border-line py-4">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="text-sm text-ink-3">Realistic timeline</span>
+                    <span className="num-dot text-4xl leading-none text-ink">
+                      {estimate.estimatedMonths}
+                      <span className="num ml-1.5 text-xs font-normal text-ink-3">
+                        {estimate.estimatedMonths === 1 ? 'month' : 'months'}
+                      </span>
+                    </span>
+                  </div>
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="text-sm text-ink-3">Safe rate</span>
+                    <span className="num text-lg leading-none font-semibold text-ink">
+                      {estimate.rateKgPerWeek}
+                      <span className="ml-1 text-2xs font-normal text-ink-3">kg / week</span>
+                    </span>
+                  </div>
+                </div>
+              </>
+            )}
+
+            <div className="flex flex-col gap-2">
+              <span className="text-2xs font-medium text-ink-3">Plan length</span>
+              <div className="flex flex-wrap gap-1.5">
+                {DURATION_KEYS.map((d) => (
+                  <button
+                    key={d}
+                    type="button"
+                    onClick={() => setDuration(d)}
+                    aria-pressed={duration === d}
+                    className={cn(
+                      'min-h-10 rounded-full px-3.5 text-xs font-medium transition-colors duration-150',
+                      duration === d
+                        ? 'bg-brand text-brand-ink'
+                        : 'bg-surface-2 text-ink-2 hover:text-ink',
+                    )}
+                  >
+                    {DURATION_LABELS[d]}
+                  </button>
+                ))}
               </div>
+              {!estimate.openEnded && !estimate.isUnrealistic && (
+                <p className="text-2xs text-good">
+                  {DURATION_LABELS[duration]} fits the timeline.
+                </p>
+              )}
             </div>
 
             {estimate.isUnrealistic ? (
@@ -363,10 +385,33 @@ export function OnboardingPage() {
               </div>
             )}
 
-            <Button size="lg" onClick={generate} className="w-full">
-              Generate plan
-              <ArrowRight size={18} weight="bold" />
+            <Button size="lg" onClick={generate} disabled={designing} className="w-full">
+              {designing ? (
+                <>
+                  <CircleNotch size={18} weight="bold" className="animate-spin" />
+                  Designing your programme
+                </>
+              ) : (
+                <>
+                  Design my programme
+                  <ArrowRight size={18} weight="bold" />
+                </>
+              )}
             </Button>
+
+            {designing && aiCoachEnabled && (
+              <p className="rounded-md bg-surface-2 p-3 text-2xs leading-relaxed text-ink-2">
+                The coach usually takes a minute or two. You can keep using Forma; the programme
+                will be waiting under Planner when it is ready.
+              </p>
+            )}
+
+            <p className="flex items-start gap-1.5 text-2xs text-ink-3">
+              <Sparkle size={13} className="mt-px shrink-0" />
+              {aiCoachEnabled
+                ? 'The AI coach designs the split and movements. Timelines and safe rates stay computed locally and are never up for negotiation.'
+                : 'The AI coach is offline, so the standard template builder will design this programme.'}
+            </p>
 
             <p className="text-2xs text-ink-3">
               Builds {DURATION_LABELS[estimate.isUnrealistic ? estimate.recommendedDuration : duration]}{' '}

@@ -3,10 +3,8 @@ import { persist } from 'zustand/middleware'
 import type {
   BodyweightEntry,
   DayOfWeek,
-  DurationKey,
   Exercise,
   GeneratedPlan,
-  OnboardingInput,
   PlannedExercise,
   ProgressionRule,
   WeeklyPlan,
@@ -14,7 +12,6 @@ import type {
 } from '../lib/types'
 import { generatedExercises } from '../data/exercises-generated'
 import { populateByIdCache } from '../lib/exercises'
-import { generatePlan } from '../lib/plan-generator'
 import { todayIso } from '../lib/dates'
 
 export const DAYS: DayOfWeek[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
@@ -69,7 +66,7 @@ interface GymState {
     patch: Partial<Pick<PlannedExercise, 'timed' | 'unilateral' | 'supersetGroup'>>,
   ) => void
   setSupersetGroup: (planId: string, day: DayOfWeek, exerciseIds: string[], groupId: string | null) => void
-  createGeneratedPlan: (input: OnboardingInput, requested: DurationKey) => string
+  addGeneratedPlan: (plan: GeneratedPlan) => void
   deleteGeneratedPlan: (id: string) => void
   saveGeneratedAsPlan: (generatedId: string) => string | null
 }
@@ -328,11 +325,8 @@ export const useGym = create<GymState>()(
           }),
         })),
 
-      createGeneratedPlan: (input, requested) => {
-        const plan = generatePlan(input, requested)
-        set((s) => ({ generatedPlans: [plan, ...s.generatedPlans] }))
-        return plan.id
-      },
+      addGeneratedPlan: (plan) =>
+        set((s) => ({ generatedPlans: [plan, ...s.generatedPlans] })),
 
       deleteGeneratedPlan: (id) => set((s) => ({ generatedPlans: s.generatedPlans.filter((p) => p.id !== id) })),
 

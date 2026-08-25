@@ -1,5 +1,6 @@
 import { useDeferredValue, useMemo, useState } from 'react'
 import { MagnifyingGlass, Plus } from '@phosphor-icons/react'
+import { exerciseImageCandidates, exercisePhotoFrames } from '../lib/images'
 import { useGym } from '../store/useGym'
 import { exerciseLookup } from '../lib/exercises'
 import { MovementFrames } from '@/components/movement-frames'
@@ -7,7 +8,6 @@ import { Button } from '../ui/Button'
 import { Tag } from '../ui/Tag'
 import { Input } from '../ui/Input'
 import { FormSelect } from '../ui/FormSelect'
-import { ExerciseThumb } from '../ui/ExerciseThumb'
 import { PageHeader } from '../ui/PageHeader'
 import { EmptyState } from '../ui/EmptyState'
 import {
@@ -54,6 +54,7 @@ export function LibraryPage() {
 
   const [query, setQuery] = useState('')
   const [muscle, setMuscle] = useState<MuscleGroup | 'all'>('all')
+  const [equipment, setEquipment] = useState<Equipment | 'all'>('all')
   const [visible, setVisible] = useState(PAGE)
   const [detail, setDetail] = useState<Exercise | null>(null)
   const [addOpen, setAddOpen] = useState(false)
@@ -68,10 +69,19 @@ export function LibraryPage() {
     [customExercises],
   )
 
+  /* Only equipment that actually exists in the catalogue; the import maps
+     kettlebells and odd implements to "other", so a literal enum would offer
+     empty filters. */
+  const equipmentOptions = useMemo(() => {
+    const present = new Set(exercises.map((e) => e.equipment))
+    return EQUIPMENT.filter((e) => present.has(e))
+  }, [exercises])
+
   const filtered = useMemo(() => {
     const q = deferredQuery.trim().toLowerCase()
     return exercises.filter((e) => {
       if (muscle !== 'all' && e.muscle !== muscle) return false
+      if (equipment !== 'all' && e.equipment !== equipment) return false
       if (!q) return true
       return (
         e.name.toLowerCase().includes(q) ||
@@ -80,7 +90,7 @@ export function LibraryPage() {
         MUSCLE_LABELS[e.muscle].toLowerCase().includes(q)
       )
     })
-  }, [exercises, deferredQuery, muscle])
+  }, [exercises, deferredQuery, muscle, equipment])
 
   const shown = filtered.slice(0, visible)
   const resetPaging = () => setVisible(PAGE)
@@ -99,20 +109,35 @@ export function LibraryPage() {
       />
 
       <div className="sticky top-14 z-10 -mx-4 flex flex-col gap-3 bg-bg/90 px-4 py-3 backdrop-blur-md md:-mx-8 md:px-8 lg:top-0">
-        <div className="relative">
-          <MagnifyingGlass
-            size={16}
-            className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-ink-3"
-          />
-          <Input
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value)
+        <div className="flex gap-2">
+          <div className="relative min-w-0 flex-1">
+            <MagnifyingGlass
+              size={16}
+              className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-ink-3"
+            />
+            <Input
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value)
+                resetPaging()
+              }}
+              placeholder={`Search ${exercises.length} movements`}
+              aria-label="Search movements"
+              className="pl-9"
+            />
+          </div>
+          <FormSelect
+            value={equipment}
+            onValueChange={(v) => {
+              setEquipment(v as Equipment | 'all')
               resetPaging()
             }}
-            placeholder={`Search ${exercises.length} movements`}
-            aria-label="Search movements"
-            className="pl-9"
+            ariaLabel="Filter by equipment"
+            className="h-11 w-36 shrink-0 sm:w-44"
+            options={[
+              { value: 'all', label: 'All equipment' },
+              ...equipmentOptions.map((e) => ({ value: e, label: EQUIPMENT_LABELS[e] })),
+            ]}
           />
         </div>
 
@@ -146,13 +171,14 @@ export function LibraryPage() {
         <EmptyState
           icon={<MagnifyingGlass size={20} />}
           title="No matches"
-          description="Try another word, or clear the muscle filter."
+          description="Try another word, or clear the filters."
           action={
             <Button
               variant="secondary"
               onClick={() => {
                 setQuery('')
                 setMuscle('all')
+                setEquipment('all')
                 resetPaging()
               }}
             >
@@ -168,25 +194,10 @@ export function LibraryPage() {
               : `${filtered.length} of ${exercises.length} movements`}
           </p>
 
-          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
             {shown.map((e) => (
               <li key={e.id}>
-                <button
-                  type="button"
-                  onClick={() => setDetail(e)}
-                  className="flex w-full flex-col gap-2.5 rounded-xl bg-surface p-2.5 text-left shadow-[var(--shadow-panel)] transition-shadow duration-150 hover:shadow-[var(--shadow-tile)]"
-                >
-                  <ExerciseThumb exercise={e} size="fill" />
-                  <span className="flex flex-col gap-1.5 px-0.5 pb-0.5">
-                    <span className="line-clamp-2 text-sm leading-snug font-medium text-ink">
-                      {e.name}
-                    </span>
-                    <span className="flex flex-wrap gap-1">
-                      <Tag>{MUSCLE_LABELS[e.muscle]}</Tag>
-                      <Tag tone="outline">{EQUIPMENT_LABELS[e.equipment]}</Tag>
-                    </span>
-                  </span>
-                </button>
+                <MovementCard exercise={e} onOpen={() => setDetail(e)} />
               </li>
             ))}
           </ul>
@@ -214,6 +225,58 @@ export function LibraryPage() {
         }}
       />
     </div>
+  )
+}
+
+/**
+ * Hovering swaps to the rep's end frame, so the card shows the movement rather
+ * than a pose. Touch devices simply keep the start frame.
+ */
+function MovementCard({ exercise, onOpen }: { exercise: Exercise; onOpen: () => void }) {
+  const [hovered, setHovered] = useState(false)
+  const [failed, setFailed] = useState(false)
+  const frames = exercisePhotoFrames(exercise)
+  const base = exerciseImageCandidates(exercise)[0]
+  const src = hovered && frames && !failed ? frames.end : base
+  const isCustom = exercise.id.startsWith('custom-')
+
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocus={() => setHovered(true)}
+      onBlur={() => setHovered(false)}
+      className="flex w-full flex-col gap-3 rounded-xl bg-surface p-3 text-left shadow-[var(--shadow-panel)] transition-shadow duration-150 hover:shadow-[var(--shadow-tile)]"
+    >
+      {base ? (
+        <img
+          src={src}
+          alt={`${exercise.name}, ${exercise.muscle} with ${exercise.equipment}`}
+          loading="lazy"
+          decoding="async"
+          onError={() => (src === frames?.end ? setFailed(true) : undefined)}
+          className="aspect-[4/3] w-full rounded-md bg-surface-2 object-cover"
+        />
+      ) : (
+        <span className="flex aspect-[4/3] w-full items-center justify-center rounded-md bg-surface-2">
+          <span className="num text-lg font-semibold tracking-widest text-ink-3">
+            {exercise.muscle.slice(0, 3).toUpperCase()}
+          </span>
+        </span>
+      )}
+      <span className="flex flex-col gap-1.5 px-0.5 pb-0.5">
+        <span className="line-clamp-2 text-sm leading-snug font-medium text-ink">
+          {exercise.name}
+        </span>
+        <span className="flex flex-wrap items-center gap-1.5">
+          <Tag>{MUSCLE_LABELS[exercise.muscle]}</Tag>
+          {isCustom && <Tag tone="brand">Yours</Tag>}
+          <span className="text-2xs text-ink-3">{EQUIPMENT_LABELS[exercise.equipment]}</span>
+        </span>
+      </span>
+    </button>
   )
 }
 

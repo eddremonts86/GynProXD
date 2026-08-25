@@ -7,6 +7,8 @@ import { chromium } from 'playwright'
 const BASE = process.env.BASE_URL ?? 'http://localhost:3015'
 const browser = await chromium.launch()
 const ctx = await browser.newContext({ viewport: { width: 375, height: 812 } })
+// The audit exercises the deterministic path; the coach has its own live test.
+await ctx.addInitScript(() => localStorage.setItem('forma-coach', 'off'))
 const page = await ctx.newPage()
 
 const errors = []
@@ -36,7 +38,7 @@ if (!(await page.textContent('body'))?.includes('Realistic timeline')) {
 }
 console.log('ok: free text parsed and estimate shown')
 
-await page.getByRole('button', { name: 'Generate plan' }).click()
+await page.getByRole('button', { name: 'Design my programme' }).click()
 await page.waitForURL(/\/generated\/.+/, { timeout: 5000 })
 // The route is lazy, so wait for its content rather than the navigation alone.
 await page
