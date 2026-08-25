@@ -21,12 +21,18 @@ import { Stat } from '../ui/Stat'
 import { AuroraTile } from '../ui/AuroraTile'
 import { TrendPill } from '../ui/TrendPill'
 import { SparkArea } from '../ui/SparkArea'
-import { Input } from '../ui/Input'
 import { NumberField } from '../ui/NumberField'
 import { ExerciseThumb } from '../ui/ExerciseThumb'
 import { PageHeader, Section } from '../ui/PageHeader'
 import { EmptyState } from '../ui/EmptyState'
 import { ExercisePicker } from '@/components/exercise-picker'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog'
 import { useElapsedSeconds } from '@/hooks/use-elapsed'
 import {
   DAY_FULL_LABELS,
@@ -146,9 +152,8 @@ function TodayOverview() {
   const bodyweight = useGym((s) => s.bodyweight)
   const startWorkout = useGym((s) => s.startWorkout)
   const startWorkoutFromPlan = useGym((s) => s.startWorkoutFromPlan)
-  const logBodyweight = useGym((s) => s.logBodyweight)
 
-  const [kg, setKg] = useState('')
+  const [weighInOpen, setWeighInOpen] = useState(false)
   const day = todayDayOfWeek()
 
   const scheduled = useMemo(
@@ -222,18 +227,30 @@ function TodayOverview() {
             lastWeighIn
               ? targetKg !== undefined
                 ? `Target ${targetKg} kg`
-                : `Logged ${formatLongDate(lastWeighIn.date)}`
-              : 'Log your first weigh-in below'
+                : lastWeighIn.date === todayIso()
+                  ? 'Logged today'
+                  : `Logged ${formatLongDate(lastWeighIn.date)}`
+              : 'No weigh-ins yet. Your trend starts with the first one.'
           }
           foot={
-            weightDelta !== null && weightDelta !== 0 ? (
-              <TrendPill
-                delta={weightDelta}
-                unit="kg"
-                window="last 30 days"
-                positiveIsGood={losingIsGood === undefined ? undefined : !losingIsGood}
-              />
-            ) : undefined
+            <>
+              {weightDelta !== null && weightDelta !== 0 && (
+                <TrendPill
+                  delta={weightDelta}
+                  unit="kg"
+                  window="last 30 days"
+                  positiveIsGood={losingIsGood === undefined ? undefined : !losingIsGood}
+                />
+              )}
+              <button
+                type="button"
+                onClick={() => setWeighInOpen(true)}
+                className="inline-flex h-9 items-center gap-1.5 rounded-full bg-surface px-3.5 text-xs font-medium text-ink shadow-[var(--shadow-panel)] transition-transform duration-150 active:translate-y-px"
+              >
+                <Plus size={14} weight="bold" />
+                Log weigh-in
+              </button>
+            </>
           }
         />
       </div>
@@ -369,32 +386,79 @@ function TodayOverview() {
         </Panel>
       )}
 
-      <Section title="Bodyweight">
+      <RecentSessions />
+
+      <WeighInDialog
+        open={weighInOpen}
+        onOpenChange={setWeighInOpen}
+        lastKg={lastWeighIn?.kg}
+      />
+    </div>
+  )
+}
+
+function WeighInDialog({
+  open,
+  onOpenChange,
+  lastKg,
+}: {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  lastKg?: number
+}) {
+  const logBodyweight = useGym((s) => s.logBodyweight)
+
+  /* Untouched means "start from the last known weight": most weigh-ins are a
+     small nudge away from the previous one. Reset on close, not via effects. */
+  const [draft, setDraft] = useState<string | null>(null)
+  const kg = draft ?? (lastKg !== undefined ? String(lastKg) : '')
+  const value = Number(kg)
+
+  const close = (next: boolean) => {
+    if (!next) setDraft(null)
+    onOpenChange(next)
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={close}>
+      <DialogContent className="sm:max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Log weigh-in</DialogTitle>
+          <DialogDescription>
+            Dated today. It feeds the trend on this tile and the History chart.
+          </DialogDescription>
+        </DialogHeader>
         <form
           onSubmit={(e) => {
             e.preventDefault()
-            const v = Number(kg)
-            if (v > 0) logBodyweight(v)
-            setKg('')
+            if (value > 0) {
+              logBodyweight(value)
+              close(false)
+            }
           }}
-          className="flex items-end gap-2"
+          className="flex flex-col gap-4"
         >
-          <Input
-            label="Weigh in"
+          <NumberField
+            label="Bodyweight"
+            unit="kg"
             value={kg}
-            onChange={(e) => setKg(e.target.value)}
-            inputMode="decimal"
-            placeholder={lastWeighIn ? String(lastWeighIn.kg) : '78.5'}
-            className="max-w-40"
+            onValueChange={setDraft}
+            step={0.1}
+            decimals={1}
+            min={20}
+            max={400}
           />
-          <Button type="submit" disabled={!(Number(kg) > 0)}>
-            Log
-          </Button>
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => close(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={!(value > 0)}>
+              Save
+            </Button>
+          </div>
         </form>
-      </Section>
-
-      <RecentSessions />
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }
 
