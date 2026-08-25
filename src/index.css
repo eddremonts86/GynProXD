@@ -3,81 +3,112 @@
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/geist-mono";
+@import "@fontsource-variable/doto";
 
 @custom-variant dark (&:is(.dark *));
 
 /* ---------------------------------------------------------------------------
-   Instrument — design tokens
-   Graphite + chalk neutrals, one cobalt signal. Flat surfaces, hairline rules,
-   tabular mono for every number. Semantics only: no decorative color.
+   Soft Signal — design tokens
+   Warm chalk surfaces, floating borderless cards, monochrome charcoal chrome.
+   Colour lives in exactly one material: the aurora gradient reserved for the
+   hero data tiles. Hero figures render in Doto, a real dot-matrix face.
 
    Radius rule (single documented system):
-     panels/cards  -> lg  (12px)
-     controls      -> md  (8px)   buttons, inputs, selects
-     tags/insets   -> sm  (6px)
-     pills/chips   -> full
+     buttons, chips, pills -> full
+     cards, panels, tiles  -> xl  (24px)
+     inputs, steppers      -> md  (14px)
+     tags, thumbnails      -> sm  (10px)
 --------------------------------------------------------------------------- */
 
 :root {
-  --bg: #f2f3f5;
-  --surface: #ffffff;
-  --surface-2: #e8eaee;
-  --line: #d9dce2;
-  --line-strong: #c2c7d0;
+  --bg: #ecebe8;
+  --surface: #fafaf8;
+  --surface-2: #e4e3df;
+  --line: #deddd8;
+  --line-strong: #c8c7c1;
 
-  --ink: #14161a;
-  --ink-2: #3d434d;
-  --ink-3: #5e646e;
+  --ink: #1d1d1a;
+  --ink-2: #45443f;
+  --ink-3: #64635d;
 
-  --brand: #1d47d6;
-  --brand-ink: #ffffff;
-  --brand-soft: #1d47d614;
-  --brand-hover: #1a3fbe;
+  --brand: #24241f;
+  --brand-ink: #f6f5f2;
+  --brand-soft: #24241f0f;
+  --brand-hover: #3a3a34;
 
-  --danger: #c2321f;
+  --danger: #b93526;
   --danger-ink: #ffffff;
-  --danger-soft: #c2321f14;
-  --good: #0f7a4a;
-  --good-soft: #0f7a4a14;
+  --danger-soft: #b9352614;
+  --good: #2e7038;
+  --good-soft: #2e703814;
 
-  --shadow-panel: 0 1px 2px rgb(20 22 26 / 0.05);
-  --shadow-raised: 0 -1px 0 rgb(20 22 26 / 0.06), 0 -8px 24px rgb(20 22 26 / 0.06);
-  --shadow-overlay: 0 12px 40px rgb(20 22 26 / 0.16);
+  /* Aurora material: verified for white text at the saturated center. */
+  --aurora-green-deep: #3a8641;
+  --aurora-green-mid: #7fbf5e;
+  --aurora-green-soft: #dcecc3;
+  --aurora-orange-deep: #cf6f1e;
+  --aurora-orange-mid: #eda04f;
+  --aurora-orange-soft: #f6ddb8;
+
+  --chart-1: #3f8f46;
+  --chart-2: #d97722;
+  --chart-3: #64635d;
+  --chart-4: #c8c7c1;
+  --chart-5: #b93526;
+
+  --shadow-panel: 0 1px 2px rgb(29 29 26 / 0.04), 0 12px 32px -12px rgb(29 29 26 / 0.12);
+  --shadow-tile: 0 2px 4px rgb(29 29 26 / 0.05), 0 20px 44px -16px rgb(29 29 26 / 0.18);
+  --shadow-raised: 0 -1px 0 rgb(29 29 26 / 0.05), 0 -8px 24px rgb(29 29 26 / 0.08);
+  --shadow-overlay: 0 24px 64px -12px rgb(29 29 26 / 0.28);
 
   color-scheme: light;
 }
 
 .dark {
-  --bg: #0f1114;
-  --surface: #171a1f;
-  --surface-2: #1f232a;
-  --line: #2a2f37;
-  --line-strong: #3a404a;
+  --bg: #141412;
+  --surface: #1e1e1b;
+  --surface-2: #262622;
+  --line: #32322d;
+  --line-strong: #45453f;
 
-  --ink: #f0f2f5;
-  --ink-2: #c3c8d0;
-  --ink-3: #8a919d;
+  --ink: #f2f1ed;
+  --ink-2: #c8c7c1;
+  --ink-3: #9b9a93;
 
-  --brand: #6c8cff;
-  --brand-ink: #0f1114;
-  --brand-soft: #6c8cff1f;
-  --brand-hover: #8aa6ff;
+  --brand: #ecebe6;
+  --brand-ink: #1a1a17;
+  --brand-soft: #ecebe614;
+  --brand-hover: #ffffff;
 
-  --danger: #ff7a6b;
-  --danger-ink: #0f1114;
-  --danger-soft: #ff7a6b1f;
-  --good: #4ade9a;
-  --good-soft: #4ade9a1f;
+  --danger: #ff8272;
+  --danger-ink: #1a1a17;
+  --danger-soft: #ff82721f;
+  --good: #6fce7f;
+  --good-soft: #6fce7f1f;
+
+  --aurora-green-deep: #2f6d36;
+  --aurora-green-mid: #55924a;
+  --aurora-green-soft: #33402a;
+  --aurora-orange-deep: #a85a19;
+  --aurora-orange-mid: #c77f36;
+  --aurora-orange-soft: #46341f;
+
+  --chart-1: #6fce7f;
+  --chart-2: #f0a45c;
+  --chart-3: #9b9a93;
+  --chart-4: #45453f;
+  --chart-5: #ff8272;
 
   --shadow-panel: none;
+  --shadow-tile: 0 20px 44px -16px rgb(0 0 0 / 0.5);
   --shadow-raised: 0 -1px 0 rgb(0 0 0 / 0.5), 0 -8px 24px rgb(0 0 0 / 0.35);
-  --shadow-overlay: 0 12px 40px rgb(0 0 0 / 0.55);
+  --shadow-overlay: 0 24px 64px -12px rgb(0 0 0 / 0.6);
 
   color-scheme: dark;
 }
 
-/* shadcn/base-ui semantic aliases, pointed at the same Instrument tokens so
-   vendored components in components/ui inherit the theme without forking. */
+/* shadcn/base-ui semantic aliases, pointed at the same tokens so vendored
+   components in components/ui inherit the theme without forking. */
 :root,
 .dark {
   --background: var(--bg);
@@ -99,13 +130,7 @@
   --border: var(--line);
   --input: var(--line);
   --ring: var(--brand);
-  --radius: 0.75rem;
-
-  --chart-1: var(--brand);
-  --chart-2: var(--ink-3);
-  --chart-3: var(--good);
-  --chart-4: var(--line-strong);
-  --chart-5: var(--danger);
+  --radius: 1rem;
 
   --sidebar: var(--surface);
   --sidebar-foreground: var(--ink-2);
@@ -171,16 +196,17 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-2xl: 20px;
-  --radius-3xl: 24px;
-  --radius-4xl: 28px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-2xl: 28px;
+  --radius-3xl: 32px;
+  --radius-4xl: 36px;
 
   --font-sans: "Geist Variable", ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-dot: "Doto Variable", "Geist Mono Variable", ui-monospace, monospace;
   --font-heading: var(--font-sans);
 
   --text-2xs: 0.6875rem;
@@ -196,6 +222,7 @@
   --text-6xl: 4rem;
 
   --shadow-panel: var(--shadow-panel);
+  --shadow-tile: var(--shadow-tile);
   --shadow-raised: var(--shadow-raised);
   --shadow-overlay: var(--shadow-overlay);
 
@@ -233,7 +260,7 @@
     line-height: 1.2;
   }
 
-  /* Every number in the app is tabular so columns of data never jitter. */
+  /* Comparable figures are tabular so columns of data never jitter. */
   .num {
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
@@ -241,8 +268,16 @@
     letter-spacing: -0.01em;
   }
 
+  /* Hero figures render in a real dot-matrix face, the page's signature. */
+  .num-dot {
+    font-family: var(--font-dot);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+  }
+
   :focus-visible {
-    outline: 2px solid var(--brand);
+    outline: 2px solid var(--ink);
     outline-offset: 2px;
     border-radius: var(--radius-sm);
   }
@@ -273,12 +308,27 @@
     background: transparent;
   }
 
-  /* Native number spinners fight thumb input during a set. */
   input[type="number"]::-webkit-outer-spin-button,
   input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
   }
+}
+
+@utility aurora-green {
+  color: #ffffff;
+  background:
+    radial-gradient(120% 90% at 18% 0%, var(--aurora-green-soft) 0%, transparent 55%),
+    radial-gradient(130% 110% at 85% 110%, var(--aurora-orange-mid) 0%, transparent 52%),
+    radial-gradient(140% 120% at 50% 45%, var(--aurora-green-mid) 0%, var(--aurora-green-deep) 78%);
+}
+
+@utility aurora-orange {
+  color: #ffffff;
+  background:
+    radial-gradient(120% 90% at 80% 0%, var(--aurora-orange-soft) 0%, transparent 55%),
+    radial-gradient(130% 110% at 8% 110%, var(--aurora-green-mid) 0%, transparent 48%),
+    radial-gradient(140% 120% at 45% 50%, var(--aurora-orange-mid) 0%, var(--aurora-orange-deep) 80%);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -276,9 +276,9 @@ export function OnboardingPage() {
             <div className="flex flex-col gap-4 border-y border-line py-4">
               <div className="flex items-baseline justify-between gap-3">
                 <span className="text-sm text-ink-3">Realistic timeline</span>
-                <span className="num text-3xl leading-none font-semibold text-ink">
+                <span className="num-dot text-4xl leading-none text-ink">
                   {estimate.estimatedMonths}
-                  <span className="ml-1 text-xs font-normal text-ink-3">
+                  <span className="num ml-1.5 text-xs font-normal text-ink-3">
                     {estimate.estimatedMonths === 1 ? 'month' : 'months'}
                   </span>
                 </span>

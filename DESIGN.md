@@ -1,17 +1,19 @@
 ---
 name: Forma
-description: Local-first hybrid training tracker. Graphite and chalk, one cobalt signal, every number tabular.
+description: Local-first hybrid training tracker. Chalk surfaces, floating cards, one aurora material, dot-matrix hero figures.
 colors:
-  brand: "#1d47d6"
-  brand-dark: "#6c8cff"
-  bg-light: "#f2f3f5"
-  bg-dark: "#0f1114"
-  surface-light: "#ffffff"
-  surface-dark: "#171a1f"
-  ink-light: "#14161a"
-  ink-dark: "#f0f2f5"
-  danger: "#c2321f"
-  good: "#0f7a4a"
+  brand: "#24241f"
+  brand-dark: "#ecebe6"
+  bg-light: "#ecebe8"
+  bg-dark: "#141412"
+  surface-light: "#fafaf8"
+  surface-dark: "#1e1e1b"
+  ink-light: "#1d1d1a"
+  ink-dark: "#f2f1ed"
+  aurora-green: "#3a8641"
+  aurora-orange: "#cf6f1e"
+  good: "#2e7038"
+  danger: "#b93526"
 typography:
   display:
     fontFamily: "Geist Variable, ui-sans-serif, system-ui, sans-serif"
@@ -19,11 +21,10 @@ typography:
     fontWeight: 600
     lineHeight: 1.2
     letterSpacing: "-0.015em"
-  title:
-    fontFamily: "Geist Variable, ui-sans-serif, sans-serif"
-    fontSize: "1.125rem"
-    fontWeight: 600
-    lineHeight: 1.2
+  hero-figure:
+    fontFamily: "Doto Variable, Geist Mono Variable, monospace"
+    fontWeight: 700
+    fontVariantNumeric: "tabular-nums"
   body:
     fontFamily: "Geist Variable, ui-sans-serif, sans-serif"
     fontSize: "0.875rem"
@@ -33,15 +34,11 @@ typography:
     fontFamily: "Geist Mono Variable, ui-monospace, monospace"
     fontVariantNumeric: "tabular-nums"
     fontWeight: 600
-  label:
-    fontFamily: "Geist Variable, ui-sans-serif, sans-serif"
-    fontSize: "0.6875rem"
-    fontWeight: 500
 rounded:
-  sm: "6px"
-  md: "8px"
-  lg: "12px"
-  xl: "16px"
+  pill: "9999px"
+  card: "24px"
+  control: "14px"
+  tag: "10px"
 spacing:
   xs: "6px"
   sm: "12px"
@@ -54,181 +51,166 @@ spacing:
 
 ## Overview
 
-**Creative north star: "Instrument".**
+**Creative north star: "Soft Signal".**
 
-Forma is a measuring device, not a motivational poster. Its promise is that it
-refuses to lie about how long a goal takes, so the interface is built to look
-like something calibrated: cool graphite and chalk neutrals, hairline rules, one
-saturated cobalt used only where a decision is being made, and every number set
-in tabular mono so columns of data never shift.
+Forma reads like a modern health dashboard: warm chalk surfaces, borderless
+cards that float on soft shadows, pill-shaped controls, and a monochrome
+charcoal chrome that stays out of the way. Colour is not an accent sprinkled
+around the page; it lives in exactly one material, the aurora gradient, and
+that material is reserved for the hero data tiles. The one number a tile
+exists to show renders in Doto, a real dot-matrix face, which is the page's
+signature.
 
-The app is used with a raised heart rate on a phone between sets, and calmly on
-a desktop while planning a week. Both cases want the same thing: large legible
-numbers, generous touch targets, and nothing decorative competing for attention.
+The app is still used with a raised heart rate on a phone between sets and
+calmly on a desktop while planning, so nothing about the softness trades away
+legibility: figures stay large and tabular, touch targets stay at 44px, and
+every pairing is contrast-verified.
 
 **Key characteristics**
 
-- Cool neutrals, never warm cream or beige. Off-black and off-white, never pure.
-- Exactly one accent. Cobalt marks the primary action and the current selection.
-- No gradients, no glows, no blurred blobs. Depth comes from hairlines and one
-  tonal step between page and surface.
-- Numbers are content. They get mono, tabular figures, and the largest type on
-  the screen.
-- Real photography carries the imagery. Nothing is invented to fill space.
+- Warm chalk neutrals, light-first. Dark is a graphite complement, one tap away.
+- Chrome is monochrome: charcoal pills for actions and selection. No blue, no
+  purple, nothing decorative.
+- The aurora gradient (green to orange) appears only on hero data tiles.
+- Hero figures in Doto dots; every other number in tabular Geist Mono.
+- Cards have no borders. Elevation comes from soft tinted shadows.
+- Photography carries the imagery. Nothing is invented to fill space.
 
 ## Colours
 
-Two themes, one palette structure. Every value is a CSS custom property in
-`src/index.css`; components only ever reference the semantic name.
+Two themes, one structure. Every value is a custom property in
+`src/index.css`; components only reference semantic names.
 
 | Token | Light | Dark | Use |
 |---|---|---|---|
-| `--bg` | `#f2f3f5` | `#0f1114` | Page ground |
-| `--surface` | `#ffffff` | `#171a1f` | Panels, rail, dialogs |
-| `--surface-2` | `#e8eaee` | `#1f232a` | Inset areas, thumbnails, chips |
-| `--line` | `#d9dce2` | `#2a2f37` | Hairline borders and dividers |
-| `--line-strong` | `#c2c7d0` | `#3a404a` | Hover borders, scrollbars |
-| `--ink` | `#14161a` | `#f0f2f5` | Headings, numbers, primary text |
-| `--ink-2` | `#3d434d` | `#c3c8d0` | Body text |
-| `--ink-3` | `#5e646e` | `#8a919d` | Labels, secondary text |
-| `--brand` | `#1d47d6` | `#6c8cff` | Primary action, selection, progression |
-| `--danger` | `#c2321f` | `#ff7a6b` | Destructive actions only |
-| `--good` | `#0f7a4a` | `#4ade9a` | Personal records only |
+| `--bg` | `#ecebe8` | `#141412` | Page ground |
+| `--surface` | `#fafaf8` | `#1e1e1b` | Cards, rail pills, dialogs |
+| `--surface-2` | `#e4e3df` | `#262622` | Insets, chips, thumbnails |
+| `--line` | `#deddd8` | `#32322d` | Hairlines where a shadow is too much |
+| `--ink` | `#1d1d1a` | `#f2f1ed` | Headings, figures |
+| `--ink-2` | `#45443f` | `#c8c7c1` | Body text |
+| `--ink-3` | `#64635d` | `#9b9a93` | Labels, secondary text |
+| `--brand` | `#24241f` | `#ecebe6` | Primary action and selection pills |
+| `--good` | `#2e7038` | `#6fce7f` | Personal records, improving trends |
+| `--danger` | `#b93526` | `#ff8272` | Destructive actions, worsening trends |
 
-**The one-accent rule.** Cobalt means "this is the thing to press, or the thing
-currently selected". It is never decoration. If a screen has two cobalt regions
-that are not both actionable, one of them is wrong.
+**The aurora rule.** The gradient material exists in two tones, green and
+orange, and appears only on `AuroraTile`. It never decorates a button, a
+background or a chart. White text on it is verified at 3:1 for the large
+dot figures and 4.5:1 for supporting text against the saturated center in
+both themes.
 
-**The semantic-colour rule.** Red is destructive, green is a record. Neither is
-ever used for emphasis. That is why the brand is blue: it leaves both free.
+**The monochrome-chrome rule.** Buttons, active navigation and selected chips
+are charcoal in light and chalk in dark. If interface chrome has a hue, it is
+wrong. Green and red carry meaning only: records and improvement, destruction
+and regression.
 
-**Contrast.** Every text and accent pair is verified against WCAG AA in both
-themes. Body text clears 4.5:1 on every surface it can land on, and the accent
-clears 4.5:1 as text and as a fill.
+**Charts.** `--chart-1` (green) for training data, `--chart-2` (orange) for
+bodyweight, neutrals for references. Area charts use a vertical gradient fill
+from 30% opacity to transparent, per the shadcn chart language.
 
 ## Typography
 
-**Geist Variable** for everything, **Geist Mono Variable** for data. Both are
-self-hosted through `@fontsource-variable`, so there is no render-blocking
-request to a font CDN. There is no serif anywhere in this app.
+**Geist Variable** for interface text, **Geist Mono Variable** for tabular
+data, **Doto Variable** for hero figures only. There is no serif.
 
-| Role | Size | Weight | Notes |
+| Role | Face | Size | Notes |
 |---|---|---|---|
-| Page title | `text-3xl` | 600 | One per route |
-| Section title | `text-lg` | 600 | Sits on a hairline rule |
-| Body | `text-base` (0.875rem) | 400 | Capped at 58ch |
-| Label | `text-2xs` (0.6875rem) | 500 | `--ink-3` |
-| Data | mono, `text-lg` to `text-3xl` | 600 | Always `.num` |
+| Page title | Geist 600 | `text-3xl` | One per route |
+| Section title | Geist 600 | `text-lg` | On a hairline rule |
+| Hero figure | Doto 700, `.num-dot` | `text-4xl` to `text-6xl` | AuroraTile, clocks, the estimate |
+| Data | Geist Mono, `.num` | `text-sm` to `text-2xl` | Everything comparable |
+| Label | Geist 500 | `text-2xs` | `--ink-3` |
 
-**The `.num` rule.** Any figure a user compares against another figure gets the
-`.num` class: mono family, tabular figures, tightened tracking. Elapsed time,
-weights, reps, volume, dates, week indices. This is what stops a ticking clock
-from jittering its own layout.
+**The `.num-dot` rule.** Doto marks the one number a surface exists to show:
+the tile figures, the session clocks, the plan estimate. It never appears in
+lists, tables, chips or axes; those stay in `.num` so columns align and read
+fast.
 
-**No eyebrows.** There are no small uppercase labels above headings anywhere in
-this app. A section's position on the page already says what it is.
-
-## Layout
-
-Desktop is a fixed 240px rail plus a `76rem` content column. Below `lg` the rail
-becomes a 56px top bar plus a five-item bottom navigation with a safe-area inset.
-Content padding is `px-4 py-6` on phones and `px-8 py-10` from `md`.
-
-Sections stack with `gap-8`. Within a section, `gap-3` to `gap-4`. Stat rows use
-a `gap-px` grid over a `--line` background, so the dividers are real hairlines
-rather than borders that double up.
-
-Full-height surfaces use `min-h-[100dvh]`, never `h-screen`.
+**No eyebrows.** No small uppercase labels above headings anywhere.
 
 ## Shapes
 
-One radius system, applied without exception:
+One documented radius system, applied without exception:
 
-- Panels, cards and dialogs: `lg` (12px)
-- Controls (buttons, inputs, selects, steppers): `md` (8px)
-- Small tags and thumbnails: `sm` (6px)
-- Chips and pills that represent a selection: `rounded-full`
-
-Borders are always 1px `--line`. There are no 2px borders.
+- Buttons, chips, pills, trend badges: full (pill)
+- Cards, tiles, dialogs: `xl` (24px)
+- Inputs, selects, steppers: `md` (14px)
+- Tags and thumbnails: `sm` (10px)
 
 ## Elevation
 
-Surfaces are flat. In light mode a panel carries a single 1px 5% shadow; in dark
-mode it carries none and relies on the tonal step alone. Shadows exist only for
-things that float above the page: dialogs (`--shadow-overlay`) and sticky bars
-(`--shadow-raised`).
+Cards are borderless and float on tinted shadows: `--shadow-panel` at rest,
+`--shadow-tile` for the aurora tiles and hover states, `--shadow-overlay` for
+dialogs. Hairlines survive only where a shadow would be noise: dividers inside
+cards, quiet panels, empty-state dashes. Dark mode drops resting shadows and
+relies on the tonal step.
 
-## Components
+## Widgets
 
-### Buttons
+### AuroraTile
+The hero surface: gradient material, a label, one Doto figure, an optional
+sub-line and an optional `TrendPill`. Green for training, orange for
+bodyweight. With nothing to measure it says so in plain words instead of
+faking a zero.
 
-`primary` cobalt fill with `--brand-ink` text, `secondary` surface with a
-hairline, `ghost` text-only, `danger` filled red, `dangerQuiet` red outline.
-Heights: `xs` 32, `sm` 36, `md` 44 (default), `lg` 52. Anything a thumb hits
-mid-session uses `md` or `lg`. Every button presses down 1px on `:active`.
+### TrendPill
+"+12 kg last 30 days" on a floating pill. The arrow carries direction; colour
+carries judgement only when a direction is objectively good or bad (weight
+moves toward a target, volume grows). With no defensible judgement the arrow
+stays neutral.
+
+### Stat + SparkArea
+A small floating tile: label, tabular figure, and a quiet gradient sparkline
+with no axes and no interaction. The sparkline hides below two data points.
+
+### Charts
+Recharts through the shadcn chart wrapper: gradient area charts with hairline
+grids, unit-labelled axes, and pill tooltips. Weekly volume, estimated 1RM and
+bodyweight (with the plan's target as a dashed reference line). Chart
+animations stay off; they ignore reduced-motion preferences and add nothing.
 
 ### NumberField
+Unchanged mid-session logging control: two 44px steppers around a large
+tabular readout, hold to repeat.
 
-The mid-session logging control. Two 44px steppers flank a large mono readout
-that stays directly editable. Holding a stepper repeats after 380ms, so a 40kg
-change is one gesture. Weight steps by 2.5, reps by 1, seconds by 5.
+## Layout
 
-### Panel
-
-`raised` (surface plus hairline plus shadow), `quiet` (hairline only), `inset`
-(`--surface-2`). Panels group things that belong together. Where a hairline or
-whitespace would do the job, there is no panel.
-
-### Tag
-
-Factual labels only: muscle group, equipment, progression rule, superset group.
-Tones map to meaning, never to decoration.
-
-### ExerciseThumb
-
-Photography first. Every movement in the dataset ships two real photographs, so
-the catalogue reads as one consistent set rather than a mix of drawings and
-photos. The bundled RepDB illustration is the fallback when the photo cannot be
-fetched, and a typographic three-letter muscle tile is the last resort. The tile
-is rendered in CSS, so it follows the theme and ships no assets.
-
-The detail view shows both frames, labelled start and end. A single still cannot
-explain a movement.
+Desktop: a 240px rail of pill items on the page ground plus a `76rem` content
+column. Below `lg`: a chalk top bar and a five-item bottom nav where the
+active item is a charcoal pill. Sections stack with `gap-8`; metric grids use
+`gap-4` between floating tiles. Full-height surfaces use `min-h-[100dvh]`.
 
 ## Motion
 
-`MOTION_INTENSITY 4`: motion confirms state changes and nothing else.
+Motion confirms state and nothing else: 150ms colour transitions, a 180ms
+scale-in on a logged set, the rest countdown draining linearly, buttons
+pressing down 1px. Everything respects `prefers-reduced-motion`. No parallax,
+no scroll effects, no chart draw-ins.
 
-- Colour and border transitions at 150ms.
-- A logged set scales in at 180ms with `cubic-bezier(0.16, 1, 0.3, 1)`.
-- The rest countdown bar shrinks linearly over one second per tick.
-- The personal-record confirmation fades in once and clears itself.
+## Theme
 
-Everything above is wrapped in `useReducedMotion`, and the global reduced-motion
-media query collapses all durations to zero. There are no infinite loops, no
-parallax and no scroll hijacking.
+Light-first: the language is built around chalk, so light is the default
+rather than the system preference. The toggle persists the choice and the
+dark theme keeps hierarchy, the aurora material and AA contrast intact.
 
 ## Copy
 
-- English throughout. The free-text intake parses English and Spanish, because
-  the parser has always understood both and the box should not pretend otherwise.
-- The persisted domain vocabulary is Spanish (`adelgazar`, `trimestral`). It is
-  never rendered raw; `src/lib/labels.ts` maps every value to a display string.
-- No em-dashes. No implementation detail in the interface: no framework names,
-  no storage keys, no asset counts, no version stamps.
-- Plain sentences. "Rest day", not "recovery is a quiet promise".
+English throughout, plain sentences, no em-dashes, no implementation detail on
+screen. The persisted Spanish domain vocabulary is mapped to display strings in
+`src/lib/labels.ts` and never rendered raw.
 
 ## Do
 
-- Do put every comparable figure in `.num`.
+- Do reserve the aurora material for hero data tiles.
+- Do put every comparable figure in `.num` and only hero figures in `.num-dot`.
 - Do keep touch targets at 44px or more.
-- Do state what a disabled control is waiting for.
 - Do test both themes before calling a screen done.
 
 ## Don't
 
-- Don't add a second accent colour.
-- Don't use red or green for anything other than destructive and record.
-- Don't invent imagery for a movement that has none.
-- Don't put an uppercase label above a heading.
-- Don't reach for a panel when a hairline would do.
+- Don't add a hue to chrome. Charcoal and chalk only.
+- Don't put borders on floating cards.
+- Don't use Doto for lists, tables or axes.
+- Don't fake a figure when there is nothing to measure; say so instead.
+- Don't animate charts.

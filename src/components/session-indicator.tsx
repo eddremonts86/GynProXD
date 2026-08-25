@@ -24,13 +24,13 @@ export function SessionRailCard() {
   return (
     <Link
       to="/"
-      className="flex flex-col gap-2 rounded-md border border-brand/40 bg-brand-soft p-3 transition-colors hover:border-brand"
+      className="flex flex-col gap-2 rounded-lg bg-surface p-3 shadow-[var(--shadow-panel)] transition-shadow hover:shadow-[var(--shadow-tile)]"
     >
-      <span className="flex items-center gap-1.5 text-2xs font-medium text-brand">
+      <span className="flex items-center gap-1.5 text-2xs font-medium text-ink-2">
         <Barbell size={14} weight="bold" />
         Session in progress
       </span>
-      <span className="num text-xl leading-none font-semibold text-ink">
+      <span className="num-dot text-2xl leading-none text-ink">
         {session.elapsed === null ? '--:--' : formatClock(session.elapsed)}
       </span>
       <span className="text-2xs text-ink-3">{pluralize(session.sets, 'set')} logged</span>
@@ -45,11 +45,11 @@ export function SessionMobileBar() {
   return (
     <Link
       to="/"
-      className="flex items-center gap-2 border-t border-brand/40 bg-brand-soft px-4 py-2.5 backdrop-blur"
+      className="flex items-center gap-2 bg-surface/95 px-4 py-2.5 shadow-[var(--shadow-raised)] backdrop-blur"
     >
-      <Barbell size={16} weight="bold" className="shrink-0 text-brand" />
-      <span className="text-xs font-medium text-brand">Session in progress</span>
-      <span className="num ml-auto text-sm font-semibold text-ink">
+      <Barbell size={16} weight="bold" className="shrink-0 text-ink-2" />
+      <span className="text-xs font-medium text-ink-2">Session in progress</span>
+      <span className="num-dot ml-auto text-lg leading-none text-ink">
         {session.elapsed === null ? '--:--' : formatClock(session.elapsed)}
       </span>
     </Link>

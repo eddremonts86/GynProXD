@@ -1,31 +1,26 @@
 import { useMemo, useState } from 'react'
 import { CaretDown, ChartLineUp, Trash } from '@phosphor-icons/react'
-import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts'
+import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from 'recharts'
 import { useGym } from '../store/useGym'
 import { e1rmSeries, exerciseById } from '../lib/exercises'
 import { muscleMaxVolume, muscleVolume } from '../lib/muscle-volume'
+import { isoDaysAgo } from '../lib/dates'
+import { weeklyVolumeSeries, workoutTotals } from '../lib/stats'
 import { Button, IconButton } from '../ui/Button'
 import { Panel } from '../ui/Panel'
 import { Stat } from '../ui/Stat'
 import { FormSelect } from '../ui/FormSelect'
 import { PageHeader, Section } from '../ui/PageHeader'
 import { EmptyState } from '../ui/EmptyState'
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from '@/components/ui/chart'
 import { MUSCLE_LABELS, formatLongDate, formatShortDate, pluralize } from '../lib/labels'
-import { isoDaysAgo } from '../lib/dates'
 import { cn } from '@/lib/utils'
 import type { MuscleGroup, SetEntry } from '../lib/types'
-
-function setVolume(s: SetEntry): number {
-  return s.weight * (s.durationSec ? 1 : s.reps)
-}
 
 function describeSet(s: SetEntry): string {
   const load = s.weight > 0 ? `${s.weight}kg` : 'BW'
@@ -33,18 +28,10 @@ function describeSet(s: SetEntry): string {
   return `${load} × ${work}${s.side ? ` ${s.side}` : ''}`
 }
 
-const chartAxis = { fontSize: 11, fill: 'var(--ink-3)' }
+const axisTick = { fontSize: 11, fill: 'var(--ink-3)' }
 
-/* Recharts widens these callback params, so adapt rather than fight the types. */
-const dateLabel = (label: unknown) => formatLongDate(String(label))
-const kgValue = (name: string) => (value: unknown): [string, string] => [`${value} kg`, name]
-const chartTooltip = {
-  background: 'var(--surface)',
-  border: '1px solid var(--line)',
-  borderRadius: '8px',
-  fontSize: 12,
-  color: 'var(--ink)',
-}
+/** "9.4k" style ticks so the axis never clips five-digit volumes. */
+const compactKg = (v: number) => (v >= 1000 ? `${Math.round(v / 100) / 10}k` : String(v))
 
 export function HistoryPage() {
   const workouts = useGym((s) => s.workouts)
@@ -53,12 +40,11 @@ export function HistoryPage() {
   const totals = useMemo(() => {
     let sets = 0
     let volume = 0
-    for (const w of workouts)
-      for (const e of w.exercises)
-        for (const s of e.sets) {
-          sets += 1
-          volume += setVolume(s)
-        }
+    for (const w of workouts) {
+      const t = workoutTotals(w)
+      sets += t.sets
+      volume += t.volume
+    }
     const from = isoDaysAgo(29)
     const recentDays = new Set(workouts.filter((w) => w.date >= from).map((w) => w.date))
     return { sets, volume: Math.round(volume), recentDays: recentDays.size }
@@ -81,21 +67,22 @@ export function HistoryPage() {
     <div className="flex flex-col gap-8">
       <PageHeader title="History" description="Every finished session, and what it added up to." />
 
-      <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-line bg-line md:grid-cols-4">
-        <div className="bg-surface p-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <Panel padding="md">
           <Stat label="Sessions" value={workouts.length} />
-        </div>
-        <div className="bg-surface p-4">
+        </Panel>
+        <Panel padding="md">
           <Stat label="Sets" value={totals.sets} />
-        </div>
-        <div className="bg-surface p-4">
+        </Panel>
+        <Panel padding="md">
           <Stat label="Total volume" value={totals.volume.toLocaleString('en-GB')} unit="kg" />
-        </div>
-        <div className="bg-surface p-4">
+        </Panel>
+        <Panel padding="md">
           <Stat label="Days trained" value={totals.recentDays} hint="In the last 30 days" />
-        </div>
+        </Panel>
       </div>
 
+      <WeeklyVolumeChart />
       <StrengthChart />
       {bodyweight.length >= 2 && <BodyweightChart />}
       <MuscleBalance />
@@ -103,6 +90,60 @@ export function HistoryPage() {
     </div>
   )
 }
+
+const volumeConfig = {
+  volume: { label: 'Volume', color: 'var(--chart-1)' },
+} satisfies ChartConfig
+
+function WeeklyVolumeChart() {
+  const workouts = useGym((s) => s.workouts)
+  const series = useMemo(
+    () => weeklyVolumeSeries(workouts, 12).map((p) => ({ ...p, week: formatShortDate(p.start) })),
+    [workouts],
+  )
+  const trained = series.filter((p) => p.sessions > 0).length
+  if (trained < 2) return null
+
+  return (
+    <Section title="Weekly volume" hint="Last 12 weeks">
+      <Panel padding="md">
+        <ChartContainer config={volumeConfig} className="h-52 w-full">
+          <AreaChart data={series} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
+            <defs>
+              <linearGradient id="fill-volume" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="var(--color-volume)" stopOpacity={0.3} />
+                <stop offset="100%" stopColor="var(--color-volume)" stopOpacity={0.02} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid stroke="var(--line)" strokeDasharray="2 4" vertical={false} />
+            <XAxis dataKey="week" tick={axisTick} axisLine={false} tickLine={false} />
+            <YAxis tick={axisTick} axisLine={false} tickLine={false} width={44} tickFormatter={compactKg} />
+            <ChartTooltip
+              content={
+                <ChartTooltipContent
+                  formatter={(value) => [`${Number(value).toLocaleString('en-GB')} kg`, ' lifted']}
+                  labelFormatter={(label) => `Week of ${label}`}
+                />
+              }
+            />
+            <Area
+              type="monotone"
+              dataKey="volume"
+              stroke="var(--color-volume)"
+              strokeWidth={2}
+              fill="url(#fill-volume)"
+              isAnimationActive={false}
+            />
+          </AreaChart>
+        </ChartContainer>
+      </Panel>
+    </Section>
+  )
+}
+
+const e1rmConfig = {
+  e1rm: { label: 'Estimated 1RM', color: 'var(--chart-1)' },
+} satisfies ChartConfig
 
 function StrengthChart() {
   const workouts = useGym((s) => s.workouts)
@@ -141,40 +182,48 @@ function StrengthChart() {
       }
     >
       {series.length < 2 ? (
-        <p className="rounded-lg border border-dashed border-line px-4 py-10 text-center text-sm text-ink-3">
+        <p className="rounded-xl border border-dashed border-line px-4 py-10 text-center text-sm text-ink-3">
           Log this movement in at least two sessions to see a trend.
         </p>
       ) : (
         <Panel padding="md">
-          <div className="h-56 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={series} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
-                <CartesianGrid stroke="var(--line)" strokeDasharray="2 4" vertical={false} />
-                <XAxis
-                  dataKey="date"
-                  tickFormatter={formatShortDate}
-                  tick={chartAxis}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis tick={chartAxis} axisLine={false} tickLine={false} width={44} unit="kg" />
-                <Tooltip
-                  contentStyle={chartTooltip}
-                  labelStyle={{ color: 'var(--ink-3)', fontSize: 11 }}
-                  labelFormatter={dateLabel}
-                  formatter={kgValue('Estimated 1RM')}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="e1rm"
-                  stroke="var(--brand)"
-                  strokeWidth={2}
-                  dot={{ r: 2.5, fill: 'var(--brand)', strokeWidth: 0 }}
-                  activeDot={{ r: 5 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+          <ChartContainer config={e1rmConfig} className="h-56 w-full">
+            <AreaChart data={series} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
+              <defs>
+                <linearGradient id="fill-e1rm" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="var(--color-e1rm)" stopOpacity={0.3} />
+                  <stop offset="100%" stopColor="var(--color-e1rm)" stopOpacity={0.02} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid stroke="var(--line)" strokeDasharray="2 4" vertical={false} />
+              <XAxis
+                dataKey="date"
+                tickFormatter={formatShortDate}
+                tick={axisTick}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis tick={axisTick} axisLine={false} tickLine={false} width={48} unit="kg" />
+              <ChartTooltip
+                content={
+                  <ChartTooltipContent
+                    formatter={(value) => [`${value} kg`, ' estimated']}
+                    labelFormatter={(label) => formatLongDate(String(label))}
+                  />
+                }
+              />
+              <Area
+                type="monotone"
+                dataKey="e1rm"
+                stroke="var(--color-e1rm)"
+                strokeWidth={2}
+                fill="url(#fill-e1rm)"
+                dot={{ r: 2.5, fill: 'var(--color-e1rm)', strokeWidth: 0 }}
+                activeDot={{ r: 5 }}
+                isAnimationActive={false}
+              />
+            </AreaChart>
+          </ChartContainer>
           <p className="mt-2 text-2xs text-ink-3">
             Epley estimate from your heaviest set each session. A guide, not a tested max.
           </p>
@@ -184,8 +233,17 @@ function StrengthChart() {
   )
 }
 
+const weightConfig = {
+  kg: { label: 'Bodyweight', color: 'var(--chart-2)' },
+} satisfies ChartConfig
+
 function BodyweightChart() {
   const bodyweight = useGym((s) => s.bodyweight)
+  const targetKg = useGym((s) => {
+    const newest = [...s.generatedPlans].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0]
+    return newest?.input.targetWeightKg
+  })
+
   const series = useMemo(
     () => [...bodyweight].sort((a, b) => a.date.localeCompare(b.date)).slice(-24),
     [bodyweight],
@@ -205,40 +263,57 @@ function BodyweightChart() {
       }
     >
       <Panel padding="md">
-        <div className="h-44 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={series} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
-              <CartesianGrid stroke="var(--line)" strokeDasharray="2 4" vertical={false} />
-              <XAxis
-                dataKey="date"
-                tickFormatter={formatShortDate}
-                tick={chartAxis}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                tick={chartAxis}
-                axisLine={false}
-                tickLine={false}
-                width={44}
-                domain={['auto', 'auto']}
-                unit="kg"
-              />
-              <Tooltip
-                contentStyle={chartTooltip}
-                labelFormatter={dateLabel}
-                formatter={kgValue('Bodyweight')}
-              />
-              <Line
-                type="monotone"
-                dataKey="kg"
+        <ChartContainer config={weightConfig} className="h-48 w-full">
+          <AreaChart data={series} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
+            <defs>
+              <linearGradient id="fill-kg" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="var(--color-kg)" stopOpacity={0.3} />
+                <stop offset="100%" stopColor="var(--color-kg)" stopOpacity={0.02} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid stroke="var(--line)" strokeDasharray="2 4" vertical={false} />
+            <XAxis
+              dataKey="date"
+              tickFormatter={formatShortDate}
+              tick={axisTick}
+              axisLine={false}
+              tickLine={false}
+            />
+            <YAxis
+              tick={axisTick}
+              axisLine={false}
+              tickLine={false}
+              width={52}
+              domain={['auto', 'auto']}
+              unit="kg"
+            />
+            <ChartTooltip
+              content={
+                <ChartTooltipContent
+                  formatter={(value) => [`${value} kg`, ' weighed']}
+                  labelFormatter={(label) => formatLongDate(String(label))}
+                />
+              }
+            />
+            {targetKg !== undefined && (
+              <ReferenceLine
+                y={targetKg}
                 stroke="var(--ink-3)"
-                strokeWidth={2}
-                dot={{ r: 2.5, fill: 'var(--ink-3)', strokeWidth: 0 }}
+                strokeDasharray="4 4"
+                label={{ value: `Target ${targetKg} kg`, fill: 'var(--ink-3)', fontSize: 11, position: 'insideBottomRight' }}
               />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+            )}
+            <Area
+              type="monotone"
+              dataKey="kg"
+              stroke="var(--color-kg)"
+              strokeWidth={2}
+              fill="url(#fill-kg)"
+              dot={{ r: 2.5, fill: 'var(--color-kg)', strokeWidth: 0 }}
+              isAnimationActive={false}
+            />
+          </AreaChart>
+        </ChartContainer>
       </Panel>
     </Section>
   )
@@ -261,29 +336,28 @@ function MuscleBalance() {
 
   return (
     <Section title="Where the volume went" hint="Last 4 weeks">
-      <ul className="flex flex-col">
-        {rows.map(([muscle, v], i) => (
-          <li
-            key={muscle}
-            className={cn(
-              'flex items-center gap-4 py-2.5',
-              i > 0 && 'border-t border-line',
-            )}
-          >
-            <span className="w-28 shrink-0 text-sm text-ink-2">{MUSCLE_LABELS[muscle]}</span>
-            <span className="flex-1">
-              <span
-                className="block h-1.5 rounded-full bg-brand"
-                style={{ width: `${Math.max(2, Math.round((v / max) * 100))}%` }}
-              />
-            </span>
-            <span className="num w-24 shrink-0 text-right text-sm text-ink">
-              {Math.round(v).toLocaleString('en-GB')}
-              <span className="ml-1 text-2xs text-ink-3">kg</span>
-            </span>
-          </li>
-        ))}
-      </ul>
+      <Panel padding="md">
+        <ul className="flex flex-col">
+          {rows.map(([muscle, v], i) => (
+            <li
+              key={muscle}
+              className={cn('flex items-center gap-4 py-2.5', i > 0 && 'border-t border-line')}
+            >
+              <span className="w-28 shrink-0 text-sm text-ink-2">{MUSCLE_LABELS[muscle]}</span>
+              <span className="flex-1">
+                <span
+                  className="block h-2 rounded-full bg-[var(--chart-1)]"
+                  style={{ width: `${Math.max(2, Math.round((v / max) * 100))}%` }}
+                />
+              </span>
+              <span className="num w-24 shrink-0 text-right text-sm text-ink">
+                {Math.round(v).toLocaleString('en-GB')}
+                <span className="ml-1 text-2xs text-ink-3">kg</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </Panel>
     </Section>
   )
 }
@@ -296,15 +370,13 @@ function SessionList() {
 
   return (
     <Section title="Sessions" hint={pluralize(workouts.length, 'session')}>
-      <ul className="flex flex-col gap-2">
+      <ul className="flex flex-col gap-3">
         {workouts.map((w) => {
-          const sets = w.exercises.reduce((n, e) => n + e.sets.length, 0)
-          const volume = Math.round(
-            w.exercises.reduce((n, e) => n + e.sets.reduce((m, s) => m + setVolume(s), 0), 0),
-          )
+          const t = workoutTotals(w)
+          const volume = Math.round(t.volume)
           const open = expanded === w.id
           return (
-            <li key={w.id} className="overflow-hidden rounded-lg border border-line bg-surface">
+            <li key={w.id} className="overflow-hidden rounded-xl bg-surface shadow-[var(--shadow-panel)]">
               <div className="flex items-center gap-2 p-3 pl-4">
                 <button
                   type="button"
@@ -325,7 +397,7 @@ function SessionList() {
                       {formatLongDate(w.date)}
                     </span>
                     <span className="num block truncate text-2xs text-ink-3">
-                      {pluralize(w.exercises.length, 'movement')}, {pluralize(sets, 'set')},{' '}
+                      {pluralize(w.exercises.length, 'movement')}, {pluralize(t.sets, 'set')},{' '}
                       {volume.toLocaleString('en-GB')} kg
                     </span>
                   </span>

@@ -116,24 +116,24 @@ export function GeneratedPlanPage() {
         }
       />
 
-      <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-line bg-line md:grid-cols-4">
-        <div className="bg-surface p-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <Panel padding="md">
           <Stat label="Timeline" value={plan.estimatedMonths} unit="months" />
-        </div>
-        <div className="bg-surface p-4">
-          <Stat label="Rate" value={plan.rateKgPerWeek} unit="kg / week" tone="brand" />
-        </div>
-        <div className="bg-surface p-4">
+        </Panel>
+        <Panel padding="md">
+          <Stat label="Rate" value={plan.rateKgPerWeek} unit="kg / week" />
+        </Panel>
+        <Panel padding="md">
           <Stat label="Programme" value={plan.weeks.length} unit="weeks" />
-        </div>
-        <div className="bg-surface p-4">
+        </Panel>
+        <Panel padding="md">
           <Stat
             label="Starting weight"
             value={plan.input.weightKg}
             unit="kg"
             hint={plan.input.targetWeightKg ? `Target ${plan.input.targetWeightKg} kg` : undefined}
           />
-        </div>
+        </Panel>
       </div>
 
       {plan.warnings.length > 0 && (

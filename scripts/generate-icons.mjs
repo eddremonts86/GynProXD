@@ -7,8 +7,8 @@ import { chromium } from 'playwright'
 import { mkdir, writeFile } from 'node:fs/promises'
 
 const OUT = 'public'
-const BRAND = '#1d47d6'
-const INK = '#ffffff'
+const BRAND = '#24241f'
+const INK = '#f6f5f2'
 
 /** Bars sit inside the middle 60% so the art survives a maskable crop. */
 const BARS = [

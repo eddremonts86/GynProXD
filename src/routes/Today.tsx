@@ -18,6 +18,9 @@ import { Button, IconButton } from '../ui/Button'
 import { Panel } from '../ui/Panel'
 import { Tag } from '../ui/Tag'
 import { Stat } from '../ui/Stat'
+import { AuroraTile } from '../ui/AuroraTile'
+import { TrendPill } from '../ui/TrendPill'
+import { SparkArea } from '../ui/SparkArea'
 import { Input } from '../ui/Input'
 import { NumberField } from '../ui/NumberField'
 import { ExerciseThumb } from '../ui/ExerciseThumb'
@@ -35,6 +38,7 @@ import {
   pluralize,
 } from '../lib/labels'
 import { isoDaysAgo, todayIso } from '../lib/dates'
+import { bodyweightDelta, rangeVolume, setVolume, weeklyVolumeSeries, workoutTotals } from '../lib/stats'
 import { cn } from '@/lib/utils'
 import type { DayOfWeek, PlannedExercise, SetEntry, WeeklyPlan, Workout } from '../lib/types'
 
@@ -54,10 +58,6 @@ function isNewRecord(
 ): boolean {
   if (bestE1rm(workouts, exerciseId) <= 0) return false
   return isPersonalRecord(exerciseId, set, workouts, earlierSets)
-}
-
-function setVolume(s: SetEntry): number {
-  return s.weight * (s.durationSec ? 1 : s.reps)
 }
 
 function describeSet(s: SetEntry): string {
@@ -160,45 +160,110 @@ function TodayOverview() {
     [plans, day],
   )
 
-  const week = useMemo(() => {
-    const from = isoDaysAgo(6)
-    const recent = workouts.filter((w) => w.date >= from)
-    let sets = 0
-    let volume = 0
-    for (const w of recent)
-      for (const e of w.exercises)
-        for (const s of e.sets) {
-          sets += 1
-          volume += setVolume(s)
-        }
-    return { sessions: recent.length, sets, volume: Math.round(volume) }
+  const metrics = useMemo(() => {
+    const thisWeek = rangeVolume(workouts, isoDaysAgo(6), todayIso())
+    const lastWeek = rangeVolume(workouts, isoDaysAgo(13), isoDaysAgo(7))
+    const recent = workouts.filter((w) => w.date >= isoDaysAgo(6))
+    const sets = recent.reduce((n, w) => n + workoutTotals(w).sets, 0)
+    const weekSeries = weeklyVolumeSeries(workouts, 12)
+    return {
+      thisWeek,
+      volumeDelta: Math.round(thisWeek - lastWeek),
+      hadLastWeek: lastWeek > 0,
+      sessions: recent.length,
+      sets,
+      weeksTrained: weekSeries.filter((p) => p.sessions > 0).length,
+      volumeSpark: weekSeries.map((p) => ({ value: p.volume })),
+    }
   }, [workouts])
 
+  const weightSpark = useMemo(
+    () =>
+      [...bodyweight]
+        .sort((a, b) => a.date.localeCompare(b.date))
+        .slice(-12)
+        .map((e) => ({ value: e.kg })),
+    [bodyweight],
+  )
+  const weightDelta = useMemo(() => bodyweightDelta(bodyweight, 30), [bodyweight])
+
   const lastWeighIn = bodyweight.length > 0 ? [...bodyweight].sort((a, b) => b.date.localeCompare(a.date))[0] : null
+  const targetKg = useGym((s) => {
+    const newest = [...s.generatedPlans].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0]
+    return newest?.input.targetWeightKg
+  })
+  const losingIsGood =
+    targetKg !== undefined && lastWeighIn ? targetKg < lastWeighIn.kg : undefined
   const primary = scheduled[0]
 
   return (
     <div className="flex flex-col gap-8">
       <PageHeader title="Today" description={formatLongDate(todayIso())} />
 
-      <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-line bg-line md:grid-cols-4">
-        <div className="bg-surface p-4">
-          <Stat label="Sessions this week" value={week.sessions} />
-        </div>
-        <div className="bg-surface p-4">
-          <Stat label="Sets this week" value={week.sets} />
-        </div>
-        <div className="bg-surface p-4">
-          <Stat label="Volume this week" value={week.volume.toLocaleString('en-GB')} unit="kg" />
-        </div>
-        <div className="bg-surface p-4">
+      <div className="grid gap-4 lg:grid-cols-2">
+        <AuroraTile
+          tone="green"
+          label="Training volume, last 7 days"
+          value={metrics.thisWeek.toLocaleString('en-GB')}
+          unit="kg"
+          sub={`${pluralize(metrics.sessions, 'session')}, ${pluralize(metrics.sets, 'set')}`}
+          foot={
+            metrics.hadLastWeek && metrics.volumeDelta !== 0 ? (
+              <TrendPill delta={metrics.volumeDelta} unit="kg" window="vs previous week" />
+            ) : undefined
+          }
+        />
+        <AuroraTile
+          tone="orange"
+          label="Bodyweight"
+          value={lastWeighIn?.kg}
+          unit={lastWeighIn ? 'kg' : undefined}
+          sub={
+            lastWeighIn
+              ? targetKg !== undefined
+                ? `Target ${targetKg} kg`
+                : `Logged ${formatLongDate(lastWeighIn.date)}`
+              : 'Log your first weigh-in below'
+          }
+          foot={
+            weightDelta !== null && weightDelta !== 0 ? (
+              <TrendPill
+                delta={weightDelta}
+                unit="kg"
+                window="last 30 days"
+                positiveIsGood={losingIsGood === undefined ? undefined : !losingIsGood}
+              />
+            ) : undefined
+          }
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <Panel padding="md">
+          <Stat label="Sessions, last 7 days" value={metrics.sessions} />
+        </Panel>
+        <Panel padding="md">
+          <Stat label="Sets, last 7 days" value={metrics.sets} />
+        </Panel>
+        <Panel padding="md">
           <Stat
-            label="Bodyweight"
-            value={lastWeighIn ? lastWeighIn.kg : '--'}
-            unit={lastWeighIn ? 'kg' : undefined}
-            hint={lastWeighIn ? `Logged ${formatLongDate(lastWeighIn.date)}` : 'Not logged yet'}
+            label="Weeks trained"
+            value={`${metrics.weeksTrained}/12`}
+            spark={
+              metrics.weeksTrained > 0 ? (
+                <SparkArea data={metrics.volumeSpark} color="var(--chart-1)" />
+              ) : undefined
+            }
           />
-        </div>
+        </Panel>
+        <Panel padding="md">
+          <Stat
+            label="Weight, 30 days"
+            value={weightDelta === null ? '--' : weightDelta > 0 ? `+${weightDelta}` : weightDelta}
+            unit={weightDelta === null ? undefined : 'kg'}
+            spark={<SparkArea data={weightSpark} color="var(--chart-2)" />}
+          />
+        </Panel>
       </div>
 
       {primary ? (
@@ -854,7 +919,7 @@ function SessionHeader({
     <div className="sticky top-14 z-20 -mx-4 border-b border-line bg-bg/90 px-4 backdrop-blur-md md:-mx-8 md:px-8 lg:top-0">
       <div className="flex flex-wrap items-center gap-x-6 gap-y-3 py-3">
         <div className="flex items-baseline gap-1.5">
-          <span className="num text-2xl leading-none font-semibold text-ink">
+          <span className="num-dot text-3xl leading-none text-ink">
             {elapsed === null ? '--:--' : formatClock(elapsed)}
           </span>
           <span className="text-2xs text-ink-3">elapsed</span>

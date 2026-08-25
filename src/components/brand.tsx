@@ -9,7 +9,7 @@ export function Mark({ className }: { className?: string }) {
     <span
       aria-hidden="true"
       className={cn(
-        'flex size-8 shrink-0 flex-col justify-center gap-[3px] rounded-md bg-brand px-2',
+        'flex size-8 shrink-0 flex-col justify-center gap-[3px] rounded-sm bg-brand px-2',
         className,
       )}
     >

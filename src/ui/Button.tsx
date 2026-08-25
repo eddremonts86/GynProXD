@@ -14,17 +14,17 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 const variantMap: Record<Variant, string> = {
   primary: 'bg-brand text-brand-ink hover:bg-brand-hover disabled:bg-line disabled:text-ink-3',
   secondary:
-    'border border-line bg-surface text-ink hover:border-line-strong hover:bg-surface-2 disabled:opacity-45',
+    'border border-line bg-surface text-ink shadow-[var(--shadow-panel)] hover:border-line-strong hover:bg-surface-2 disabled:opacity-45 disabled:shadow-none',
   ghost: 'text-ink-3 hover:bg-surface-2 hover:text-ink disabled:opacity-45',
   danger: 'bg-danger text-danger-ink hover:opacity-90 disabled:opacity-45',
   dangerQuiet: 'border border-danger/40 text-danger hover:bg-danger-soft disabled:opacity-45',
 }
 
 const sizeMap: Record<Size, string> = {
-  xs: 'h-8 gap-1.5 rounded-md px-2.5 text-2xs',
-  sm: 'h-9 gap-1.5 rounded-md px-3 text-xs',
-  md: 'h-11 gap-2 rounded-md px-4 text-sm',
-  lg: 'h-[3.25rem] gap-2 rounded-md px-5 text-lg',
+  xs: 'h-8 gap-1.5 px-3 text-2xs',
+  sm: 'h-9 gap-1.5 px-3.5 text-xs',
+  md: 'h-11 gap-2 px-5 text-sm',
+  lg: 'h-[3.25rem] gap-2 px-6 text-lg',
 }
 
 export function Button({
@@ -41,7 +41,7 @@ export function Button({
       type={type}
       disabled={disabled}
       className={cn(
-        'inline-flex shrink-0 items-center justify-center whitespace-nowrap font-medium',
+        'inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full font-medium',
         'transition-[background-color,border-color,color,transform] duration-150 ease-[var(--ease-out-expo)]',
         'active:translate-y-px disabled:pointer-events-none disabled:active:translate-y-0',
         variantMap[variant],

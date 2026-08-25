@@ -174,7 +174,7 @@ export function LibraryPage() {
                 <button
                   type="button"
                   onClick={() => setDetail(e)}
-                  className="flex w-full flex-col gap-2.5 rounded-lg border border-line bg-surface p-2.5 text-left transition-colors duration-150 hover:border-line-strong hover:bg-surface-2"
+                  className="flex w-full flex-col gap-2.5 rounded-xl bg-surface p-2.5 text-left shadow-[var(--shadow-panel)] transition-shadow duration-150 hover:shadow-[var(--shadow-tile)]"
                 >
                   <ExerciseThumb exercise={e} size="fill" />
                   <span className="flex flex-col gap-1.5 px-0.5 pb-0.5">

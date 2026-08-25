@@ -3,16 +3,20 @@ import { cn } from '@/lib/utils'
 
 interface PanelProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode
-  /** Quiet panels sit directly on the page background with a hairline only. */
+  /**
+   * raised: floating card, shadow instead of a border.
+   * quiet: hairline only, sits flat on the page.
+   * inset: one tonal step down, for areas inside a card.
+   */
   tone?: 'raised' | 'quiet' | 'inset'
   padding?: 'none' | 'sm' | 'md' | 'lg'
   interactive?: boolean
 }
 
 const toneMap = {
-  raised: 'border border-line bg-surface shadow-[var(--shadow-panel)]',
+  raised: 'bg-surface shadow-[var(--shadow-panel)]',
   quiet: 'border border-line bg-transparent',
-  inset: 'border border-line/70 bg-surface-2',
+  inset: 'bg-surface-2',
 } as const
 
 const paddingMap = {
@@ -33,11 +37,10 @@ export function Panel({
   return (
     <div
       className={cn(
-        'rounded-lg',
+        'rounded-xl',
         toneMap[tone],
         paddingMap[padding],
-        interactive &&
-          'cursor-pointer transition-colors duration-150 hover:border-line-strong hover:bg-surface-2',
+        interactive && 'cursor-pointer transition-shadow duration-150 hover:shadow-[var(--shadow-tile)]',
         className,
       )}
       {...props}

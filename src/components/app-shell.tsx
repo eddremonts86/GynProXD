@@ -40,7 +40,7 @@ function isActive(item: NavItem, pathname: string): boolean {
 
 function DesktopRail({ pathname }: { pathname: string }) {
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r border-line bg-surface lg:flex">
+    <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col lg:flex">
       <div className="px-5 py-5">
         <Link to="/" aria-label="Forma, go to today">
           <Wordmark />
@@ -56,16 +56,13 @@ function DesktopRail({ pathname }: { pathname: string }) {
               to={item.to}
               aria-current={active ? 'page' : undefined}
               className={cn(
-                'relative flex h-10 items-center gap-2.5 rounded-md px-3 text-sm font-medium',
+                'flex h-11 items-center gap-2.5 rounded-full px-4 text-sm font-medium',
                 'transition-colors duration-150',
                 active
-                  ? 'bg-brand-soft text-brand'
-                  : 'text-ink-3 hover:bg-surface-2 hover:text-ink',
+                  ? 'bg-brand text-brand-ink shadow-[var(--shadow-panel)]'
+                  : 'text-ink-3 hover:bg-surface hover:text-ink',
               )}
             >
-              {active && (
-                <span className="absolute top-2 bottom-2 -left-3 w-0.5 rounded-full bg-brand" />
-              )}
               <item.icon size={18} weight={active ? 'fill' : 'regular'} />
               {item.label}
             </Link>
@@ -75,7 +72,7 @@ function DesktopRail({ pathname }: { pathname: string }) {
 
       <div className="flex flex-col gap-3 p-3">
         <SessionRailCard />
-        <div className="flex items-center justify-between border-t border-line pt-3">
+        <div className="flex items-center justify-between pt-1">
           <span className="px-1 text-2xs text-ink-3">Local only. No account.</span>
           <ThemeToggle />
         </div>
@@ -87,7 +84,7 @@ function DesktopRail({ pathname }: { pathname: string }) {
 function MobileChrome({ pathname }: { pathname: string }) {
   return (
     <>
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-line bg-bg/85 px-4 backdrop-blur-md lg:hidden">
+      <header className="sticky top-0 z-30 flex h-14 items-center justify-between bg-bg/85 px-4 backdrop-blur-md lg:hidden">
         <Link to="/" aria-label="Forma, go to today" className="flex items-center gap-2">
           <Mark className="size-7" />
           <span className="text-base leading-none font-semibold tracking-tight text-ink">Forma</span>
@@ -99,7 +96,7 @@ function MobileChrome({ pathname }: { pathname: string }) {
         <SessionMobileBar />
         <nav
           aria-label="Main"
-          className="flex border-t border-line bg-bg/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md"
+          className="flex gap-1 bg-bg/95 px-2 py-1.5 pb-[calc(env(safe-area-inset-bottom)+0.375rem)] shadow-[var(--shadow-raised)] backdrop-blur-md"
         >
           {NAV.map((item) => {
             const active = isActive(item, pathname)
@@ -109,9 +106,9 @@ function MobileChrome({ pathname }: { pathname: string }) {
                 to={item.to}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'flex min-h-14 flex-1 flex-col items-center justify-center gap-1 text-2xs font-medium',
+                  'flex min-h-12 flex-1 flex-col items-center justify-center gap-0.5 rounded-full text-2xs font-medium',
                   'transition-colors duration-150',
-                  active ? 'text-brand' : 'text-ink-3',
+                  active ? 'bg-brand text-brand-ink' : 'text-ink-3',
                 )}
               >
                 <item.icon size={20} weight={active ? 'fill' : 'regular'} />
