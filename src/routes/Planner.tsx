@@ -1,390 +1,505 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { useGym, DAY_LABELS, DAYS } from '../store/useGym'
-import { exerciseById, exerciseLookup } from '../lib/exercises'
-import { Badge } from '../ui/Badge'
-import { Button } from '../ui/Button'
-import { Card } from '../ui/Card'
-import { EmptyState } from '../ui/EmptyState'
+import { ArrowRight, Plus, SlidersHorizontal, Trash, X } from '@phosphor-icons/react'
+import { useGym, DAYS, DAY_LABELS } from '../store/useGym'
+import { exerciseById } from '../lib/exercises'
+import { Button, IconButton } from '../ui/Button'
+import { Panel } from '../ui/Panel'
+import { Tag } from '../ui/Tag'
 import { Input } from '../ui/Input'
 import { FormSelect } from '../ui/FormSelect'
-import { PageHeader } from '../ui/PageHeader'
-import { Illustration } from '../ui/Illustration'
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { ExerciseThumb } from '../ui/ExerciseThumb'
+import { PageHeader, Section } from '../ui/PageHeader'
+import { EmptyState } from '../ui/EmptyState'
+import { ExercisePicker } from '@/components/exercise-picker'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog'
 import { Switch } from '@/components/ui/switch'
-import type { DayOfWeek, ProgressionRule } from '../lib/types'
+import {
+  DAY_FULL_LABELS,
+  EQUIPMENT_LABELS,
+  GOAL_LABELS,
+  MUSCLE_LABELS,
+  PROGRESSION_LABELS,
+  pluralize,
+} from '../lib/labels'
+import { cn } from '@/lib/utils'
+import type { DayOfWeek, PlannedExercise, ProgressionRule } from '../lib/types'
 
-const DAY_ORDER = DAYS
+const DAY_BY_INDEX: DayOfWeek[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
 
 export function PlannerPage() {
   const navigate = useNavigate()
   const plans = useGym((s) => s.plans)
-  const generatedPlans = useGym((s) => s.generatedPlans)
-  const customExercises = useGym((s) => s.customExercises)
   const createPlan = useGym((s) => s.createPlan)
   const deletePlan = useGym((s) => s.deletePlan)
   const addExerciseToDay = useGym((s) => s.addExerciseToDay)
   const removeExerciseFromDay = useGym((s) => s.removeExerciseFromDay)
-  const updateExerciseProgression = useGym((s) => s.updateExerciseProgression)
-  const updateExerciseOptions = useGym((s) => s.updateExerciseOptions)
   const startWorkoutFromPlan = useGym((s) => s.startWorkoutFromPlan)
-  const deleteGeneratedPlan = useGym((s) => s.deleteGeneratedPlan)
-  const saveGeneratedAsPlan = useGym((s) => s.saveGeneratedAsPlan)
 
-  const exercises = useMemo(
-    () => Array.from(exerciseLookup(customExercises).values()).sort((a, b) => a.name.localeCompare(b.name)),
-    [customExercises],
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null)
+  const [selectedDay, setSelectedDay] = useState<DayOfWeek>(
+    () => DAY_BY_INDEX[new Date().getDay()] ?? 'mon',
   )
-
   const [newPlanName, setNewPlanName] = useState('')
-  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(plans[0]?.id ?? null)
-  const [filterByDay, setFilterByDay] = useState<Record<DayOfWeek, string>>({
-    mon: '',
-    tue: '',
-    wed: '',
-    thu: '',
-    fri: '',
-    sat: '',
-    sun: '',
-  })
+  const [creating, setCreating] = useState(false)
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const [configuring, setConfiguring] = useState<PlannedExercise | null>(null)
+  const [confirmDelete, setConfirmDelete] = useState(false)
 
+  /* Derived, so deleting a plan falls back to the first one with no effect needed. */
   const selectedPlan = plans.find((p) => p.id === selectedPlanId) ?? plans[0] ?? null
 
   const handleCreate = () => {
-    const id = createPlan(newPlanName || 'My Plan')
+    const name = newPlanName.trim()
+    if (!name) return
+    setSelectedPlanId(createPlan(name))
     setNewPlanName('')
-    setSelectedPlanId(id)
+    setCreating(false)
   }
 
-  if (plans.length === 0 || !selectedPlan) {
+  const dayExercises = useMemo(
+    () => selectedPlan?.days.find((d) => d.day === selectedDay)?.exercises ?? [],
+    [selectedPlan, selectedDay],
+  )
+
+  if (!selectedPlan) {
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-8">
         <PageHeader
-          eyebrow="Forma · Planner"
-          title="Weekly rhythm"
-          description="Hybrid calisthenics + barbell, planned around your week. Each day is a quiet promise."
+          title="Planner"
+          description="Lay out the week once. Today reads from it every morning."
         />
-        <Illustration variant="hero" className="h-36 w-full" />
-        <Card className="border-accent/20 bg-accent-soft">
-          <h3 className="font-display text-base text-ink">¿Nuevo aquí?</h3>
-          <p className="mt-1 text-sm text-muted">Genera un plan mensual/trimestral/semestral/anual en 30s desde onboarding.</p>
-          <Button className="mt-3 w-full" onClick={() => navigate({ to: '/onboarding' })}>
-            Generar mi plan automático
-          </Button>
-        </Card>
         <EmptyState
           title="No plans yet"
-          description="Create your first weekly plan. Add exercises per day, pick progression, and start guided sessions from Today."
+          description="Generate a periodised plan from your goal and the time you actually have, or start an empty week and fill it in yourself."
           action={
-            <div className="flex w-full max-w-sm gap-2">
-              <Input
-                value={newPlanName}
-                onChange={(e) => setNewPlanName(e.target.value)}
-                placeholder="Plan name — e.g. Push / Pull / Legs"
-                className="flex-1"
-              />
-              <Button onClick={handleCreate}>Create</Button>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <Button onClick={() => navigate({ to: '/onboarding' })}>
+                Build my plan
+                <ArrowRight size={16} weight="bold" />
+              </Button>
+              <Button variant="secondary" onClick={() => setSelectedPlanId(createPlan('My week'))}>
+                Start an empty week
+              </Button>
             </div>
           }
         />
-        {generatedPlans.length > 0 && (
-          <Card>
-            <h3 className="font-display text-base text-ink">Planes generados</h3>
-            <div className="mt-3 flex flex-col gap-2">
-              {generatedPlans.slice(0, 5).map((g) => (
-                <div key={g.id} className="flex items-center justify-between rounded-[var(--radius-md)] bg-surface-2 border border-line/40 px-3 py-2">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-ink-soft">{g.weeklyTemplate.name}</p>
-                    <p className="text-xs text-muted">
-                      {g.approvedDuration} · {g.weeks.length} sem · {g.input.goal} · {g.input.daysPerWeek}×
-                    </p>
-                  </div>
-                  <div className="flex gap-1">
-                    <Button size="sm" variant="ghost" onClick={() => navigate({ to: '/generated/$id', params: { id: g.id } })}>
-                      Ver
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => {
-                        const pid = saveGeneratedAsPlan(g.id)
-                        if (pid) setSelectedPlanId(pid)
-                      }}
-                    >
-                      Guardar
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-        )}
+        <GeneratedPlans onOpenPlan={(id) => setSelectedPlanId(id)} />
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       <PageHeader
-        eyebrow="Forma · Planner"
-        title={selectedPlan.name}
-        description="Warm data, offline. Tap a day to add movements — 3D plate is your rest between sets."
+        title="Planner"
+        description="Lay out the week once. Today reads from it every morning."
         action={
-          <Button variant="secondary" size="sm" onClick={() => deletePlan(selectedPlan.id)} disabled={plans.length === 0}>
-            Delete plan
-          </Button>
+          <>
+            <Button variant="secondary" onClick={() => navigate({ to: '/onboarding' })}>
+              Generate a plan
+            </Button>
+            <Button onClick={() => setCreating(true)}>
+              <Plus size={16} weight="bold" />
+              New plan
+            </Button>
+          </>
         }
       />
 
-      <Illustration variant="orb" className="h-20 w-full" />
-
-      <Card className="border-accent/20 bg-accent-soft">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <h3 className="font-display text-base text-ink">¿Sin plan?</h3>
-            <p className="text-sm text-muted">Genera mensual/trimestral/semestral/anual en 30s.</p>
-          </div>
-          <Button size="sm" onClick={() => navigate({ to: '/onboarding' })}>
-            Generar
-          </Button>
+      {plans.length > 1 && (
+        <div className="flex flex-wrap gap-1.5">
+          {plans.map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              onClick={() => setSelectedPlanId(p.id)}
+              aria-pressed={p.id === selectedPlan.id}
+              className={cn(
+                'min-h-11 rounded-full border px-4 text-xs font-medium transition-colors duration-150',
+                p.id === selectedPlan.id
+                  ? 'border-brand bg-brand text-brand-ink'
+                  : 'border-line bg-surface text-ink-3 hover:border-line-strong hover:text-ink',
+              )}
+            >
+              {p.name}
+            </button>
+          ))}
         </div>
-      </Card>
-
-      {generatedPlans.length > 0 && (
-        <Card>
-          <h3 className="font-display text-base text-ink">Planes generados</h3>
-          <p className="mt-1 text-xs tracking-wide text-muted uppercase">Local — toca Ver o Guardar en Planner</p>
-          <div className="mt-3 flex flex-col gap-2">
-            {generatedPlans.slice(0, 6).map((g) => (
-              <div key={g.id} className="flex items-center justify-between rounded-[var(--radius-md)] bg-surface-2 border border-line/40 px-3 py-2">
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-ink-soft">{g.weeklyTemplate.name}</p>
-                  <p className="text-xs text-muted">
-                    {g.approvedDuration} · {g.weeks.length} sem · {g.input.goal} · {g.input.daysPerWeek}×{g.input.minsPerSession}min · eff {g.input.effort}
-                  </p>
-                </div>
-                <div className="flex gap-1">
-                  <Button size="sm" variant="ghost" onClick={() => navigate({ to: '/generated/$id', params: { id: g.id } })}>
-                    Ver
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => {
-                      const pid = saveGeneratedAsPlan(g.id)
-                      if (pid) setSelectedPlanId(pid)
-                    }}
-                  >
-                    Guardar
-                  </Button>
-                  <button
-                    onClick={() => deleteGeneratedPlan(g.id)}
-                    className="rounded-full p-1 text-muted hover:text-ink-soft"
-                    aria-label="Eliminar"
-                  >
-                    ×
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
       )}
 
-      <Card className="flex flex-col gap-3">
-        <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium tracking-widest text-muted uppercase">Plans</label>
-          <ScrollArea>
-            <div className="flex gap-1.5 pb-1">
-              {plans.map((p) => (
-                <button
-                  key={p.id}
-                  onClick={() => setSelectedPlanId(p.id)}
-                  className={[
-                    'shrink-0 rounded-full border px-4 py-2.5 text-xs font-medium transition-colors min-h-11',
-                    selectedPlanId === p.id || (!selectedPlanId && p.id === plans[0].id)
-                      ? 'border-accent bg-accent text-accent-contrast'
-                      : 'border-line bg-card text-muted hover:border-line-strong hover:text-ink-soft',
-                  ].join(' ')}
-                >
-                  {p.name}
-                </button>
-              ))}
-            </div>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
-        </div>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            if (!newPlanName.trim()) return
-            handleCreate()
-          }}
-          className="flex gap-2"
-        >
-          <Input
-            value={newPlanName}
-            onChange={(e) => setNewPlanName(e.target.value)}
-            placeholder="New plan name…"
-            className="flex-1"
-          />
-          <Button type="submit" disabled={!newPlanName.trim()}>
-            Create
-          </Button>
-        </form>
-      </Card>
-
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {DAY_ORDER.map((day) => {
-          const plannedDay = selectedPlan.days.find((d) => d.day === day)
-          const dayExercises = plannedDay?.exercises ?? []
-          const filter = filterByDay[day]
-          const filtered = filter.trim()
-            ? exercises
-                .filter(
-                  (e) =>
-                    e.name.toLowerCase().includes(filter.toLowerCase()) ||
-                    e.muscle.includes(filter.toLowerCase()),
-                )
-                .slice(0, 6)
-            : []
-
-          return (
-            <Card key={day} className="flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <h3 className="font-display text-base text-ink">
-                  {DAY_LABELS[day]} <span className="font-sans text-xs font-normal tracking-wide text-muted uppercase">· {dayExercises.length}</span>
-                </h3>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    startWorkoutFromPlan(selectedPlan.id, day)
-                    navigate({ to: '/' })
-                  }}
-                  disabled={dayExercises.length === 0}
-                >
-                  Start
-                </Button>
-              </div>
-
-              {dayExercises.length > 0 ? (
-                <ul className="flex flex-col gap-2">
-                  {dayExercises.map((pe) => {
-                    const ex = exerciseById(pe.exerciseId)
-                    const isSuperset = !!pe.supersetGroup
-                    return (
-                      <li
-                        key={pe.exerciseId}
-                        className={[
-                          'flex flex-col gap-1.5 rounded-[var(--radius-md)] px-3 py-2 border',
-                          isSuperset ? 'bg-accent/5 border-accent/30' : 'bg-surface-2 border-line/40',
-                        ].join(' ')}
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-medium text-ink-soft flex items-center gap-1.5">
-                              {isSuperset && <Badge variant="accent" className="px-1.5 py-0 text-[10px]">{pe.supersetGroup}</Badge>}
-                              {ex?.name ?? pe.exerciseId}
-                            </p>
-                            {ex && (
-                              <span className="text-xs text-muted">
-                                {ex.muscle} · {ex.equipment}
-                              </span>
-                            )}
-                          </div>
-                          <button
-                            onClick={() => removeExerciseFromDay(selectedPlan.id, day, pe.exerciseId)}
-                            className="flex h-11 w-11 items-center justify-center rounded-full text-muted hover:bg-surface hover:text-ink-soft shrink-0"
-                            aria-label={`Remove ${exerciseById(pe.exerciseId)?.name ?? pe.exerciseId}`}
-                          >
-                            ×
-                          </button>
-                        </div>
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          <FormSelect
-                            ariaLabel={`Progression for ${exerciseById(pe.exerciseId)?.name ?? pe.exerciseId}`}
-                            value={pe.progression}
-                            onValueChange={(v) =>
-                              updateExerciseProgression(selectedPlan.id, day, pe.exerciseId, v as ProgressionRule)
-                            }
-                            options={[
-                              { value: 'none', label: 'none' },
-                              { value: 'linear', label: 'linear' },
-                              { value: 'double', label: 'double' },
-                            ]}
-                            className="min-h-8 w-auto py-1 text-xs"
-                          />
-                          <label className="flex cursor-pointer items-center gap-1.5 rounded-full border border-line bg-surface px-2 py-1 text-xs text-muted min-h-8" title="Timed set (duration vs reps)">
-                            <Switch size="sm" checked={!!pe.timed} onCheckedChange={(checked) => updateExerciseOptions(selectedPlan.id, day, pe.exerciseId, { timed: checked === true })} aria-label={`Timed ${exerciseById(pe.exerciseId)?.name ?? pe.exerciseId}`} />
-                            ⏱ {pe.timed ? 'timed' : 'reps'}
-                          </label>
-                          <label className="flex cursor-pointer items-center gap-1.5 rounded-full border border-line bg-surface px-2 py-1 text-xs text-muted min-h-8" title="Unilateral (L/R per set)">
-                            <Switch size="sm" checked={!!pe.unilateral} onCheckedChange={(checked) => updateExerciseOptions(selectedPlan.id, day, pe.exerciseId, { unilateral: checked === true })} aria-label={`Unilateral ${exerciseById(pe.exerciseId)?.name ?? pe.exerciseId}`} />
-                            ⇄ {pe.unilateral ? 'L/R' : 'bilateral'}
-                          </label>
-                          <FormSelect
-                            ariaLabel="Superset group"
-                            value={pe.supersetGroup ?? ''}
-                            onValueChange={(v) => updateExerciseOptions(selectedPlan.id, day, pe.exerciseId, { supersetGroup: v || null })}
-                            options={[
-                              { value: '', label: '— superset' },
-                              { value: 'A', label: 'A' },
-                              { value: 'B', label: 'B' },
-                              { value: 'C', label: 'C' },
-                            ]}
-                            className="min-h-8 w-auto py-1 text-xs"
-                          />
-                        </div>
-                      </li>
-                    )
-                  })}
-                </ul>
-              ) : (
-                <p className="rounded-[var(--radius-md)] border border-dashed border-line/60 bg-transparent px-3 py-4 text-center text-xs text-muted">
-                  No exercises — warm, human, offline
-                </p>
-              )}
-
-              <div className="flex flex-col gap-2 border-t border-line pt-3">
-                <Input
-                  value={filter}
-                  onChange={(e) => setFilterByDay((prev) => ({ ...prev, [day]: e.target.value }))}
-                  placeholder="Add exercise — search…"
-                />
-                {filtered.length > 0 && (
-                  <div className="flex flex-col gap-1">
-                    {filtered.map((e) => (
-                      <div
-                        key={e.id}
-                        className="flex items-center justify-between gap-2 rounded-[var(--radius-md)] border border-transparent bg-surface px-3 py-2 hover:border-line"
-                      >
-                        <div className="min-w-0">
-                          <p className="truncate text-xs font-medium text-ink-soft">{e.name}</p>
-                          <div className="flex gap-1 mt-1">
-                            <Badge>{e.muscle}</Badge>
-                            <Badge variant="muted">{e.equipment}</Badge>
-                          </div>
-                        </div>
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          onClick={() => {
-                            addExerciseToDay(selectedPlan.id, day, e.id)
-                            setFilterByDay((prev) => ({ ...prev, [day]: '' }))
-                          }}
-                        >
-                          Add
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </Card>
+      <Section
+        title={selectedPlan.name}
+        hint={pluralize(
+          selectedPlan.days.reduce((n, d) => n + d.exercises.length, 0),
+          'movement',
+        )}
+        action={
+          confirmDelete ? (
+            <>
+              <Button size="sm" variant="ghost" onClick={() => setConfirmDelete(false)}>
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                variant="danger"
+                onClick={() => {
+                  deletePlan(selectedPlan.id)
+                  setSelectedPlanId(null)
+                  setConfirmDelete(false)
+                }}
+              >
+                Delete plan
+              </Button>
+            </>
+          ) : (
+            <Button size="sm" variant="ghost" onClick={() => setConfirmDelete(true)}>
+              <Trash size={15} />
+              Delete
+            </Button>
           )
-        })}
-      </div>
+        }
+      >
+        {/* Week strip: the whole plan at a glance, one tap per day. */}
+        <div className="grid grid-cols-7 gap-1.5">
+          {DAYS.map((d) => {
+            const count = selectedPlan.days.find((x) => x.day === d)?.exercises.length ?? 0
+            const active = d === selectedDay
+            return (
+              <button
+                key={d}
+                type="button"
+                onClick={() => setSelectedDay(d)}
+                aria-pressed={active}
+                aria-label={`${DAY_FULL_LABELS[d]}, ${pluralize(count, 'movement')}`}
+                className={cn(
+                  'flex min-h-16 flex-col items-center justify-center gap-1 rounded-md border transition-colors duration-150',
+                  active
+                    ? 'border-brand bg-brand text-brand-ink'
+                    : count > 0
+                      ? 'border-line bg-surface text-ink hover:border-line-strong'
+                      : 'border-dashed border-line bg-transparent text-ink-3 hover:border-line-strong',
+                )}
+              >
+                <span className="text-2xs font-medium">{DAY_LABELS[d]}</span>
+                <span className="num text-lg leading-none font-semibold">{count}</span>
+              </button>
+            )
+          })}
+        </div>
+      </Section>
+
+      <Panel padding="none" className="overflow-hidden">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line p-5">
+          <div className="flex min-w-0 flex-col gap-1">
+            <h2 className="text-xl text-ink">{DAY_FULL_LABELS[selectedDay]}</h2>
+            <p className="text-sm text-ink-3">{pluralize(dayExercises.length, 'movement')}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="secondary" onClick={() => setPickerOpen(true)}>
+              <Plus size={16} weight="bold" />
+              Add movement
+            </Button>
+            <Button
+              disabled={dayExercises.length === 0}
+              onClick={() => {
+                startWorkoutFromPlan(selectedPlan.id, selectedDay)
+                void navigate({ to: '/' })
+              }}
+            >
+              Start
+            </Button>
+          </div>
+        </div>
+
+        {dayExercises.length === 0 ? (
+          <p className="px-5 py-10 text-center text-sm text-ink-3">
+            Nothing planned for {DAY_FULL_LABELS[selectedDay]}. Leave it empty for recovery, or add
+            a movement.
+          </p>
+        ) : (
+          <ul className="divide-y divide-line">
+            {dayExercises.map((pe) => {
+              const ex = exerciseById(pe.exerciseId)
+              return (
+                <li key={pe.exerciseId} className="flex items-center gap-3 p-4 md:px-5">
+                  {ex && <ExerciseThumb exercise={ex} size="md" />}
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-ink">
+                      {ex?.name ?? pe.exerciseId}
+                    </p>
+                    <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                      {ex && (
+                        <span className="text-2xs text-ink-3">
+                          {MUSCLE_LABELS[ex.muscle]} · {EQUIPMENT_LABELS[ex.equipment]}
+                        </span>
+                      )}
+                      {pe.progression !== 'none' && (
+                        <Tag tone="brand">{PROGRESSION_LABELS[pe.progression]}</Tag>
+                      )}
+                      {pe.timed && <Tag>Timed</Tag>}
+                      {pe.unilateral && <Tag>Per side</Tag>}
+                      {pe.supersetGroup && <Tag>Superset {pe.supersetGroup}</Tag>}
+                    </div>
+                  </div>
+                  <IconButton
+                    size="sm"
+                    onClick={() => setConfiguring(pe)}
+                    aria-label={`Configure ${ex?.name ?? pe.exerciseId}`}
+                  >
+                    <SlidersHorizontal size={16} />
+                  </IconButton>
+                  <IconButton
+                    size="sm"
+                    onClick={() => removeExerciseFromDay(selectedPlan.id, selectedDay, pe.exerciseId)}
+                    aria-label={`Remove ${ex?.name ?? pe.exerciseId}`}
+                  >
+                    <X size={16} />
+                  </IconButton>
+                </li>
+              )
+            })}
+          </ul>
+        )}
+      </Panel>
+
+      <GeneratedPlans onOpenPlan={(id) => setSelectedPlanId(id)} />
+
+      <ExercisePicker
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        excludeIds={dayExercises.map((e) => e.exerciseId)}
+        title={`Add to ${DAY_FULL_LABELS[selectedDay]}`}
+        description="Search by name, muscle or equipment."
+        onSelect={(exercise) => {
+          addExerciseToDay(selectedPlan.id, selectedDay, exercise.id)
+          setPickerOpen(false)
+        }}
+      />
+
+      <ExerciseConfigDialog
+        planId={selectedPlan.id}
+        day={selectedDay}
+        exercise={configuring}
+        onClose={() => setConfiguring(null)}
+      />
+
+      <Dialog open={creating} onOpenChange={setCreating}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>New plan</DialogTitle>
+            <DialogDescription>
+              A plan is one week that repeats. You can keep more than one.
+            </DialogDescription>
+          </DialogHeader>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              handleCreate()
+            }}
+            className="flex flex-col gap-3"
+          >
+            <Input
+              label="Name"
+              value={newPlanName}
+              onChange={(e) => setNewPlanName(e.target.value)}
+              placeholder="Push pull legs"
+              autoFocus
+            />
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" onClick={() => setCreating(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={!newPlanName.trim()}>
+                Create
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
+  )
+}
+
+function ExerciseConfigDialog({
+  planId,
+  day,
+  exercise,
+  onClose,
+}: {
+  planId: string
+  day: DayOfWeek
+  exercise: PlannedExercise | null
+  onClose: () => void
+}) {
+  const updateExerciseProgression = useGym((s) => s.updateExerciseProgression)
+  const updateExerciseOptions = useGym((s) => s.updateExerciseOptions)
+  const plans = useGym((s) => s.plans)
+
+  /* Read back from the store so the dialog reflects edits as they are made. */
+  const live =
+    plans
+      .find((p) => p.id === planId)
+      ?.days.find((d) => d.day === day)
+      ?.exercises.find((e) => e.exerciseId === exercise?.exerciseId) ?? exercise
+
+  const name = exercise ? (exerciseById(exercise.exerciseId)?.name ?? exercise.exerciseId) : ''
+
+  return (
+    <Dialog open={!!exercise} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-md">
+        {live && (
+          <>
+            <DialogHeader>
+              <DialogTitle>{name}</DialogTitle>
+              <DialogDescription>How this movement behaves during a session.</DialogDescription>
+            </DialogHeader>
+
+            <div className="flex flex-col gap-4">
+              <FormSelect
+                label="Progression"
+                value={live.progression}
+                onValueChange={(v) =>
+                  updateExerciseProgression(planId, day, live.exerciseId, v as ProgressionRule)
+                }
+                options={(['none', 'linear', 'double'] as ProgressionRule[]).map((r) => ({
+                  value: r,
+                  label: PROGRESSION_LABELS[r],
+                }))}
+              />
+
+              <ToggleRow
+                label="Timed sets"
+                hint="Log seconds instead of reps. For planks and holds."
+                checked={!!live.timed}
+                onChange={(checked) =>
+                  updateExerciseOptions(planId, day, live.exerciseId, { timed: checked })
+                }
+              />
+
+              <ToggleRow
+                label="One side at a time"
+                hint="Log a left and a right set separately."
+                checked={!!live.unilateral}
+                onChange={(checked) =>
+                  updateExerciseOptions(planId, day, live.exerciseId, { unilateral: checked })
+                }
+              />
+
+              <FormSelect
+                label="Superset group"
+                value={live.supersetGroup ?? ''}
+                onValueChange={(v) =>
+                  updateExerciseOptions(planId, day, live.exerciseId, { supersetGroup: v || null })
+                }
+                options={[
+                  { value: '', label: 'Not in a superset' },
+                  { value: 'A', label: 'Group A' },
+                  { value: 'B', label: 'Group B' },
+                  { value: 'C', label: 'Group C' },
+                ]}
+              />
+              <p className="text-2xs text-ink-3">
+                Movements in the same group run back to back. Rest only starts once the group is
+                done.
+              </p>
+
+              <div className="flex justify-end">
+                <Button onClick={onClose}>Done</Button>
+              </div>
+            </div>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function ToggleRow({
+  label,
+  hint,
+  checked,
+  onChange,
+}: {
+  label: string
+  hint: string
+  checked: boolean
+  onChange: (checked: boolean) => void
+}) {
+  return (
+    <label className="flex cursor-pointer items-start justify-between gap-4">
+      <span className="flex flex-col gap-0.5">
+        <span className="text-sm font-medium text-ink">{label}</span>
+        <span className="text-2xs text-ink-3">{hint}</span>
+      </span>
+      <Switch
+        checked={checked}
+        onCheckedChange={(v) => onChange(v === true)}
+        aria-label={label}
+        className="mt-0.5 shrink-0"
+      />
+    </label>
+  )
+}
+
+function GeneratedPlans({ onOpenPlan }: { onOpenPlan: (planId: string) => void }) {
+  const navigate = useNavigate()
+  const generatedPlans = useGym((s) => s.generatedPlans)
+  const saveGeneratedAsPlan = useGym((s) => s.saveGeneratedAsPlan)
+  const deleteGeneratedPlan = useGym((s) => s.deleteGeneratedPlan)
+
+  if (generatedPlans.length === 0) return null
+
+  return (
+    <Section title="Generated programmes" hint={pluralize(generatedPlans.length, 'programme')}>
+      <ul className="flex flex-col gap-2">
+        {generatedPlans.map((g) => (
+          <li
+            key={g.id}
+            className="flex flex-wrap items-center gap-3 rounded-md border border-line bg-surface px-4 py-3"
+          >
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-ink">{g.weeklyTemplate.name}</p>
+              <p className="num mt-0.5 text-2xs text-ink-3">
+                {GOAL_LABELS[g.input.goal]}, {g.weeks.length} weeks, {g.input.daysPerWeek} sessions
+                a week
+              </p>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => navigate({ to: '/generated/$id', params: { id: g.id } })}
+              >
+                View
+              </Button>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => {
+                  const planId = saveGeneratedAsPlan(g.id)
+                  if (planId) onOpenPlan(planId)
+                }}
+              >
+                Copy to planner
+              </Button>
+              <IconButton
+                size="sm"
+                onClick={() => deleteGeneratedPlan(g.id)}
+                aria-label={`Delete ${g.weeklyTemplate.name}`}
+              >
+                <Trash size={15} />
+              </IconButton>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </Section>
   )
 }

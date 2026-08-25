@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Download } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { DownloadSimple } from '@phosphor-icons/react'
+import { Button } from '@/ui/Button'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -35,17 +35,16 @@ export function InstallAppButton() {
 
   return (
     <Button
-      size="sm"
+      variant="secondary"
       onClick={() => {
         void deferred.prompt()
-        deferred.userChoice.then((choice) => {
+        void deferred.userChoice.then((choice) => {
           if (choice.outcome === 'accepted') setInstalled(true)
           setDeferred(null)
         })
       }}
-      className="gap-1.5"
     >
-      <Download className="h-4 w-4" />
+      <DownloadSimple size={16} />
       Install app
     </Button>
   )

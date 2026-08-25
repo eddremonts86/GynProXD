@@ -1,6 +1,25 @@
 import { generatedExercises } from '../data/exercises-generated'
 import { estimatePlan, DURATION_WEEKS } from './plan-estimate'
+import { toLocalIso } from './dates'
 import type { DurationKey, GeneratedDay, GeneratedPlan, OnboardingInput, WeeklyPlan, PlannedDay, DayOfWeek } from './types'
+
+const DURATION_MONTHS: Record<DurationKey, number> = {
+  mensual: 1,
+  trimestral: 3,
+  semestral: 6,
+  anual: 12,
+}
+
+/** Plan names are shown in the UI, so they use the English vocabulary. */
+const GOAL_PLAN_NAMES: Record<OnboardingInput['goal'], string> = {
+  adelgazar: 'Fat loss',
+  musculo: 'Muscle',
+  recomp: 'Recomposition',
+  fuerza: 'Strength',
+  general: 'General fitness',
+  hibrido: 'Hybrid',
+}
+
 
 const DAYS: DayOfWeek[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
 
@@ -100,7 +119,7 @@ export function generatePlan(input: OnboardingInput, requested: DurationKey, sta
 
   const weeklyTemplate: WeeklyPlan = {
     id: `plan-gen-${Date.now()}`,
-    name: `Forma · ${estimate.estimatedMonths}m · ${input.goal}`,
+    name: `${GOAL_PLAN_NAMES[input.goal]} · ${DURATION_MONTHS[approvedDuration]} months`,
     days: weeklyDays,
     createdAt: new Date().toISOString(),
   }
@@ -122,7 +141,7 @@ export function generatePlan(input: OnboardingInput, requested: DurationKey, sta
         const date = new Date(start)
         date.setDate(start.getDate() + offset)
         return {
-          date: date.toISOString().slice(0, 10),
+          date: toLocalIso(date),
           day: d.day,
           exercises,
         }

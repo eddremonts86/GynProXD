@@ -58,8 +58,12 @@ export function estimatePlan(
     estimatedWeeks = Math.ceil(deltaLoss / rate)
     if (input.targetWeightKg !== undefined) {
       const bmiTarget = input.heightCm ? input.targetWeightKg / ((input.heightCm / 100) ** 2) : 0
-      if (bmiTarget > 0 && bmiTarget < 18.5) warnings.push('Objetivo por debajo de IMC saludable — consulta profesional.')
-      if (deltaLoss > 30 && estimatedWeeks < 26) warnings.push('Pérdida grande — ritmo seguro requiere más tiempo.')
+      if (bmiTarget > 0 && bmiTarget < 18.5) {
+        warnings.push('That target sits below a healthy BMI. Please talk to a professional first.')
+      }
+      if (deltaLoss > 30 && estimatedWeeks < 26) {
+        warnings.push('Losing this much safely takes longer than the plan you picked.')
+      }
     }
   } else if ((input.goal === 'musculo' || input.goal === 'hibrido') && deltaGain > 0) {
     rate = rateForMuscleGain(input)
@@ -101,8 +105,10 @@ export function estimatePlan(
   const isUnrealistic = requestedWeeks < estimatedWeeks * 0.7
 
   if (isUnrealistic) {
+    const requestedMonths = Math.max(1, Math.round(requestedWeeks / 4.345))
     warnings.unshift(
-      `Objetivo no realista en ${requested} (${requestedWeeks} sem). Estimado ${estimatedWeeks} sem (~${estimatedMonths} meses) a ${rate.toFixed(2)} kg/sem.`,
+      `At a safe ${rate.toFixed(2)} kg per week this goal needs about ${estimatedMonths} months, ` +
+        `more than the ${requestedMonths} you asked for.`,
     )
   }
 
@@ -113,18 +119,20 @@ export function estimatePlan(
     for (let w = 4; w < estimatedWeeks; w += 4) {
       const prog = Math.min(totalDelta, rate * w)
       const weight = input.weightKg + sign * prog
-      milestones.push({ week: w, weight: Math.round(weight * 10) / 10, note: `Sem ${w}` })
+      milestones.push({ week: w, weight: Math.round(weight * 10) / 10, note: `Week ${w}` })
     }
     milestones.push({
       week: estimatedWeeks,
       weight: input.targetWeightKg,
-      note: 'Objetivo',
+      note: 'Target',
     })
   } else {
-    for (let w = 4; w <= estimatedWeeks; w += 4) milestones.push({ week: w, note: `Sem ${w}` })
+    for (let w = 4; w <= estimatedWeeks; w += 4) milestones.push({ week: w, note: `Week ${w}` })
   }
 
-  if (!warnings.length && estimatedWeeks > 52) warnings.push('Plan largo — incluye deloads cada 4ª semana.')
+  if (!warnings.length && estimatedWeeks > 52) {
+    warnings.push('A plan this long includes a lighter deload week every fourth week.')
+  }
 
   return {
     estimatedWeeks,

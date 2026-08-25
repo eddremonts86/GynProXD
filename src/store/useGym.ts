@@ -15,6 +15,7 @@ import type {
 import { generatedExercises } from '../data/exercises-generated'
 import { populateByIdCache } from '../lib/exercises'
 import { generatePlan } from '../lib/plan-generator'
+import { todayIso } from '../lib/dates'
 
 export const DAYS: DayOfWeek[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
 export const DAY_LABELS: Record<DayOfWeek, string> = {
@@ -43,6 +44,8 @@ interface GymState {
   startWorkoutFromPlan: (planId: string, day: DayOfWeek) => void
   discardWorkout: () => void
   addSet: (exerciseId: string, weight: number, reps: number, opts?: { durationSec?: number; side?: 'L' | 'R' }) => void
+  addExerciseToSession: (exerciseId: string) => void
+  removeExerciseFromSession: (exerciseId: string) => void
   finishWorkout: () => void
   deleteWorkout: (id: string) => void
   clearAllData: () => void
@@ -71,7 +74,7 @@ interface GymState {
   saveGeneratedAsPlan: (generatedId: string) => string | null
 }
 
-const today = () => new Date().toISOString().slice(0, 10)
+const today = todayIso
 
 populateByIdCache(generatedExercises)
 
@@ -95,7 +98,14 @@ export const useGym = create<GymState>()(
         }),
 
       startWorkout: () =>
-        set({ activeWorkout: { id: crypto.randomUUID(), date: today(), exercises: [] } }),
+        set({
+          activeWorkout: {
+            id: crypto.randomUUID(),
+            date: today(),
+            startedAt: new Date().toISOString(),
+            exercises: [],
+          },
+        }),
 
       startWorkoutFromPlan: (planId, day) =>
         set((s) => {
@@ -106,7 +116,14 @@ export const useGym = create<GymState>()(
             sets: [] as { weight: number; reps: number; durationSec?: number; side?: 'L' | 'R' }[],
             supersetGroup: pe.supersetGroup ?? undefined,
           }))
-          return { activeWorkout: { id: crypto.randomUUID(), date: today(), exercises } }
+          return {
+            activeWorkout: {
+              id: crypto.randomUUID(),
+              date: today(),
+              startedAt: new Date().toISOString(),
+              exercises,
+            },
+          }
         }),
 
       discardWorkout: () => set({ activeWorkout: null }),
@@ -124,13 +141,39 @@ export const useGym = create<GymState>()(
           return { activeWorkout: w }
         }),
 
+      addExerciseToSession: (exerciseId) =>
+        set((s) => {
+          if (!s.activeWorkout) return s
+          if (s.activeWorkout.exercises.some((e) => e.exerciseId === exerciseId)) return s
+          return {
+            activeWorkout: {
+              ...s.activeWorkout,
+              exercises: [...s.activeWorkout.exercises, { exerciseId, sets: [] }],
+            },
+          }
+        }),
+
+      removeExerciseFromSession: (exerciseId) =>
+        set((s) => {
+          if (!s.activeWorkout) return s
+          return {
+            activeWorkout: {
+              ...s.activeWorkout,
+              exercises: s.activeWorkout.exercises.filter((e) => e.exerciseId !== exerciseId),
+            },
+          }
+        }),
+
       finishWorkout: () =>
         set((s) => {
-          if (!s.activeWorkout || s.activeWorkout.exercises.length === 0) {
-            return { activeWorkout: null }
-          }
+          if (!s.activeWorkout) return { activeWorkout: null }
+          const performed = s.activeWorkout.exercises.filter((e) => e.sets.length > 0)
+          if (performed.length === 0) return { activeWorkout: null }
           return {
-            workouts: [s.activeWorkout, ...s.workouts],
+            workouts: [
+              { ...s.activeWorkout, exercises: performed, endedAt: new Date().toISOString() },
+              ...s.workouts,
+            ],
             activeWorkout: null,
           }
         }),

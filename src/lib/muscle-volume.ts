@@ -1,12 +1,13 @@
 import { exerciseById } from './exercises'
 import type { MuscleGroup, Workout } from './types'
+import { toLocalIso } from './dates'
 
 const MUSCLES: MuscleGroup[] = ['chest', 'back', 'shoulders', 'biceps', 'triceps', 'quads', 'hamstrings', 'glutes', 'calves', 'core', 'other']
 
 export function muscleVolume(workouts: Workout[], weeks = 4): Record<MuscleGroup, number> {
   const cutoff = new Date()
   cutoff.setDate(cutoff.getDate() - weeks * 7)
-  const cutoffStr = cutoff.toISOString().slice(0, 10)
+  const cutoffStr = toLocalIso(cutoff)
   const vol: Record<string, number> = {}
   for (const m of MUSCLES) vol[m] = 0
   for (const w of workouts) {

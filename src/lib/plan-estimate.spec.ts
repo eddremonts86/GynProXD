@@ -25,7 +25,7 @@ describe('estimatePlan', () => {
     expect(r.estimatedMonths).toBeLessThanOrEqual(24)
     expect(r.rateKgPerWeek).toBeCloseTo(0.7, 1)
     expect(r.isUnrealistic).toBe(true)
-    expect(r.warnings[0]).toMatch(/no realista/i)
+    expect(r.warnings[0]).toMatch(/more than the/i)
     expect(r.milestones.at(-1)?.weight).toBe(80)
   })
 

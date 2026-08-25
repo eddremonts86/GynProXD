@@ -1,4 +1,4 @@
-import path from 'path'
+import path from 'node:path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -24,8 +24,11 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
+          // The movement dataset barely changes, so it gets its own long-lived chunk.
+          if (id.includes('src/data/')) return 'exercise-data'
           if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('@tanstack') || id.includes('zustand')) return 'vendor'
-          if (id.includes('@base-ui') || id.includes('lucide-react') || id.includes('class-variance-authority') || id.includes('clsx') || id.includes('tailwind-merge')) return 'shadcn'
+          if (id.includes('@phosphor-icons') || id.includes('node_modules/motion')) return 'ui'
+          if (id.includes('@base-ui') || id.includes('class-variance-authority') || id.includes('clsx') || id.includes('tailwind-merge')) return 'primitives'
           return undefined
         },
       },
@@ -40,9 +43,9 @@ export default defineConfig({
       manifest: {
         name: 'Forma',
         short_name: 'Forma',
-        description: 'Forma — hybrid calisthenics + gym, local-first, Noir Warm editorial.',
-        theme_color: '#1a1816',
-        background_color: '#1a1816',
+        description: 'Plan, train and track offline. Your data stays in this browser.',
+        theme_color: '#f2f3f5',
+        background_color: '#f2f3f5',
         display: 'standalone',
         scope: '/',
         start_url: '/',
@@ -53,20 +56,33 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,webp,woff2}'],
+        globPatterns: ['**/*.{js,css,html,woff2}', 'favicon.svg', 'pwa-*.png', 'apple-touch-icon.png'],
         runtimeCaching: [
           {
+            urlPattern: ({ url }) => url.pathname.startsWith('/repdb/'),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'movement-artwork',
+              expiration: { maxEntries: 500, maxAgeSeconds: 60 * 60 * 24 * 180 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
+            // Movements without local artwork fall back to dataset photos, which
+            // stay available offline once they have been looked at.
             urlPattern: /^https:\/\/cdn\.jsdelivr\.net\/.*/i,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'jsdelivr-images',
-              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              cacheName: 'movement-photos',
+              expiration: { maxEntries: 400, maxAgeSeconds: 60 * 60 * 24 * 90 },
               cacheableResponse: { statuses: [0, 200] },
             },
           },
         ],
       },
-      devOptions: { enabled: true, type: 'module' },
+      // The service worker only earns its keep in a real build; in dev it just
+      // fights HMR and floods the console with registration failures.
+      devOptions: { enabled: false },
     }),
   ],
 })

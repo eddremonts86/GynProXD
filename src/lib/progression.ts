@@ -34,7 +34,7 @@ export function suggestNext(
     return {
       weight: 0,
       reps,
-      reason: `bodyweight: +1 rep over last time (${top.reps})`,
+      reason: `Bodyweight: one more rep than last time (${top.reps}).`,
     }
   }
 
@@ -42,7 +42,7 @@ export function suggestNext(
     return {
       weight: round(top.weight + KG_STEP_BARBELL),
       reps: top.reps,
-      reason: `linear: +${KG_STEP_BARBELL}kg from ${top.weight}×${top.reps}`,
+      reason: `Linear: ${KG_STEP_BARBELL}kg more than ${top.weight}kg × ${top.reps}.`,
     }
   }
 
@@ -52,7 +52,7 @@ export function suggestNext(
     return {
       weight: round(top.weight + KG_STEP_BARBELL),
       reps: minReps,
-      reason: `double progression: hit ${last.sets.length}×${maxReps} at ${top.weight}kg → +${KG_STEP_BARBELL}kg`,
+      reason: `Double progression: you hit ${last.sets.length}×${maxReps} at ${top.weight}kg, so add ${KG_STEP_BARBELL}kg.`,
     }
   }
   const targetReps = Math.min(maxReps, Math.max(minReps, top.reps))
@@ -61,8 +61,8 @@ export function suggestNext(
     reps: targetReps,
     reason:
       top.reps < minReps
-        ? `double progression: stay at ${top.weight}kg, build reps (${top.reps} → ${targetReps})`
-        : `double progression: same weight, push reps to ${maxReps}`,
+        ? `Double progression: hold ${top.weight}kg and build from ${top.reps} to ${targetReps} reps.`
+        : `Double progression: same weight, push towards ${maxReps} reps.`,
   }
 }
 

@@ -1,30 +1,32 @@
 import type { ReactNode } from 'react'
-import { Card } from './Card'
+import { cn } from '@/lib/utils'
 
 interface EmptyStateProps {
+  icon?: ReactNode
   title: string
   description?: string
   action?: ReactNode
-  icon?: ReactNode
+  className?: string
 }
 
-export function EmptyState({ title, description, action, icon }: EmptyStateProps) {
+export function EmptyState({ icon, title, description, action, className }: EmptyStateProps) {
   return (
-    <Card className="flex flex-col items-center gap-3 py-10 text-center">
-      {icon ? (
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-surface-2 text-muted border border-line">
+    <div
+      className={cn(
+        'flex flex-col items-center gap-3 rounded-lg border border-dashed border-line px-6 py-12 text-center',
+        className,
+      )}
+    >
+      {icon && (
+        <span className="flex size-10 items-center justify-center rounded-full bg-surface-2 text-ink-3">
           {icon}
-        </div>
-      ) : (
-        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/10 flex items-center justify-center">
-          <span className="h-2 w-2 rounded-full bg-accent/60" />
-        </div>
+        </span>
       )}
       <div className="flex flex-col gap-1.5">
-        <p className="font-display text-lg font-normal text-ink tracking-tight">{title}</p>
-        {description && <p className="max-w-[30ch] text-sm leading-5 text-muted">{description}</p>}
+        <p className="text-lg text-ink">{title}</p>
+        {description && <p className="max-w-[42ch] text-sm text-ink-3">{description}</p>}
       </div>
-      {action && <div className="pt-3">{action}</div>}
-    </Card>
+      {action && <div className="pt-1">{action}</div>}
+    </div>
   )
 }

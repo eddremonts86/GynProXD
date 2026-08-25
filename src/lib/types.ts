@@ -46,6 +46,10 @@ export interface LoggedExercise {
 export interface Workout {
   id: string
   date: string
+  /** ISO timestamp. Absent on sessions recorded before durations were tracked. */
+  startedAt?: string
+  /** ISO timestamp, written when the session is finished. */
+  endedAt?: string
   exercises: LoggedExercise[]
 }
 

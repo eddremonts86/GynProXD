@@ -1,212 +1,281 @@
 import { useMemo, useState } from 'react'
-import { useParams, useNavigate } from '@tanstack/react-router'
+import { useNavigate, useParams } from '@tanstack/react-router'
+import { ArrowRight, CaretLeft, CaretRight, DownloadSimple, Trash, Warning } from '@phosphor-icons/react'
 import { useGym } from '../store/useGym'
 import { exerciseById } from '../lib/exercises'
-import { Card } from '../ui/Card'
-import { Button } from '../ui/Button'
-import { Badge } from '../ui/Badge'
-import { PageHeader } from '../ui/PageHeader'
-import { Illustration } from '../ui/Illustration'
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-import type { DurationKey } from '../lib/types'
+import { Button, IconButton } from '../ui/Button'
+import { Panel } from '../ui/Panel'
+import { Tag } from '../ui/Tag'
+import { Stat } from '../ui/Stat'
+import { PageHeader, Section } from '../ui/PageHeader'
+import { EmptyState } from '../ui/EmptyState'
+import {
+  DAY_FULL_LABELS,
+  DURATION_KEYS,
+  DURATION_LABELS,
+  GOAL_LABELS,
+  PROGRESSION_LABELS,
+  formatShortDate,
+  pluralize,
+} from '../lib/labels'
+import { todayIso } from '../lib/dates'
+import { cn } from '@/lib/utils'
+
+function isDeloadWeek(weekIndex: number): boolean {
+  return (weekIndex + 1) % 4 === 0
+}
 
 export function GeneratedPlanPage() {
-  const params = useParams({ strict: false }) as { id?: string }
-  const id = (params as { id?: string }).id ?? (params as { generatedId?: string }).generatedId ?? ''
-  const plan = useGym((s) => s.generatedPlans.find((g) => g.id === id))
-  const saveAsPlan = useGym((s) => s.saveGeneratedAsPlan)
-  const deleteGen = useGym((s) => s.deleteGeneratedPlan)
-  const createGeneratedPlan = useGym((s) => s.createGeneratedPlan)
   const navigate = useNavigate()
+  const params = useParams({ strict: false }) as { id?: string }
+  const id = params.id ?? ''
+
+  const plan = useGym((s) => s.generatedPlans.find((g) => g.id === id))
+  const saveGeneratedAsPlan = useGym((s) => s.saveGeneratedAsPlan)
+  const deleteGeneratedPlan = useGym((s) => s.deleteGeneratedPlan)
+  const createGeneratedPlan = useGym((s) => s.createGeneratedPlan)
+
   const [activeWeek, setActiveWeek] = useState(0)
-  const todayStr = new Date().toISOString().slice(0, 10)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const today = todayIso()
 
-  const activeWeekData = useMemo(() => plan?.weeks[activeWeek] ?? plan?.weeks[0], [plan, activeWeek])
+  const week = useMemo(
+    () => plan?.weeks[activeWeek] ?? plan?.weeks[0],
+    [plan, activeWeek],
+  )
 
-  if (!plan || !activeWeekData) {
+  if (!plan || !week) {
     return (
-      <div className="flex flex-col gap-4">
-        <PageHeader eyebrow="Forma · Plan" title="No encontrado" description="Este plan no existe o fue eliminado." />
-        <Button variant="secondary" onClick={() => navigate({ to: '/onboarding' })}>
-          Volver a onboarding
-        </Button>
+      <div className="flex flex-col gap-8">
+        <PageHeader title="Plan not found" />
+        <EmptyState
+          title="This programme no longer exists"
+          description="It was deleted, or the link points at a programme from a different browser."
+          action={
+            <Button onClick={() => navigate({ to: '/onboarding' })}>Build a new plan</Button>
+          }
+        />
       </div>
     )
   }
 
-  const handleSave = () => {
-    const planId = saveAsPlan(plan.id)
-    if (planId) navigate({ to: '/planner' })
+  const save = () => {
+    if (saveGeneratedAsPlan(plan.id)) void navigate({ to: '/planner' })
   }
-  const handleExport = () => {
-    const blob = new Blob([JSON.stringify(plan, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
+
+  const exportJson = () => {
+    const url = URL.createObjectURL(
+      new Blob([JSON.stringify(plan, null, 2)], { type: 'application/json' }),
+    )
     const a = document.createElement('a')
     a.href = url
-    a.download = `forma-generated-${plan.id}.json`
+    a.download = `forma-programme-${plan.id}.json`
     a.click()
     URL.revokeObjectURL(url)
   }
-  const handleRegenerate = (d: DurationKey) => {
-    const newId = createGeneratedPlan(plan.input, d)
-    setActiveWeek(0)
-    navigate({ to: '/generated/$id', params: { id: newId } })
-  }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       <PageHeader
-        eyebrow={`Forma · ${plan.approvedDuration} · ${plan.input.goal}`}
         title={plan.weeklyTemplate.name}
-        description={`${plan.weeks.length} semanas · ${plan.input.daysPerWeek}× ${plan.input.minsPerSession}min · esfuerzo ${plan.input.effort} · ${plan.input.weightKg}kg → ${plan.input.targetWeightKg ?? '—'}kg`}
+        description={`${GOAL_LABELS[plan.input.goal]} over ${plan.weeks.length} weeks, ${plan.input.daysPerWeek} sessions a week of ${plan.input.minsPerSession} minutes.`}
         action={
-          <div className="flex gap-2">
-            <Button variant="ghost" size="sm" onClick={handleExport}>
-              Exportar
+          <>
+            <IconButton size="md" onClick={exportJson} aria-label="Export this programme as JSON">
+              <DownloadSimple size={18} />
+            </IconButton>
+            {confirmDelete ? (
+              <>
+                <Button variant="ghost" onClick={() => setConfirmDelete(false)}>
+                  Cancel
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={() => {
+                    deleteGeneratedPlan(plan.id)
+                    void navigate({ to: '/planner' })
+                  }}
+                >
+                  Delete
+                </Button>
+              </>
+            ) : (
+              <IconButton
+                size="md"
+                onClick={() => setConfirmDelete(true)}
+                aria-label="Delete this programme"
+              >
+                <Trash size={18} />
+              </IconButton>
+            )}
+            <Button onClick={save}>
+              Copy to planner
+              <ArrowRight size={16} weight="bold" />
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => deleteGen(plan.id)}>
-              Eliminar
-            </Button>
-            <Button size="sm" onClick={handleSave}>
-              Guardar en Planner
-            </Button>
-          </div>
+          </>
         }
       />
 
-      <Illustration variant="hero" className="h-28 w-full" />
-
-      <Card>
-        <h3 className="font-display text-lg text-ink">Estimación</h3>
-        <div className="mt-3 grid grid-cols-3 gap-3">
-          <div className="rounded-[var(--radius-md)] bg-surface-2 border border-line/40 px-3 py-2 text-center">
-            <p className="text-xs tracking-widest text-muted uppercase">Estimado</p>
-            <p className="font-display text-xl text-ink">{plan.estimatedMonths}m</p>
-            <p className="text-xs text-muted">{plan.estimatedWeeks} sem</p>
-          </div>
-          <div className="rounded-[var(--radius-md)] bg-surface-2 border border-line/40 px-3 py-2 text-center">
-            <p className="text-xs tracking-widest text-muted uppercase">Ritmo</p>
-            <p className="font-display text-xl text-accent">{plan.rateKgPerWeek}</p>
-            <p className="text-xs text-muted">kg/sem</p>
-          </div>
-          <div className="rounded-[var(--radius-md)] bg-surface-2 border border-line/40 px-3 py-2 text-center">
-            <p className="text-xs tracking-widest text-muted uppercase">Duración</p>
-            <p className="font-display text-xl text-ink">{plan.approvedDuration}</p>
-            <p className="text-xs text-muted">{plan.weeks.length} sem</p>
-          </div>
+      <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-line bg-line md:grid-cols-4">
+        <div className="bg-surface p-4">
+          <Stat label="Timeline" value={plan.estimatedMonths} unit="months" />
         </div>
-        {plan.warnings.length > 0 && (
-          <div className="mt-3 rounded-[var(--radius-md)] border border-accent/20 bg-accent-soft px-3 py-2">
+        <div className="bg-surface p-4">
+          <Stat label="Rate" value={plan.rateKgPerWeek} unit="kg / week" tone="brand" />
+        </div>
+        <div className="bg-surface p-4">
+          <Stat label="Programme" value={plan.weeks.length} unit="weeks" />
+        </div>
+        <div className="bg-surface p-4">
+          <Stat
+            label="Starting weight"
+            value={plan.input.weightKg}
+            unit="kg"
+            hint={plan.input.targetWeightKg ? `Target ${plan.input.targetWeightKg} kg` : undefined}
+          />
+        </div>
+      </div>
+
+      {plan.warnings.length > 0 && (
+        <Panel padding="md" className="flex gap-3 border-danger/30">
+          <Warning size={18} weight="fill" className="mt-0.5 shrink-0 text-danger" />
+          <div className="flex flex-col gap-1">
             {plan.warnings.map((w) => (
-              <p key={w} className="text-xs leading-4 text-accent">
-                ⚠ {w}
+              <p key={w} className="text-sm text-ink-2">
+                {w}
               </p>
             ))}
           </div>
-        )}
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {plan.milestones.slice(0, 8).map((m) => (
-            <span key={m.week} className="rounded-full bg-surface-2 px-2.5 py-1 text-xs border border-line/40 text-ink-soft">
-              s{m.week}: {m.weight ?? '·'}kg
-            </span>
-          ))}
-        </div>
-        <div className="mt-4 border-t border-line pt-3">
-          <p className="text-xs font-medium tracking-widest text-muted uppercase">Regenerar con otra duración</p>
-          <p className="mt-0.5 text-xs text-muted">Mismos datos, nuevo calendario. El plan actual se conserva.</p>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {(['mensual', 'trimestral', 'semestral', 'anual'] as DurationKey[]).map((d) => (
-              <Button
-                key={d}
-                size="sm"
-                variant={d === plan.approvedDuration ? 'secondary' : 'ghost'}
-                onClick={() => handleRegenerate(d)}
-                className={d === plan.approvedDuration ? 'border-accent/40' : ''}
-              >
-                {d}{d === plan.approvedDuration ? ' ✓' : ''}
-              </Button>
-            ))}
-          </div>
-        </div>
-      </Card>
+        </Panel>
+      )}
 
-      <Card>
-        <div className="flex items-center justify-between gap-2">
-          <h4 className="font-display text-base text-ink">Semanas</h4>
-          <Badge variant="muted">{plan.weeks.length} total</Badge>
-        </div>
-        <ScrollArea className="mt-3">
-          <div className="flex gap-1.5 pb-1">
-            {plan.weeks.map((w) => (
+      <Section
+        title={`Week ${week.weekIndex + 1}`}
+        hint={isDeloadWeek(week.weekIndex) ? 'Deload week, lighter on purpose' : undefined}
+        action={
+          <>
+            <IconButton
+              size="sm"
+              disabled={activeWeek === 0}
+              onClick={() => setActiveWeek((v) => Math.max(0, v - 1))}
+              aria-label="Previous week"
+            >
+              <CaretLeft size={16} weight="bold" />
+            </IconButton>
+            <span className="num px-1 text-2xs text-ink-3">
+              {week.weekIndex + 1} / {plan.weeks.length}
+            </span>
+            <IconButton
+              size="sm"
+              disabled={activeWeek >= plan.weeks.length - 1}
+              onClick={() => setActiveWeek((v) => Math.min(plan.weeks.length - 1, v + 1))}
+              aria-label="Next week"
+            >
+              <CaretRight size={16} weight="bold" />
+            </IconButton>
+          </>
+        }
+      >
+        <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-1 md:-mx-8 md:px-8">
+          {plan.weeks.map((w) => {
+            const active = w.weekIndex === week.weekIndex
+            const hasToday = w.days.some((d) => d.date === today)
+            return (
               <button
                 key={w.weekIndex}
+                type="button"
                 onClick={() => setActiveWeek(w.weekIndex)}
-                className={[
-                  'shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium min-h-9',
-                  activeWeek === w.weekIndex ? 'border-accent bg-accent text-accent-contrast' : 'border-line bg-card text-muted',
-                  w.days.some((d) => d.date === todayStr) ? 'ring-1 ring-accent' : '',
-                ].join(' ')}
+                aria-pressed={active}
+                aria-label={`Week ${w.weekIndex + 1}${isDeloadWeek(w.weekIndex) ? ', deload' : ''}`}
+                className={cn(
+                  'num flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-md border px-2.5 text-xs font-medium transition-colors duration-150',
+                  active
+                    ? 'border-brand bg-brand text-brand-ink'
+                    : isDeloadWeek(w.weekIndex)
+                      ? 'border-dashed border-line bg-surface text-ink-3 hover:border-line-strong'
+                      : 'border-line bg-surface text-ink-2 hover:border-line-strong',
+                  hasToday && !active && 'ring-1 ring-brand',
+                )}
               >
                 {w.weekIndex + 1}
-                {(w.weekIndex + 1) % 4 === 0 ? ' • deload' : ''}
               </button>
-            ))}
-          </div>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
-        <div className="mt-2 flex gap-2">
-          <Button variant="secondary" size="sm" disabled={activeWeek === 0} onClick={() => setActiveWeek((v) => Math.max(0, v - 1))}>
-            ← Anterior
-          </Button>
-          <Button variant="secondary" size="sm" disabled={activeWeek === plan.weeks.length - 1} onClick={() => setActiveWeek((v) => Math.min(plan.weeks.length - 1, v + 1))}>
-            Siguiente →
-          </Button>
-          <span className="ml-auto self-center text-xs text-muted">Semana {activeWeek + 1} de {plan.weeks.length}</span>
-        </div>
-      </Card>
-
-      <Card key={activeWeekData.weekIndex} padding="md">
-        <div className="flex items-center justify-between">
-          <h4 className="font-display text-base text-ink">
-            Semana {activeWeekData.weekIndex + 1}
-            {(activeWeekData.weekIndex + 1) % 4 === 0 && <span className="ml-2 text-xs font-sans tracking-wide text-accent uppercase">deload</span>}
-          </h4>
-          <Badge variant="muted">{activeWeekData.days.length} días</Badge>
-        </div>
-        <div className="mt-3 grid gap-3 md:grid-cols-2">
-          {activeWeekData.days.map((d) => {
-            const isToday = d.date === todayStr
-            return (
-              <div key={d.date} className={['rounded-[var(--radius-md)] p-3 border', isToday ? 'bg-accent/10 border-accent/40 ring-1 ring-accent' : 'bg-surface-2 border-line/40'].join(' ')}>
-                <div className="flex items-center justify-between">
-                  <span className={['text-xs font-semibold tracking-widest uppercase', isToday ? 'text-accent' : 'text-accent'].join(' ')}>{d.day}{isToday ? ' • hoy' : ''}</span>
-                  <span className="font-mono text-xs text-muted">{d.date}</span>
-                </div>
-                <ul className="mt-2 flex flex-col gap-1.5">
-                  {d.exercises.map((pe) => {
-                    const ex = exerciseById(pe.exerciseId)
-                    return (
-                      <li key={pe.exerciseId} className="flex items-center justify-between gap-2">
-                        <span className="truncate text-sm text-ink-soft">{ex?.name ?? pe.exerciseId}</span>
-                        {pe.progression !== 'none' && <Badge variant="muted">{pe.progression}</Badge>}
-                      </li>
-                    )
-                  })}
-                </ul>
-              </div>
             )
           })}
         </div>
-      </Card>
 
-      <div className="flex gap-2">
-        <Button variant="secondary" onClick={() => navigate({ to: '/planner' })}>
-          Ver Planner
-        </Button>
-        <Button onClick={handleSave} className="flex-1">
-          Guardar como Weekly Plan
-        </Button>
-      </div>
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {week.days.map((d) => {
+            const isToday = d.date === today
+            return (
+              <Panel
+                key={d.date}
+                padding="md"
+                className={cn('flex flex-col gap-3', isToday && 'border-brand/50 bg-brand-soft')}
+              >
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="text-sm font-semibold text-ink">{DAY_FULL_LABELS[d.day]}</span>
+                  <span className="num text-2xs text-ink-3">
+                    {isToday ? 'Today' : formatShortDate(d.date)}
+                  </span>
+                </div>
+                <ul className="flex flex-col gap-1.5">
+                  {d.exercises.map((pe) => (
+                    <li key={pe.exerciseId} className="flex items-center justify-between gap-2">
+                      <span className="truncate text-sm text-ink-2">
+                        {exerciseById(pe.exerciseId)?.name ?? pe.exerciseId}
+                      </span>
+                      {pe.progression !== 'none' && (
+                        <Tag tone="brand">{PROGRESSION_LABELS[pe.progression]}</Tag>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </Panel>
+            )
+          })}
+        </div>
+      </Section>
+
+      {plan.milestones.length > 0 && (
+        <Section title="Checkpoints" hint={pluralize(plan.milestones.length, 'checkpoint')}>
+          <ul className="flex flex-wrap gap-1.5">
+            {plan.milestones.map((m) => (
+              <li
+                key={m.week}
+                className="num rounded-full border border-line bg-surface px-2.5 py-1 text-2xs text-ink-2"
+              >
+                Week {m.week}
+                {m.weight !== undefined ? `, ${m.weight} kg` : ''}
+              </li>
+            ))}
+          </ul>
+        </Section>
+      )}
+
+      <Section title="Try a different length">
+        <div className="flex flex-wrap gap-2">
+          {DURATION_KEYS.map((d) => {
+            const current = d === plan.approvedDuration
+            return (
+              <Button
+                key={d}
+                variant={current ? 'primary' : 'secondary'}
+                disabled={current}
+                onClick={() => {
+                  const newId = createGeneratedPlan(plan.input, d)
+                  setActiveWeek(0)
+                  void navigate({ to: '/generated/$id', params: { id: newId } })
+                }}
+              >
+                {DURATION_LABELS[d]}
+              </Button>
+            )
+          })}
+        </div>
+        <p className="text-2xs text-ink-3">
+          Same details, a new calendar. This programme is kept either way.
+        </p>
+      </Section>
     </div>
   )
 }

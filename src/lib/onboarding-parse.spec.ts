@@ -27,6 +27,34 @@ describe('parseOnboarding', () => {
     expect(partial.effort).toBe(5)
   })
 
+  it('parses an English description', () => {
+    const { partial, confidence } = parseOnboarding(
+      'male, 40 years old, 140kg and want to get down to 80kg, gym 3 times a week for 2h, effort medium',
+    )
+    expect(partial.sex).toBe('hombre')
+    expect(partial.age).toBe(40)
+    expect(partial.weightKg).toBe(140)
+    expect(partial.targetWeightKg).toBe(80)
+    expect(partial.goal).toBe('adelgazar')
+    expect(partial.equipment).toBe('barbell')
+    expect(partial.daysPerWeek).toBe(3)
+    expect(partial.minsPerSession).toBe(120)
+    expect(partial.effort).toBe(3)
+    expect(confidence).toBeGreaterThan(0.5)
+  })
+
+  it('parses English bodyweight and beginner wording', () => {
+    const { partial } = parseOnboarding(
+      'beginner woman, 65kg, calisthenics at home, 4 days a week, 45 minutes, build muscle',
+    )
+    expect(partial.sex).toBe('mujer')
+    expect(partial.level).toBe('principiante')
+    expect(partial.equipment).toBe('bodyweight')
+    expect(partial.goal).toBe('musculo')
+    expect(partial.daysPerWeek).toBe(4)
+    expect(partial.minsPerSession).toBe(45)
+  })
+
   it('defaults when empty', () => {
     const { partial } = parseOnboarding('')
     const merged = mergeWithDefaults(partial)

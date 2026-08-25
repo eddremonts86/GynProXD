@@ -38,7 +38,7 @@ describe('lastPerformance', () => {
 describe('suggestNext', () => {
   it('linear adds 2.5kg at same reps', () => {
     const s = suggestNext('linear', ex, [workout('2026-08-20', [[60, 8], [60, 8]])])
-    expect(s).toEqual({ weight: 62.5, reps: 8, reason: expect.stringContaining('+2.5kg') })
+    expect(s).toEqual({ weight: 62.5, reps: 8, reason: expect.stringContaining('2.5kg more') })
   })
 
   it('linear with no history returns null', () => {
