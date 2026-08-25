@@ -22,7 +22,7 @@ export function Tag({ children, tone = 'neutral', className }: TagProps) {
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-full px-2 py-0.5 text-2xs leading-4 font-medium',
+        'inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-2xs leading-4 font-medium',
         toneMap[tone],
         className,
       )}

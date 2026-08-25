@@ -15,6 +15,7 @@ import { useGym } from '../store/useGym'
 import { exerciseById } from '../lib/exercises'
 import { todayIso } from '../lib/dates'
 import { buildProgramme } from '../lib/ai-plan'
+import { writePlannerSelection } from '../lib/planner-selection'
 import { Button, IconButton } from '../ui/Button'
 import { Panel } from '../ui/Panel'
 import { Tag } from '../ui/Tag'
@@ -84,7 +85,11 @@ export function GeneratedPlanPage() {
   }
 
   const save = () => {
-    if (saveGeneratedAsPlan(plan.id)) void navigate({ to: '/planner' })
+    const planId = saveGeneratedAsPlan(plan.id)
+    if (planId) {
+      writePlannerSelection(planId)
+      void navigate({ to: '/planner' })
+    }
   }
 
   const exportJson = () => {
