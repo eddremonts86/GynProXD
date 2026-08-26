@@ -27,6 +27,7 @@ import { ExerciseThumb } from '../ui/ExerciseThumb'
 import { PageHeader, Section } from '../ui/PageHeader'
 import { EmptyState } from '../ui/EmptyState'
 import { ExercisePicker } from '@/components/exercise-picker'
+import { ExerciseOfTheDay } from '@/components/exercise-of-the-day'
 import { MealSuggestions } from '@/components/meal-suggestions'
 import {
   Dialog,
@@ -405,6 +406,8 @@ function TodayOverview({
           </div>
         </Panel>
       )}
+
+      <ExerciseOfTheDay />
 
       <MealSuggestions />
 
