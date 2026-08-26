@@ -6,8 +6,15 @@
  */
 
 import type { Challenge } from './challenge'
+import type { Collection } from './collection'
 
-export type TemplateKind = 'announcement' | 'event' | 'menu' | 'offer' | 'challenge'
+export type TemplateKind =
+  | 'announcement'
+  | 'event'
+  | 'menu'
+  | 'offer'
+  | 'challenge'
+  | 'collection'
 
 export interface MenuCourse {
   name: string
@@ -29,6 +36,7 @@ export interface GymMessage {
   menu?: { courses: MenuCourse[] }
   offer?: { discount: string; validUntil?: string; code: string }
   challenge?: Challenge
+  collection?: Collection
   /** Also surface as a strip under the top bar, for this many minutes. */
   banner?: { minutes: number }
   /** Where the banner's View action goes; default is the inbox. */
@@ -47,6 +55,7 @@ export const TEMPLATE_LABELS: Record<TemplateKind, string> = {
   menu: 'Daily menu',
   offer: 'Offer',
   challenge: 'Challenge',
+  collection: 'Collection',
 }
 
 const sameGym = (a: string | undefined, b: string | undefined): boolean =>

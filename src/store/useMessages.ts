@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import type { GymMessage, TemplateKind, MenuCourse } from '../lib/messages'
 import type { Challenge } from '../lib/challenge'
+import type { Collection } from '../lib/collection'
 
 /**
  * The device message bus. Plaintext by design (see docs/PANELS.md): gym
@@ -37,6 +38,7 @@ export interface PublishInput {
   menu?: { courses: MenuCourse[] }
   offer?: { discount: string; validUntil?: string; code: string }
   challenge?: Challenge
+  collection?: Collection
   banner?: { minutes: number }
   link?: 'menu'
 }

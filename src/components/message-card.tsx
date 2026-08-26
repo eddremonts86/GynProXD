@@ -2,7 +2,8 @@ import { Check, MapPin, X } from '@phosphor-icons/react'
 import { TEMPLATE_LABELS, offerPayload, type GymMessage } from '@/lib/messages'
 import { repsForDay, totalReps } from '@/lib/challenge'
 import { exerciseById } from '@/lib/exercises'
-import { formatShortDate } from '@/lib/labels'
+import { MUSCLE_LABELS, formatShortDate } from '@/lib/labels'
+import { ExerciseThumb } from '@/ui/ExerciseThumb'
 import { Panel } from '@/ui/Panel'
 import { Tag } from '@/ui/Tag'
 import { Button } from '@/ui/Button'
@@ -15,6 +16,7 @@ const KIND_TONE = {
   menu: 'good',
   offer: 'danger',
   challenge: 'brand',
+  collection: 'good',
 } as const
 
 /**
@@ -140,6 +142,25 @@ export function MessageCard({
             </div>
           )}
         </div>
+      )}
+
+      {message.kind === 'collection' && message.collection && (
+        <ul className="flex flex-col gap-1.5 border-t border-line pt-3">
+          {message.collection.exerciseIds.map((id) => {
+            const ex = exerciseById(id)
+            return (
+              <li key={id} className="flex items-center gap-2.5">
+                {ex && <ExerciseThumb exercise={ex} size="sm" />}
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm text-ink">{ex?.name ?? id}</span>
+                  {ex && (
+                    <span className="block text-2xs text-ink-3">{MUSCLE_LABELS[ex.muscle]}</span>
+                  )}
+                </span>
+              </li>
+            )
+          })}
+        </ul>
       )}
 
       {message.kind === 'offer' && message.offer && (

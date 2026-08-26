@@ -25,6 +25,10 @@ import { todayIso } from '../lib/dates'
 import { generatedExercises } from '../data/exercises-generated'
 import { Combobox } from '../ui/Combobox'
 import { renderChallengeCard, shareOrDownloadPng } from '../lib/session-card'
+import { validCollectionIds } from '../lib/collection'
+import { exerciseById } from '../lib/exercises'
+import { ExercisePicker } from '@/components/exercise-picker'
+import { ExerciseThumb } from '../ui/ExerciseThumb'
 import { MessageCard } from '@/components/message-card'
 import { MenuEditor } from '@/components/menu-editor'
 import { Switch } from '@/components/ui/switch'
@@ -47,7 +51,14 @@ interface CourseDraft {
   dishes: string
 }
 
-const KINDS: TemplateKind[] = ['announcement', 'event', 'menu', 'offer', 'challenge']
+const KINDS: TemplateKind[] = [
+  'announcement',
+  'event',
+  'menu',
+  'offer',
+  'challenge',
+  'collection',
+]
 
 /** Movement names for the challenge form's suggestion list, resolved on publish. */
 const EXERCISE_NAMES = generatedExercises.map((e) => e.name).sort((a, b) => a.localeCompare(b))
@@ -103,6 +114,8 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
   const [chStart, setChStart] = useState('20')
   const [chDelta, setChDelta] = useState('1')
   const [chUnit, setChUnit] = useState<'reps' | 'seconds'>('reps')
+  const [collectionPicks, setCollectionPicks] = useState<string[]>([])
+  const [collectionSearch, setCollectionSearch] = useState('')
   const [everyone, setEveryone] = useState(true)
   const [picked, setPicked] = useState<string[]>([])
   const [bannerOn, setBannerOn] = useState(false)
@@ -176,8 +189,22 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
         },
       }
     }
+    if (kind === 'collection') {
+      const exerciseIds = validCollectionIds(collectionPicks, (id) => !!exerciseById(id))
+      if (exerciseIds.length < 2) return null
+      return {
+        ...common,
+        collection: {
+          id: 'preview',
+          name: common.title,
+          blurb: common.body,
+          exerciseIds,
+          source: 'gym' as const,
+        },
+      }
+    }
     return common
-  }, [gym, profileId, kind, title, body, eventDate, eventTime, eventPlace, courses, discount, validUntil, code, chExerciseName, chDays, chStart, chDelta, chUnit])
+  }, [gym, profileId, kind, title, body, eventDate, eventTime, eventPlace, courses, discount, validUntil, code, chExerciseName, chDays, chStart, chDelta, chUnit, collectionPicks])
 
   const doPublish = () => {
     if (!draft) {
@@ -190,7 +217,9 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
               ? 'An offer needs a title and the discount.'
               : kind === 'challenge'
                 ? 'A challenge needs a title, a movement from the library, and sane numbers (7-120 days, positive start).'
-                : 'Give the message a title.',
+                : kind === 'collection'
+                  ? 'A collection needs a title and at least two movements.'
+                  : 'Give the message a title.',
       )
       return
     }
@@ -211,6 +240,9 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
       challenge: draft.challenge
         ? { ...draft.challenge, id: `chal-${gym.trim().toLowerCase()}-${Date.now()}` }
         : undefined,
+      collection: draft.collection
+        ? { ...draft.collection, id: `coll-${gym.trim().toLowerCase()}-${Date.now()}` }
+        : undefined,
       banner: bannerOn ? { minutes: Number(bannerMinutes) } : undefined,
     })
     const reach = everyone ? pluralize(members.length, 'member') : pluralize(picked.length, 'member')
@@ -230,6 +262,8 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
     setChStart('20')
     setChDelta('1')
     setChUnit('reps')
+    setCollectionPicks([])
+    setCollectionSearch('')
     setEveryone(true)
     setPicked([])
     setBannerOn(false)
@@ -291,7 +325,9 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
                         ? 'Bring-a-friend week'
                         : kind === 'challenge'
                           ? 'September squat countdown'
-                          : 'New opening hours'
+                          : kind === 'collection'
+                            ? 'For desk workers'
+                            : 'New opening hours'
                 }
               />
 
@@ -435,6 +471,63 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
                   <p className="text-2xs text-ink-3">
                     Use a negative change for a countdown — hard days first, momentum later.
                   </p>
+                </div>
+              )}
+
+              {kind === 'collection' && (
+                <div className="flex flex-col gap-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setCollectionSearch('open')}
+                    >
+                      <Plus size={14} weight="bold" />
+                      Add movement
+                    </Button>
+                    <span className="text-2xs text-ink-3">
+                      {collectionPicks.length === 0
+                        ? 'Pick at least two.'
+                        : pluralize(collectionPicks.length, 'movement')}
+                    </span>
+                  </div>
+                  {collectionPicks.length > 0 && (
+                    <ul className="flex flex-col gap-1.5">
+                      {collectionPicks.map((id) => {
+                        const ex = exerciseById(id)
+                        return (
+                          <li
+                            key={id}
+                            className="flex items-center gap-3 rounded-md bg-surface-2 px-3 py-2"
+                          >
+                            {ex && <ExerciseThumb exercise={ex} size="sm" />}
+                            <span className="min-w-0 flex-1 truncate text-sm text-ink">
+                              {ex?.name ?? id}
+                            </span>
+                            <IconButton
+                              aria-label={`Remove ${ex?.name ?? id}`}
+                              onClick={() =>
+                                touch(setCollectionPicks)(collectionPicks.filter((p) => p !== id))
+                              }
+                            >
+                              <Trash size={14} />
+                            </IconButton>
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  )}
+                  <ExercisePicker
+                    open={collectionSearch === 'open'}
+                    onOpenChange={(open) => setCollectionSearch(open ? 'open' : '')}
+                    excludeIds={collectionPicks}
+                    title="Add to this collection"
+                    description="Movements members will see grouped under this hub."
+                    onSelect={(exercise) => {
+                      touch(setCollectionPicks)([...collectionPicks, exercise.id])
+                      setCollectionSearch('')
+                    }}
+                  />
                 </div>
               )}
 
@@ -589,6 +682,9 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
                             {m.kind === 'offer' ? ` · saved ${m.saved.length}` : ''}
                             {m.kind === 'offer' && m.offer ? ` · code ${m.offer.code}` : ''}
                             {m.kind === 'challenge' ? ` · joined ${m.joined?.length ?? 0}` : ''}
+                            {m.kind === 'collection' && m.collection
+                              ? ` · ${pluralize(m.collection.exerciseIds.length, 'movement')}`
+                              : ''}
                           </span>
                         </span>
                       }

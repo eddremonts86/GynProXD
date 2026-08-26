@@ -4,6 +4,10 @@ import { exerciseImageCandidates, exercisePhotoFrames } from '../lib/images'
 import { useGym } from '../store/useGym'
 import { exerciseLookup } from '../lib/exercises'
 import { sessionCountsByExercise } from '../lib/stats'
+import { inboxFor } from '../lib/messages'
+import { useMessages } from '../store/useMessages'
+import { useSession } from '../store/useSession'
+import { SAMPLE_COLLECTIONS } from '../data/sample-collections'
 import { MovementFrames } from '@/components/movement-frames'
 import { Button } from '../ui/Button'
 import { Tag } from '../ui/Tag'
@@ -53,11 +57,15 @@ export function LibraryPage() {
   const customExercises = useGym((s) => s.customExercises)
   const addExercise = useGym((s) => s.addExercise)
   const workouts = useGym((s) => s.workouts)
+  const messages = useMessages((s) => s.messages)
+  const profileId = useSession((s) => s.profileId)
+  const gym = useSession((s) => s.gym)
 
   const [query, setQuery] = useState('')
   const [muscle, setMuscle] = useState<MuscleGroup | 'all'>('all')
   const [equipment, setEquipment] = useState<Equipment | 'all'>('all')
   const [done, setDone] = useState<'all' | 'done' | 'todo'>('all')
+  const [collectionId, setCollectionId] = useState<string | null>(null)
   const [visible, setVisible] = useState(PAGE)
   const [detail, setDetail] = useState<Exercise | null>(null)
   const [addOpen, setAddOpen] = useState(false)
@@ -82,9 +90,24 @@ export function LibraryPage() {
 
   const doneCounts = useMemo(() => sessionCountsByExercise(workouts), [workouts])
 
+  /* Bundled hubs plus whatever the member's gym has curated. Life
+     situations, not muscle groups — members know their circumstances. */
+  const collections = useMemo(() => {
+    const fromGym = profileId
+      ? inboxFor(messages, { id: profileId, gym: gym ?? undefined })
+          .filter((m) => m.kind === 'collection' && m.collection)
+          .map((m) => m.collection!)
+      : []
+    return [...fromGym, ...SAMPLE_COLLECTIONS]
+  }, [messages, profileId, gym])
+
+  const activeCollection = collections.find((c) => c.id === collectionId) ?? null
+
   const filtered = useMemo(() => {
     const q = deferredQuery.trim().toLowerCase()
+    const inCollection = activeCollection ? new Set(activeCollection.exerciseIds) : null
     return exercises.filter((e) => {
+      if (inCollection && !inCollection.has(e.id)) return false
       if (muscle !== 'all' && e.muscle !== muscle) return false
       if (equipment !== 'all' && e.equipment !== equipment) return false
       if (done === 'done' && !doneCounts.has(e.id)) return false
@@ -97,7 +120,7 @@ export function LibraryPage() {
         MUSCLE_LABELS[e.muscle].toLowerCase().includes(q)
       )
     })
-  }, [exercises, deferredQuery, muscle, equipment, done, doneCounts])
+  }, [exercises, deferredQuery, muscle, equipment, done, doneCounts, activeCollection])
 
   const shown = filtered.slice(0, visible)
   const resetPaging = () => setVisible(PAGE)
@@ -163,6 +186,32 @@ export function LibraryPage() {
         </div>
 
         <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-0.5 md:-mx-8 md:px-8">
+          {collections.map((c) => {
+            const active = collectionId === c.id
+            return (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => {
+                  setCollectionId(active ? null : c.id)
+                  resetPaging()
+                }}
+                aria-pressed={active}
+                title={c.blurb}
+                className={cn(
+                  'min-h-9 shrink-0 rounded-full border px-3 text-xs font-medium transition-colors duration-150',
+                  active
+                    ? 'border-brand bg-brand text-brand-ink'
+                    : 'border-dashed border-line bg-surface text-ink-3 hover:border-line-strong hover:text-ink',
+                )}
+              >
+                {c.name}
+              </button>
+            )
+          })}
+        </div>
+
+        <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-0.5 md:-mx-8 md:px-8">
           {(['all', ...MUSCLES] as const).map((m) => {
             const active = muscle === m
             return (
@@ -188,6 +237,10 @@ export function LibraryPage() {
         </div>
       </div>
 
+      {activeCollection?.blurb && (
+        <p className="max-w-[70ch] text-sm text-ink-3">{activeCollection.blurb}</p>
+      )}
+
       {filtered.length === 0 ? (
         <EmptyState
           icon={<MagnifyingGlass size={20} />}
@@ -201,6 +254,7 @@ export function LibraryPage() {
                 setMuscle('all')
                 setEquipment('all')
                 setDone('all')
+                setCollectionId(null)
                 resetPaging()
               }}
             >
