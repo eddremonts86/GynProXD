@@ -46,27 +46,22 @@ const NAV: NavItem[] = [
   { label: 'History', to: '/history', icon: ChartLineUp },
 ]
 
-const PANEL_ITEM: Partial<Record<ProfileRole, NavItem>> = {
-  gym: { label: 'Gym', to: '/gym', icon: Storefront },
+const PANEL_ITEM: Partial<Record<ProfileRole, { label: string; to: string; icon: Icon }>> = {
+  gym: { label: 'Gym panel', to: '/gym', icon: Storefront },
   admin: { label: 'Admin', to: '/admin', icon: ShieldCheck },
 }
 
-/** Work areas only; Inbox and Settings live in the top bar's utility cluster. */
-function navFor(role: ProfileRole): NavItem[] {
-  const items = [...NAV]
-  const panel = PANEL_ITEM[role]
-  if (panel) items.push(panel)
-  return items
-}
-
 /**
- * Inbox bell and Settings gear, top right on every breakpoint. Gym
- * operators get no bell: authors never receive their own broadcasts, so
- * their inbox is empty by construction — their surface is the sent list.
+ * The role panel, Inbox bell and Settings gear, top right on every
+ * breakpoint. The nav below stays identical for everyone: work areas only.
+ * Gym operators get no bell: authors never receive their own broadcasts,
+ * so their inbox is empty by construction — their surface is the panel.
  */
 function UtilityCluster({ pathname }: { pathname: string }) {
   const role = useSession((s) => s.role)
   const unread = useUnread()
+  const panel = PANEL_ITEM[role]
+  const panelActive = panel ? pathname.startsWith(panel.to) : false
   const inboxActive = pathname.startsWith('/inbox') || pathname.startsWith('/menu')
   const settingsActive = pathname.startsWith('/settings')
   const itemClass = (active: boolean) =>
@@ -76,6 +71,16 @@ function UtilityCluster({ pathname }: { pathname: string }) {
     )
   return (
     <span className="flex items-center gap-0.5">
+      {panel && (
+        <Link
+          to={panel.to}
+          aria-label={panel.label}
+          aria-current={panelActive ? 'page' : undefined}
+          className={itemClass(panelActive)}
+        >
+          <panel.icon size={20} weight={panelActive ? 'fill' : 'regular'} />
+        </Link>
+      )}
       {role !== 'gym' && (
         <Link
           to="/inbox"
@@ -133,8 +138,6 @@ function isActive(item: NavItem, pathname: string): boolean {
 }
 
 function DesktopRail({ pathname }: { pathname: string }) {
-  const role = useSession((s) => s.role)
-  const items = navFor(role)
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col lg:flex">
       <div className="px-5 py-5">
@@ -144,7 +147,7 @@ function DesktopRail({ pathname }: { pathname: string }) {
       </div>
 
       <nav aria-label="Main" className="flex flex-1 flex-col gap-0.5 px-3">
-        {items.map((item) => {
+        {NAV.map((item) => {
           const active = isActive(item, pathname)
           return (
             <Link
@@ -175,8 +178,6 @@ function DesktopRail({ pathname }: { pathname: string }) {
 }
 
 function MobileChrome({ pathname }: { pathname: string }) {
-  const role = useSession((s) => s.role)
-  const items = navFor(role)
   return (
     <>
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between bg-bg/85 px-4 backdrop-blur-md lg:hidden">
@@ -196,7 +197,7 @@ function MobileChrome({ pathname }: { pathname: string }) {
           aria-label="Main"
           className="flex gap-1 bg-bg/95 px-2 py-1.5 pb-[calc(env(safe-area-inset-bottom)+0.375rem)] shadow-[var(--shadow-raised)] backdrop-blur-md"
         >
-          {items.map((item) => {
+          {NAV.map((item) => {
             const active = isActive(item, pathname)
             return (
               <Link
