@@ -35,6 +35,8 @@ export interface PublishInput {
   event?: { date: string; time?: string; place?: string }
   menu?: { courses: MenuCourse[] }
   offer?: { discount: string; validUntil?: string; code: string }
+  banner?: { minutes: number }
+  link?: 'menu'
 }
 
 interface MessagesState {
@@ -45,6 +47,7 @@ interface MessagesState {
   renameGym: (from: string, to: string) => void
   markRead: (ids: string[], profileId: string) => void
   respond: (id: string, profileId: string, answer: 'yes' | 'no') => void
+  dismissBanner: (id: string, profileId: string) => void
   toggleSaved: (id: string, profileId: string) => void
   rehydrate: () => void
 }
@@ -99,6 +102,16 @@ export const useMessages = create<MessagesState>()((set, get) => ({
       return { ...m, readBy: [...m.readBy, profileId] }
     })
     if (!changed) return
+    persist(messages)
+    set({ messages })
+  },
+
+  dismissBanner: (id, profileId) => {
+    const messages = get().messages.map((m) =>
+      m.id === id && !m.bannerDismissedBy?.includes(profileId)
+        ? { ...m, bannerDismissedBy: [...(m.bannerDismissedBy ?? []), profileId] }
+        : m,
+    )
     persist(messages)
     set({ messages })
   },

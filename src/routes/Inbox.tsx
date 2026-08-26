@@ -1,10 +1,13 @@
 import { useEffect } from 'react'
-import { Link, Navigate } from '@tanstack/react-router'
-import { BellSimpleSlash, Storefront } from '@phosphor-icons/react'
+import { Link, Navigate, useNavigate } from '@tanstack/react-router'
+import { BellSimpleSlash, ForkKnife, Storefront } from '@phosphor-icons/react'
 import { useSession } from '../store/useSession'
 import { useMessages } from '../store/useMessages'
 import { inboxFor } from '../lib/messages'
 import { notificationsEnabled, notificationsSupported } from '../lib/notify'
+import { useMenus } from '../store/useMenus'
+import { menuFor } from '../lib/menu'
+import { Button } from '../ui/Button'
 import { MessageCard } from '@/components/message-card'
 import { PageHeader } from '../ui/PageHeader'
 import { Panel } from '../ui/Panel'
@@ -18,6 +21,9 @@ export function InboxPage() {
   const markRead = useMessages((s) => s.markRead)
   const respond = useMessages((s) => s.respond)
   const toggleSaved = useMessages((s) => s.toggleSaved)
+  const menus = useMenus((s) => s.menus)
+  const navigate = useNavigate()
+  const gymMenu = menuFor(menus, gym ?? undefined)
 
   const me = profileId ? { id: profileId, gym: gym ?? undefined } : null
   const inbox = me ? inboxFor(messages, me) : []
@@ -42,6 +48,14 @@ export function InboxPage() {
           gym
             ? `Events, menus and offers from ${gym}.`
             : 'Messages from your gym land here.'
+        }
+        action={
+          gymMenu ? (
+            <Button variant="secondary" size="sm" onClick={() => navigate({ to: '/menu' })}>
+              <ForkKnife size={15} />
+              Gym menu
+            </Button>
+          ) : undefined
         }
       />
 

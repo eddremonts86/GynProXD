@@ -20,6 +20,7 @@ import { Wordmark, Mark } from '@/components/brand'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { SessionRailCard, SessionMobileBar } from '@/components/session-indicator'
 import { ProfileGate } from '@/components/profile-gate'
+import { GymBanner } from '@/components/gym-banner'
 import { useSession } from '@/store/useSession'
 import { useMessages } from '@/store/useMessages'
 import { unreadCount } from '@/lib/messages'
@@ -62,7 +63,7 @@ function navFor(role: ProfileRole, withInbox: boolean): NavItem[] {
   const panel = PANEL_ITEM[role]
   if (panel) items.splice(4, 0, panel)
   if (withInbox && role !== 'gym') {
-    items.splice(4, 0, { label: 'Inbox', to: '/inbox', icon: BellSimple })
+    items.splice(4, 0, { label: 'Inbox', to: '/inbox', icon: BellSimple, owns: ['/menu'] })
   }
   return items
 }
@@ -300,6 +301,7 @@ export function AppShell() {
       <MobileChrome pathname={pathname} />
       <main id="main" className="lg:pl-60">
         <div className="mx-auto w-full max-w-[76rem] px-4 py-6 pb-32 md:px-8 md:py-10 lg:pb-12">
+          <GymBanner />
           <Outlet />
         </div>
       </main>

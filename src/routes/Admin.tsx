@@ -3,6 +3,7 @@ import { Navigate } from '@tanstack/react-router'
 import { PencilSimple, Plus, Trash } from '@phosphor-icons/react'
 import { useSession } from '../store/useSession'
 import { useMessages } from '../store/useMessages'
+import { useMenus } from '../store/useMenus'
 import {
   addGymToCatalogue,
   deleteGymEverywhere,
@@ -47,6 +48,8 @@ function AdminDesk({ selfId }: { selfId: string }) {
   const messages = useMessages((s) => s.messages)
   const removeByGym = useMessages((s) => s.removeByGym)
   const renameGymMessages = useMessages((s) => s.renameGym)
+  const renameGymMenus = useMenus((s) => s.renameGym)
+  const removeMenu = useMenus((s) => s.removeMenu)
   const refreshMeta = useSession((s) => s.refreshMeta)
 
   const [profiles, setProfiles] = useState(listProfiles)
@@ -99,6 +102,7 @@ function AdminDesk({ selfId }: { selfId: string }) {
     if (renaming && renameTo.trim()) {
       renameGymEverywhere(renaming, renameTo)
       renameGymMessages(renaming, renameTo)
+      renameGymMenus(renaming, renameTo)
       refresh()
     }
     setRenaming(null)
@@ -108,6 +112,7 @@ function AdminDesk({ selfId }: { selfId: string }) {
   const doDeleteGym = (name: string) => {
     deleteGymEverywhere(name)
     removeByGym(name)
+    removeMenu(name)
     setConfirmGym(null)
     refresh()
   }

@@ -89,3 +89,36 @@ describe('author exclusion', () => {
     expect(isAddressedTo(own, { id: 'gym-1', gym: 'Forge & Flow' })).toBe(false)
   })
 })
+
+describe('banners', () => {
+  const ana = { id: 'p-ana', gym: 'Forge & Flow' }
+  const t0 = new Date('2026-08-26T10:00:00.000Z').getTime()
+
+  it('shows inside the window, hides after it', async () => {
+    const { activeBanners } = await import('./messages')
+    const banner = msg({ banner: { minutes: 5 } })
+    expect(activeBanners([banner], ana, t0 + 4 * 60_000)).toHaveLength(1)
+    expect(activeBanners([banner], ana, t0 + 6 * 60_000)).toHaveLength(0)
+  })
+
+  it('never shows to another gym, the author, or after dismissal', async () => {
+    const { activeBanners } = await import('./messages')
+    const banner = msg({ banner: { minutes: 5 } })
+    expect(activeBanners([banner], { id: 'p-x', gym: 'Iron Barn' }, t0)).toHaveLength(0)
+    expect(activeBanners([banner], { id: 'gym-1', gym: 'Forge & Flow' }, t0)).toHaveLength(0)
+    const dismissed = msg({ banner: { minutes: 5 }, bannerDismissedBy: ['p-ana'] })
+    expect(activeBanners([dismissed], ana, t0)).toHaveLength(0)
+  })
+
+  it('respects personal targeting', async () => {
+    const { activeBanners } = await import('./messages')
+    const targeted = msg({ banner: { minutes: 5 }, audience: ['p-ana'] })
+    expect(activeBanners([targeted], ana, t0)).toHaveLength(1)
+    expect(activeBanners([targeted], { id: 'p-bo', gym: 'Forge & Flow' }, t0)).toHaveLength(0)
+  })
+
+  it('messages without banner never surface as banners', async () => {
+    const { activeBanners } = await import('./messages')
+    expect(activeBanners([msg({})], ana, t0)).toHaveLength(0)
+  })
+})

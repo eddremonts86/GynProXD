@@ -26,9 +26,14 @@ export interface GymMessage {
   event?: { date: string; time?: string; place?: string }
   menu?: { courses: MenuCourse[] }
   offer?: { discount: string; validUntil?: string; code: string }
+  /** Also surface as a strip under the top bar, for this many minutes. */
+  banner?: { minutes: number }
+  /** Where the banner's View action goes; default is the inbox. */
+  link?: 'menu'
   readBy: string[]
   rsvp: Record<string, 'yes' | 'no'>
   saved: string[]
+  bannerDismissedBy?: string[]
 }
 
 export const TEMPLATE_LABELS: Record<TemplateKind, string> = {
@@ -67,6 +72,31 @@ export function unreadCount(
   return messages.filter((m) => isAddressedTo(m, profile) && !m.readBy.includes(profile.id))
     .length
 }
+
+/** Banners still inside their window, addressed to and not dismissed by the viewer. */
+export function activeBanners(
+  messages: GymMessage[],
+  profile: { id: string; gym?: string },
+  now: number = Date.now(),
+): GymMessage[] {
+  return messages
+    .filter((m) => {
+      if (!m.banner || !isAddressedTo(m, profile)) return false
+      if (m.bannerDismissedBy?.includes(profile.id)) return false
+      const expires = new Date(m.createdAt).getTime() + m.banner.minutes * 60_000
+      return expires > now
+    })
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+}
+
+export const BANNER_DURATIONS = [
+  { minutes: 5, label: '5 minutes' },
+  { minutes: 15, label: '15 minutes' },
+  { minutes: 30, label: '30 minutes' },
+  { minutes: 60, label: '1 hour' },
+  { minutes: 240, label: '4 hours' },
+  { minutes: 1440, label: 'All day' },
+] as const
 
 export function sentBy(messages: GymMessage[], gym: string): GymMessage[] {
   return messages

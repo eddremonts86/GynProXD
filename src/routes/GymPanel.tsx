@@ -11,6 +11,7 @@ import {
 import { useSession } from '../store/useSession'
 import { useMessages } from '../store/useMessages'
 import {
+  BANNER_DURATIONS,
   TEMPLATE_LABELS,
   makeOfferCode,
   sentBy,
@@ -21,8 +22,11 @@ import { listProfiles } from '../lib/profiles'
 import { formatShortDate, pluralize } from '../lib/labels'
 import { todayIso } from '../lib/dates'
 import { MessageCard } from '@/components/message-card'
+import { MenuEditor } from '@/components/menu-editor'
+import { Switch } from '@/components/ui/switch'
 import { Avatar } from '../ui/Avatar'
 import { Button, IconButton } from '../ui/Button'
+import { FormSelect } from '../ui/FormSelect'
 import { Input } from '../ui/Input'
 import { Panel } from '../ui/Panel'
 import { PageHeader, Section } from '../ui/PageHeader'
@@ -76,6 +80,8 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
   const [code, setCode] = useState(makeOfferCode)
   const [everyone, setEveryone] = useState(true)
   const [picked, setPicked] = useState<string[]>([])
+  const [bannerOn, setBannerOn] = useState(false)
+  const [bannerMinutes, setBannerMinutes] = useState('5')
   const [error, setError] = useState<string | null>(null)
   const [published, setPublished] = useState<string | null>(null)
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
@@ -155,6 +161,7 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
       event: draft.event,
       menu: draft.menu,
       offer: draft.offer,
+      banner: bannerOn ? { minutes: Number(bannerMinutes) } : undefined,
     })
     const reach = everyone ? pluralize(members.length, 'member') : pluralize(picked.length, 'member')
     setPublished(`Published to ${reach}.`)
@@ -170,6 +177,7 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
     setCode(makeOfferCode())
     setEveryone(true)
     setPicked([])
+    setBannerOn(false)
   }
 
   const touch = <T,>(setter: (v: T) => void) => (v: T) => {
@@ -381,6 +389,33 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
                 </div>
               </div>
 
+              <div className="flex flex-wrap items-center gap-3 border-t border-line pt-4">
+                <label className="flex items-center gap-2 text-sm text-ink-2">
+                  <Switch
+                    aria-label="Show as a banner"
+                    checked={bannerOn}
+                    onCheckedChange={(on) => {
+                      setBannerOn(on)
+                      setPublished(null)
+                    }}
+                  />
+                  Show as a banner
+                </label>
+                {bannerOn && (
+                  <FormSelect
+                    ariaLabel="Banner duration"
+                    size="sm"
+                    value={bannerMinutes}
+                    onValueChange={setBannerMinutes}
+                    options={BANNER_DURATIONS.map((d) => ({
+                      value: String(d.minutes),
+                      label: `for ${d.label.toLowerCase()}`,
+                    }))}
+                    className="w-40"
+                  />
+                )}
+              </div>
+
               <div className="flex flex-wrap items-center gap-3">
                 <Button onClick={doPublish}>
                   <PaperPlaneTilt size={16} />
@@ -456,6 +491,10 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
                 })}
               </div>
             )}
+          </Section>
+
+          <Section title="Menu" hint="standing kitchen card">
+            <MenuEditor gym={gym} profileId={profileId} />
           </Section>
         </div>
 

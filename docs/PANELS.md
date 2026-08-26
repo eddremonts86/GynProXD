@@ -63,6 +63,28 @@ in the member inbox:
 QR generation is client-side via `uqr` (MIT, ~4 kB, no dependencies),
 wrapped in `src/ui/QrCode.tsx` as theme-aware SVG.
 
+## Banners
+
+Any message can also ride as a banner: a strip under the top bar shown to
+its audience for a configurable window (5 minutes to all day), then gone.
+Targeting is the message's own — the whole gym, a group, or one person —
+so a banner for Iris never renders for Bram. Dismissal is per-profile and
+permanent (`bannerDismissedBy`). Expiry is wall-clock from publish;
+`activeBanners()` in `src/lib/messages.ts` is the single source of truth
+and is unit-tested. Operators never see their own banners (author
+exclusion). The strip lives in the app shell above the route outlet.
+
+## Standing menus
+
+Each gym keeps a permanent kitchen card (`forma-gym-menus`, one per gym)
+separate from the one-off "Daily menu" broadcast. The gym panel's Menu
+section edits it in place — sections of items with descriptions and
+prices, seedable from `SAMPLE_MENU` — and members browse it at `/menu`
+(linked from the inbox header and from menu banners). "Promote as banner"
+publishes an announcement whose banner links straight to `/menu`, which is
+how the kitchen reaches members who never open the inbox. Admin gym
+renames and deletes propagate to menus like they do to messages.
+
 ## Notifications
 
 Delivered where a serverless app can deliver them:
