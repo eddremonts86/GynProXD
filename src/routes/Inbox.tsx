@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Link } from '@tanstack/react-router'
+import { Link, Navigate } from '@tanstack/react-router'
 import { BellSimpleSlash, Storefront } from '@phosphor-icons/react'
 import { useSession } from '../store/useSession'
 import { useMessages } from '../store/useMessages'
@@ -13,6 +13,7 @@ import { Panel } from '../ui/Panel'
 export function InboxPage() {
   const profileId = useSession((s) => s.profileId)
   const gym = useSession((s) => s.gym)
+  const role = useSession((s) => s.role)
   const messages = useMessages((s) => s.messages)
   const markRead = useMessages((s) => s.markRead)
   const respond = useMessages((s) => s.respond)
@@ -29,6 +30,9 @@ export function InboxPage() {
   }, [unreadIds.join(','), me?.id])
 
   const quiet = notificationsSupported() && !notificationsEnabled()
+
+  /* Operators never receive broadcasts; their surface is the panel. */
+  if (role === 'gym') return <Navigate to="/gym" />
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">

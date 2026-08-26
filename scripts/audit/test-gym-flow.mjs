@@ -121,6 +121,14 @@ if (!sent?.includes('going 1')) fail('RSVP tally missing from sent list')
 if (!sent?.includes('saved 1')) fail('save tally missing from sent list')
 console.log('ok: gym sees read/RSVP/save tallies')
 
+// 5b. Operators have no Inbox (dead by construction) and /inbox bounces.
+if (await page.getByRole('link', { name: 'Inbox' }).count()) {
+  fail('gym operator still shows an Inbox nav item')
+}
+await page.goto(`${BASE}/inbox`, { waitUntil: 'networkidle' })
+await page.getByRole('heading', { name: 'Gym panel' }).waitFor({ timeout: 5000 })
+console.log('ok: operator inbox is hidden and bounces to the panel')
+
 // 6. Members never leak across gyms: a stranger sees nothing.
 await lock()
 await page.getByRole('button', { name: 'New profile' }).click()

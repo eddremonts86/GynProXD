@@ -43,7 +43,9 @@ export function GymPanelPage() {
   const gym = useSession((s) => s.gym)
   const profileId = useSession((s) => s.profileId)
 
-  if (role !== 'gym' || !gym || !profileId) return <Navigate to="/" />
+  if (role !== 'gym' || !gym || !profileId) {
+    return <Navigate to={role === 'admin' ? '/admin' : '/'} />
+  }
   return <GymDesk gym={gym} profileId={profileId} />
 }
 

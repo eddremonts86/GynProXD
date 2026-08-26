@@ -37,7 +37,9 @@ const ROLE_LABELS: Record<ProfileRole, string> = {
 export function AdminPage() {
   const role = useSession((s) => s.role)
   const profileId = useSession((s) => s.profileId)
-  if (role !== 'admin' || !profileId) return <Navigate to="/" />
+  if (role !== 'admin' || !profileId) {
+    return <Navigate to={role === 'gym' ? '/gym' : '/'} />
+  }
   return <AdminDesk selfId={profileId} />
 }
 
@@ -190,17 +192,19 @@ function AdminDesk({ selfId }: { selfId: string }) {
                       </span>
                     </span>
 
-                    <FormSelect
-                      ariaLabel={`Role for ${p.name}`}
-                      size="sm"
-                      value={p.role}
-                      onValueChange={(v) => setRole(p.id, v as ProfileRole)}
-                      options={(['member', 'gym', 'admin'] as const).map((r) => ({
-                        value: r,
-                        label: ROLE_LABELS[r],
-                      }))}
-                      className={p.id === selfId ? 'w-32 pointer-events-none opacity-45' : 'w-32'}
-                    />
+                    {p.id !== selfId && (
+                      <FormSelect
+                        ariaLabel={`Role for ${p.name}`}
+                        size="sm"
+                        value={p.role}
+                        onValueChange={(v) => setRole(p.id, v as ProfileRole)}
+                        options={(['member', 'gym', 'admin'] as const).map((r) => ({
+                          value: r,
+                          label: ROLE_LABELS[r],
+                        }))}
+                        className="w-32"
+                      />
+                    )}
 
                     {confirmUserId === p.id ? (
                       <span className="flex shrink-0 items-center gap-2">

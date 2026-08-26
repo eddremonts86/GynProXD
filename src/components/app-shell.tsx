@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import {
   Link,
   Outlet,
+  useNavigate,
   useRouterState,
 } from '@tanstack/react-router'
 import {
@@ -50,12 +51,19 @@ const PANEL_ITEM: Partial<Record<ProfileRole, NavItem>> = {
   admin: { label: 'Admin', to: '/admin', icon: ShieldCheck },
 }
 
-/** Desktop shows Inbox as a nav item; mobile carries it as a header bell. */
+/**
+ * Desktop shows Inbox as a nav item; mobile carries it as a header bell.
+ * Gym operators get no Inbox anywhere: authors never receive their own
+ * broadcasts, so their inbox is empty by construction — their surface is
+ * the panel's sent list.
+ */
 function navFor(role: ProfileRole, withInbox: boolean): NavItem[] {
   const items = [...NAV]
   const panel = PANEL_ITEM[role]
   if (panel) items.splice(4, 0, panel)
-  if (withInbox) items.splice(4, 0, { label: 'Inbox', to: '/inbox', icon: BellSimple })
+  if (withInbox && role !== 'gym') {
+    items.splice(4, 0, { label: 'Inbox', to: '/inbox', icon: BellSimple })
+  }
   return items
 }
 
@@ -144,18 +152,20 @@ function MobileChrome({ pathname }: { pathname: string }) {
           <span className="text-base leading-none font-semibold tracking-tight text-ink">enForma</span>
         </Link>
         <span className="flex items-center gap-0.5">
-          <Link
-            to="/inbox"
-            aria-label={unread > 0 ? `Inbox, ${unread} unread` : 'Inbox'}
-            className="relative flex size-9 items-center justify-center rounded-full text-ink-3"
-          >
-            <BellSimple size={20} weight={pathname.startsWith('/inbox') ? 'fill' : 'regular'} />
-            {unread > 0 && (
-              <span className="absolute top-1 right-1">
-                <UnreadBadge count={unread} />
-              </span>
-            )}
-          </Link>
+          {role !== 'gym' && (
+            <Link
+              to="/inbox"
+              aria-label={unread > 0 ? `Inbox, ${unread} unread` : 'Inbox'}
+              className="relative flex size-9 items-center justify-center rounded-full text-ink-3"
+            >
+              <BellSimple size={20} weight={pathname.startsWith('/inbox') ? 'fill' : 'regular'} />
+              {unread > 0 && (
+                <span className="absolute top-1 right-1">
+                  <UnreadBadge count={unread} />
+                </span>
+              )}
+            </Link>
+          )}
           <ThemeToggle />
         </span>
       </header>
@@ -228,6 +238,15 @@ export function AppShell() {
   const setLocked = useSession((s) => s.setLocked)
   const gym = useSession((s) => s.gym)
   const unread = useUnread()
+  const navigate = useNavigate()
+
+  /* Operators and admins unlocking onto Today land on their own desk
+     instead; any deeper route is left alone (resume where you were). */
+  const landFor = (role: ProfileRole) => {
+    if (window.location.pathname !== '/') return
+    if (role === 'gym') void navigate({ to: '/gym' })
+    if (role === 'admin') void navigate({ to: '/admin' })
+  }
 
   /* System notification when unread grows: on unlock, and live when a gym
      publishes from another tab (the storage event rehydrates the bus). */
@@ -260,7 +279,10 @@ export function AppShell() {
       <ProfileGate
         onUnlocked={() => {
           const meta = activeProfile()
-          if (meta) setUnlocked(meta)
+          if (meta) {
+            setUnlocked(meta)
+            landFor(meta.role)
+          }
         }}
       />
     )
