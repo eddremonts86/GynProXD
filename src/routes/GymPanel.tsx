@@ -24,12 +24,16 @@ import { todayIso } from '../lib/dates'
 import { MessageCard } from '@/components/message-card'
 import { MenuEditor } from '@/components/menu-editor'
 import { Switch } from '@/components/ui/switch'
+import { Tabs, TabPanel } from '../ui/Tabs'
+import { Collapse } from '../ui/Collapse'
+import { useMenus } from '../store/useMenus'
+import { menuFor, countItems } from '../lib/menu'
 import { Avatar } from '../ui/Avatar'
 import { Button, IconButton } from '../ui/Button'
 import { FormSelect } from '../ui/FormSelect'
 import { Input } from '../ui/Input'
 import { Panel } from '../ui/Panel'
-import { PageHeader, Section } from '../ui/PageHeader'
+import { PageHeader } from '../ui/PageHeader'
 import { Tag } from '../ui/Tag'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
@@ -57,6 +61,9 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
   const messages = useMessages((s) => s.messages)
   const publish = useMessages((s) => s.publish)
   const remove = useMessages((s) => s.remove)
+  const menus = useMenus((s) => s.menus)
+  const savedMenu = menuFor(menus, gym)
+  const [tab, setTab] = useState('compose')
 
   const members = useMemo(
     () =>
@@ -193,10 +200,18 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
         description={`${gym} — reach your members with events, menus and offers.`}
       />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(15rem,0.42fr)]">
-        <div className="flex flex-col gap-8">
-          <Section title="New message">
-            <Panel padding="lg" className="flex flex-col gap-4">
+      <Tabs
+        value={tab}
+        onValueChange={setTab}
+        tabs={[
+          { value: 'compose', label: 'Compose' },
+          { value: 'sent', label: 'Sent', count: sent.length },
+          { value: 'menu', label: 'Menu', count: savedMenu ? countItems(savedMenu) : 0 },
+          { value: 'members', label: 'Members', count: members.length },
+        ]}
+      >
+        <TabPanel value="compose" className="flex flex-col gap-6">
+          <Panel padding="lg" className="flex flex-col gap-4">
               <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Template">
                 {KINDS.map((k) => (
                   <button
@@ -428,77 +443,93 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
                   </span>
                 )}
               </div>
+          </Panel>
+
+          {draft && (
+            <div className="flex flex-col gap-2">
+              <span className="text-2xs font-medium text-ink-3">Preview — what members see</span>
+              <MessageCard message={draft} />
+            </div>
+          )}
+        </TabPanel>
+
+        <TabPanel value="sent">
+          {sent.length === 0 ? (
+            <Panel padding="lg">
+              <p className="text-sm text-ink-3">
+                Nothing published yet. Compose a message and its history lands here, with read,
+                RSVP and save tallies.
+              </p>
             </Panel>
-
-            {draft && (
-              <div className="flex flex-col gap-2">
-                <span className="text-2xs font-medium text-ink-3">Preview — what members see</span>
-                <MessageCard message={draft} />
-              </div>
-            )}
-          </Section>
-
-          <Section title="Sent" hint={pluralize(sent.length, 'message')}>
-            {sent.length === 0 ? (
-              <p className="text-sm text-ink-3">Nothing published yet. Your history lands here.</p>
-            ) : (
-              <div className="flex flex-col gap-2">
-                {sent.map((m) => {
-                  const going = Object.values(m.rsvp).filter((r) => r === 'yes').length
-                  const declined = Object.values(m.rsvp).filter((r) => r === 'no').length
-                  return (
-                    <Panel key={m.id} padding="md" className="flex items-center gap-3">
-                      <div className="flex min-w-0 flex-1 flex-col gap-1">
-                        <span className="flex flex-wrap items-center gap-2">
-                          <Tag>{TEMPLATE_LABELS[m.kind]}</Tag>
-                          <span className="truncate text-sm font-semibold text-ink">{m.title}</span>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {sent.map((m) => {
+                const going = Object.values(m.rsvp).filter((r) => r === 'yes').length
+                const declined = Object.values(m.rsvp).filter((r) => r === 'no').length
+                return (
+                  <Panel key={m.id} padding="md">
+                    <Collapse
+                      header={
+                        <span className="flex min-w-0 flex-col gap-1">
+                          <span className="flex flex-wrap items-center gap-2">
+                            <Tag>{TEMPLATE_LABELS[m.kind]}</Tag>
+                            <span className="truncate text-sm font-semibold text-ink">
+                              {m.title}
+                            </span>
+                          </span>
+                          <span className="num text-2xs font-normal text-ink-3">
+                            {formatShortDate(m.createdAt.slice(0, 10))} ·{' '}
+                            {m.audience === 'all'
+                              ? 'everyone'
+                              : pluralize(m.audience.length, 'member')}{' '}
+                            · read {m.readBy.length}
+                            {m.kind === 'event' ? ` · going ${going} · declined ${declined}` : ''}
+                            {m.kind === 'offer' ? ` · saved ${m.saved.length}` : ''}
+                            {m.kind === 'offer' && m.offer ? ` · code ${m.offer.code}` : ''}
+                          </span>
                         </span>
-                        <span className="num text-2xs text-ink-3">
-                          {formatShortDate(m.createdAt.slice(0, 10))} ·{' '}
-                          {m.audience === 'all' ? 'everyone' : pluralize(m.audience.length, 'member')} ·{' '}
-                          read {m.readBy.length}
-                          {m.kind === 'event' ? ` · going ${going} · declined ${declined}` : ''}
-                          {m.kind === 'offer' ? ` · saved ${m.saved.length}` : ''}
-                          {m.kind === 'offer' && m.offer ? ` · code ${m.offer.code}` : ''}
-                        </span>
-                      </div>
-                      {confirmDelete === m.id ? (
-                        <span className="flex shrink-0 items-center gap-2">
-                          <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(null)}>
-                            Cancel
-                          </Button>
-                          <Button
-                            variant="danger"
-                            size="sm"
-                            onClick={() => {
-                              remove(m.id)
-                              setConfirmDelete(null)
-                            }}
+                      }
+                      headerExtras={
+                        confirmDelete === m.id ? (
+                          <>
+                            <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(null)}>
+                              Cancel
+                            </Button>
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              onClick={() => {
+                                remove(m.id)
+                                setConfirmDelete(null)
+                              }}
+                            >
+                              Delete
+                            </Button>
+                          </>
+                        ) : (
+                          <IconButton
+                            aria-label={`Delete ${m.title}`}
+                            onClick={() => setConfirmDelete(m.id)}
                           >
-                            Delete
-                          </Button>
-                        </span>
-                      ) : (
-                        <IconButton
-                          aria-label={`Delete ${m.title}`}
-                          onClick={() => setConfirmDelete(m.id)}
-                        >
-                          <Trash size={15} />
-                        </IconButton>
-                      )}
-                    </Panel>
-                  )
-                })}
-              </div>
-            )}
-          </Section>
+                            <Trash size={15} />
+                          </IconButton>
+                        )
+                      }
+                    >
+                      <MessageCard message={m} />
+                    </Collapse>
+                  </Panel>
+                )
+              })}
+            </div>
+          )}
+        </TabPanel>
 
-          <Section title="Menu" hint="standing kitchen card">
-            <MenuEditor gym={gym} profileId={profileId} />
-          </Section>
-        </div>
+        <TabPanel value="menu">
+          <MenuEditor gym={gym} profileId={profileId} />
+        </TabPanel>
 
-        <Section title="Members" hint={pluralize(members.length, 'member')}>
+        <TabPanel value="members">
           <Panel padding="lg">
             {members.length === 0 ? (
               <p className="max-w-[40ch] text-sm text-ink-3">
@@ -521,8 +552,8 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
               </ul>
             )}
           </Panel>
-        </Section>
-      </div>
+        </TabPanel>
+      </Tabs>
     </div>
   )
 }

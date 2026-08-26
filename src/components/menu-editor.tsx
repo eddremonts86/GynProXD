@@ -8,6 +8,7 @@ import { BANNER_DURATIONS } from '@/lib/messages'
 import { SAMPLE_MENU } from '@/data/sample-menu'
 import { pluralize } from '@/lib/labels'
 import { Button, IconButton } from '@/ui/Button'
+import { Collapse } from '@/ui/Collapse'
 import { FormSelect } from '@/ui/FormSelect'
 import { Input } from '@/ui/Input'
 import { Panel } from '@/ui/Panel'
@@ -95,24 +96,36 @@ export function MenuEditor({ gym, profileId }: { gym: string; profileId: string 
       ) : (
         <>
           {sections.map((section, si) => (
-            <div key={si} className="flex flex-col gap-2 rounded-lg bg-surface-2 p-3">
-              <div className="flex items-center gap-2">
-                <Input
-                  aria-label={`Section ${si + 1} name`}
-                  value={section.name}
-                  onChange={(e) => patchSection(si, { name: e.target.value })}
-                  placeholder="Section — e.g. Post-workout shakes"
-                  className="h-9 font-semibold"
-                />
-                <IconButton
-                  aria-label={`Remove section ${section.name || si + 1}`}
-                  onClick={() => setSections(sections.filter((_, i) => i !== si))}
-                >
-                  <Trash size={15} />
-                </IconButton>
-              </div>
+            <div key={si} className="rounded-lg bg-surface-2 p-3">
+              <Collapse
+                defaultOpen={!section.name.trim() || section.items.every((i) => !i.name.trim())}
+                header={
+                  <span className="flex items-baseline gap-2">
+                    <span className="truncate">{section.name.trim() || 'New section'}</span>
+                    <span className="num text-2xs font-normal text-ink-3">
+                      {pluralize(section.items.filter((i) => i.name.trim()).length, 'item')}
+                    </span>
+                  </span>
+                }
+                headerExtras={
+                  <IconButton
+                    aria-label={`Remove section ${section.name || si + 1}`}
+                    onClick={() => setSections(sections.filter((_, i) => i !== si))}
+                  >
+                    <Trash size={15} />
+                  </IconButton>
+                }
+              >
+                <div className="flex flex-col gap-2">
+                  <Input
+                    aria-label={`Section ${si + 1} name`}
+                    value={section.name}
+                    onChange={(e) => patchSection(si, { name: e.target.value })}
+                    placeholder="Section — e.g. Post-workout shakes"
+                    className="h-9 font-semibold"
+                  />
 
-              {section.items.map((item, ii) => (
+                  {section.items.map((item, ii) => (
                 <div key={ii} className="flex flex-wrap items-center gap-2">
                   <Input
                     aria-label={`Item ${ii + 1} name in ${section.name || `section ${si + 1}`}`}
@@ -145,18 +158,22 @@ export function MenuEditor({ gym, profileId }: { gym: string; profileId: string 
                     <Trash size={14} />
                   </IconButton>
                 </div>
-              ))}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="self-start"
-                onClick={() =>
-                  patchSection(si, { items: [...section.items, { name: '', desc: '', price: '' }] })
-                }
-              >
-                <Plus size={13} weight="bold" />
-                Add item
-              </Button>
+                  ))}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="self-start"
+                    onClick={() =>
+                      patchSection(si, {
+                        items: [...section.items, { name: '', desc: '', price: '' }],
+                      })
+                    }
+                  >
+                    <Plus size={13} weight="bold" />
+                    Add item
+                  </Button>
+                </div>
+              </Collapse>
             </div>
           ))}
 

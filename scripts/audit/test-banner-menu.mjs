@@ -71,6 +71,7 @@ console.log('ok: cast created')
 
 // 1. Operator saves the sample menu and promotes it as a banner.
 await page.goto(`${BASE}/gym`, { waitUntil: 'networkidle' })
+await page.getByRole('tab', { name: /^Menu/ }).click()
 await page.getByRole('button', { name: 'Load the sample menu' }).click()
 await page.getByRole('button', { name: 'Save menu' }).click()
 await page.getByText('Menu saved.').waitFor({ timeout: 5000 })
@@ -79,6 +80,7 @@ await page.getByText('Menu promoted').waitFor({ timeout: 5000 })
 console.log('ok: menu saved from sample and promoted')
 
 // 2. A banner targeted at Iris alone.
+await page.getByRole('tab', { name: /^Compose/ }).click()
 await page.getByLabel('Title').fill('Iris — your comp day pass is ready')
 await page.getByRole('button', { name: /^Iris$/ }).click()
 await page.getByRole('switch', { name: 'Show as a banner' }).click()
