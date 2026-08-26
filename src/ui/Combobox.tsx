@@ -62,6 +62,7 @@ export function Combobox({
           id={inputId}
           placeholder={placeholder}
           aria-invalid={error ? true : undefined}
+          aria-describedby={error && inputId ? `${inputId}-err` : undefined}
           className={cn(
             'h-11 w-full rounded-md border bg-surface px-3 pr-10 text-sm text-ink',
             'placeholder:text-ink-3 transition-colors duration-150',
@@ -135,7 +136,9 @@ export function Combobox({
       )}
       {control}
       {error ? (
-        <p className="text-2xs text-danger">{error}</p>
+        <p id={inputId ? `${inputId}-err` : undefined} className="text-2xs text-danger">
+          {error}
+        </p>
       ) : (
         hint && <p className="text-2xs text-ink-3">{hint}</p>
       )}
