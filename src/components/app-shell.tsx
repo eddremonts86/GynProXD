@@ -44,7 +44,6 @@ const NAV: NavItem[] = [
   { label: 'Planner', to: '/planner', icon: CalendarBlank, owns: ['/onboarding', '/generated'] },
   { label: 'Library', to: '/library', icon: ListMagnifyingGlass },
   { label: 'History', to: '/history', icon: ChartLineUp },
-  { label: 'Settings', to: '/settings', icon: GearSix },
 ]
 
 const PANEL_ITEM: Partial<Record<ProfileRole, NavItem>> = {
@@ -52,20 +51,56 @@ const PANEL_ITEM: Partial<Record<ProfileRole, NavItem>> = {
   admin: { label: 'Admin', to: '/admin', icon: ShieldCheck },
 }
 
-/**
- * Desktop shows Inbox as a nav item; mobile carries it as a header bell.
- * Gym operators get no Inbox anywhere: authors never receive their own
- * broadcasts, so their inbox is empty by construction — their surface is
- * the panel's sent list.
- */
-function navFor(role: ProfileRole, withInbox: boolean): NavItem[] {
+/** Work areas only; Inbox and Settings live in the top bar's utility cluster. */
+function navFor(role: ProfileRole): NavItem[] {
   const items = [...NAV]
   const panel = PANEL_ITEM[role]
-  if (panel) items.splice(4, 0, panel)
-  if (withInbox && role !== 'gym') {
-    items.splice(4, 0, { label: 'Inbox', to: '/inbox', icon: BellSimple, owns: ['/menu'] })
-  }
+  if (panel) items.push(panel)
   return items
+}
+
+/**
+ * Inbox bell and Settings gear, top right on every breakpoint. Gym
+ * operators get no bell: authors never receive their own broadcasts, so
+ * their inbox is empty by construction — their surface is the sent list.
+ */
+function UtilityCluster({ pathname }: { pathname: string }) {
+  const role = useSession((s) => s.role)
+  const unread = useUnread()
+  const inboxActive = pathname.startsWith('/inbox') || pathname.startsWith('/menu')
+  const settingsActive = pathname.startsWith('/settings')
+  const itemClass = (active: boolean) =>
+    cn(
+      'relative flex size-9 items-center justify-center rounded-full transition-colors duration-150',
+      active ? 'bg-brand text-brand-ink' : 'text-ink-3 hover:bg-surface hover:text-ink',
+    )
+  return (
+    <span className="flex items-center gap-0.5">
+      {role !== 'gym' && (
+        <Link
+          to="/inbox"
+          aria-label={unread > 0 ? `Inbox, ${unread} unread` : 'Inbox'}
+          aria-current={inboxActive ? 'page' : undefined}
+          className={itemClass(inboxActive)}
+        >
+          <BellSimple size={20} weight={inboxActive ? 'fill' : 'regular'} />
+          {unread > 0 && (
+            <span className="absolute -top-0.5 -right-0.5">
+              <UnreadBadge count={unread} />
+            </span>
+          )}
+        </Link>
+      )}
+      <Link
+        to="/settings"
+        aria-label="Settings"
+        aria-current={settingsActive ? 'page' : undefined}
+        className={itemClass(settingsActive)}
+      >
+        <GearSix size={20} weight={settingsActive ? 'fill' : 'regular'} />
+      </Link>
+    </span>
+  )
 }
 
 /** Unread gym messages for the unlocked profile. */
@@ -99,8 +134,7 @@ function isActive(item: NavItem, pathname: string): boolean {
 
 function DesktopRail({ pathname }: { pathname: string }) {
   const role = useSession((s) => s.role)
-  const unread = useUnread()
-  const items = navFor(role, true)
+  const items = navFor(role)
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col lg:flex">
       <div className="px-5 py-5">
@@ -127,7 +161,6 @@ function DesktopRail({ pathname }: { pathname: string }) {
             >
               <item.icon size={18} weight={active ? 'fill' : 'regular'} />
               <span className="flex-1">{item.label}</span>
-              {item.to === '/inbox' && <UnreadBadge count={unread} />}
             </Link>
           )
         })}
@@ -143,8 +176,7 @@ function DesktopRail({ pathname }: { pathname: string }) {
 
 function MobileChrome({ pathname }: { pathname: string }) {
   const role = useSession((s) => s.role)
-  const unread = useUnread()
-  const items = navFor(role, false)
+  const items = navFor(role)
   return (
     <>
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between bg-bg/85 px-4 backdrop-blur-md lg:hidden">
@@ -153,20 +185,7 @@ function MobileChrome({ pathname }: { pathname: string }) {
           <span className="text-base leading-none font-semibold tracking-tight text-ink">enForma</span>
         </Link>
         <span className="flex items-center gap-0.5">
-          {role !== 'gym' && (
-            <Link
-              to="/inbox"
-              aria-label={unread > 0 ? `Inbox, ${unread} unread` : 'Inbox'}
-              className="relative flex size-9 items-center justify-center rounded-full text-ink-3"
-            >
-              <BellSimple size={20} weight={pathname.startsWith('/inbox') ? 'fill' : 'regular'} />
-              {unread > 0 && (
-                <span className="absolute top-1 right-1">
-                  <UnreadBadge count={unread} />
-                </span>
-              )}
-            </Link>
-          )}
+          <UtilityCluster pathname={pathname} />
           <ThemeToggle />
         </span>
       </header>
@@ -301,6 +320,11 @@ export function AppShell() {
       <MobileChrome pathname={pathname} />
       <main id="main" className="lg:pl-60">
         <div className="mx-auto w-full max-w-[76rem] px-4 py-6 pb-32 md:px-8 md:py-10 lg:pb-12">
+          {/* Pulled up out of the content padding so it sits level with the
+              rail's wordmark, reading as the top bar's right side. */}
+          <div className="-mt-[1.375rem] mb-4 hidden justify-end lg:flex">
+            <UtilityCluster pathname={pathname} />
+          </div>
           <GymBanner />
           <Outlet />
         </div>
