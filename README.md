@@ -59,6 +59,12 @@ all fall back to the built-in deterministic generator.
   weeks of volume actually went.
 - **Offline.** Installable PWA. The app shell is precached; movement artwork is
   cached as you use it.
+- **Gym & admin panels.** Profiles carry a role: gym operators see their
+  members and publish templated messages (announcements, events with RSVP,
+  daily menus, QR-coded offers); an admin profile manages users, roles and
+  the gym catalogue. Delivery is local-first — in-app inbox with unread
+  badges plus opt-in system notifications (see docs/PANELS.md for the
+  push-server seam).
 - **Local profiles.** Per-person encrypted stores on one device, with a lock
   screen, passphrase-gated unlock and one-time migration of pre-profile data.
 

@@ -82,3 +82,10 @@ describe('offer codes', () => {
     expect(offerPayload('AB2D-EF3H', 'Forge & Flow')).toBe('enforma:offer:AB2D-EF3H:Forge & Flow')
   })
 })
+
+describe('author exclusion', () => {
+  it('a gym profile never receives its own broadcast', () => {
+    const own = msg({ audience: 'all' })
+    expect(isAddressedTo(own, { id: 'gym-1', gym: 'Forge & Flow' })).toBe(false)
+  })
+})

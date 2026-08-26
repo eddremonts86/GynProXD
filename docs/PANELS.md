@@ -95,9 +95,9 @@ would need to change shape.
 - **Overview**: profiles, gyms, messages counted.
 - **Users**: the full directory with role management (member/gym/admin),
   plus the same edit/delete as the Settings device panel.
-- **Gyms**: catalogue CRUD. Renaming a gym rewrites the catalogue entry and
-  every profile pointing at it; deleting unassigns members and removes its
-  messages.
+- **Gyms**: catalogue CRUD. Renaming a gym rewrites the catalogue entry,
+  every profile pointing at it and every message it ever sent; deleting
+  unassigns members and removes its messages.
 
 ## Navigation by role
 

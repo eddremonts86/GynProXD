@@ -44,6 +44,7 @@ export function AdminPage() {
 function AdminDesk({ selfId }: { selfId: string }) {
   const messages = useMessages((s) => s.messages)
   const removeByGym = useMessages((s) => s.removeByGym)
+  const renameGymMessages = useMessages((s) => s.renameGym)
   const refreshMeta = useSession((s) => s.refreshMeta)
 
   const [profiles, setProfiles] = useState(listProfiles)
@@ -95,6 +96,7 @@ function AdminDesk({ selfId }: { selfId: string }) {
   const doRename = () => {
     if (renaming && renameTo.trim()) {
       renameGymEverywhere(renaming, renameTo)
+      renameGymMessages(renaming, renameTo)
       refresh()
     }
     setRenaming(null)
@@ -197,7 +199,7 @@ function AdminDesk({ selfId }: { selfId: string }) {
                         value: r,
                         label: ROLE_LABELS[r],
                       }))}
-                      className={p.id === selfId ? 'pointer-events-none opacity-45' : 'w-32'}
+                      className={p.id === selfId ? 'w-32 pointer-events-none opacity-45' : 'w-32'}
                     />
 
                     {confirmUserId === p.id ? (

@@ -124,12 +124,12 @@ console.log('ok: gym recorded in registry and catalogue')
 
 // 6. Personal details encrypt with the profile and survive a reload.
 await page.goto(`${BASE}/settings`, { waitUntil: 'networkidle' })
-await page.getByLabel('Age').fill('41')
+await page.getByLabel('Age', { exact: true }).fill('41')
 await page.getByRole('button', { name: 'Save details' }).click()
 await page.getByText('Saved.').waitFor({ timeout: 5000 })
 await page.waitForTimeout(700) // autosave debounce
 await page.reload({ waitUntil: 'networkidle' })
-if ((await page.getByLabel('Age').inputValue()) !== '41') {
+if ((await page.getByLabel('Age', { exact: true }).inputValue()) !== '41') {
   fail('personal details lost after reload')
 }
 const leaked = await page.evaluate(() => {

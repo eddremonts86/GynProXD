@@ -45,6 +45,8 @@ export function isAddressedTo(
   message: GymMessage,
   profile: { id: string; gym?: string },
 ): boolean {
+  /* Authors never receive their own broadcasts; their view is the sent list. */
+  if (message.authorId === profile.id) return false
   if (!sameGym(message.gym, profile.gym)) return false
   return message.audience === 'all' || message.audience.includes(profile.id)
 }
