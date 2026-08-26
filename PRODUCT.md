@@ -24,7 +24,7 @@ Local-first, realistic, hybrid. Unlike cloud trackers that promise miracles, For
 
 ## Operating Context
 
-- Web SPA: Vite 8 + React 19 + TypeScript + TanStack Router/Query + Zustand persist (localStorage key `gynproxd-v2`) + Tailwind v4. No backend, no auth. PWA via vite-plugin-pwa (Workbox, jsDelivr image cache).
+- Web SPA: Vite 8 + React 19 + TypeScript + TanStack Router/Query + Zustand (memory) + Tailwind v4. No backend. Local profiles with passphrase-derived AES-GCM encryption at rest; the old plaintext `gynproxd-v2` store migrates into the first profile. PWA via vite-plugin-pwa (Workbox, jsDelivr image cache).
 - Routes: `/` Today and the live session, `/onboarding` (plan builder), `/generated/$id` (calendar), `/planner` (weekly), `/library` (873), `/history`, `/settings`. Onboarding is reached from empty states and Settings rather than from the navigation, because it is a setup flow rather than a destination.
 - Workflows: onboarding → estimation card → generate → calendar → save to planner → start workout from plan → log sets → finish → history.
 - Materials: exercise data from `yuhonas/free-exercise-db` via jsDelivr, RepDB flat illustrations bundled locally, both lazy-loaded. No decorative illustration is generated to stand in for a movement that has none.
@@ -34,7 +34,7 @@ Local-first, realistic, hybrid. Unlike cloud trackers that promise miracles, For
 
 **Capabilities:** 873 exercises merged with customs, lookup cache, epley 1RM, `suggestNext` linear/double, `isPersonalRecord`, bodyweight log, workout persist, plans + generatedPlans, onboarding parse (regex), estimation engine, plan generator (splits 2–6 days, deload every 4th week), calendar, PWA offline.
 
-**Constraints:** No server, no sync, no medical advice (disclaimer), localStorage only, images not bundled, must keep 873 dataset public-domain, must not copy openGym.
+**Constraints:** No server, no sync, no medical advice (disclaimer), local storage only (encrypted per profile), images not bundled, must keep 873 dataset public-domain, must not copy openGym.
 
 **Undecided:** Nutrition/macros, LLM cloud, social, backend sync — out of scope v1.
 

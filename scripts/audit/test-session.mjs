@@ -4,12 +4,14 @@
  * profile so empty states get exercised too.
  */
 import { chromium } from 'playwright'
+import { ensureProfile } from './gate.mjs'
 
 const BASE = process.env.BASE_URL ?? 'http://localhost:3015'
 const browser = await chromium.launch()
 const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } })
 await ctx.addInitScript(() => localStorage.setItem('forma-coach', 'off'))
 const page = await ctx.newPage()
+await ensureProfile(page, BASE)
 
 const errors = []
 page.on('console', (m) => {

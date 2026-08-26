@@ -1,9 +1,14 @@
 # Forma
 
 Local-first hybrid gym and calisthenics tracker. Vite 8 + React 19 + TypeScript +
-Tailwind v4 + TanStack Router/Query + Zustand (persist, localStorage) + Base UI
-primitives + PWA. No account, no server: your data lives in your browser and is
+Tailwind v4 + TanStack Router/Query + Zustand + Base UI primitives + PWA. No
+cloud, no server: data lives in this browser under local profiles, each one
+encrypted with its own passphrase (PBKDF2 + AES-GCM via WebCrypto), and is
 exportable as JSON at any time.
+
+Profiles make the device shareable: several people can train on one browser and
+nobody can read anyone else's data without their passphrase. There is no
+recovery for a forgotten passphrase; the JSON export is the backup.
 
 ## Run
 
@@ -54,6 +59,8 @@ all fall back to the built-in deterministic generator.
   weeks of volume actually went.
 - **Offline.** Installable PWA. The app shell is precached; movement artwork is
   cached as you use it.
+- **Local profiles.** Per-person encrypted stores on one device, with a lock
+  screen, passphrase-gated unlock and one-time migration of pre-profile data.
 
 ## Exercise imagery & data licensing
 

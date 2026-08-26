@@ -1,0 +1,240 @@
+import { useState } from 'react'
+import { ArrowRight, CircleNotch, Plus, UserCircle } from '@phosphor-icons/react'
+import { Wordmark } from '@/components/brand'
+import { Button } from '@/ui/Button'
+import { Input } from '@/ui/Input'
+import {
+  createProfile,
+  lastActiveProfileId,
+  legacySnapshot,
+  listProfiles,
+  unlockProfile,
+} from '@/lib/profiles'
+import { formatShortDate } from '@/lib/labels'
+import { cn } from '@/lib/utils'
+
+/**
+ * The lock screen. Every profile's data is encrypted under its passphrase, so
+ * this is not a formality: without the phrase there is nothing to show.
+ */
+export function ProfileGate({ onUnlocked }: { onUnlocked: (name: string) => void }) {
+  const [profiles] = useState(listProfiles)
+  const [mode, setMode] = useState<'unlock' | 'create'>(profiles.length > 0 ? 'unlock' : 'create')
+  const [selectedId, setSelectedId] = useState<string>(
+    () => lastActiveProfileId() ?? profiles[0]?.id ?? '',
+  )
+  const [passphrase, setPassphrase] = useState('')
+  const [name, setName] = useState('')
+  const [confirm, setConfirm] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+
+  /* Only offered while no profile exists yet: data from before profiles. */
+  const hasLegacy = profiles.length === 0 && legacySnapshot() !== null
+
+  const unlock = async () => {
+    if (busy || !selectedId) return
+    setBusy(true)
+    setError(null)
+    try {
+      const ok = await unlockProfile(selectedId, passphrase)
+      if (!ok) {
+        setError('That passphrase does not open this profile.')
+        return
+      }
+      onUnlocked(profiles.find((p) => p.id === selectedId)?.name ?? '')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const create = async () => {
+    if (busy) return
+    const trimmed = name.trim()
+    if (trimmed.length === 0) {
+      setError('Give the profile a name.')
+      return
+    }
+    if (passphrase.length < 4) {
+      setError('The passphrase needs at least 4 characters.')
+      return
+    }
+    if (passphrase !== confirm) {
+      setError('The passphrases do not match.')
+      return
+    }
+    setBusy(true)
+    setError(null)
+    try {
+      await createProfile(trimmed, passphrase, { importLegacy: hasLegacy })
+      onUnlocked(trimmed)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-8 bg-bg px-4 py-10">
+      <Wordmark />
+
+      <div className="w-full max-w-sm rounded-xl bg-surface p-6 shadow-[var(--shadow-tile)]">
+        {mode === 'unlock' ? (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              void unlock()
+            }}
+            className="flex flex-col gap-4"
+          >
+            <div className="flex flex-col gap-1">
+              <h1 className="text-xl text-ink">Who is training?</h1>
+              <p className="text-2xs text-ink-3">
+                Each profile is encrypted with its own passphrase.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              {profiles.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => {
+                    setSelectedId(p.id)
+                    setError(null)
+                  }}
+                  className={cn(
+                    'flex items-center gap-3 rounded-lg bg-surface-2 p-3 text-left transition-colors',
+                    selectedId === p.id ? 'ring-2 ring-brand' : 'hover:bg-line/60',
+                  )}
+                >
+                  <UserCircle size={22} className="shrink-0 text-ink-3" />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-semibold text-ink">{p.name}</span>
+                    <span className="num block text-2xs text-ink-3">
+                      Since {formatShortDate(p.createdAt.slice(0, 10))}
+                    </span>
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <Input
+              label="Passphrase"
+              type="password"
+              value={passphrase}
+              onChange={(e) => {
+                setPassphrase(e.target.value)
+                setError(null)
+              }}
+              error={error ?? undefined}
+              autoFocus
+            />
+
+            <Button type="submit" size="lg" disabled={busy || !passphrase} className="w-full">
+              {busy ? (
+                <CircleNotch size={18} weight="bold" className="animate-spin" />
+              ) : (
+                <>
+                  Unlock
+                  <ArrowRight size={18} weight="bold" />
+                </>
+              )}
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="sm"
+              className="self-center"
+              onClick={() => {
+                setMode('create')
+                setError(null)
+              }}
+            >
+              <Plus size={14} weight="bold" />
+              New profile
+            </Button>
+          </form>
+        ) : (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              void create()
+            }}
+            className="flex flex-col gap-4"
+          >
+            <div className="flex flex-col gap-1">
+              <h1 className="text-xl text-ink">Create your profile</h1>
+              <p className="text-2xs text-ink-3">
+                Your training data is encrypted with this passphrase and never leaves the device.
+                There is no reset: write it down, and export backups from Settings.
+              </p>
+            </div>
+
+            <Input
+              label="Name"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value)
+                setError(null)
+              }}
+              autoFocus
+            />
+            <Input
+              label="Passphrase"
+              type="password"
+              value={passphrase}
+              onChange={(e) => {
+                setPassphrase(e.target.value)
+                setError(null)
+              }}
+              hint="At least 4 characters."
+            />
+            <Input
+              label="Repeat passphrase"
+              type="password"
+              value={confirm}
+              onChange={(e) => {
+                setConfirm(e.target.value)
+                setError(null)
+              }}
+              error={error ?? undefined}
+            />
+
+            {hasLegacy && (
+              <p className="rounded-md bg-surface-2 p-3 text-2xs leading-relaxed text-ink-2">
+                Training data from before profiles existed was found on this device. It will be
+                moved into this profile and encrypted.
+              </p>
+            )}
+
+            <Button type="submit" size="lg" disabled={busy} className="w-full">
+              {busy ? (
+                <CircleNotch size={18} weight="bold" className="animate-spin" />
+              ) : (
+                'Create profile'
+              )}
+            </Button>
+
+            {profiles.length > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="self-center"
+                onClick={() => {
+                  setMode('unlock')
+                  setError(null)
+                }}
+              >
+                Back to profiles
+              </Button>
+            )}
+          </form>
+        )}
+      </div>
+
+      <p className="max-w-sm text-center text-2xs text-ink-3">
+        Local only. No cloud. A forgotten passphrase cannot be recovered.
+      </p>
+    </div>
+  )
+}

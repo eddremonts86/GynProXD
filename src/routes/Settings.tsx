@@ -2,6 +2,8 @@ import { useRef, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { DownloadSimple, UploadSimple, WarningCircle } from '@phosphor-icons/react'
 import { useGym } from '../store/useGym'
+import { useSession } from '../store/useSession'
+import { deleteActiveProfile, lockProfile } from '../lib/profiles'
 import { Button } from '../ui/Button'
 import { Panel } from '../ui/Panel'
 import { PageHeader, Section } from '../ui/PageHeader'
@@ -21,9 +23,12 @@ export function SettingsPage() {
   const importData = useGym((s) => s.importData)
   const clearAllData = useGym((s) => s.clearAllData)
 
+  const profileName = useSession((s) => s.profileName)
+  const setLocked = useSession((s) => s.setLocked)
   const fileRef = useRef<HTMLInputElement>(null)
   const [feedback, setFeedback] = useState<Feedback>(null)
   const [confirmClear, setConfirmClear] = useState(false)
+  const [confirmDeleteProfile, setConfirmDeleteProfile] = useState(false)
 
   const hasData =
     workouts.length > 0 ||
@@ -70,8 +75,56 @@ export function SettingsPage() {
     <div className="flex flex-col gap-8">
       <PageHeader
         title="Settings"
-        description="Forma runs entirely in this browser. There is no account and nothing is uploaded."
+        description="Forma runs entirely in this browser. Profiles are encrypted locally and nothing is uploaded."
       />
+
+      <Section title="Profile">
+        <Panel padding="lg" className="flex flex-col gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex min-w-0 flex-col gap-0.5">
+              <span className="truncate text-sm font-semibold text-ink">{profileName}</span>
+              <span className="text-2xs text-ink-3">
+                This profile's data is encrypted with its passphrase. Locking returns to the
+                profile screen.
+              </span>
+            </div>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                void lockProfile().then(setLocked)
+              }}
+            >
+              Lock profile
+            </Button>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
+            <p className="max-w-[46ch] text-2xs text-ink-3">
+              Deleting removes this profile and every byte of its encrypted data from the device.
+              Export a backup first.
+            </p>
+            {confirmDeleteProfile ? (
+              <span className="flex items-center gap-2">
+                <Button variant="ghost" size="sm" onClick={() => setConfirmDeleteProfile(false)}>
+                  Cancel
+                </Button>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={() => {
+                    void deleteActiveProfile().then(setLocked)
+                  }}
+                >
+                  Delete profile
+                </Button>
+              </span>
+            ) : (
+              <Button variant="dangerQuiet" size="sm" onClick={() => setConfirmDeleteProfile(true)}>
+                Delete profile
+              </Button>
+            )}
+          </div>
+        </Panel>
+      </Section>
 
       <Section title="Your data" hint={`${pluralize(workouts.length, 'session')} stored`}>
         <Panel padding="lg" className="flex flex-col gap-4">

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import {
   Link,
   Outlet,
@@ -14,6 +15,11 @@ import type { Icon } from '@phosphor-icons/react'
 import { Wordmark, Mark } from '@/components/brand'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { SessionRailCard, SessionMobileBar } from '@/components/session-indicator'
+import { ProfileGate } from '@/components/profile-gate'
+import { useSession } from '@/store/useSession'
+import { activeProfile, lockProfile, resumeSession } from '@/lib/profiles'
+import { SignOut } from '@phosphor-icons/react'
+import { IconButton } from '@/ui/Button'
 import { cn } from '@/lib/utils'
 
 interface NavItem {
@@ -72,10 +78,7 @@ function DesktopRail({ pathname }: { pathname: string }) {
 
       <div className="flex flex-col gap-3 p-3">
         <SessionRailCard />
-        <div className="flex items-center justify-between pt-1">
-          <span className="px-1 text-2xs text-ink-3">Local only. No account.</span>
-          <ThemeToggle />
-        </div>
+        <ProfileFooter />
       </div>
     </aside>
   )
@@ -122,8 +125,53 @@ function MobileChrome({ pathname }: { pathname: string }) {
   )
 }
 
+function ProfileFooter() {
+  const profileName = useSession((s) => s.profileName)
+  const setLocked = useSession((s) => s.setLocked)
+  return (
+    <div className="flex items-center justify-between gap-2 pt-1">
+      <span className="min-w-0 truncate px-1 text-2xs text-ink-3">
+        {profileName ?? 'Local only'}
+      </span>
+      <span className="flex shrink-0 items-center">
+        <ThemeToggle />
+        <IconButton
+          size="sm"
+          aria-label="Lock this profile"
+          onClick={() => {
+            void lockProfile().then(setLocked)
+          }}
+        >
+          <SignOut size={16} />
+        </IconButton>
+      </span>
+    </div>
+  )
+}
+
 export function AppShell() {
   const pathname = useRouterState({ select: (s) => s.location.pathname })
+  const status = useSession((s) => s.status)
+  const setUnlocked = useSession((s) => s.setUnlocked)
+  const setLocked = useSession((s) => s.setLocked)
+
+  /* One resume attempt per boot: a refreshed tab keeps its unlocked profile. */
+  useEffect(() => {
+    if (status !== 'boot') return
+    void resumeSession().then((resumed) => {
+      if (resumed) setUnlocked(activeProfile()?.name ?? '')
+      else setLocked()
+    })
+  }, [status, setUnlocked, setLocked])
+
+  if (status === 'boot') {
+    return <div className="min-h-[100dvh] bg-bg" aria-busy="true" />
+  }
+
+  if (status === 'locked') {
+    return <ProfileGate onUnlocked={setUnlocked} />
+  }
+
   return (
     <div className="min-h-[100dvh] bg-bg">
       <a

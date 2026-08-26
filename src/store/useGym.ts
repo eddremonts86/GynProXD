@@ -1,5 +1,4 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
 import type {
   BodyweightEntry,
   DayOfWeek,
@@ -75,9 +74,11 @@ const today = todayIso
 
 populateByIdCache(generatedExercises)
 
-export const useGym = create<GymState>()(
-  persist(
-    (set, get) => ({
+/**
+ * The store is memory-only. Persistence lives in lib/profiles: each profile's
+ * snapshot is encrypted at rest, loaded on unlock and saved on change.
+ */
+export const useGym = create<GymState>()((set, get) => ({
       customExercises: [],
       workouts: [],
       bodyweight: [],
@@ -344,39 +345,50 @@ export const useGym = create<GymState>()(
         set((s) => ({ plans: [newPlan, ...s.plans] }))
         return newPlan.id
       },
-    }),
-    {
-      name: 'gynproxd-v2',
-      partialize: (s) => ({
-        customExercises: s.customExercises,
-        workouts: s.workouts,
-        bodyweight: s.bodyweight,
-        activeWorkout: s.activeWorkout,
-        plans: s.plans,
-        generatedPlans: s.generatedPlans,
-      }),
-      onRehydrateStorage: () => (state) => {
-        if (state) {
-          populateByIdCache([...generatedExercises, ...state.customExercises])
-        } else {
-          populateByIdCache(generatedExercises)
-        }
-      },
-      merge: (persisted, current) => {
-        const p = persisted as Partial<GymState> | undefined
-        const merged: GymState = {
-          ...current,
-          ...p,
-          customExercises: p?.customExercises ?? current.customExercises,
-          workouts: p?.workouts ?? current.workouts,
-          bodyweight: p?.bodyweight ?? current.bodyweight,
-          activeWorkout: p?.activeWorkout ?? current.activeWorkout,
-          plans: (p?.plans as WeeklyPlan[] | undefined) ?? current.plans,
-          generatedPlans: (p?.generatedPlans as GeneratedPlan[] | undefined) ?? current.generatedPlans,
-        }
-        populateByIdCache([...generatedExercises, ...merged.customExercises])
-        return merged
-      },
-    },
-  ),
-)
+}))
+
+populateByIdCache(generatedExercises)
+
+/** The persisted slice of the store: user data, nothing derived. */
+export interface GymSnapshot {
+  customExercises: Exercise[]
+  workouts: Workout[]
+  bodyweight: BodyweightEntry[]
+  activeWorkout: Workout | null
+  plans: WeeklyPlan[]
+  generatedPlans: GeneratedPlan[]
+}
+
+export const EMPTY_SNAPSHOT: GymSnapshot = {
+  customExercises: [],
+  workouts: [],
+  bodyweight: [],
+  activeWorkout: null,
+  plans: [],
+  generatedPlans: [],
+}
+
+export function snapshotGym(state: GymState = useGym.getState()): GymSnapshot {
+  return {
+    customExercises: state.customExercises,
+    workouts: state.workouts,
+    bodyweight: state.bodyweight,
+    activeWorkout: state.activeWorkout,
+    plans: state.plans,
+    generatedPlans: state.generatedPlans,
+  }
+}
+
+/** Loads a profile's snapshot into the live store, tolerating older shapes. */
+export function hydrateGym(snapshot: Partial<GymSnapshot> | null | undefined): void {
+  const next: GymSnapshot = {
+    customExercises: snapshot?.customExercises ?? [],
+    workouts: snapshot?.workouts ?? [],
+    bodyweight: snapshot?.bodyweight ?? [],
+    activeWorkout: snapshot?.activeWorkout ?? null,
+    plans: snapshot?.plans ?? [],
+    generatedPlans: snapshot?.generatedPlans ?? [],
+  }
+  populateByIdCache([...generatedExercises, ...next.customExercises])
+  useGym.setState(next)
+}

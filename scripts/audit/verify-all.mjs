@@ -1,4 +1,5 @@
 import { chromium } from 'playwright'
+import { ensureProfile } from './gate.mjs'
 
 const BASE = process.env.BASE_URL ?? 'http://localhost:3015'
 const viewports = [
@@ -21,6 +22,7 @@ for (const vp of viewports) {
   const ctx = await browser.newContext({ viewport: { width: vp.width, height: vp.height } })
   await ctx.addInitScript(() => localStorage.setItem('forma-coach', 'off'))
   const page = await ctx.newPage()
+  await ensureProfile(page, BASE)
   page.on('pageerror', (e) => console.log(`pageerror ${vp.name}:`, e))
   page.on('console', (m) => { if (m.type() === 'error') console.log(`console error ${vp.name}:`, m.text()) })
   for (const r of routes) {
