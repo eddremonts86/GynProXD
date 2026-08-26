@@ -4,6 +4,7 @@ import { Wordmark } from '@/components/brand'
 import { Avatar } from '@/ui/Avatar'
 import { Button } from '@/ui/Button'
 import { Combobox } from '@/ui/Combobox'
+import { FormSelect } from '@/ui/FormSelect'
 import { Input } from '@/ui/Input'
 import {
   createProfile,
@@ -12,6 +13,7 @@ import {
   listGyms,
   listProfiles,
   unlockProfile,
+  type ProfileRole,
 } from '@/lib/profiles'
 import { formatShortDate } from '@/lib/labels'
 import { cn } from '@/lib/utils'
@@ -20,7 +22,7 @@ import { cn } from '@/lib/utils'
  * The lock screen. Every profile's data is encrypted under its passphrase, so
  * this is not a formality: without the phrase there is nothing to show.
  */
-export function ProfileGate({ onUnlocked }: { onUnlocked: (name: string) => void }) {
+export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
   const [profiles] = useState(listProfiles)
   const [mode, setMode] = useState<'unlock' | 'create'>(profiles.length > 0 ? 'unlock' : 'create')
   const [selectedId, setSelectedId] = useState<string>(
@@ -30,6 +32,7 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: (name: string) => void
   const [name, setName] = useState('')
   const [gym, setGym] = useState('')
   const [gyms] = useState(listGyms)
+  const [role, setRole] = useState<ProfileRole>('member')
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -47,7 +50,7 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: (name: string) => void
         setError('That passphrase does not open this profile.')
         return
       }
-      onUnlocked(profiles.find((p) => p.id === selectedId)?.name ?? '')
+      onUnlocked()
     } finally {
       setBusy(false)
     }
@@ -58,6 +61,10 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: (name: string) => void
     const trimmed = name.trim()
     if (trimmed.length === 0) {
       setError('Give the profile a name.')
+      return
+    }
+    if (role === 'gym' && gym.trim().length === 0) {
+      setError('A gym profile needs the name of the gym it runs.')
       return
     }
     if (passphrase.length < 4) {
@@ -71,8 +78,8 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: (name: string) => void
     setBusy(true)
     setError(null)
     try {
-      await createProfile(trimmed, passphrase, { importLegacy: hasLegacy, gym })
-      onUnlocked(trimmed)
+      await createProfile(trimmed, passphrase, { importLegacy: hasLegacy, gym, role })
+      onUnlocked()
     } finally {
       setBusy(false)
     }
@@ -185,15 +192,37 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: (name: string) => void
               }}
               autoFocus
             />
-            <Combobox
-              label="Gym"
-              value={gym}
-              onValueChange={setGym}
-              options={gyms}
-              placeholder="Search or add yours"
-              createLabel="Add gym"
-              hint="Leave empty if you train on your own."
+            <FormSelect
+              label="Profile type"
+              value={role}
+              onValueChange={(v) => {
+                setRole(v as ProfileRole)
+                setError(null)
+              }}
+              options={[
+                { value: 'member', label: 'Member — I train here' },
+                { value: 'gym', label: 'Gym — I run a gym' },
+                { value: 'admin', label: 'Administrator — I manage this device' },
+              ]}
             />
+            {role !== 'admin' && (
+              <Combobox
+                label="Gym"
+                value={gym}
+                onValueChange={(v) => {
+                  setGym(v)
+                  setError(null)
+                }}
+                options={gyms}
+                placeholder="Search or add yours"
+                createLabel="Add gym"
+                hint={
+                  role === 'gym'
+                    ? 'The gym this profile runs. Members who pick it become your audience.'
+                    : 'Leave empty if you train on your own.'
+                }
+              />
+            )}
             <Input
               label="Passphrase"
               type="password"

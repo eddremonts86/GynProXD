@@ -23,6 +23,13 @@ import { PageHeader, Section } from '../ui/PageHeader'
 import { InstallAppButton } from '@/components/install-app-button'
 import { SEX_LABELS, formatShortDate, pluralize } from '../lib/labels'
 import { todayIso } from '../lib/dates'
+import { Switch } from '@/components/ui/switch'
+import {
+  disableNotifications,
+  enableNotifications,
+  notificationsEnabled,
+  notificationsSupported,
+} from '../lib/notify'
 
 type Feedback = { tone: 'good' | 'danger'; text: string } | null
 
@@ -141,6 +148,8 @@ export function SettingsPage() {
       </Section>
 
       <DeviceProfilesSection />
+
+      <NotificationsSection />
 
       <Section title="Your data" hint={`${pluralize(workouts.length, 'session')} stored`}>
         <Panel padding="lg" className="flex flex-col gap-4">
@@ -292,7 +301,7 @@ export function SettingsPage() {
 function ProfileIdentityPanel() {
   const details = useGym((s) => s.profileDetails)
   const setProfileDetails = useGym((s) => s.setProfileDetails)
-  const setUnlocked = useSession((s) => s.setUnlocked)
+  const refreshMeta = useSession((s) => s.refreshMeta)
   const [meta] = useState(activeProfile)
   const [gyms] = useState(listGyms)
 
@@ -312,7 +321,7 @@ function ProfileIdentityPanel() {
     const trimmedName = name.trim()
     if (meta && trimmedName) {
       updateProfileMeta(meta.id, { name: trimmedName, gym })
-      setUnlocked(trimmedName)
+      refreshMeta({ name: trimmedName, gym })
     }
     const next: ProfileDetails = {}
     const ageN = Math.round(Number(age))
@@ -385,6 +394,43 @@ function ProfileIdentityPanel() {
         )}
       </div>
     </Panel>
+  )
+}
+
+/** System notifications for gym messages, honest about their local reach. */
+function NotificationsSection() {
+  const [enabled, setEnabled] = useState(notificationsEnabled)
+  const [blocked, setBlocked] = useState(false)
+  if (!notificationsSupported()) return null
+
+  return (
+    <Section title="Notifications">
+      <Panel padding="lg" className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <span className="text-sm font-semibold text-ink">Gym messages</span>
+          <span className="max-w-[52ch] text-2xs text-ink-3">
+            {blocked
+              ? 'Your browser has notifications blocked for enForma. Allow them in the site settings and try again.'
+              : 'A system notification when your gym sends something new, shown while enForma is open on this device.'}
+          </span>
+        </div>
+        <Switch
+          aria-label="Notify about gym messages"
+          checked={enabled}
+          onCheckedChange={(on) => {
+            if (!on) {
+              disableNotifications()
+              setEnabled(false)
+              return
+            }
+            void enableNotifications().then((ok) => {
+              setEnabled(ok)
+              setBlocked(!ok)
+            })
+          }}
+        />
+      </Panel>
+    </Section>
   )
 }
 

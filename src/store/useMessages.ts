@@ -41,6 +41,7 @@ interface MessagesState {
   messages: GymMessage[]
   publish: (input: PublishInput) => GymMessage
   remove: (id: string) => void
+  removeByGym: (gym: string) => void
   markRead: (ids: string[], profileId: string) => void
   respond: (id: string, profileId: string, answer: 'yes' | 'no') => void
   toggleSaved: (id: string, profileId: string) => void
@@ -67,6 +68,13 @@ export const useMessages = create<MessagesState>()((set, get) => ({
 
   remove: (id) => {
     const messages = get().messages.filter((m) => m.id !== id)
+    persist(messages)
+    set({ messages })
+  },
+
+  removeByGym: (gym) => {
+    const key = gym.trim().toLowerCase()
+    const messages = get().messages.filter((m) => m.gym.trim().toLowerCase() !== key)
     persist(messages)
     set({ messages })
   },
