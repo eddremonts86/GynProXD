@@ -5,7 +5,7 @@ import { useGym } from '../store/useGym'
 import { e1rmSeries, exerciseById } from '../lib/exercises'
 import { muscleMaxVolume, muscleVolume } from '../lib/muscle-volume'
 import { isoDaysAgo } from '../lib/dates'
-import { weeklyVolumeSeries, workoutTotals } from '../lib/stats'
+import { sessionCountsByExercise, weeklyVolumeSeries, workoutTotals } from '../lib/stats'
 import { Button, IconButton } from '../ui/Button'
 import { Panel } from '../ui/Panel'
 import { Stat } from '../ui/Stat'
@@ -150,10 +150,7 @@ function StrengthChart() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
   const options = useMemo(() => {
-    const counts = new Map<string, number>()
-    for (const w of workouts)
-      for (const e of w.exercises) counts.set(e.exerciseId, (counts.get(e.exerciseId) ?? 0) + 1)
-    return [...counts.entries()]
+    return [...sessionCountsByExercise(workouts).entries()]
       .sort((a, b) => b[1] - a[1])
       .map(([id]) => ({ value: id, label: exerciseById(id)?.name ?? id }))
   }, [workouts])

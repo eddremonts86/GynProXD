@@ -8,10 +8,10 @@ import {
   parseMealDbList,
   parseSpoonacularResults,
   rankSuggestions,
-  seedFrom,
   spoonacularQuery,
   type RecipeSuggestion,
 } from './recipes'
+import { seedFrom } from './seed'
 import type { OnboardingInput } from './types'
 
 const input: OnboardingInput = {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { bodyweightDelta, rangeVolume, weeklyVolumeSeries } from './stats'
+import { bodyweightDelta, rangeVolume, sessionCountsByExercise, weeklyVolumeSeries } from './stats'
 import type { Workout } from './types'
 
 const workout = (date: string, weight: number, reps: number): Workout => ({
@@ -28,6 +28,23 @@ describe('rangeVolume', () => {
   it('sums inclusive bounds only', () => {
     const w = [workout('2026-08-01', 10, 10), workout('2026-08-05', 20, 10), workout('2026-08-09', 30, 10)]
     expect(rangeVolume(w, '2026-08-01', '2026-08-05')).toBe(300)
+  })
+})
+
+describe('sessionCountsByExercise', () => {
+  it('counts performances per exercise across sessions', () => {
+    const counts = sessionCountsByExercise([
+      workout('2026-08-24', 100, 5),
+      workout('2026-08-25', 100, 5),
+      { id: 'w3', date: '2026-08-26', exercises: [{ exerciseId: 'y', sets: [{ weight: 20, reps: 8 }] }] },
+    ])
+    expect(counts.get('x')).toBe(2)
+    expect(counts.get('y')).toBe(1)
+    expect(counts.get('z')).toBeUndefined()
+  })
+
+  it('is empty for no workouts', () => {
+    expect(sessionCountsByExercise([]).size).toBe(0)
   })
 })
 

@@ -1,4 +1,5 @@
 import { mealTargets, type NutritionTarget } from './nutrition-target'
+import { seedFrom } from './seed'
 
 /**
  * Recipe suggestions from two free sources. TheMealDB is keyless and allows
@@ -45,16 +46,6 @@ export const DAILY_CATEGORIES = [
   'Lamb',
   'Pork',
 ] as const
-
-/** FNV-1a. Every device hashes the same date to the same dish, no backend. */
-export function seedFrom(text: string): number {
-  let h = 2166136261
-  for (let i = 0; i < text.length; i++) {
-    h ^= text.charCodeAt(i)
-    h = Math.imul(h, 16777619)
-  }
-  return h >>> 0
-}
 
 export function dailyCategoryFor(dateIso: string): string {
   return DAILY_CATEGORIES[seedFrom(dateIso) % DAILY_CATEGORIES.length]

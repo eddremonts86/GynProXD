@@ -76,6 +76,17 @@ export function weeklyVolumeSeries(workouts: Workout[], weeks = 12, today = new 
   return points
 }
 
+/**
+ * Times each exercise was performed across all sessions. Feeds the strength
+ * chart's exercise ordering, the library's done filter and done-count chips.
+ */
+export function sessionCountsByExercise(workouts: Workout[]): Map<string, number> {
+  const counts = new Map<string, number>()
+  for (const w of workouts)
+    for (const e of w.exercises) counts.set(e.exerciseId, (counts.get(e.exerciseId) ?? 0) + 1)
+  return counts
+}
+
 /** Signed bodyweight change across the last `days`, or null without two points. */
 export function bodyweightDelta(entries: BodyweightEntry[], days: number, today = new Date()): number | null {
   if (entries.length < 2) return null

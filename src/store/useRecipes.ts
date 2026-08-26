@@ -5,9 +5,9 @@ import {
   fetchSuggestions,
   rankSuggestions,
   recipeSearchEnabled,
-  seedFrom,
   type RecipeSuggestion,
 } from '../lib/recipes'
+import { seedFrom } from '../lib/seed'
 import { annotateSuggestions } from '../lib/recipe-coach'
 import { nutritionTargetFor } from '../lib/nutrition-target'
 import { SAMPLE_SUGGESTIONS } from '../data/sample-recipes'
