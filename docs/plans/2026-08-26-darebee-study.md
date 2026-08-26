@@ -1,6 +1,6 @@
 # Darebee study: what to steal and how to build it
 
-Status: approved — executing phases 0–8 (2026-08-26)
+Status: implemented — phases 0–8 shipped 2026-08-26 (phase 9 still a plan)
 Date: 2026-08-26
 
 Decisions locked with Edd 2026-08-26: scope is phases 0–8 (phase 9 stays a
@@ -306,8 +306,43 @@ untouched.
 
 ## Phases
 
-Ordered by value/effort. Each phase ships alone and gets its own detailed
-task plan (superpowers writing-plans format) before execution.
+Ordered by value/effort. Phases 0–8 are implemented and committed on `dev`;
+each was verified in the browser, not only by tests. What landed, per phase,
+plus the deviations worth knowing:
+
+- **0** `seed.ts`, `stats.sessionCountsByExercise`. The gym-rename bug in the
+  fit check turned out to be already handled: `Admin.doRename` calls
+  `useMessages.renameGym` and `useMenus.renameGym` alongside
+  `renameGymEverywhere`. No fix needed.
+- **1** `Workout.ec`, finish-summary card, EC + duration badges, library
+  done filter and counts.
+- **2** `daily-pick.ts` (pure, no store — simpler than the dish of the day),
+  movement-of-the-day card with an injected-RNG reroll.
+- **3** `targetSets` on the session's `LoggedExercise` at
+  `startWorkoutFromPlan` + live `setSessionIntensity`, I/II/III = 2/3/4,
+  logged-vs-target chips, `Workout.intensity`. Plus the progression guard:
+  double progression now needs three sets of evidence.
+- **4** `challenge.ts` + 4 bundled challenges + `/challenges` + the
+  `challenge` bus kind with a joined tally. Progress lives in the encrypted
+  `GymSnapshot`; the definition is copied on join. **Found and fixed while
+  verifying**: the 400 ms autosave debounce could lose the last writes to a
+  full page navigation — `profiles.ts` now also flushes on `pagehide`.
+- **5** `session-card.ts` renders posters on a canvas (not SVG — the loaded
+  Geist faces just work, and only same-origin `/repdb` illustrations are
+  drawn so export can never taint). Share sheet with download fallback from
+  the finish summary, history rows, today's day, and a challenge wall
+  poster in the gym's sent list.
+- **6** `fitness-test.ts` + `/fitness-test`, prefilling the designer's level
+  and effort; retest at 8 weeks shown in-app and, opt-in, as one
+  notification per stale test on a **separate** `training` channel.
+- **7** `alternatives.ts` + a swap control in the session focus card
+  (logged sets are never discarded), and `ecNote` per day: coach-written
+  through `cleanText`, six rotating templates on the standard path, dropped
+  on deload weeks, living on `PlannedDay` so it survives the planner copy.
+- **8** `collection.ts` + 3 bundled hubs + the `collection` bus kind;
+  members get them as library filter chips, gym-curated first.
+
+Phase 9 keeps its own plan below and has not been started.
 
 **Phase 0 — prerequisites (S)**: commit the recipes work sitting
 untracked on `dev`; move `seedFrom` to `src/lib/seed.ts` (recipes re-import,
