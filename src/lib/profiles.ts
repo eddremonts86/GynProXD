@@ -19,11 +19,15 @@ import { EMPTY_SNAPSHOT, hydrateGym, snapshotGym, useGym, type GymSnapshot } fro
  * closing the browser locks). Nothing about a profile is readable without it.
  */
 
+export type ProfileRole = 'member' | 'gym' | 'admin'
+
 export interface ProfileMeta {
   id: string
   name: string
-  /** Gym the person trains at. Plaintext by design: shown before unlock. */
+  /** Gym the person trains at — or, for a gym-role profile, the gym it runs. */
   gym?: string
+  /** Panel access. Gates navigation, never cryptography. Absent = member. */
+  role?: ProfileRole
   createdAt: string
   kdf: { salt: string; iterations: number }
   /** A small encrypted sentinel, used to verify a passphrase on unlock. */
@@ -68,14 +72,16 @@ export interface ProfileSummary {
   id: string
   name: string
   gym?: string
+  role: ProfileRole
   createdAt: string
 }
 
 export function listProfiles(): ProfileSummary[] {
-  return readRegistry().profiles.map(({ id, name, gym, createdAt }) => ({
+  return readRegistry().profiles.map(({ id, name, gym, role, createdAt }) => ({
     id,
     name,
     gym,
+    role: role ?? 'member',
     createdAt,
   }))
 }
@@ -104,10 +110,17 @@ export function lastActiveProfileId(): string | undefined {
   return readRegistry().lastActiveId
 }
 
-export function activeProfile(): { id: string; name: string; gym?: string } | null {
+export function activeProfile(): {
+  id: string
+  name: string
+  gym?: string
+  role: ProfileRole
+} | null {
   if (!activeId) return null
   const meta = readRegistry().profiles.find((p) => p.id === activeId)
-  return meta ? { id: meta.id, name: meta.name, gym: meta.gym } : null
+  return meta
+    ? { id: meta.id, name: meta.name, gym: meta.gym, role: meta.role ?? 'member' }
+    : null
 }
 
 /**
@@ -115,7 +128,10 @@ export function activeProfile(): { id: string; name: string; gym?: string } | nu
  * encryption on purpose (the lock screen shows them), so any unlocked user
  * can administer them. Training data stays sealed under each passphrase.
  */
-export function updateProfileMeta(id: string, patch: { name?: string; gym?: string }): boolean {
+export function updateProfileMeta(
+  id: string,
+  patch: { name?: string; gym?: string; role?: ProfileRole },
+): boolean {
   const registry = readRegistry()
   const meta = registry.profiles.find((p) => p.id === id)
   if (!meta) return false
@@ -132,8 +148,44 @@ export function updateProfileMeta(id: string, patch: { name?: string; gym?: stri
       delete meta.gym
     }
   }
+  if (patch.role !== undefined) {
+    if (patch.role === 'member') delete meta.role
+    else meta.role = patch.role
+  }
   writeRegistry(registry)
   return true
+}
+
+/** Renames a gym in the catalogue and on every profile pointing at it. */
+export function renameGymEverywhere(from: string, to: string): void {
+  const target = to.trim()
+  if (!target) return
+  const key = from.trim().toLowerCase()
+  const registry = readRegistry()
+  registry.gyms = (registry.gyms ?? []).filter((g) => g.toLowerCase() !== key)
+  rememberGym(registry, target)
+  for (const meta of registry.profiles) {
+    if (meta.gym?.toLowerCase() === key) meta.gym = target
+  }
+  writeRegistry(registry)
+}
+
+/** Drops a gym from the catalogue and unassigns every member of it. */
+export function deleteGymEverywhere(name: string): void {
+  const key = name.trim().toLowerCase()
+  const registry = readRegistry()
+  registry.gyms = (registry.gyms ?? []).filter((g) => g.toLowerCase() !== key)
+  for (const meta of registry.profiles) {
+    if (meta.gym?.toLowerCase() === key) delete meta.gym
+  }
+  writeRegistry(registry)
+}
+
+/** Adds a gym to the device catalogue without touching any profile. */
+export function addGymToCatalogue(name: string): void {
+  const registry = readRegistry()
+  rememberGym(registry, name)
+  writeRegistry(registry)
 }
 
 /** Removes any profile and its ciphertext. Locks first if it is the active one. */
@@ -211,15 +263,17 @@ async function startSession(id: string, key: CryptoKey, data: Partial<GymSnapsho
 export async function createProfile(
   name: string,
   passphrase: string,
-  options?: { importLegacy?: boolean; gym?: string },
+  options?: { importLegacy?: boolean; gym?: string; role?: ProfileRole },
 ): Promise<void> {
   const salt = randomBytes(16)
   const key = await deriveKey(passphrase, salt, KDF_ITERATIONS)
   const gym = options?.gym?.trim()
+  const role = options?.role
   const meta: ProfileMeta = {
     id: `profile-${Date.now()}-${toBase64(randomBytes(6)).replace(/[^a-zA-Z0-9]/g, '')}`,
     name: name.trim(),
     ...(gym ? { gym } : {}),
+    ...(role && role !== 'member' ? { role } : {}),
     createdAt: new Date().toISOString(),
     kdf: { salt: toBase64(salt), iterations: KDF_ITERATIONS },
     check: await encryptJson(key, SENTINEL),
