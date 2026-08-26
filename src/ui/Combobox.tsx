@@ -13,6 +13,7 @@ interface ComboboxProps {
   options: string[]
   label?: string
   hint?: string
+  error?: string
   placeholder?: string
   /** Verb shown on the create row, e.g. "Add gym". */
   createLabel?: string
@@ -25,6 +26,7 @@ export function Combobox({
   options,
   label,
   hint,
+  error,
   placeholder,
   createLabel = 'Add',
   id,
@@ -59,10 +61,12 @@ export function Combobox({
         <Primitive.Input
           id={inputId}
           placeholder={placeholder}
+          aria-invalid={error ? true : undefined}
           className={cn(
-            'h-11 w-full rounded-md border border-line bg-surface px-3 pr-10 text-sm text-ink',
+            'h-11 w-full rounded-md border bg-surface px-3 pr-10 text-sm text-ink',
             'placeholder:text-ink-3 transition-colors duration-150',
-            'hover:border-line-strong focus:border-brand focus:outline-none',
+            'focus:border-brand focus:outline-none',
+            error ? 'border-danger' : 'border-line hover:border-line-strong',
           )}
         />
         <Primitive.Trigger
@@ -121,7 +125,7 @@ export function Combobox({
     </Primitive.Root>
   )
 
-  if (!label && !hint) return control
+  if (!label && !hint && !error) return control
   return (
     <div className="flex flex-col gap-1.5">
       {label && (
@@ -130,7 +134,11 @@ export function Combobox({
         </label>
       )}
       {control}
-      {hint && <p className="text-2xs text-ink-3">{hint}</p>}
+      {error ? (
+        <p className="text-2xs text-danger">{error}</p>
+      ) : (
+        hint && <p className="text-2xs text-ink-3">{hint}</p>
+      )}
     </div>
   )
 }

@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { ArrowRight, CircleNotch, Plus } from '@phosphor-icons/react'
+import { ArrowRight, CircleNotch, Eye, EyeSlash, Plus } from '@phosphor-icons/react'
 import { Wordmark } from '@/components/brand'
 import { Avatar } from '@/ui/Avatar'
-import { Button } from '@/ui/Button'
+import { Button, IconButton } from '@/ui/Button'
 import { Combobox } from '@/ui/Combobox'
 import { FormSelect } from '@/ui/FormSelect'
 import { Input } from '@/ui/Input'
+import { Tag } from '@/ui/Tag'
 import {
   createProfile,
   lastActiveProfileId,
@@ -21,7 +22,31 @@ import { cn } from '@/lib/utils'
 /**
  * The lock screen. Every profile's data is encrypted under its passphrase, so
  * this is not a formality: without the phrase there is nothing to show.
+ * Validation anchors to the failing field and moves focus there — a form
+ * that points at the wrong field teaches people to distrust it.
  */
+
+type ErrorField = 'unlock' | 'name' | 'gym' | 'pass' | 'confirm'
+interface GateError {
+  field: ErrorField
+  text: string
+}
+
+const ROLE_TAGS: Partial<Record<ProfileRole, string>> = { gym: 'Gym', admin: 'Admin' }
+
+function RevealToggle({ shown, onToggle }: { shown: boolean; onToggle: () => void }) {
+  return (
+    <IconButton
+      type="button"
+      size="sm"
+      aria-label={shown ? 'Hide passphrase' : 'Show passphrase'}
+      onClick={onToggle}
+    >
+      {shown ? <EyeSlash size={16} /> : <Eye size={16} />}
+    </IconButton>
+  )
+}
+
 export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
   const [profiles] = useState(listProfiles)
   const [mode, setMode] = useState<'unlock' | 'create'>(profiles.length > 0 ? 'unlock' : 'create')
@@ -34,8 +59,15 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
   const [gyms] = useState(listGyms)
   const [role, setRole] = useState<ProfileRole>('member')
   const [confirm, setConfirm] = useState('')
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<GateError | null>(null)
+  const [showPass, setShowPass] = useState(false)
   const [busy, setBusy] = useState(false)
+
+  const errorFor = (field: ErrorField) => (error?.field === field ? error.text : undefined)
+  const failWith = (field: ErrorField, text: string, focusId?: string) => {
+    setError({ field, text })
+    if (focusId) document.getElementById(focusId)?.focus()
+  }
 
   /* Only offered while no profile exists yet: data from before profiles. */
   const hasLegacy = profiles.length === 0 && legacySnapshot() !== null
@@ -47,7 +79,7 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
     try {
       const ok = await unlockProfile(selectedId, passphrase)
       if (!ok) {
-        setError('That passphrase does not open this profile.')
+        failWith('unlock', 'That passphrase does not open this profile.', 'f-passphrase')
         return
       }
       onUnlocked()
@@ -60,19 +92,19 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
     if (busy) return
     const trimmed = name.trim()
     if (trimmed.length === 0) {
-      setError('Give the profile a name.')
+      failWith('name', 'Give the profile a name.', 'f-name')
       return
     }
     if (role === 'gym' && gym.trim().length === 0) {
-      setError('A gym profile needs the name of the gym it runs.')
+      failWith('gym', 'A gym profile needs the name of the gym it runs.', 'f-gym')
       return
     }
     if (passphrase.length < 4) {
-      setError('The passphrase needs at least 4 characters.')
+      failWith('pass', 'The passphrase needs at least 4 characters.', 'f-passphrase')
       return
     }
     if (passphrase !== confirm) {
-      setError('The passphrases do not match.')
+      failWith('confirm', 'The passphrases do not match.', 'f-repeat-passphrase')
       return
     }
     setBusy(true)
@@ -113,6 +145,7 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
                   onClick={() => {
                     setSelectedId(p.id)
                     setError(null)
+                    document.getElementById('f-passphrase')?.focus()
                   }}
                   className={cn(
                     'flex items-center gap-3 rounded-lg bg-surface-2 p-3 text-left transition-colors',
@@ -121,7 +154,10 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
                 >
                   <Avatar name={p.name} seed={p.id} />
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-semibold text-ink">{p.name}</span>
+                    <span className="flex items-center gap-2">
+                      <span className="truncate text-sm font-semibold text-ink">{p.name}</span>
+                      {ROLE_TAGS[p.role] && <Tag tone="outline">{ROLE_TAGS[p.role]}</Tag>}
+                    </span>
                     <span className="block truncate text-2xs text-ink-3">
                       {p.gym ? `${p.gym} · ` : ''}
                       <span className="num">since {formatShortDate(p.createdAt.slice(0, 10))}</span>
@@ -133,13 +169,14 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
 
             <Input
               label="Passphrase"
-              type="password"
+              type={showPass ? 'text' : 'password'}
               value={passphrase}
               onChange={(e) => {
                 setPassphrase(e.target.value)
                 setError(null)
               }}
-              error={error ?? undefined}
+              error={errorFor('unlock')}
+              trailing={<RevealToggle shown={showPass} onToggle={() => setShowPass((v) => !v)} />}
               autoFocus
             />
 
@@ -161,6 +198,8 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
               onClick={() => {
                 setMode('create')
                 setError(null)
+                setShowPass(false)
+                setPassphrase('')
               }}
             >
               <Plus size={14} weight="bold" />
@@ -190,6 +229,7 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
                 setName(e.target.value)
                 setError(null)
               }}
+              error={errorFor('name')}
               autoFocus
             />
             <FormSelect
@@ -216,6 +256,7 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
                 options={gyms}
                 placeholder="Search or add yours"
                 createLabel="Add gym"
+                error={errorFor('gym')}
                 hint={
                   role === 'gym'
                     ? 'The gym this profile runs. Members who pick it become your audience.'
@@ -225,23 +266,25 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
             )}
             <Input
               label="Passphrase"
-              type="password"
+              type={showPass ? 'text' : 'password'}
               value={passphrase}
               onChange={(e) => {
                 setPassphrase(e.target.value)
                 setError(null)
               }}
-              hint="At least 4 characters."
+              error={errorFor('pass')}
+              hint="At least 4 characters. There is no way to recover it."
+              trailing={<RevealToggle shown={showPass} onToggle={() => setShowPass((v) => !v)} />}
             />
             <Input
               label="Repeat passphrase"
-              type="password"
+              type={showPass ? 'text' : 'password'}
               value={confirm}
               onChange={(e) => {
                 setConfirm(e.target.value)
                 setError(null)
               }}
-              error={error ?? undefined}
+              error={errorFor('confirm')}
             />
 
             {hasLegacy && (
@@ -267,6 +310,9 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
                 onClick={() => {
                   setMode('unlock')
                   setError(null)
+                  setShowPass(false)
+                  setPassphrase('')
+                  setConfirm('')
                 }}
               >
                 Back to profiles
