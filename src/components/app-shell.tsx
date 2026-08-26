@@ -14,6 +14,7 @@ import {
   ListMagnifyingGlass,
   ShieldCheck,
   Storefront,
+  Trophy,
 } from '@phosphor-icons/react'
 import type { Icon } from '@phosphor-icons/react'
 import { Wordmark, Mark } from '@/components/brand'
@@ -42,6 +43,7 @@ interface NavItem {
 const NAV: NavItem[] = [
   { label: 'Today', to: '/', icon: Barbell },
   { label: 'Planner', to: '/planner', icon: CalendarBlank, owns: ['/onboarding', '/generated'] },
+  { label: 'Challenges', to: '/challenges', icon: Trophy },
   { label: 'Library', to: '/library', icon: ListMagnifyingGlass },
   { label: 'History', to: '/history', icon: ChartLineUp },
 ]

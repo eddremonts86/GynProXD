@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate } from '@tanstack/react-router'
 import { BellSimpleSlash, ForkKnife, Storefront } from '@phosphor-icons/react'
 import { useSession } from '../store/useSession'
 import { useMessages } from '../store/useMessages'
+import { useGym } from '../store/useGym'
 import { inboxFor } from '../lib/messages'
 import { notificationsEnabled, notificationsSupported } from '../lib/notify'
 import { useMenus } from '../store/useMenus'
@@ -21,6 +22,8 @@ export function InboxPage() {
   const markRead = useMessages((s) => s.markRead)
   const respond = useMessages((s) => s.respond)
   const toggleSaved = useMessages((s) => s.toggleSaved)
+  const toggleJoined = useMessages((s) => s.toggleJoined)
+  const startChallenge = useGym((s) => s.startChallenge)
   const menus = useMenus((s) => s.menus)
   const navigate = useNavigate()
   const gymMenu = menuFor(menus, gym ?? undefined)
@@ -46,7 +49,7 @@ export function InboxPage() {
         title="Inbox"
         description={
           gym
-            ? `Events, menus and offers from ${gym}.`
+            ? `Events, menus, offers and challenges from ${gym}.`
             : 'Messages from your gym land here.'
         }
         action={
@@ -96,6 +99,16 @@ export function InboxPage() {
               unread={unreadIds.includes(m.id)}
               onRsvp={(answer) => me && respond(m.id, me.id, answer)}
               onToggleSave={() => me && toggleSaved(m.id, me.id)}
+              onToggleJoin={() => {
+                if (!me || !m.challenge) return
+                /* Joined already? The button is a doorway, not an undo. */
+                if ((m.joined ?? []).includes(me.id)) {
+                  void navigate({ to: '/challenges' })
+                  return
+                }
+                startChallenge(m.challenge)
+                toggleJoined(m.id, me.id)
+              }}
             />
           ))}
         </div>

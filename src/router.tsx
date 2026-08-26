@@ -28,6 +28,9 @@ const GymPanelPage = React.lazy(() =>
 )
 const AdminPage = React.lazy(() => import('./routes/Admin').then((m) => ({ default: m.AdminPage })))
 const MenuPage = React.lazy(() => import('./routes/Menu').then((m) => ({ default: m.MenuPage })))
+const ChallengesPage = React.lazy(() =>
+  import('./routes/Challenges').then((m) => ({ default: m.ChallengesPage })),
+)
 
 const rootRoute = createRootRoute({ component: AppShell })
 
@@ -48,6 +51,7 @@ export const router = createRouter({
   routeTree: rootRoute.addChildren([
     lazyRoute('/', TodayPage),
     lazyRoute('/planner', PlannerPage),
+    lazyRoute('/challenges', ChallengesPage),
     lazyRoute('/library', LibraryPage),
     lazyRoute('/history', HistoryPage),
     lazyRoute('/settings', SettingsPage),

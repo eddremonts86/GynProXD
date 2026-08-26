@@ -1,5 +1,7 @@
 import { Check, MapPin, X } from '@phosphor-icons/react'
 import { TEMPLATE_LABELS, offerPayload, type GymMessage } from '@/lib/messages'
+import { repsForDay, totalReps } from '@/lib/challenge'
+import { exerciseById } from '@/lib/exercises'
 import { formatShortDate } from '@/lib/labels'
 import { Panel } from '@/ui/Panel'
 import { Tag } from '@/ui/Tag'
@@ -12,6 +14,7 @@ const KIND_TONE = {
   event: 'brand',
   menu: 'good',
   offer: 'danger',
+  challenge: 'brand',
 } as const
 
 /**
@@ -24,16 +27,19 @@ export function MessageCard({
   viewer,
   onRsvp,
   onToggleSave,
+  onToggleJoin,
   unread,
 }: {
   message: GymMessage
   viewer?: string
   onRsvp?: (answer: 'yes' | 'no') => void
   onToggleSave?: () => void
+  onToggleJoin?: () => void
   unread?: boolean
 }) {
   const myRsvp = viewer ? message.rsvp[viewer] : undefined
   const savedByMe = viewer ? message.saved.includes(viewer) : false
+  const joinedByMe = viewer ? (message.joined ?? []).includes(viewer) : false
 
   return (
     <Panel padding="lg" className={cn('flex flex-col gap-3', unread && 'ring-1 ring-brand/40')}>
@@ -105,6 +111,35 @@ export function MessageCard({
             </div>
           ))}
         </dl>
+      )}
+
+      {message.kind === 'challenge' && message.challenge && (
+        <div className="flex flex-col gap-3 border-t border-line pt-3">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <Tag tone="outline">
+              {exerciseById(message.challenge.exerciseId)?.name ?? message.challenge.exerciseId}
+            </Tag>
+            <Tag tone="outline">{message.challenge.days} days</Tag>
+            <Tag tone="outline">
+              {message.challenge.start} →{' '}
+              {repsForDay(message.challenge, message.challenge.days)} {message.challenge.unit}
+            </Tag>
+            <Tag tone="outline">
+              {totalReps(message.challenge).toLocaleString('en-GB')} total
+            </Tag>
+          </div>
+          {viewer && onToggleJoin && (
+            <div>
+              <Button
+                size="sm"
+                variant={joinedByMe ? 'primary' : 'secondary'}
+                onClick={onToggleJoin}
+              >
+                {joinedByMe ? 'Joined' : 'Join challenge'}
+              </Button>
+            </div>
+          )}
+        </div>
       )}
 
       {message.kind === 'offer' && message.offer && (

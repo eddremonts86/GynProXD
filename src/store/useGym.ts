@@ -15,6 +15,7 @@ import { generatedExercises } from '../data/exercises-generated'
 import { populateByIdCache } from '../lib/exercises'
 import { INTENSITY_SETS } from '../lib/intensity'
 import { todayIso } from '../lib/dates'
+import type { ActiveChallenge, Challenge } from '../lib/challenge'
 
 export const DAYS: DayOfWeek[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
 export const DAY_LABELS: Record<DayOfWeek, string> = {
@@ -74,6 +75,10 @@ interface GymState {
   addGeneratedPlan: (plan: GeneratedPlan) => void
   deleteGeneratedPlan: (id: string) => void
   saveGeneratedAsPlan: (generatedId: string) => string | null
+  challenges: ActiveChallenge[]
+  startChallenge: (challenge: Challenge) => void
+  abandonChallenge: (challengeId: string) => void
+  toggleChallengeDay: (challengeId: string, dateIso: string) => void
 }
 
 const today = todayIso
@@ -92,6 +97,36 @@ export const useGym = create<GymState>()((set, get) => ({
       plans: [],
       generatedPlans: [],
       profileDetails: null,
+      challenges: [],
+
+      /* Day one is the day you join. The definition is copied in, so a
+         gym-published challenge keeps working if its message is deleted. */
+      startChallenge: (challenge) =>
+        set((s) => {
+          if (s.challenges.some((c) => c.challenge.id === challenge.id)) return s
+          return {
+            challenges: [
+              { challenge: structuredClone(challenge), startedAt: today(), completedDays: [] },
+              ...s.challenges,
+            ],
+          }
+        }),
+
+      abandonChallenge: (challengeId) =>
+        set((s) => ({
+          challenges: s.challenges.filter((c) => c.challenge.id !== challengeId),
+        })),
+
+      toggleChallengeDay: (challengeId, dateIso) =>
+        set((s) => ({
+          challenges: s.challenges.map((c) => {
+            if (c.challenge.id !== challengeId) return c
+            const completedDays = c.completedDays.includes(dateIso)
+              ? c.completedDays.filter((d) => d !== dateIso)
+              : [...c.completedDays, dateIso]
+            return { ...c, completedDays }
+          }),
+        })),
 
       addExercise: (e) =>
         set((s) => {
@@ -226,6 +261,7 @@ export const useGym = create<GymState>()((set, get) => ({
           plans: [],
           generatedPlans: [],
           profileDetails: null,
+          challenges: [],
         }),
 
       setProfileDetails: (details) => set({ profileDetails: details }),
@@ -242,6 +278,7 @@ export const useGym = create<GymState>()((set, get) => ({
             exercises?: unknown
             plans?: unknown
             generatedPlans?: unknown
+            challenges?: unknown
           }
           if (!Array.isArray(d.workouts)) return false
           const customs = Array.isArray(d.customExercises)
@@ -259,6 +296,7 @@ export const useGym = create<GymState>()((set, get) => ({
             ...(Array.isArray(d.bodyweight) ? { bodyweight: d.bodyweight as BodyweightEntry[] } : {}),
             ...(Array.isArray(d.plans) ? { plans: d.plans as WeeklyPlan[] } : {}),
             ...(Array.isArray(d.generatedPlans) ? { generatedPlans: d.generatedPlans as GeneratedPlan[] } : {}),
+            ...(Array.isArray(d.challenges) ? { challenges: d.challenges as ActiveChallenge[] } : {}),
           })
           return true
         } catch {
@@ -399,6 +437,7 @@ export interface GymSnapshot {
   plans: WeeklyPlan[]
   generatedPlans: GeneratedPlan[]
   profileDetails: ProfileDetails | null
+  challenges: ActiveChallenge[]
 }
 
 export const EMPTY_SNAPSHOT: GymSnapshot = {
@@ -409,6 +448,7 @@ export const EMPTY_SNAPSHOT: GymSnapshot = {
   plans: [],
   generatedPlans: [],
   profileDetails: null,
+  challenges: [],
 }
 
 export function snapshotGym(state: GymState = useGym.getState()): GymSnapshot {
@@ -420,6 +460,7 @@ export function snapshotGym(state: GymState = useGym.getState()): GymSnapshot {
     plans: state.plans,
     generatedPlans: state.generatedPlans,
     profileDetails: state.profileDetails,
+    challenges: state.challenges,
   }
 }
 
@@ -433,6 +474,7 @@ export function hydrateGym(snapshot: Partial<GymSnapshot> | null | undefined): v
     plans: snapshot?.plans ?? [],
     generatedPlans: snapshot?.generatedPlans ?? [],
     profileDetails: snapshot?.profileDetails ?? null,
+    challenges: snapshot?.challenges ?? [],
   }
   populateByIdCache([...generatedExercises, ...next.customExercises])
   useGym.setState(next)

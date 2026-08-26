@@ -238,10 +238,17 @@ function flushOnHide(): void {
   if (document.visibilityState === 'hidden') void persistNow()
 }
 
+/* Full page navigations can beat the 400ms debounce; pagehide is the last
+   reliable moment to flush (visibilitychange alone misses some reloads). */
+function flushOnPageHide(): void {
+  void persistNow()
+}
+
 function bindAutosave(): void {
   unsubscribe?.()
   unsubscribe = useGym.subscribe(scheduleSave)
   document.addEventListener('visibilitychange', flushOnHide)
+  window.addEventListener('pagehide', flushOnPageHide)
 }
 
 async function startSession(id: string, key: CryptoKey, data: Partial<GymSnapshot>): Promise<void> {
@@ -342,6 +349,7 @@ export async function lockProfile(): Promise<void> {
   unsubscribe?.()
   unsubscribe = null
   document.removeEventListener('visibilitychange', flushOnHide)
+  window.removeEventListener('pagehide', flushOnPageHide)
   activeKey = null
   activeId = null
   hydrateGym(EMPTY_SNAPSHOT)

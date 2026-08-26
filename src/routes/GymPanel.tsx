@@ -21,6 +21,8 @@ import {
 import { listProfiles } from '../lib/profiles'
 import { formatShortDate, pluralize } from '../lib/labels'
 import { todayIso } from '../lib/dates'
+import { generatedExercises } from '../data/exercises-generated'
+import { Combobox } from '../ui/Combobox'
 import { MessageCard } from '@/components/message-card'
 import { MenuEditor } from '@/components/menu-editor'
 import { Switch } from '@/components/ui/switch'
@@ -43,7 +45,16 @@ interface CourseDraft {
   dishes: string
 }
 
-const KINDS: TemplateKind[] = ['announcement', 'event', 'menu', 'offer']
+const KINDS: TemplateKind[] = ['announcement', 'event', 'menu', 'offer', 'challenge']
+
+/** Movement names for the challenge form's suggestion list, resolved on publish. */
+const EXERCISE_NAMES = generatedExercises.map((e) => e.name).sort((a, b) => a.localeCompare(b))
+
+function exerciseIdByName(name: string): string | null {
+  const key = name.trim().toLowerCase()
+  const match = generatedExercises.find((e) => e.name.toLowerCase() === key)
+  return match?.id ?? null
+}
 
 /** The gym operator's desk: members, composer with templates, sent history. */
 export function GymPanelPage() {
@@ -85,6 +96,11 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
   const [discount, setDiscount] = useState('')
   const [validUntil, setValidUntil] = useState('')
   const [code, setCode] = useState(makeOfferCode)
+  const [chExerciseName, setChExerciseName] = useState('')
+  const [chDays, setChDays] = useState('30')
+  const [chStart, setChStart] = useState('20')
+  const [chDelta, setChDelta] = useState('1')
+  const [chUnit, setChUnit] = useState<'reps' | 'seconds'>('reps')
   const [everyone, setEveryone] = useState(true)
   const [picked, setPicked] = useState<string[]>([])
   const [bannerOn, setBannerOn] = useState(false)
@@ -138,8 +154,28 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
         offer: { discount: discount.trim(), validUntil: validUntil || undefined, code },
       }
     }
+    if (kind === 'challenge') {
+      const exerciseId = exerciseIdByName(chExerciseName)
+      const days = Number(chDays)
+      const start = Number(chStart)
+      const delta = Number(chDelta)
+      if (!exerciseId || !Number.isInteger(days) || days < 7 || days > 120) return null
+      if (!Number.isFinite(start) || start <= 0 || !Number.isFinite(delta)) return null
+      return {
+        ...common,
+        challenge: {
+          id: 'preview',
+          name: common.title,
+          exerciseId,
+          days,
+          start,
+          delta,
+          unit: chUnit,
+        },
+      }
+    }
     return common
-  }, [gym, profileId, kind, title, body, eventDate, eventTime, eventPlace, courses, discount, validUntil, code])
+  }, [gym, profileId, kind, title, body, eventDate, eventTime, eventPlace, courses, discount, validUntil, code, chExerciseName, chDays, chStart, chDelta, chUnit])
 
   const doPublish = () => {
     if (!draft) {
@@ -150,7 +186,9 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
             ? 'A menu needs a title and at least one course with dishes.'
             : kind === 'offer'
               ? 'An offer needs a title and the discount.'
-              : 'Give the message a title.',
+              : kind === 'challenge'
+                ? 'A challenge needs a title, a movement from the library, and sane numbers (7-120 days, positive start).'
+                : 'Give the message a title.',
       )
       return
     }
@@ -168,6 +206,9 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
       event: draft.event,
       menu: draft.menu,
       offer: draft.offer,
+      challenge: draft.challenge
+        ? { ...draft.challenge, id: `chal-${gym.trim().toLowerCase()}-${Date.now()}` }
+        : undefined,
       banner: bannerOn ? { minutes: Number(bannerMinutes) } : undefined,
     })
     const reach = everyone ? pluralize(members.length, 'member') : pluralize(picked.length, 'member')
@@ -182,6 +223,11 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
     setDiscount('')
     setValidUntil('')
     setCode(makeOfferCode())
+    setChExerciseName('')
+    setChDays('30')
+    setChStart('20')
+    setChDelta('1')
+    setChUnit('reps')
     setEveryone(true)
     setPicked([])
     setBannerOn(false)
@@ -197,7 +243,7 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
     <div className="flex flex-col gap-8">
       <PageHeader
         title="Gym panel"
-        description={`${gym} — reach your members with events, menus and offers.`}
+        description={`${gym} — reach your members with events, menus, offers and challenges.`}
       />
 
       <Tabs
@@ -241,7 +287,9 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
                       ? "Today's kitchen"
                       : kind === 'offer'
                         ? 'Bring-a-friend week'
-                        : 'New opening hours'
+                        : kind === 'challenge'
+                          ? 'September squat countdown'
+                          : 'New opening hours'
                 }
               />
 
@@ -333,6 +381,58 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
                     <Plus size={14} weight="bold" />
                     Add course
                   </Button>
+                </div>
+              )}
+
+              {kind === 'challenge' && (
+                <div className="flex flex-col gap-3">
+                  <Combobox
+                    label="Movement"
+                    value={chExerciseName}
+                    onValueChange={touch(setChExerciseName)}
+                    options={EXERCISE_NAMES}
+                    placeholder="Bodyweight Squat"
+                    createLabel="Use"
+                  />
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    <Input
+                      label="Days"
+                      type="number"
+                      min={7}
+                      max={120}
+                      value={chDays}
+                      onChange={(e) => touch(setChDays)(e.target.value)}
+                    />
+                    <Input
+                      label="Day 1 count"
+                      type="number"
+                      min={1}
+                      value={chStart}
+                      onChange={(e) => touch(setChStart)(e.target.value)}
+                    />
+                    <Input
+                      label="Change per day"
+                      type="number"
+                      value={chDelta}
+                      onChange={(e) => touch(setChDelta)(e.target.value)}
+                    />
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-2xs font-medium text-ink-3">Unit</span>
+                      <FormSelect
+                        ariaLabel="Challenge unit"
+                        value={chUnit}
+                        onValueChange={(v) => touch(setChUnit)(v as 'reps' | 'seconds')}
+                        options={[
+                          { value: 'reps', label: 'Reps' },
+                          { value: 'seconds', label: 'Seconds' },
+                        ]}
+                        className="h-11"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-2xs text-ink-3">
+                    Use a negative change for a countdown — hard days first, momentum later.
+                  </p>
                 </div>
               )}
 
@@ -486,6 +586,7 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
                             {m.kind === 'event' ? ` · going ${going} · declined ${declined}` : ''}
                             {m.kind === 'offer' ? ` · saved ${m.saved.length}` : ''}
                             {m.kind === 'offer' && m.offer ? ` · code ${m.offer.code}` : ''}
+                            {m.kind === 'challenge' ? ` · joined ${m.joined?.length ?? 0}` : ''}
                           </span>
                         </span>
                       }

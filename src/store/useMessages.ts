@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import type { GymMessage, TemplateKind, MenuCourse } from '../lib/messages'
+import type { Challenge } from '../lib/challenge'
 
 /**
  * The device message bus. Plaintext by design (see docs/PANELS.md): gym
@@ -35,6 +36,7 @@ export interface PublishInput {
   event?: { date: string; time?: string; place?: string }
   menu?: { courses: MenuCourse[] }
   offer?: { discount: string; validUntil?: string; code: string }
+  challenge?: Challenge
   banner?: { minutes: number }
   link?: 'menu'
 }
@@ -49,6 +51,7 @@ interface MessagesState {
   respond: (id: string, profileId: string, answer: 'yes' | 'no') => void
   dismissBanner: (id: string, profileId: string) => void
   toggleSaved: (id: string, profileId: string) => void
+  toggleJoined: (id: string, profileId: string) => void
   rehydrate: () => void
 }
 
@@ -131,6 +134,18 @@ export const useMessages = create<MessagesState>()((set, get) => ({
         ? m.saved.filter((p) => p !== profileId)
         : [...m.saved, profileId]
       return { ...m, saved }
+    })
+    persist(messages)
+    set({ messages })
+  },
+
+  toggleJoined: (id, profileId) => {
+    const messages = get().messages.map((m) => {
+      if (m.id !== id) return m
+      const joined = (m.joined ?? []).includes(profileId)
+        ? (m.joined ?? []).filter((p) => p !== profileId)
+        : [...(m.joined ?? []), profileId]
+      return { ...m, joined }
     })
     persist(messages)
     set({ messages })
