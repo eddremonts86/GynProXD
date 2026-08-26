@@ -24,25 +24,6 @@ const lock = async () => {
   await gate().waitFor({ timeout: 5000 })
 }
 
-const createProfile = async ({ name, role, gym, pass }) => {
-  if (await gate().isVisible().catch(() => false)) {
-    await page.getByRole('button', { name: 'New profile' }).click()
-  }
-  await page.getByLabel('Name').fill(name)
-  if (role) {
-    await page.getByRole('combobox', { name: 'Profile type' }).click()
-    await page.getByRole('option', { name: role }).click()
-  }
-  if (gym) {
-    await page.getByLabel('Gym', { exact: true }).fill(gym)
-    await page.getByRole('option', { name: /Add gym|^/.source ? new RegExp(`Add gym|${gym}`) : gym }).first().click()
-  }
-  await page.getByLabel('Passphrase', { exact: true }).fill(pass)
-  await page.getByLabel('Repeat passphrase').fill(pass)
-  await page.getByRole('button', { name: 'Create profile' }).click()
-  await inApp()
-}
-
 const unlock = async (name, pass) => {
   await page.getByRole('button', { name }).click()
   await page.getByLabel('Passphrase', { exact: true }).fill(pass)
