@@ -33,21 +33,45 @@ export default defineConfig(({ mode }) => {
       }
     : undefined
 
+  /**
+   * Same arrangement for meal suggestions: the Spoonacular key is injected as
+   * an x-api-key header on the server side of the proxy. TheMealDB needs no
+   * key and allows CORS, so the dish of the day calls it directly.
+   */
+  const recipeProxy: Record<string, ProxyOptions> | undefined = env.SPOONACULAR_API_KEY
+    ? {
+        '/api/recipes/spoonacular': {
+          target: 'https://api.spoonacular.com',
+          changeOrigin: true,
+          rewrite: (p) => p.replace(/^\/api\/recipes\/spoonacular/, ''),
+          configure: (proxy) => {
+            proxy.on('proxyReq', (proxyReq) => {
+              proxyReq.setHeader('x-api-key', env.SPOONACULAR_API_KEY)
+            })
+          },
+        },
+      }
+    : undefined
+
+  const apiProxy =
+    aiProxy || recipeProxy ? { ...(aiProxy ?? {}), ...(recipeProxy ?? {}) } : undefined
+
   return {
   define: {
     __AI_COACH__: JSON.stringify(Boolean(env.MINIMAX_API_KEY)),
     __AI_COACH_MODEL__: JSON.stringify(env.MINIMAX_MODEL || 'MiniMax-Text-01'),
+    __RECIPE_SEARCH__: JSON.stringify(Boolean(env.SPOONACULAR_API_KEY)),
   },
   server: {
     port: PORT,
     strictPort: true,
     host: '127.0.0.1',
-    proxy: aiProxy,
+    proxy: apiProxy,
   },
   preview: {
     port: PORT,
     strictPort: true,
-    proxy: aiProxy,
+    proxy: apiProxy,
   },
   resolve: {
     alias: {

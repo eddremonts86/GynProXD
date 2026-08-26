@@ -1,5 +1,5 @@
 import { useDeferredValue, useMemo, useState } from 'react'
-import { MagnifyingGlass, Plus } from '@phosphor-icons/react'
+import { CaretRight, MagnifyingGlass, Plus } from '@phosphor-icons/react'
 import { exerciseImageCandidates, exercisePhotoFrames } from '../lib/images'
 import { useGym } from '../store/useGym'
 import { exerciseLookup } from '../lib/exercises'
@@ -229,8 +229,10 @@ export function LibraryPage() {
 }
 
 /**
- * Hovering swaps to the rep's end frame, so the card shows the movement rather
- * than a pose. Touch devices simply keep the start frame.
+ * Same card anatomy as the recipe suggestions: full-bleed photo on top, then
+ * title, fact chips with the muscle as the filled one, a first line of the
+ * instructions, and a details affordance pinned to the bottom. Hovering still
+ * swaps to the rep's end frame; touch devices simply keep the start frame.
  */
 function MovementCard({ exercise, onOpen }: { exercise: Exercise; onOpen: () => void }) {
   const [hovered, setHovered] = useState(false)
@@ -248,7 +250,7 @@ function MovementCard({ exercise, onOpen }: { exercise: Exercise; onOpen: () => 
       onMouseLeave={() => setHovered(false)}
       onFocus={() => setHovered(true)}
       onBlur={() => setHovered(false)}
-      className="flex w-full flex-col gap-3 rounded-xl bg-surface p-3 text-left shadow-[var(--shadow-panel)] transition-shadow duration-150 hover:shadow-[var(--shadow-tile)]"
+      className="flex h-full w-full flex-col overflow-hidden rounded-xl bg-surface text-left shadow-[var(--shadow-panel)] transition-shadow duration-150 hover:shadow-[var(--shadow-tile)]"
     >
       {base ? (
         <img
@@ -257,23 +259,32 @@ function MovementCard({ exercise, onOpen }: { exercise: Exercise; onOpen: () => 
           loading="lazy"
           decoding="async"
           onError={() => (src === frames?.end ? setFailed(true) : undefined)}
-          className="aspect-[4/3] w-full rounded-md bg-surface-2 object-cover"
+          className="aspect-[4/3] w-full bg-surface-2 object-cover"
         />
       ) : (
-        <span className="flex aspect-[4/3] w-full items-center justify-center rounded-md bg-surface-2">
+        <span className="flex aspect-[4/3] w-full items-center justify-center bg-surface-2">
           <span className="num text-lg font-semibold tracking-widest text-ink-3">
             {exercise.muscle.slice(0, 3).toUpperCase()}
           </span>
         </span>
       )}
-      <span className="flex flex-col gap-1.5 px-0.5 pb-0.5">
-        <span className="line-clamp-2 text-sm leading-snug font-medium text-ink">
+      <span className="flex flex-1 flex-col gap-2 p-4">
+        <span className="line-clamp-2 text-sm leading-snug font-semibold text-ink">
           {exercise.name}
         </span>
         <span className="flex flex-wrap items-center gap-1.5">
-          <Tag>{MUSCLE_LABELS[exercise.muscle]}</Tag>
-          {isCustom && <Tag tone="brand">Yours</Tag>}
-          <span className="text-2xs text-ink-3">{EQUIPMENT_LABELS[exercise.equipment]}</span>
+          <Tag tone="brand">{MUSCLE_LABELS[exercise.muscle]}</Tag>
+          <Tag tone="outline">{EQUIPMENT_LABELS[exercise.equipment]}</Tag>
+          {isCustom && <Tag>Yours</Tag>}
+        </span>
+        {exercise.instructions?.[0] && (
+          <span className="line-clamp-2 text-2xs leading-relaxed text-ink-3">
+            {exercise.instructions[0]}
+          </span>
+        )}
+        <span className="mt-auto inline-flex items-center gap-1 pt-1 text-2xs font-medium text-brand">
+          View movement
+          <CaretRight size={12} weight="bold" />
         </span>
       </span>
     </button>

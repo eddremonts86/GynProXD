@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { DownloadSimple, PencilSimple, Trash, UploadSimple, WarningCircle } from '@phosphor-icons/react'
 import { useGym } from '../store/useGym'
+import { useRecipes } from '../store/useRecipes'
 import { useSession } from '../store/useSession'
 import {
   activeProfile,
@@ -42,6 +43,7 @@ export function SettingsPage() {
   const generatedPlans = useGym((s) => s.generatedPlans)
   const importData = useGym((s) => s.importData)
   const clearAllData = useGym((s) => s.clearAllData)
+  const clearSuggestions = useRecipes((s) => s.clearSuggestions)
 
   const profileName = useSession((s) => s.profileName)
   const setLocked = useSession((s) => s.setLocked)
@@ -239,6 +241,7 @@ export function SettingsPage() {
                 variant="danger"
                 onClick={() => {
                   clearAllData()
+                  clearSuggestions()
                   setConfirmClear(false)
                   setFeedback({ tone: 'good', text: 'All data deleted.' })
                 }}
@@ -282,6 +285,27 @@ export function SettingsPage() {
               RepDB
             </a>{' '}
             under its free-tier attribution licence.
+          </p>
+          <p className="max-w-[62ch] text-2xs">
+            The dish of the day, with its photo, comes from{' '}
+            <a
+              href="https://www.themealdb.com"
+              target="_blank"
+              rel="noreferrer"
+              className="text-brand underline underline-offset-2"
+            >
+              TheMealDB
+            </a>
+            . Meal suggestions, their nutrition numbers and photos come from the{' '}
+            <a
+              href="https://spoonacular.com/food-api"
+              target="_blank"
+              rel="noreferrer"
+              className="text-brand underline underline-offset-2"
+            >
+              spoonacular API
+            </a>
+            .
           </p>
           <p className="max-w-[62ch] text-2xs">
             enForma is not medical advice. Talk to a professional before changing how you train or

@@ -6,6 +6,7 @@ import { menuFor } from '../lib/menu'
 import { formatShortDate } from '../lib/labels'
 import { PageHeader, Section } from '../ui/PageHeader'
 import { Panel } from '../ui/Panel'
+import { DishOfTheDay } from '@/components/dish-of-the-day'
 
 /** The member's view of their gym's standing kitchen card. */
 export function MenuPage() {
@@ -23,6 +24,8 @@ export function MenuPage() {
             : 'What your gym serves, when they publish it.'
         }
       />
+
+      <DishOfTheDay />
 
       {!menu ? (
         <Panel padding="lg" className="flex flex-col items-start gap-3">

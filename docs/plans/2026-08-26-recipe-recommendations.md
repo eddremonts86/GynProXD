@@ -1,7 +1,16 @@
 # Recipe recommendations: daily dish + plan-aligned suggestions
 
-Status: proposed (research done, no code yet)
+Status: implemented 2026-08-26 (all phases, same day)
 Date: 2026-08-26
+
+> Implementation notes. The app's UI turned out to be English (the Spanish
+> domain vocabulary is never rendered raw, see `src/lib/labels.ts`), so the
+> planned translate-to-Spanish pass was dropped: recipe titles are shown as
+> delivered and the coach writes its notes in English like the rest of the
+> UI. TheMealDB's category lists mix plates with condiments and cake, so a
+> deterministic `isPlate` title filter was added and the thin "Vegan"
+> category was dropped from the daily rotation in favour of "Vegetarian".
+> The web-only decision makes TheMealDB's app-store supporter clause moot.
 
 ## Goal
 
