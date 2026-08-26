@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react'
-import { CaretDown, ChartLineUp, Trash } from '@phosphor-icons/react'
+import { CaretDown, ChartLineUp, ShareNetwork, Trash } from '@phosphor-icons/react'
 import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from 'recharts'
 import { useGym } from '../store/useGym'
 import { e1rmSeries, exerciseById } from '../lib/exercises'
 import { muscleMaxVolume, muscleVolume } from '../lib/muscle-volume'
 import { isoDaysAgo } from '../lib/dates'
 import { sessionCountsByExercise, weeklyVolumeSeries, workoutTotals } from '../lib/stats'
+import { cardFromWorkout, renderSessionCard, shareOrDownloadPng } from '../lib/session-card'
 import { Button, IconButton } from '../ui/Button'
 import { Panel } from '../ui/Panel'
 import { Tag } from '../ui/Tag'
@@ -412,6 +413,18 @@ function SessionList() {
                     </span>
                   </span>
                 </button>
+
+                <IconButton
+                  size="sm"
+                  aria-label={`Share the session from ${formatLongDate(w.date)} as an image`}
+                  onClick={() =>
+                    void renderSessionCard(cardFromWorkout(w)).then((blob) =>
+                      shareOrDownloadPng(blob, `enforma-session-${w.date}.png`),
+                    )
+                  }
+                >
+                  <ShareNetwork size={15} />
+                </IconButton>
 
                 {confirmId === w.id ? (
                   <span className="flex shrink-0 items-center gap-1.5">

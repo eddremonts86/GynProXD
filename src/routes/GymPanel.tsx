@@ -3,6 +3,7 @@ import { Navigate } from '@tanstack/react-router'
 import {
   ArrowsClockwise,
   Check,
+  DownloadSimple,
   PaperPlaneTilt,
   Plus,
   Trash,
@@ -23,6 +24,7 @@ import { formatShortDate, pluralize } from '../lib/labels'
 import { todayIso } from '../lib/dates'
 import { generatedExercises } from '../data/exercises-generated'
 import { Combobox } from '../ui/Combobox'
+import { renderChallengeCard, shareOrDownloadPng } from '../lib/session-card'
 import { MessageCard } from '@/components/message-card'
 import { MenuEditor } from '@/components/menu-editor'
 import { Switch } from '@/components/ui/switch'
@@ -591,7 +593,20 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
                         </span>
                       }
                       headerExtras={
-                        confirmDelete === m.id ? (
+                        <>
+                        {m.kind === 'challenge' && m.challenge && (
+                          <IconButton
+                            aria-label={`Download ${m.title} as a wall poster`}
+                            onClick={() =>
+                              void renderChallengeCard(m.challenge!, gym).then((blob) =>
+                                shareOrDownloadPng(blob, `enforma-challenge-${m.challenge!.id}.png`),
+                              )
+                            }
+                          >
+                            <DownloadSimple size={15} />
+                          </IconButton>
+                        )}
+                        {confirmDelete === m.id ? (
                           <>
                             <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(null)}>
                               Cancel
@@ -614,7 +629,8 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
                           >
                             <Trash size={15} />
                           </IconButton>
-                        )
+                        )}
+                        </>
                       }
                     >
                       <MessageCard message={m} />

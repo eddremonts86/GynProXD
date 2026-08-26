@@ -6,6 +6,7 @@ import {
   Barbell,
   CheckCircle,
   Plus,
+  ShareNetwork,
   SkipForward,
   Timer,
   TrendUp,
@@ -50,6 +51,12 @@ import { isoDaysAgo, todayIso } from '../lib/dates'
 import { bodyweightDelta, rangeVolume, setVolume, weeklyVolumeSeries, workoutTotals } from '../lib/stats'
 import { summarizeSession } from '../lib/session-summary'
 import { INTENSITIES, INTENSITY_HELP } from '../lib/intensity'
+import {
+  cardFromPlannedDay,
+  cardFromWorkout,
+  renderSessionCard,
+  shareOrDownloadPng,
+} from '../lib/session-card'
 import { cn } from '@/lib/utils'
 import type {
   DayOfWeek,
@@ -323,6 +330,16 @@ function TodayOverview({
               </p>
             </div>
             <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto">
+              <IconButton
+                aria-label="Share this day as an image"
+                onClick={() =>
+                  void renderSessionCard(
+                    cardFromPlannedDay(primary.planName, DAY_FULL_LABELS[day], primary.exercises),
+                  ).then((blob) => shareOrDownloadPng(blob, `enforma-${day}.png`))
+                }
+              >
+                <ShareNetwork size={16} />
+              </IconButton>
               <IntensityPicker value={intensity} onChange={setIntensity} />
               <Button
                 size="lg"
@@ -561,6 +578,20 @@ function FinishSummary({
                 : `${prNames.length} new records: ${prNames.join(', ')}.`}
             </p>
           )}
+          <div>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() =>
+                void renderSessionCard(cardFromWorkout(workout)).then((blob) =>
+                  shareOrDownloadPng(blob, `enforma-session-${workout.date}.png`),
+                )
+              }
+            >
+              <ShareNetwork size={14} weight="bold" />
+              Share card
+            </Button>
+          </div>
         </div>
       </Panel>
     </motion.div>
