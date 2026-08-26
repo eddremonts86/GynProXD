@@ -62,7 +62,9 @@ export function InboxPage() {
             </p>
           ) : (
             <p className="max-w-[52ch] text-sm text-ink-3">
-              You train independently, so there is no gym to hear from. Pick one under{' '}
+              {role === 'admin'
+                ? 'This profile has no gym set. Pick one under '
+                : 'You train independently, so there is no gym to hear from. Pick one under '}
               <Link to="/settings" className="text-brand underline underline-offset-2">
                 Settings
               </Link>{' '}

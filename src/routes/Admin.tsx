@@ -180,7 +180,9 @@ function AdminDesk({ selfId }: { selfId: string }) {
                 ) : (
                   <div className="flex flex-wrap items-center gap-3">
                     <Avatar name={p.name} seed={p.id} />
-                    <span className="min-w-0 flex-1">
+                    {/* min-w forces the controls to wrap under on narrow screens
+                        instead of crushing the name to one letter. */}
+                    <span className="min-w-[11rem] flex-1">
                       <span className="flex items-center gap-2">
                         <span className="truncate text-sm font-semibold text-ink">{p.name}</span>
                         {p.id === selfId && <Tag tone="brand">You</Tag>}

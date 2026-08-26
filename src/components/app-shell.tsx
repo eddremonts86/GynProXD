@@ -47,7 +47,7 @@ const NAV: NavItem[] = [
 ]
 
 const PANEL_ITEM: Partial<Record<ProfileRole, NavItem>> = {
-  gym: { label: 'Gym panel', to: '/gym', icon: Storefront },
+  gym: { label: 'Gym', to: '/gym', icon: Storefront },
   admin: { label: 'Admin', to: '/admin', icon: ShieldCheck },
 }
 
