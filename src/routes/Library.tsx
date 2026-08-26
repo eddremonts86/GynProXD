@@ -3,6 +3,7 @@ import { CaretRight, MagnifyingGlass, Plus } from '@phosphor-icons/react'
 import { exerciseImageCandidates, exercisePhotoFrames } from '../lib/images'
 import { useGym } from '../store/useGym'
 import { exerciseLookup } from '../lib/exercises'
+import { sessionCountsByExercise } from '../lib/stats'
 import { MovementFrames } from '@/components/movement-frames'
 import { Button } from '../ui/Button'
 import { Tag } from '../ui/Tag'
@@ -51,10 +52,12 @@ const PAGE = 48
 export function LibraryPage() {
   const customExercises = useGym((s) => s.customExercises)
   const addExercise = useGym((s) => s.addExercise)
+  const workouts = useGym((s) => s.workouts)
 
   const [query, setQuery] = useState('')
   const [muscle, setMuscle] = useState<MuscleGroup | 'all'>('all')
   const [equipment, setEquipment] = useState<Equipment | 'all'>('all')
+  const [done, setDone] = useState<'all' | 'done' | 'todo'>('all')
   const [visible, setVisible] = useState(PAGE)
   const [detail, setDetail] = useState<Exercise | null>(null)
   const [addOpen, setAddOpen] = useState(false)
@@ -77,11 +80,15 @@ export function LibraryPage() {
     return EQUIPMENT.filter((e) => present.has(e))
   }, [exercises])
 
+  const doneCounts = useMemo(() => sessionCountsByExercise(workouts), [workouts])
+
   const filtered = useMemo(() => {
     const q = deferredQuery.trim().toLowerCase()
     return exercises.filter((e) => {
       if (muscle !== 'all' && e.muscle !== muscle) return false
       if (equipment !== 'all' && e.equipment !== equipment) return false
+      if (done === 'done' && !doneCounts.has(e.id)) return false
+      if (done === 'todo' && doneCounts.has(e.id)) return false
       if (!q) return true
       return (
         e.name.toLowerCase().includes(q) ||
@@ -90,7 +97,7 @@ export function LibraryPage() {
         MUSCLE_LABELS[e.muscle].toLowerCase().includes(q)
       )
     })
-  }, [exercises, deferredQuery, muscle, equipment])
+  }, [exercises, deferredQuery, muscle, equipment, done, doneCounts])
 
   const shown = filtered.slice(0, visible)
   const resetPaging = () => setVisible(PAGE)
@@ -109,8 +116,8 @@ export function LibraryPage() {
       />
 
       <div className="sticky top-14 z-10 -mx-4 flex flex-col gap-3 bg-bg/90 px-4 py-3 backdrop-blur-md md:-mx-8 md:px-8 lg:top-0">
-        <div className="flex gap-2">
-          <div className="relative min-w-0 flex-1">
+        <div className="flex flex-wrap gap-2">
+          <div className="relative min-w-48 flex-1">
             <MagnifyingGlass
               size={16}
               className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-ink-3"
@@ -137,6 +144,20 @@ export function LibraryPage() {
             options={[
               { value: 'all', label: 'All equipment' },
               ...equipmentOptions.map((e) => ({ value: e, label: EQUIPMENT_LABELS[e] })),
+            ]}
+          />
+          <FormSelect
+            value={done}
+            onValueChange={(v) => {
+              setDone(v as 'all' | 'done' | 'todo')
+              resetPaging()
+            }}
+            ariaLabel="Filter by training history"
+            className="h-11 w-32 shrink-0"
+            options={[
+              { value: 'all', label: 'Any history' },
+              { value: 'done', label: 'Done' },
+              { value: 'todo', label: 'Not done' },
             ]}
           />
         </div>
@@ -179,6 +200,7 @@ export function LibraryPage() {
                 setQuery('')
                 setMuscle('all')
                 setEquipment('all')
+                setDone('all')
                 resetPaging()
               }}
             >
@@ -197,7 +219,11 @@ export function LibraryPage() {
           <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
             {shown.map((e) => (
               <li key={e.id}>
-                <MovementCard exercise={e} onOpen={() => setDetail(e)} />
+                <MovementCard
+                  exercise={e}
+                  doneCount={doneCounts.get(e.id) ?? 0}
+                  onOpen={() => setDetail(e)}
+                />
               </li>
             ))}
           </ul>
@@ -234,7 +260,15 @@ export function LibraryPage() {
  * instructions, and a details affordance pinned to the bottom. Hovering still
  * swaps to the rep's end frame; touch devices simply keep the start frame.
  */
-function MovementCard({ exercise, onOpen }: { exercise: Exercise; onOpen: () => void }) {
+function MovementCard({
+  exercise,
+  doneCount,
+  onOpen,
+}: {
+  exercise: Exercise
+  doneCount: number
+  onOpen: () => void
+}) {
   const [hovered, setHovered] = useState(false)
   const [failed, setFailed] = useState(false)
   const frames = exercisePhotoFrames(exercise)
@@ -276,6 +310,7 @@ function MovementCard({ exercise, onOpen }: { exercise: Exercise; onOpen: () => 
           <Tag tone="brand">{MUSCLE_LABELS[exercise.muscle]}</Tag>
           <Tag tone="outline">{EQUIPMENT_LABELS[exercise.equipment]}</Tag>
           {isCustom && <Tag>Yours</Tag>}
+          {doneCount > 0 && <Tag tone="good">{doneCount}×</Tag>}
         </span>
         {exercise.instructions?.[0] && (
           <span className="line-clamp-2 text-2xs leading-relaxed text-ink-3">

@@ -50,6 +50,8 @@ export interface Workout {
   startedAt?: string
   /** ISO timestamp, written when the session is finished. */
   endedAt?: string
+  /** Self-assigned extra credit: the member pushed beyond the plan. */
+  ec?: boolean
   exercises: LoggedExercise[]
 }
 

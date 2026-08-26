@@ -9,6 +9,7 @@ import {
   SkipForward,
   Timer,
   TrendUp,
+  X,
 } from '@phosphor-icons/react'
 import { useGym } from '../store/useGym'
 import { exerciseById, lastPerformance } from '../lib/exercises'
@@ -46,6 +47,7 @@ import {
 } from '../lib/labels'
 import { isoDaysAgo, todayIso } from '../lib/dates'
 import { bodyweightDelta, rangeVolume, setVolume, weeklyVolumeSeries, workoutTotals } from '../lib/stats'
+import { summarizeSession } from '../lib/session-summary'
 import { cn } from '@/lib/utils'
 import type { DayOfWeek, PlannedExercise, SetEntry, WeeklyPlan, Workout } from '../lib/types'
 
@@ -139,14 +141,22 @@ function computePrefill(exerciseId: string, plans: WeeklyPlan[], workouts: Worko
 
 export function TodayPage() {
   const activeWorkout = useGym((s) => s.activeWorkout)
-  return activeWorkout ? <ActiveSession workout={activeWorkout} /> : <TodayOverview />
+  const [finishedId, setFinishedId] = useState<string | null>(null)
+  if (activeWorkout) return <ActiveSession workout={activeWorkout} onFinished={setFinishedId} />
+  return <TodayOverview finishedId={finishedId} onDismissSummary={() => setFinishedId(null)} />
 }
 
 /* -------------------------------------------------------------------------- */
 /*  Idle: what am I doing today                                               */
 /* -------------------------------------------------------------------------- */
 
-function TodayOverview() {
+function TodayOverview({
+  finishedId,
+  onDismissSummary,
+}: {
+  finishedId: string | null
+  onDismissSummary: () => void
+}) {
   const navigate = useNavigate()
   const plans = useGym((s) => s.plans)
   const workouts = useGym((s) => s.workouts)
@@ -201,10 +211,19 @@ function TodayOverview() {
   const losingIsGood =
     targetKg !== undefined && lastWeighIn ? targetKg < lastWeighIn.kg : undefined
   const primary = scheduled[0]
+  const finished = finishedId ? (workouts.find((w) => w.id === finishedId) ?? null) : null
 
   return (
     <div className="flex flex-col gap-8">
       <PageHeader title="Today" description={formatLongDate(todayIso())} />
+
+      {finished && (
+        <FinishSummary
+          workout={finished}
+          earlier={workouts.filter((w) => w.id !== finished.id)}
+          onDismiss={onDismissSummary}
+        />
+      )}
 
       <div className="grid gap-4 lg:grid-cols-2">
         <AuroraTile
@@ -465,6 +484,73 @@ function WeighInDialog({
   )
 }
 
+/**
+ * The outcome of the session just finished: duration, work done, records.
+ * Motion here confirms the state change and nothing else (see DESIGN.md).
+ */
+function FinishSummary({
+  workout,
+  earlier,
+  onDismiss,
+}: {
+  workout: Workout
+  earlier: Workout[]
+  onDismiss: () => void
+}) {
+  const reduceMotion = useReducedMotion()
+  const summary = useMemo(() => summarizeSession(workout, earlier), [workout, earlier])
+  const prNames = summary.prs.map((id) => exerciseById(id)?.name ?? id)
+
+  const facts: { value: string; label: string }[] = []
+  if (summary.durationMin !== null && summary.durationMin > 0)
+    facts.push({ value: String(summary.durationMin), label: 'min' })
+  facts.push({ value: String(summary.sets), label: summary.sets === 1 ? 'set' : 'sets' })
+  if (summary.volume > 0)
+    facts.push({ value: summary.volume.toLocaleString('en-GB'), label: 'kg volume' })
+
+  return (
+    <motion.div
+      initial={reduceMotion ? false : { opacity: 0, y: 8, scale: 0.985 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.25, ease: 'easeOut' }}
+    >
+      <Panel padding="lg" className="relative">
+        <IconButton
+          size="sm"
+          onClick={onDismiss}
+          aria-label="Dismiss session summary"
+          className="absolute top-3 right-3"
+        >
+          <X size={16} weight="bold" />
+        </IconButton>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2">
+            <CheckCircle size={20} weight="fill" className="text-good" />
+            <h2 className="text-base font-semibold text-ink">Session finished</h2>
+            {workout.ec && <Tag tone="brand">EC</Tag>}
+          </div>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            {facts.map((f) => (
+              <span key={f.label} className="flex items-baseline gap-1.5">
+                <span className="num text-lg leading-none font-semibold text-ink">{f.value}</span>
+                <span className="text-2xs text-ink-3">{f.label}</span>
+              </span>
+            ))}
+          </div>
+          {prNames.length > 0 && (
+            <p className="flex items-center gap-1.5 text-sm text-ink-2">
+              <TrendUp size={16} weight="bold" className="shrink-0 text-good" />
+              {prNames.length === 1
+                ? `New record on ${prNames[0]}.`
+                : `${prNames.length} new records: ${prNames.join(', ')}.`}
+            </p>
+          )}
+        </div>
+      </Panel>
+    </motion.div>
+  )
+}
+
 function RecentSessions() {
   const navigate = useNavigate()
   const workouts = useGym((s) => s.workouts)
@@ -488,7 +574,10 @@ function RecentSessions() {
               className="flex items-center justify-between gap-3 rounded-md border border-line bg-surface px-4 py-3"
             >
               <span className="min-w-0">
-                <span className="block text-sm font-medium text-ink">{formatLongDate(w.date)}</span>
+                <span className="flex items-center gap-1.5 text-sm font-medium text-ink">
+                  {formatLongDate(w.date)}
+                  {w.ec && <Tag tone="brand">EC</Tag>}
+                </span>
                 <span className="block truncate text-2xs text-ink-3">
                   {w.exercises
                     .map((e) => exerciseById(e.exerciseId)?.name ?? e.exerciseId)
@@ -509,7 +598,13 @@ function RecentSessions() {
 /*  Active session                                                            */
 /* -------------------------------------------------------------------------- */
 
-function ActiveSession({ workout }: { workout: Workout }) {
+function ActiveSession({
+  workout,
+  onFinished,
+}: {
+  workout: Workout
+  onFinished: (id: string) => void
+}) {
   const plans = useGym((s) => s.plans)
   const workouts = useGym((s) => s.workouts)
   const addSet = useGym((s) => s.addSet)
@@ -532,6 +627,7 @@ function ActiveSession({ workout }: { workout: Workout }) {
   const [pickerOpen, setPickerOpen] = useState(false)
   const [prFlash, setPrFlash] = useState(false)
   const [confirmDiscard, setConfirmDiscard] = useState(false)
+  const [ec, setEc] = useState(false)
 
   const plannedOptions = useCallback(
     (exerciseId: string): PlannedExercise | null => {
@@ -685,8 +781,10 @@ function ActiveSession({ workout }: { workout: Workout }) {
           elapsed={elapsed}
           sets={0}
           volume={0}
-          onFinish={finishWorkout}
+          onFinish={() => finishWorkout()}
           canFinish={false}
+          ec={ec}
+          onToggleEc={() => setEc((v) => !v)}
         />
         <EmptyState
           icon={<Barbell size={20} />}
@@ -724,10 +822,13 @@ function ActiveSession({ workout }: { workout: Workout }) {
         sets={totals.sets}
         volume={totals.volume}
         onFinish={() => {
-          finishWorkout()
+          finishWorkout({ ec })
+          onFinished(workout.id)
           setRestLeft(null)
         }}
         canFinish={totals.sets > 0}
+        ec={ec}
+        onToggleEc={() => setEc((v) => !v)}
         rest={
           restLeft === null
             ? null
@@ -973,6 +1074,8 @@ function SessionHeader({
   volume,
   onFinish,
   canFinish,
+  ec,
+  onToggleEc,
   rest,
 }: {
   elapsed: number | null
@@ -980,6 +1083,8 @@ function SessionHeader({
   volume: number
   onFinish: () => void
   canFinish: boolean
+  ec: boolean
+  onToggleEc: () => void
   rest?: RestState | null
 }) {
   return (
@@ -1001,7 +1106,21 @@ function SessionHeader({
           </span>
           <span className="text-2xs text-ink-3">kg volume</span>
         </div>
-        <Button onClick={onFinish} disabled={!canFinish} className="ml-auto">
+        <button
+          type="button"
+          onClick={onToggleEc}
+          aria-pressed={ec}
+          title="Extra credit: pushed beyond the plan"
+          className={cn(
+            'ml-auto min-h-9 shrink-0 rounded-full border px-3 text-xs font-semibold transition-colors duration-150',
+            ec
+              ? 'border-brand bg-brand text-brand-ink'
+              : 'border-line bg-surface text-ink-3 hover:border-line-strong hover:text-ink',
+          )}
+        >
+          EC
+        </button>
+        <Button onClick={onFinish} disabled={!canFinish}>
           Finish
         </Button>
       </div>

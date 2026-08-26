@@ -8,6 +8,7 @@ import { isoDaysAgo } from '../lib/dates'
 import { sessionCountsByExercise, weeklyVolumeSeries, workoutTotals } from '../lib/stats'
 import { Button, IconButton } from '../ui/Button'
 import { Panel } from '../ui/Panel'
+import { Tag } from '../ui/Tag'
 import { Stat } from '../ui/Stat'
 import { FormSelect } from '../ui/FormSelect'
 import { PageHeader, Section } from '../ui/PageHeader'
@@ -20,12 +21,20 @@ import {
 } from '@/components/ui/chart'
 import { MUSCLE_LABELS, formatLongDate, formatShortDate, pluralize } from '../lib/labels'
 import { cn } from '@/lib/utils'
-import type { MuscleGroup, SetEntry } from '../lib/types'
+import type { MuscleGroup, SetEntry, Workout } from '../lib/types'
 
 function describeSet(s: SetEntry): string {
   const load = s.weight > 0 ? `${s.weight}kg` : 'BW'
   const work = s.durationSec ? `${s.durationSec}s` : `${s.reps}`
   return `${load} × ${work}${s.side ? ` ${s.side}` : ''}`
+}
+
+/** Whole minutes of a finished session, or null before durations were tracked. */
+function sessionMinutes(w: Workout): number | null {
+  if (!w.startedAt || !w.endedAt) return null
+  const ms = Date.parse(w.endedAt) - Date.parse(w.startedAt)
+  if (!Number.isFinite(ms) || ms <= 0) return null
+  return Math.round(ms / 60000)
 }
 
 const axisTick = { fontSize: 11, fill: 'var(--ink-3)' }
@@ -391,12 +400,14 @@ function SessionList() {
                     )}
                   />
                   <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-medium text-ink">
+                    <span className="flex items-center gap-1.5 text-sm font-medium text-ink">
                       {formatLongDate(w.date)}
+                      {w.ec && <Tag tone="brand">EC</Tag>}
                     </span>
                     <span className="num block truncate text-2xs text-ink-3">
                       {pluralize(w.exercises.length, 'movement')}, {pluralize(t.sets, 'set')},{' '}
                       {volume.toLocaleString('en-GB')} kg
+                      {sessionMinutes(w) !== null && ` · ${sessionMinutes(w)} min`}
                     </span>
                   </span>
                 </button>
