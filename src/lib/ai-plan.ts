@@ -49,6 +49,7 @@ interface RawExercise {
 interface RawDay {
   day?: unknown
   exercises?: unknown
+  ecNote?: unknown
 }
 
 interface RawResponse {
@@ -116,6 +117,7 @@ export function validateBlocks(
     if (!Array.isArray(rawDays) || rawDays.length !== Math.min(input.daysPerWeek, 7)) return null
 
     const byDay = new Map<DayOfWeek, PlannedExercise[]>()
+    const notesByDay = new Map<DayOfWeek, string>()
     for (const rawDay of rawDays as RawDay[]) {
       const day = rawDay?.day as DayOfWeek
       if (!DAY_VALUES.includes(day) || byDay.has(day)) return null
@@ -145,9 +147,17 @@ export function validateBlocks(
       }
       if (exercises.length < 3) return null
       byDay.set(day, exercises.slice(0, 8))
+      const note = cleanText(rawDay.ecNote, 120)
+      if (note) notesByDay.set(day, note)
     }
 
-    blocks.push(DAY_VALUES.map((d) => ({ day: d, exercises: byDay.get(d) ?? [] })))
+    blocks.push(
+      DAY_VALUES.map((d) => ({
+        day: d,
+        exercises: byDay.get(d) ?? [],
+        ecNote: notesByDay.get(d),
+      })),
+    )
   }
   return blocks.length > 0 ? blocks : null
 }
@@ -178,9 +188,10 @@ ${catalogue}
 - progression per movement: "linear" (add 2.5 kg each session), "double" (build reps to the top of the range, then add weight), or "none" (stretches, easy accessories). Beginners: mostly linear on compounds.
 - supersetGroup pairs accessories back to back: "A", "B", "C" or null. Never superset the main compound.
 - timed is true only for holds such as planks. unilateral is true only for one-side-at-a-time movements.
+- ecNote per day: ONE short optional extra-credit line for anyone who finishes with something left, at most 120 characters. Concrete and additive, e.g. "Add a fourth set on the first movement" or "Finish with a 90 second plank". Never required, never medical advice.
 
 Reply with ONE minified JSON object on a single line, nothing else, exactly this shape:
-{"planName":"...","coachNotes":"...","blocks":[{"days":[{"day":"mon","exercises":[{"exerciseId":"...","progression":"linear","supersetGroup":null,"timed":false,"unilateral":false}]}]}]}
+{"planName":"...","coachNotes":"...","blocks":[{"days":[{"day":"mon","ecNote":"...","exercises":[{"exerciseId":"...","progression":"linear","supersetGroup":null,"timed":false,"unilateral":false}]}]}]}
 planName: at most 40 characters, no dates. coachNotes: 2 or 3 plain sentences on how the programme is built and why the blocks differ. No medical claims, no hyphens used as dashes.`
 }
 

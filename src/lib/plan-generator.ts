@@ -106,6 +106,21 @@ function pickExercise(
   return candidates[(levelOffset + block) % candidates.length]
 }
 
+/**
+ * Extra credit for the standard template: one optional line per day, so a
+ * plan built without the coach still offers something to the member who
+ * finishes with fuel left. Additive and never required — the same contract
+ * the coach is held to.
+ */
+const EC_TEMPLATES: string[] = [
+  'Add one more set on the first movement.',
+  'Finish with a 90 second plank.',
+  'Take 30 seconds less rest between sets.',
+  'Add 10 slow reps of the last movement.',
+  'Close with 5 minutes of brisk walking.',
+  'Hold the last rep of every set for 3 seconds.',
+]
+
 function progressionFor(effort: number, equipment: string): 'none' | 'linear' | 'double' {
   if (equipment === 'bodyweight') return effort >= 4 ? 'linear' : 'none'
   if (effort <= 2) return 'none'
@@ -214,6 +229,8 @@ export function assemblePlan(
           date: toLocalIso(date),
           day: d.day,
           exercises,
+          /* A deload week is the one week extra credit would undo. */
+          ecNote: isDeload ? undefined : d.ecNote,
         }
       })
     weeks.push({ weekIndex: w, days })
@@ -256,6 +273,7 @@ export function generatePlan(input: OnboardingInput, requested: DurationKey, sta
           target.exercises.push({ exerciseId: id, progression: prog })
         }
       })
+      target.ecNote = EC_TEMPLATES[idx % EC_TEMPLATES.length]
     })
     return days
   }

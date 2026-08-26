@@ -82,6 +82,8 @@ export interface PlannedExercise {
 export interface PlannedDay {
   day: DayOfWeek
   exercises: PlannedExercise[]
+  /** One optional line of extra credit for the day. Absent on older plans. */
+  ecNote?: string
 }
 
 export interface WeeklyPlan {
@@ -121,6 +123,7 @@ export interface GeneratedDay {
   date: string
   day: DayOfWeek
   exercises: PlannedExercise[]
+  ecNote?: string
 }
 
 export interface GeneratedPlan {

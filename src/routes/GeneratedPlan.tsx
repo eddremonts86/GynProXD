@@ -7,6 +7,7 @@ import {
   CaretLeft,
   CaretRight,
   DownloadSimple,
+  Plus,
   Sparkle,
   Trash,
   Warning,
@@ -426,7 +427,19 @@ function DayCard({
         )}
       </ul>
 
-      <span className="flex w-full items-center justify-between border-t border-line pt-3 text-2xs font-medium text-ink-3">
+      {day.ecNote && (
+        <span className="flex w-full items-start gap-1.5 border-t border-line pt-3 text-2xs text-ink-3">
+          <Plus size={12} weight="bold" className="mt-0.5 shrink-0 text-brand" />
+          <span className="text-left">{day.ecNote}</span>
+        </span>
+      )}
+
+      <span
+        className={cn(
+          'flex w-full items-center justify-between text-2xs font-medium text-ink-3',
+          !day.ecNote && 'border-t border-line pt-3',
+        )}
+      >
         {pluralize(movements.length, 'movement')}
         <span className="flex items-center gap-1 text-ink-2 transition-transform duration-150 group-hover:translate-x-0.5">
           View day
@@ -464,6 +477,7 @@ function DayDetailDialog({ day, onClose }: { day: GeneratedDay | null; onClose: 
               <DialogDescription>
                 {formatLongDate(day.date)}, {pluralize(day.exercises.length, 'movement')}. Tap a
                 movement for photos and instructions.
+                {day.ecNote && ` Extra credit: ${day.ecNote}`}
               </DialogDescription>
             </DialogHeader>
 

@@ -3,6 +3,7 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { motion, useReducedMotion } from 'motion/react'
 import {
   ArrowRight,
+  ArrowsLeftRight,
   Barbell,
   CheckCircle,
   Plus,
@@ -51,6 +52,7 @@ import { isoDaysAgo, todayIso } from '../lib/dates'
 import { bodyweightDelta, rangeVolume, setVolume, weeklyVolumeSeries, workoutTotals } from '../lib/stats'
 import { summarizeSession } from '../lib/session-summary'
 import { testAgeDays, testIsStale } from '../lib/fitness-test'
+import { alternativesFor } from '../lib/alternatives'
 import { INTENSITIES, INTENSITY_HELP } from '../lib/intensity'
 import {
   cardFromPlannedDay,
@@ -192,7 +194,12 @@ function TodayOverview({
       plans
         .map((p) => ({ plan: p, day: p.days.find((d) => d.day === day) }))
         .filter((x) => (x.day?.exercises.length ?? 0) > 0)
-        .map((x) => ({ planId: x.plan.id, planName: x.plan.name, exercises: x.day!.exercises })),
+        .map((x) => ({
+          planId: x.plan.id,
+          planName: x.plan.name,
+          exercises: x.day!.exercises,
+          ecNote: x.day!.ecNote,
+        })),
     [plans, day],
   )
 
@@ -393,6 +400,15 @@ function TodayOverview({
               )
             })}
           </ul>
+
+          {primary.ecNote && (
+            <p className="flex items-start gap-2 border-t border-line bg-brand-soft px-5 py-3 text-2xs text-ink-2">
+              <Plus size={13} weight="bold" className="mt-0.5 shrink-0 text-brand" />
+              <span>
+                <span className="font-semibold">Extra credit</span> — {primary.ecNote}
+              </span>
+            </p>
+          )}
 
           {scheduled.length > 1 && (
             <div className="flex flex-wrap items-center gap-2 border-t border-line bg-surface-2 px-5 py-3">
@@ -695,6 +711,7 @@ function ActiveSession({
   const [restLeft, setRestLeft] = useState<number | null>(null)
   const [restTotal, setRestTotal] = useState(REST_SECONDS)
   const [pickerOpen, setPickerOpen] = useState(false)
+  const [swapOpen, setSwapOpen] = useState(false)
   const [prFlash, setPrFlash] = useState(false)
   const [confirmDiscard, setConfirmDiscard] = useState(false)
   const [ec, setEc] = useState(false)
@@ -988,6 +1005,14 @@ function ActiveSession({
               </p>
             )}
           </div>
+          {currentExercise && (
+            <IconButton
+              aria-label="Swap this movement for another"
+              onClick={() => setSwapOpen(true)}
+            >
+              <ArrowsLeftRight size={16} />
+            </IconButton>
+          )}
         </div>
 
         {suggestion && (
@@ -1126,6 +1151,14 @@ function ActiveSession({
         onOpenChange={setPickerOpen}
         workout={workout}
         onPicked={selectExercise}
+      />
+
+      <SwapDialog
+        open={swapOpen}
+        onOpenChange={setSwapOpen}
+        workout={workout}
+        current={current}
+        onSwapped={selectExercise}
       />
 
       <DiscardRow
@@ -1349,6 +1382,84 @@ function SessionPicker({
         onOpenChange(false)
       }}
     />
+  )
+}
+
+/**
+ * Same-muscle substitutes for when the rack is taken or something hurts.
+ * Sets already logged are never thrown away: the old movement only leaves
+ * the session if it is still empty.
+ */
+function SwapDialog({
+  open,
+  onOpenChange,
+  workout,
+  current,
+  onSwapped,
+}: {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  workout: Workout
+  current: { exerciseId: string; sets: SetEntry[] }
+  onSwapped: (id: string) => void
+}) {
+  const addExerciseToSession = useGym((s) => s.addExerciseToSession)
+  const removeExerciseFromSession = useGym((s) => s.removeExerciseFromSession)
+  const exercise = exerciseById(current.exerciseId)
+
+  const alternatives = useMemo(() => {
+    if (!exercise) return []
+    return alternativesFor(exercise, {
+      exclude: workout.exercises.map((e) => e.exerciseId),
+      limit: 6,
+    })
+  }, [exercise, workout.exercises])
+
+  const swapTo = (id: string) => {
+    addExerciseToSession(id)
+    if (current.sets.length === 0) removeExerciseFromSession(current.exerciseId)
+    onSwapped(id)
+    onOpenChange(false)
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Swap {exercise?.name ?? 'movement'}</DialogTitle>
+          <DialogDescription>
+            {exercise ? `Same ${MUSCLE_LABELS[exercise.muscle].toLowerCase()} work, different setup.` : ''}
+            {current.sets.length > 0 && ' Your logged sets stay in the session.'}
+          </DialogDescription>
+        </DialogHeader>
+        {alternatives.length === 0 ? (
+          <p className="text-sm text-ink-3">
+            No alternatives left for this muscle in the library.
+          </p>
+        ) : (
+          <ul className="flex flex-col gap-1.5">
+            {alternatives.map((alt) => (
+              <li key={alt.id}>
+                <button
+                  type="button"
+                  onClick={() => swapTo(alt.id)}
+                  className="flex w-full items-center gap-3 rounded-md border border-line bg-surface px-3 py-2.5 text-left transition-colors hover:border-line-strong"
+                >
+                  <ExerciseThumb exercise={alt} size="sm" />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-medium text-ink">{alt.name}</span>
+                    <span className="block text-2xs text-ink-3">
+                      {EQUIPMENT_LABELS[alt.equipment]}
+                    </span>
+                  </span>
+                  <ArrowRight size={14} weight="bold" className="shrink-0 text-ink-3" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </DialogContent>
+    </Dialog>
   )
 }
 
