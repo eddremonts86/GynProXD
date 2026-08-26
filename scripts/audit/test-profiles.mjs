@@ -145,7 +145,7 @@ if (leaked) fail('personal details readable in plaintext at rest')
 console.log('ok: personal details encrypted and persistent')
 
 // 7. Admin edits another profile's public record, then deletes it whole.
-await page.locator('form').getByLabel('Name').waitFor({ state: 'hidden' }).catch(() => {})
+await page.getByRole('tab', { name: /^Device/ }).click()
 await page.getByRole('button', { name: 'Edit Bruno' }).click()
 await page.locator('form').getByLabel('Gym', { exact: true }).fill('Peak House')
 await page.getByRole('option', { name: 'Add gym' }).click()

@@ -21,6 +21,8 @@ import { FormSelect } from '../ui/FormSelect'
 import { Input } from '../ui/Input'
 import { Panel } from '../ui/Panel'
 import { PageHeader, Section } from '../ui/PageHeader'
+import { Tabs, TabPanel } from '../ui/Tabs'
+import { Collapse } from '../ui/Collapse'
 import { InstallAppButton } from '@/components/install-app-button'
 import { SEX_LABELS, formatShortDate, pluralize } from '../lib/labels'
 import { todayIso } from '../lib/dates'
@@ -51,6 +53,7 @@ export function SettingsPage() {
   const [feedback, setFeedback] = useState<Feedback>(null)
   const [confirmClear, setConfirmClear] = useState(false)
   const [confirmDeleteProfile, setConfirmDeleteProfile] = useState(false)
+  const [tab, setTab] = useState('profile')
 
   const hasData =
     workouts.length > 0 ||
@@ -100,7 +103,17 @@ export function SettingsPage() {
         description="enForma runs entirely in this browser. Profiles are encrypted locally and nothing is uploaded."
       />
 
-      <Section title="Profile">
+      <Tabs
+        value={tab}
+        onValueChange={setTab}
+        tabs={[
+          { value: 'profile', label: 'Profile' },
+          { value: 'device', label: 'Device' },
+          { value: 'data', label: 'Data', count: workouts.length },
+          { value: 'about', label: 'About' },
+        ]}
+      >
+        <TabPanel value="profile" className="flex flex-col gap-3">
         <ProfileIdentityPanel />
         <Panel padding="lg" className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -147,13 +160,24 @@ export function SettingsPage() {
             )}
           </div>
         </Panel>
-      </Section>
 
-      <DeviceProfilesSection />
+        <Panel padding="lg" className="flex flex-wrap items-center justify-between gap-4">
+          <p className="max-w-[46ch] text-sm text-ink-3">
+            Circumstances change. Design a new programme from your current weight and the time
+            you have now; the timeline is recalculated on the way.
+          </p>
+          <Button variant="secondary" onClick={() => navigate({ to: '/onboarding' })}>
+            Design my programme
+          </Button>
+        </Panel>
+        </TabPanel>
 
-      <NotificationsSection />
+        <TabPanel value="device" className="flex flex-col gap-8">
+          <DeviceProfilesSection />
+          <NotificationsSection />
+        </TabPanel>
 
-      <Section title="Your data" hint={`${pluralize(workouts.length, 'session')} stored`}>
+        <TabPanel value="data" className="flex flex-col gap-3">
         <Panel padding="lg" className="flex flex-col gap-4">
           <dl className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
             {[
@@ -209,22 +233,10 @@ export function SettingsPage() {
             Restoring replaces everything currently stored. Export first if you want to keep it.
           </p>
         </Panel>
-      </Section>
 
-      <Section title="Programme">
-        <Panel padding="lg" className="flex flex-wrap items-center justify-between gap-4">
-          <p className="max-w-[46ch] text-sm text-ink-3">
-            Circumstances change. Design a new programme from your current weight and the time
-            you have now; the timeline is recalculated on the way.
-          </p>
-          <Button variant="secondary" onClick={() => navigate({ to: '/onboarding' })}>
-            Design my programme
-          </Button>
-        </Panel>
-      </Section>
-
-      <Section title="Delete everything">
-        <Panel padding="lg" className="flex flex-col gap-4 border-danger/30">
+        <Panel padding="lg">
+        <Collapse header={<span className="text-danger">Danger zone</span>}>
+        <div className="flex flex-col gap-4 pt-1">
           <div className="flex gap-3">
             <WarningCircle size={20} className="mt-0.5 shrink-0 text-danger" />
             <p className="max-w-[52ch] text-sm text-ink-2">
@@ -256,10 +268,12 @@ export function SettingsPage() {
               </Button>
             </div>
           )}
+        </div>
+        </Collapse>
         </Panel>
-      </Section>
+        </TabPanel>
 
-      <Section title="About">
+        <TabPanel value="about">
         <div className="flex flex-col gap-3 text-sm text-ink-3">
           <p className="max-w-[62ch]">
             enForma plans, guides and records hybrid calisthenics and barbell training. It works
@@ -312,7 +326,8 @@ export function SettingsPage() {
             eat, especially if you have an existing condition.
           </p>
         </div>
-      </Section>
+        </TabPanel>
+      </Tabs>
     </div>
   )
 }

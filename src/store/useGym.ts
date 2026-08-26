@@ -4,6 +4,7 @@ import type {
   DayOfWeek,
   Exercise,
   GeneratedPlan,
+  Intensity,
   PlannedExercise,
   ProfileDetails,
   ProgressionRule,
@@ -12,6 +13,7 @@ import type {
 } from '../lib/types'
 import { generatedExercises } from '../data/exercises-generated'
 import { populateByIdCache } from '../lib/exercises'
+import { INTENSITY_SETS } from '../lib/intensity'
 import { todayIso } from '../lib/dates'
 
 export const DAYS: DayOfWeek[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
@@ -40,7 +42,8 @@ interface GymState {
   setProfileDetails: (details: ProfileDetails | null) => void
   addExercise: (e: Exercise) => void
   startWorkout: () => void
-  startWorkoutFromPlan: (planId: string, day: DayOfWeek) => void
+  startWorkoutFromPlan: (planId: string, day: DayOfWeek, intensity?: Intensity) => void
+  setSessionIntensity: (intensity: Intensity) => void
   discardWorkout: () => void
   addSet: (exerciseId: string, weight: number, reps: number, opts?: { durationSec?: number; side?: 'L' | 'R' }) => void
   addExerciseToSession: (exerciseId: string) => void
@@ -109,7 +112,7 @@ export const useGym = create<GymState>()((set, get) => ({
           },
         }),
 
-      startWorkoutFromPlan: (planId, day) =>
+      startWorkoutFromPlan: (planId, day, intensity = 'II') =>
         set((s) => {
           const plan = s.plans.find((p) => p.id === planId)
           const planned = plan?.days.find((d) => d.day === day)
@@ -117,13 +120,31 @@ export const useGym = create<GymState>()((set, get) => ({
             exerciseId: pe.exerciseId,
             sets: [] as { weight: number; reps: number; durationSec?: number; side?: 'L' | 'R' }[],
             supersetGroup: pe.supersetGroup ?? undefined,
+            targetSets: INTENSITY_SETS[intensity],
           }))
           return {
             activeWorkout: {
               id: crypto.randomUUID(),
               date: today(),
               startedAt: new Date().toISOString(),
+              intensity,
               exercises,
+            },
+          }
+        }),
+
+      /* Applies live, mid-session: the dial is a goal, so retargeting is free. */
+      setSessionIntensity: (intensity) =>
+        set((s) => {
+          if (!s.activeWorkout) return s
+          return {
+            activeWorkout: {
+              ...s.activeWorkout,
+              intensity,
+              exercises: s.activeWorkout.exercises.map((e) => ({
+                ...e,
+                targetSets: INTENSITY_SETS[intensity],
+              })),
             },
           }
         }),
@@ -147,10 +168,18 @@ export const useGym = create<GymState>()((set, get) => ({
         set((s) => {
           if (!s.activeWorkout) return s
           if (s.activeWorkout.exercises.some((e) => e.exerciseId === exerciseId)) return s
+          const intensity = s.activeWorkout.intensity
           return {
             activeWorkout: {
               ...s.activeWorkout,
-              exercises: [...s.activeWorkout.exercises, { exerciseId, sets: [] }],
+              exercises: [
+                ...s.activeWorkout.exercises,
+                {
+                  exerciseId,
+                  sets: [],
+                  targetSets: intensity ? INTENSITY_SETS[intensity] : undefined,
+                },
+              ],
             },
           }
         }),

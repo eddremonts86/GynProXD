@@ -13,6 +13,14 @@ export interface Suggestion {
 
 const KG_STEP_BARBELL = 2.5
 
+/**
+ * Evidence floor for a load increase. A low-intensity session (2 target
+ * sets) can hit "every set at max reps" too easily; adding weight off that
+ * little evidence would accelerate progression exactly when the member
+ * chose a lighter day.
+ */
+const MIN_SETS_FOR_LOAD_INCREASE = 3
+
 function topSet(sets: SetEntry[]): SetEntry | null {
   if (sets.length === 0) return null
   return sets.reduce((a, b) => (epley1rm(b.weight, b.reps) > epley1rm(a.weight, a.reps) ? b : a))
@@ -48,11 +56,18 @@ export function suggestNext(
 
   const [minReps, maxReps] = DEFAULT_REP_RANGE
   const allSetsInRangeOrAbove = last.sets.every((s) => s.reps >= maxReps)
-  if (allSetsInRangeOrAbove) {
+  if (allSetsInRangeOrAbove && last.sets.length >= MIN_SETS_FOR_LOAD_INCREASE) {
     return {
       weight: round(top.weight + KG_STEP_BARBELL),
       reps: minReps,
       reason: `Double progression: you hit ${last.sets.length}×${maxReps} at ${top.weight}kg, so add ${KG_STEP_BARBELL}kg.`,
+    }
+  }
+  if (allSetsInRangeOrAbove) {
+    return {
+      weight: top.weight,
+      reps: maxReps,
+      reason: `Double progression: ${last.sets.length}×${maxReps} at ${top.weight}kg — log ${MIN_SETS_FOR_LOAD_INCREASE} sets at this weight before adding load.`,
     }
   }
   const targetReps = Math.min(maxReps, Math.max(minReps, top.reps))

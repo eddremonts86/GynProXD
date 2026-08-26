@@ -49,8 +49,16 @@ import {
 import { isoDaysAgo, todayIso } from '../lib/dates'
 import { bodyweightDelta, rangeVolume, setVolume, weeklyVolumeSeries, workoutTotals } from '../lib/stats'
 import { summarizeSession } from '../lib/session-summary'
+import { INTENSITIES, INTENSITY_HELP } from '../lib/intensity'
 import { cn } from '@/lib/utils'
-import type { DayOfWeek, PlannedExercise, SetEntry, WeeklyPlan, Workout } from '../lib/types'
+import type {
+  DayOfWeek,
+  Intensity,
+  PlannedExercise,
+  SetEntry,
+  WeeklyPlan,
+  Workout,
+} from '../lib/types'
 
 const REST_SECONDS = 90
 const DAY_BY_INDEX: DayOfWeek[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
@@ -166,6 +174,7 @@ function TodayOverview({
   const startWorkoutFromPlan = useGym((s) => s.startWorkoutFromPlan)
 
   const [weighInOpen, setWeighInOpen] = useState(false)
+  const [intensity, setIntensity] = useState<Intensity>('II')
   const day = todayDayOfWeek()
 
   const scheduled = useMemo(
@@ -313,14 +322,17 @@ function TodayOverview({
                 {primary.planName} · {pluralize(primary.exercises.length, 'movement')}
               </p>
             </div>
-            <Button
-              size="lg"
-              onClick={() => startWorkoutFromPlan(primary.planId, day)}
-              className="w-full sm:w-auto"
-            >
-              Start session
-              <ArrowRight size={18} weight="bold" />
-            </Button>
+            <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto">
+              <IntensityPicker value={intensity} onChange={setIntensity} />
+              <Button
+                size="lg"
+                onClick={() => startWorkoutFromPlan(primary.planId, day, intensity)}
+                className="w-full sm:w-auto"
+              >
+                Start session
+                <ArrowRight size={18} weight="bold" />
+              </Button>
+            </div>
           </div>
 
           <ul className="divide-y divide-line">
@@ -360,7 +372,7 @@ function TodayOverview({
                   key={s.planId}
                   size="sm"
                   variant="secondary"
-                  onClick={() => startWorkoutFromPlan(s.planId, day)}
+                  onClick={() => startWorkoutFromPlan(s.planId, day, intensity)}
                 >
                   {s.planName}
                 </Button>
@@ -530,6 +542,7 @@ function FinishSummary({
           <div className="flex items-center gap-2">
             <CheckCircle size={20} weight="fill" className="text-good" />
             <h2 className="text-base font-semibold text-ink">Session finished</h2>
+            {workout.intensity && <Tag tone="outline">{workout.intensity}</Tag>}
             {workout.ec && <Tag tone="brand">EC</Tag>}
           </div>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
@@ -613,6 +626,7 @@ function ActiveSession({
   const addSet = useGym((s) => s.addSet)
   const finishWorkout = useGym((s) => s.finishWorkout)
   const discardWorkout = useGym((s) => s.discardWorkout)
+  const setSessionIntensity = useGym((s) => s.setSessionIntensity)
 
   const reduceMotion = useReducedMotion()
   const elapsed = useElapsedSeconds(workout.startedAt)
@@ -788,6 +802,8 @@ function ActiveSession({
           canFinish={false}
           ec={ec}
           onToggleEc={() => setEc((v) => !v)}
+          intensity={workout.intensity ?? null}
+          onIntensity={setSessionIntensity}
         />
         <EmptyState
           icon={<Barbell size={20} />}
@@ -832,6 +848,8 @@ function ActiveSession({
         canFinish={totals.sets > 0}
         ec={ec}
         onToggleEc={() => setEc((v) => !v)}
+        intensity={workout.intensity ?? null}
+        onIntensity={setSessionIntensity}
         rest={
           restLeft === null
             ? null
@@ -867,14 +885,14 @@ function ActiveSession({
             >
               <span className="num opacity-70">{i + 1}</span>
               <span className="max-w-40 truncate">{ex?.name ?? e.exerciseId}</span>
-              {e.sets.length > 0 && (
+              {(e.sets.length > 0 || e.targetSets) && (
                 <span
                   className={cn(
                     'num rounded-full px-1.5 py-0.5 text-2xs',
                     active ? 'bg-brand-ink/20' : 'bg-surface-2 text-ink-3',
                   )}
                 >
-                  {e.sets.length}
+                  {e.targetSets ? `${e.sets.length}/${e.targetSets}` : e.sets.length}
                 </span>
               )}
             </button>
@@ -902,6 +920,11 @@ function ActiveSession({
                   <Tag>{MUSCLE_LABELS[currentExercise.muscle]}</Tag>
                   <Tag>{EQUIPMENT_LABELS[currentExercise.equipment]}</Tag>
                 </>
+              )}
+              {current.targetSets && (
+                <Tag tone={current.sets.length >= current.targetSets ? 'good' : 'outline'}>
+                  {current.sets.length}/{current.targetSets} sets
+                </Tag>
               )}
               {rule !== 'none' && <Tag tone="brand">{PROGRESSION_LABELS[rule]}</Tag>}
               {options?.supersetGroup && <Tag>Superset {options.supersetGroup}</Tag>}
@@ -1064,6 +1087,39 @@ function ActiveSession({
   )
 }
 
+function IntensityPicker({
+  value,
+  onChange,
+  size = 'md',
+}: {
+  value: Intensity | null
+  onChange: (i: Intensity) => void
+  size?: 'sm' | 'md'
+}) {
+  return (
+    <div role="group" aria-label="Session intensity" className="flex items-center gap-1">
+      {INTENSITIES.map((i) => (
+        <button
+          key={i}
+          type="button"
+          onClick={() => onChange(i)}
+          aria-pressed={value === i}
+          title={INTENSITY_HELP[i]}
+          className={cn(
+            'shrink-0 rounded-full border font-semibold transition-colors duration-150',
+            size === 'sm' ? 'min-h-8 px-2.5 text-2xs' : 'min-h-9 px-3 text-xs',
+            value === i
+              ? 'border-brand bg-brand text-brand-ink'
+              : 'border-line bg-surface text-ink-3 hover:border-line-strong hover:text-ink',
+          )}
+        >
+          {i}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 interface RestState {
   left: number
   total: number
@@ -1079,6 +1135,8 @@ function SessionHeader({
   canFinish,
   ec,
   onToggleEc,
+  intensity,
+  onIntensity,
   rest,
 }: {
   elapsed: number | null
@@ -1088,6 +1146,8 @@ function SessionHeader({
   canFinish: boolean
   ec: boolean
   onToggleEc: () => void
+  intensity: Intensity | null
+  onIntensity: (i: Intensity) => void
   rest?: RestState | null
 }) {
   return (
@@ -1109,13 +1169,16 @@ function SessionHeader({
           </span>
           <span className="text-2xs text-ink-3">kg volume</span>
         </div>
+        <div className="ml-auto hidden sm:block">
+          <IntensityPicker value={intensity} onChange={onIntensity} size="sm" />
+        </div>
         <button
           type="button"
           onClick={onToggleEc}
           aria-pressed={ec}
           title="Extra credit: pushed beyond the plan"
           className={cn(
-            'ml-auto min-h-9 shrink-0 rounded-full border px-3 text-xs font-semibold transition-colors duration-150',
+            'min-h-9 shrink-0 rounded-full border px-3 text-xs font-semibold transition-colors duration-150 max-sm:ml-auto',
             ec
               ? 'border-brand bg-brand text-brand-ink'
               : 'border-line bg-surface text-ink-3 hover:border-line-strong hover:text-ink',

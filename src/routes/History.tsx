@@ -402,6 +402,7 @@ function SessionList() {
                   <span className="min-w-0 flex-1">
                     <span className="flex items-center gap-1.5 text-sm font-medium text-ink">
                       {formatLongDate(w.date)}
+                      {w.intensity && <Tag tone="outline">{w.intensity}</Tag>}
                       {w.ec && <Tag tone="brand">EC</Tag>}
                     </span>
                     <span className="num block truncate text-2xs text-ink-3">

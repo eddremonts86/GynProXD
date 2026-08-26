@@ -41,7 +41,12 @@ export interface LoggedExercise {
   exerciseId: string
   sets: SetEntry[]
   supersetGroup?: string
+  /** Session goal from the intensity dial. A target, never a cap. */
+  targetSets?: number
 }
+
+/** Session-time volume dial. I/II/III pick the target sets per movement. */
+export type Intensity = 'I' | 'II' | 'III'
 
 export interface Workout {
   id: string
@@ -52,6 +57,8 @@ export interface Workout {
   endedAt?: string
   /** Self-assigned extra credit: the member pushed beyond the plan. */
   ec?: boolean
+  /** The volume dial the session ran at. Absent on freeform sessions. */
+  intensity?: Intensity
   exercises: LoggedExercise[]
 }
 

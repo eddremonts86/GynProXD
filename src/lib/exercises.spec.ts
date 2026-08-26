@@ -50,7 +50,13 @@ describe('suggestNext', () => {
     expect(partial?.weight).toBe(60)
     expect(partial?.reps).toBe(12)
 
-    const complete = suggestNext('double', ex, [workout('2026-08-20', [[60, 12], [60, 12]])])
+    /* Two sets at max reps is thin evidence — the load increase needs three. */
+    const thin = suggestNext('double', ex, [workout('2026-08-20', [[60, 12], [60, 12]])])
+    expect(thin?.weight).toBe(60)
+
+    const complete = suggestNext('double', ex, [
+      workout('2026-08-20', [[60, 12], [60, 12], [60, 12]]),
+    ])
     expect(complete?.weight).toBe(62.5)
     expect(complete?.reps).toBe(8)
   })
