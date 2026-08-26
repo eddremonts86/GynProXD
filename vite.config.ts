@@ -76,8 +76,8 @@ export default defineConfig(({ mode }) => {
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'pwa-192x192.png', 'pwa-512x512.png', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Forma',
-        short_name: 'Forma',
+        name: 'enForma',
+        short_name: 'enForma',
         description: 'Plan, train and track offline. Your data stays in this browser.',
         theme_color: '#ecebe8',
         background_color: '#ecebe8',

@@ -16,11 +16,11 @@ Jobs: (1) generate a realistic monthly/quarterly/semestral/annual plan from 4–
 
 ## Product Purpose
 
-Forma (evolved from GynProXD) is a local-first gym tracker that helps you plan, train, and track offline. No account, no server. You tell it a few things — goal, level, effort (hours + intensity), availability, equipment — and it estimates realistic months (e.g., 60kg loss not in 1 month) and generates a periodized calendar that syncs to a weekly planner. Success is: starting a workout in one tap, logging sets fast, seeing progress, and staying offline (PWA).
+enForma (evolved from GynProXD) is a local-first gym tracker that helps you plan, train, and track offline. No account, no server. You tell it a few things — goal, level, effort (hours + intensity), availability, equipment — and it estimates realistic months (e.g., 60kg loss not in 1 month) and generates a periodized calendar that syncs to a weekly planner. Success is: starting a workout in one tap, logging sets fast, seeing progress, and staying offline (PWA).
 
 ## Positioning
 
-Local-first, realistic, hybrid. Unlike cloud trackers that promise miracles, Forma calculates a safe rate (0.4–1.0 kg/week for fat loss, 0.06–0.35 for muscle) and refuses unrealistic timelines, then builds a periodized program from the 873 public-domain movements with deloads, progression rules, and warm human data. Clean-room rebuild, no openGym code/assets.
+Local-first, realistic, hybrid. Unlike cloud trackers that promise miracles, enForma calculates a safe rate (0.4–1.0 kg/week for fat loss, 0.06–0.35 for muscle) and refuses unrealistic timelines, then builds a periodized program from the 873 public-domain movements with deloads, progression rules, and warm human data. Clean-room rebuild, no openGym code/assets.
 
 ## Operating Context
 
@@ -40,13 +40,13 @@ Local-first, realistic, hybrid. Unlike cloud trackers that promise miracles, For
 
 ## Brand Commitments
 
-- Name: Forma (evolved from GynProXD). The mark is four rules of decreasing length read as a measuring scale, set in cobalt; the wordmark is Geist 600. Theme "Instrument": cool graphite and chalk neutrals with one cobalt signal (`#1d47d6` light, `#6c8cff` dark), red reserved for destructive and green for personal records. Geist Variable throughout, Geist Mono for every figure.
+- Name: enForma (evolved from GynProXD). The mark is four rules of decreasing length read as a measuring scale, set in cobalt; the wordmark is Geist 600. Theme "Instrument": cool graphite and chalk neutrals with one cobalt signal (`#1d47d6` light, `#6c8cff` dark), red reserved for destructive and green for personal records. Geist Variable throughout, Geist Mono for every figure.
 - Voice: plain and factual, never motivational. The product's claim is that it refuses to lie about timelines, so the interface shows its arithmetic instead of dressing it up. No decorative imagery: the only pictures are real movement illustrations and photographs.
 - Assets: favicon.svg plus PWA icons 180/192/512, all generated from the mark by `scripts/generate-icons.mjs`.
 
 ## Evidence on Hand
 
-- Live app at `http://localhost:3015` (dev, strictPort) and `dist` with PWA manifest `Forma` theme `#1a1816`.
+- Live app at `http://localhost:3015` (dev, strictPort) and `dist` with PWA manifest `enForma` theme `#1a1816`.
 - Dataset `src/data/exercises-generated.ts` 873, lib `src/lib/exercises.ts`, `progression.ts`, `plan-estimate.ts`, `plan-generator.ts`, `onboarding-parse.ts` with tests 26/26.
 - Screenshots `docs/impeccable/shots/*` before/after/radical/final/gen-final, walk reports.
 

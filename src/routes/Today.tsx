@@ -370,7 +370,7 @@ function TodayOverview() {
           <div className="flex flex-col gap-1.5">
             <h2 className="text-xl text-ink">Start with a programme</h2>
             <p className="max-w-[52ch] text-sm text-ink-3">
-              Tell Forma your goal, your weight and how much time you actually have. It works out a
+              Tell enForma your goal, your weight and how much time you actually have. It works out a
               realistic timeline and builds the weeks around it.
             </p>
           </div>

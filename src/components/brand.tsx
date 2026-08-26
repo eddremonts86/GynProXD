@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils'
 
 /**
  * Geometric mark: four rules of decreasing length, read as a measuring scale.
- * Forma is an instrument, so the identity is a scale rather than a dumbbell.
+ * enForma is an instrument, so the identity is a scale rather than a dumbbell.
  */
 export function Mark({ className }: { className?: string }) {
   return (
@@ -25,7 +25,7 @@ export function Wordmark({ className }: { className?: string }) {
   return (
     <span className={cn('flex items-center gap-2.5', className)}>
       <Mark />
-      <span className="text-lg leading-none font-semibold tracking-tight text-ink">Forma</span>
+      <span className="text-lg leading-none font-semibold tracking-tight text-ink">enForma</span>
     </span>
   )
 }

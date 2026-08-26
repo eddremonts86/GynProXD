@@ -65,7 +65,7 @@ export function SettingsPage() {
     )
     const a = document.createElement('a')
     a.href = url
-    a.download = `forma-${todayIso()}.json`
+    a.download = `enforma-${todayIso()}.json`
     a.click()
     URL.revokeObjectURL(url)
     setFeedback({ tone: 'good', text: 'Export downloaded.' })
@@ -77,7 +77,7 @@ export function SettingsPage() {
       setFeedback(
         ok
           ? { tone: 'good', text: 'Import complete.' }
-          : { tone: 'danger', text: 'That file is not a Forma export.' },
+          : { tone: 'danger', text: 'That file is not an enForma export.' },
       )
     } catch {
       setFeedback({ tone: 'danger', text: 'That file could not be read as JSON.' })
@@ -88,7 +88,7 @@ export function SettingsPage() {
     <div className="flex flex-col gap-8">
       <PageHeader
         title="Settings"
-        description="Forma runs entirely in this browser. Profiles are encrypted locally and nothing is uploaded."
+        description="enForma runs entirely in this browser. Profiles are encrypted locally and nothing is uploaded."
       />
 
       <Section title="Profile">
@@ -250,7 +250,7 @@ export function SettingsPage() {
       <Section title="About">
         <div className="flex flex-col gap-3 text-sm text-ink-3">
           <p className="max-w-[62ch]">
-            Forma plans, guides and records hybrid calisthenics and barbell training. It works
+            enForma plans, guides and records hybrid calisthenics and barbell training. It works
             offline once installed, and your training data never leaves this device.
           </p>
           <p className="max-w-[62ch] text-2xs">
@@ -275,7 +275,7 @@ export function SettingsPage() {
             under its free-tier attribution licence.
           </p>
           <p className="max-w-[62ch] text-2xs">
-            Forma is not medical advice. Talk to a professional before changing how you train or
+            enForma is not medical advice. Talk to a professional before changing how you train or
             eat, especially if you have an existing condition.
           </p>
         </div>

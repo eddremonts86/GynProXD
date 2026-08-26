@@ -511,7 +511,7 @@ export function PlannerPage() {
                 >
                   <span className="text-sm font-semibold text-ink">Design my programme</span>
                   <span className="text-2xs leading-relaxed text-ink-3">
-                    Tell Forma your goal and the time you have. The coach designs a periodised
+                    Tell enForma your goal and the time you have. The coach designs a periodised
                     programme you can copy here as a plan.
                   </span>
                 </button>

@@ -49,7 +49,7 @@ function DesktopRail({ pathname }: { pathname: string }) {
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col lg:flex">
       <div className="px-5 py-5">
-        <Link to="/" aria-label="Forma, go to today">
+        <Link to="/" aria-label="enForma, go to today">
           <Wordmark />
         </Link>
       </div>
@@ -89,9 +89,9 @@ function MobileChrome({ pathname }: { pathname: string }) {
   return (
     <>
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between bg-bg/85 px-4 backdrop-blur-md lg:hidden">
-        <Link to="/" aria-label="Forma, go to today" className="flex items-center gap-2">
+        <Link to="/" aria-label="enForma, go to today" className="flex items-center gap-2">
           <Mark className="size-7" />
-          <span className="text-base leading-none font-semibold tracking-tight text-ink">Forma</span>
+          <span className="text-base leading-none font-semibold tracking-tight text-ink">enForma</span>
         </Link>
         <ThemeToggle />
       </header>

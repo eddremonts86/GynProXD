@@ -297,7 +297,7 @@ export function GeneratedPlanPage() {
           ))}
         </div>
         <p className="text-2xs text-ink-3">
-          Forma builds a fresh programme rather than editing this one.
+          enForma builds a fresh programme rather than editing this one.
         </p>
       </Section>
 

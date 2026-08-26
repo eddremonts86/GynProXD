@@ -1,4 +1,4 @@
-# Forma
+# enForma
 
 Local-first hybrid gym and calisthenics tracker. Vite 8 + React 19 + TypeScript +
 Tailwind v4 + TanStack Router/Query + Zustand + Base UI primitives + PWA. No
@@ -43,11 +43,11 @@ all fall back to the built-in deterministic generator.
 
 - **Plan builder.** Describe your situation in free text ("40 years old, 140kg,
   want to get down to 80kg, gym 3 times a week for 2 hours") in English or
-  Spanish. Forma works out a safe rate (0.4 to 1.0 kg/week for fat loss) and a
+  Spanish. enForma works out a safe rate (0.4 to 1.0 kg/week for fat loss) and a
   realistic timeline, refuses to pretend a goal fits in less time than it takes,
   and generates a periodised 1/3/6/12 month calendar with deload weeks and
   movement rotation per 4-week block. With a target weight set, the maths run
-  regardless of the stated goal; without one, Forma says there is no clock
+  regardless of the stated goal; without one, enForma says there is no clock
   instead of inventing a timeline.
 - **Guided session.** The day's plan preloads, each movement's fields are
   prefilled from the progression engine, a 90s rest timer runs with +30s and

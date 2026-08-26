@@ -108,7 +108,7 @@ export function OnboardingPage() {
     <div className="flex flex-col gap-8">
       <PageHeader
         title="Build a plan"
-        description="Forma works out how long your goal actually takes at a safe rate, then builds the weeks around the time you have."
+        description="enForma works out how long your goal actually takes at a safe rate, then builds the weeks around the time you have."
       />
 
       <div className="grid gap-8 lg:grid-cols-[1fr_22rem] lg:items-start">
@@ -279,7 +279,7 @@ export function OnboardingPage() {
                 <h2 className="text-lg text-ink">No clock on this one</h2>
                 <p className="text-sm text-ink-3">
                   Without a target weight there is no timeline to hit. Pick the length you want to
-                  commit to and Forma will periodise it.
+                  commit to and enForma will periodise it.
                 </p>
               </div>
             ) : (
@@ -354,7 +354,7 @@ export function OnboardingPage() {
                   ))}
                   {atLongestPlan ? (
                     <p className="text-2xs text-ink-2">
-                      {DURATION_LABELS[longestDuration]} is the longest plan Forma builds. It will
+                      {DURATION_LABELS[longestDuration]} is the longest plan enForma builds. It will
                       cover the first stretch, and you can plan the rest once you get there.
                     </p>
                   ) : (
@@ -419,7 +419,7 @@ export function OnboardingPage() {
 
             {designing && aiCoachEnabled && (
               <p className="rounded-md bg-surface-2 p-3 text-2xs leading-relaxed text-ink-2">
-                The coach usually takes a minute or two. You can keep using Forma; the programme
+                The coach usually takes a minute or two. You can keep using enForma; the programme
                 will be waiting under Planner when it is ready.
               </p>
             )}

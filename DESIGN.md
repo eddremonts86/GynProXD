@@ -1,5 +1,5 @@
 ---
-name: Forma
+name: enForma
 description: Local-first hybrid training tracker. Chalk surfaces, floating cards, one aurora material, dot-matrix hero figures.
 colors:
   brand: "#24241f"
@@ -47,13 +47,13 @@ spacing:
   xl: "32px"
 ---
 
-# Design System: Forma
+# Design System: enForma
 
 ## Overview
 
 **Creative north star: "Soft Signal".**
 
-Forma reads like a modern health dashboard: warm chalk surfaces, borderless
+enForma reads like a modern health dashboard: warm chalk surfaces, borderless
 cards that float on soft shadows, pill-shaped controls, and a monochrome
 charcoal chrome that stays out of the way. Colour is not an accent sprinkled
 around the page; it lives in exactly one material, the aurora gradient, and

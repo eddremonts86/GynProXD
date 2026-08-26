@@ -99,7 +99,7 @@ export function LibraryPage() {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Library"
-        description="Every movement Forma knows, available offline."
+        description="Every movement enForma knows, available offline."
         action={
           <Button variant="secondary" onClick={() => setAddOpen(true)}>
             <Plus size={16} weight="bold" />
