@@ -33,11 +33,13 @@ export function OnboardingPage() {
   const [designing, setDesigning] = useState(false)
 
   const [text, setText] = useState('')
-  const [age, setAge] = useState('35')
-  const [sex, setSex] = useState<'hombre' | 'mujer' | 'otro'>('otro')
+  /* Saved profile details (Settings -> Profile) seed the form once. */
+  const [details] = useState(() => useGym.getState().profileDetails)
+  const [age, setAge] = useState(details?.age ? String(details.age) : '35')
+  const [sex, setSex] = useState<'hombre' | 'mujer' | 'otro'>(details?.sex ?? 'otro')
   const [weight, setWeight] = useState('80')
   const [target, setTarget] = useState('')
-  const [height, setHeight] = useState('175')
+  const [height, setHeight] = useState(details?.heightCm ? String(details.heightCm) : '175')
   const [goal, setGoal] = useState<Goal>('general')
   const [level, setLevel] = useState<Level>('principiante')
   const [days, setDays] = useState('3')

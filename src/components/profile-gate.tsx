@@ -1,12 +1,15 @@
 import { useState } from 'react'
-import { ArrowRight, CircleNotch, Plus, UserCircle } from '@phosphor-icons/react'
+import { ArrowRight, CircleNotch, Plus } from '@phosphor-icons/react'
 import { Wordmark } from '@/components/brand'
+import { Avatar } from '@/ui/Avatar'
 import { Button } from '@/ui/Button'
+import { Combobox } from '@/ui/Combobox'
 import { Input } from '@/ui/Input'
 import {
   createProfile,
   lastActiveProfileId,
   legacySnapshot,
+  listGyms,
   listProfiles,
   unlockProfile,
 } from '@/lib/profiles'
@@ -25,6 +28,8 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: (name: string) => void
   )
   const [passphrase, setPassphrase] = useState('')
   const [name, setName] = useState('')
+  const [gym, setGym] = useState('')
+  const [gyms] = useState(listGyms)
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -66,7 +71,7 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: (name: string) => void
     setBusy(true)
     setError(null)
     try {
-      await createProfile(trimmed, passphrase, { importLegacy: hasLegacy })
+      await createProfile(trimmed, passphrase, { importLegacy: hasLegacy, gym })
       onUnlocked(trimmed)
     } finally {
       setBusy(false)
@@ -107,11 +112,12 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: (name: string) => void
                     selectedId === p.id ? 'ring-2 ring-brand' : 'hover:bg-line/60',
                   )}
                 >
-                  <UserCircle size={22} className="shrink-0 text-ink-3" />
+                  <Avatar name={p.name} seed={p.id} />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-semibold text-ink">{p.name}</span>
-                    <span className="num block text-2xs text-ink-3">
-                      Since {formatShortDate(p.createdAt.slice(0, 10))}
+                    <span className="block truncate text-2xs text-ink-3">
+                      {p.gym ? `${p.gym} · ` : ''}
+                      <span className="num">since {formatShortDate(p.createdAt.slice(0, 10))}</span>
                     </span>
                   </span>
                 </button>
@@ -178,6 +184,15 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: (name: string) => void
                 setError(null)
               }}
               autoFocus
+            />
+            <Combobox
+              label="Gym"
+              value={gym}
+              onValueChange={setGym}
+              options={gyms}
+              placeholder="Search or add yours"
+              createLabel="Add gym"
+              hint="Leave empty if you train on your own."
             />
             <Input
               label="Passphrase"

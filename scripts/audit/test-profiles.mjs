@@ -87,6 +87,8 @@ console.log('ok: data at rest is ciphertext, legacy plaintext wiped')
 await lock()
 await page.getByRole('button', { name: 'New profile' }).click()
 await page.getByLabel('Name').fill('Bruno')
+await page.getByLabel('Gym', { exact: true }).fill('Iron Barn')
+await page.getByRole('option', { name: 'Add gym' }).click()
 await page.getByLabel('Passphrase', { exact: true }).fill('bruno-secret')
 await page.getByLabel('Repeat passphrase').fill('bruno-secret')
 await page.getByRole('button', { name: 'Create profile' }).click()
@@ -112,6 +114,62 @@ await page.goto(`${BASE}/history`, { waitUntil: 'networkidle' })
 await page.getByRole('button', { expanded: false }).first().click()
 await page.getByText('Pushups').first().waitFor({ timeout: 5000 })
 console.log('ok: profile A unlocks with its own data intact')
+
+// 5. The gym landed in the public registry and the device catalogue.
+const registry = await page.evaluate(() => JSON.parse(localStorage.getItem('forma-profiles')))
+const bruno = registry.profiles.find((p) => p.name === 'Bruno')
+if (bruno?.gym !== 'Iron Barn') fail(`Bruno's gym missing from registry: ${bruno?.gym}`)
+if (!registry.gyms?.includes('Iron Barn')) fail('gym catalogue missing the created gym')
+console.log('ok: gym recorded in registry and catalogue')
+
+// 6. Personal details encrypt with the profile and survive a reload.
+await page.goto(`${BASE}/settings`, { waitUntil: 'networkidle' })
+await page.getByLabel('Age').fill('41')
+await page.getByRole('button', { name: 'Save details' }).click()
+await page.getByText('Saved.').waitFor({ timeout: 5000 })
+await page.waitForTimeout(700) // autosave debounce
+await page.reload({ waitUntil: 'networkidle' })
+if ((await page.getByLabel('Age').inputValue()) !== '41') {
+  fail('personal details lost after reload')
+}
+const leaked = await page.evaluate(() => {
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i)
+    if (k.startsWith('forma-data-') && localStorage.getItem(k)?.includes('profileDetails')) {
+      return true
+    }
+  }
+  return false
+})
+if (leaked) fail('personal details readable in plaintext at rest')
+console.log('ok: personal details encrypted and persistent')
+
+// 7. Admin edits another profile's public record, then deletes it whole.
+await page.locator('form').getByLabel('Name').waitFor({ state: 'hidden' }).catch(() => {})
+await page.getByRole('button', { name: 'Edit Bruno' }).click()
+await page.locator('form').getByLabel('Gym', { exact: true }).fill('Peak House')
+await page.getByRole('option', { name: 'Add gym' }).click()
+await page.locator('form').getByRole('button', { name: 'Save' }).click()
+const afterEdit = await page.evaluate(() => JSON.parse(localStorage.getItem('forma-profiles')))
+if (afterEdit.profiles.find((p) => p.name === 'Bruno')?.gym !== 'Peak House') {
+  fail('admin gym edit did not stick')
+}
+console.log('ok: admin edited another profile gym')
+
+await page.getByRole('button', { name: 'Delete Bruno' }).click()
+await page.getByRole('button', { name: 'Delete', exact: true }).click()
+await page.waitForTimeout(300)
+const afterDelete = await page.evaluate(() => ({
+  registry: JSON.parse(localStorage.getItem('forma-profiles')),
+  dataKeys: Object.keys(localStorage).filter((k) => k.startsWith('forma-data-')),
+}))
+if (afterDelete.registry.profiles.some((p) => p.name === 'Bruno')) {
+  fail('deleted profile still in registry')
+}
+if (afterDelete.dataKeys.length !== 1) {
+  fail(`expected 1 encrypted store after delete, found ${afterDelete.dataKeys.length}`)
+}
+console.log('ok: admin delete removed the profile and its ciphertext')
 
 await browser.close()
 if (!process.exitCode) console.log('\nprofile isolation ok')

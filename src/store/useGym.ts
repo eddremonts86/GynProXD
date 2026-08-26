@@ -5,6 +5,7 @@ import type {
   Exercise,
   GeneratedPlan,
   PlannedExercise,
+  ProfileDetails,
   ProgressionRule,
   WeeklyPlan,
   Workout,
@@ -35,6 +36,8 @@ interface GymState {
   activeWorkout: Workout | null
   plans: WeeklyPlan[]
   generatedPlans: GeneratedPlan[]
+  profileDetails: ProfileDetails | null
+  setProfileDetails: (details: ProfileDetails | null) => void
   addExercise: (e: Exercise) => void
   startWorkout: () => void
   startWorkoutFromPlan: (planId: string, day: DayOfWeek) => void
@@ -85,6 +88,7 @@ export const useGym = create<GymState>()((set, get) => ({
       activeWorkout: null,
       plans: [],
       generatedPlans: [],
+      profileDetails: null,
 
       addExercise: (e) =>
         set((s) => {
@@ -187,7 +191,10 @@ export const useGym = create<GymState>()((set, get) => ({
           activeWorkout: null,
           plans: [],
           generatedPlans: [],
+          profileDetails: null,
         }),
+
+      setProfileDetails: (details) => set({ profileDetails: details }),
 
       logBodyweight: (kg) =>
         set((s) => ({ bodyweight: [{ date: today(), kg }, ...s.bodyweight] })),
@@ -357,6 +364,7 @@ export interface GymSnapshot {
   activeWorkout: Workout | null
   plans: WeeklyPlan[]
   generatedPlans: GeneratedPlan[]
+  profileDetails: ProfileDetails | null
 }
 
 export const EMPTY_SNAPSHOT: GymSnapshot = {
@@ -366,6 +374,7 @@ export const EMPTY_SNAPSHOT: GymSnapshot = {
   activeWorkout: null,
   plans: [],
   generatedPlans: [],
+  profileDetails: null,
 }
 
 export function snapshotGym(state: GymState = useGym.getState()): GymSnapshot {
@@ -376,6 +385,7 @@ export function snapshotGym(state: GymState = useGym.getState()): GymSnapshot {
     activeWorkout: state.activeWorkout,
     plans: state.plans,
     generatedPlans: state.generatedPlans,
+    profileDetails: state.profileDetails,
   }
 }
 
@@ -388,6 +398,7 @@ export function hydrateGym(snapshot: Partial<GymSnapshot> | null | undefined): v
     activeWorkout: snapshot?.activeWorkout ?? null,
     plans: snapshot?.plans ?? [],
     generatedPlans: snapshot?.generatedPlans ?? [],
+    profileDetails: snapshot?.profileDetails ?? null,
   }
   populateByIdCache([...generatedExercises, ...next.customExercises])
   useGym.setState(next)

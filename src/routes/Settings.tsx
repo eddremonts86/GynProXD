@@ -1,14 +1,27 @@
 import { useRef, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { DownloadSimple, UploadSimple, WarningCircle } from '@phosphor-icons/react'
+import { DownloadSimple, PencilSimple, Trash, UploadSimple, WarningCircle } from '@phosphor-icons/react'
 import { useGym } from '../store/useGym'
 import { useSession } from '../store/useSession'
-import { deleteActiveProfile, lockProfile } from '../lib/profiles'
+import {
+  activeProfile,
+  deleteActiveProfile,
+  deleteProfileById,
+  listGyms,
+  listProfiles,
+  lockProfile,
+  updateProfileMeta,
+} from '../lib/profiles'
+import type { ProfileDetails } from '../lib/types'
+import { Avatar } from '../ui/Avatar'
 import { Button } from '../ui/Button'
+import { Combobox } from '../ui/Combobox'
+import { FormSelect } from '../ui/FormSelect'
+import { Input } from '../ui/Input'
 import { Panel } from '../ui/Panel'
 import { PageHeader, Section } from '../ui/PageHeader'
 import { InstallAppButton } from '@/components/install-app-button'
-import { pluralize } from '../lib/labels'
+import { SEX_LABELS, formatShortDate, pluralize } from '../lib/labels'
 import { todayIso } from '../lib/dates'
 
 type Feedback = { tone: 'good' | 'danger'; text: string } | null
@@ -79,6 +92,7 @@ export function SettingsPage() {
       />
 
       <Section title="Profile">
+        <ProfileIdentityPanel />
         <Panel padding="lg" className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex min-w-0 flex-col gap-0.5">
@@ -125,6 +139,8 @@ export function SettingsPage() {
           </div>
         </Panel>
       </Section>
+
+      <DeviceProfilesSection />
 
       <Section title="Your data" hint={`${pluralize(workouts.length, 'session')} stored`}>
         <Panel padding="lg" className="flex flex-col gap-4">
@@ -265,5 +281,275 @@ export function SettingsPage() {
         </div>
       </Section>
     </div>
+  )
+}
+
+/**
+ * The person behind the profile. Name and gym live in the plaintext registry
+ * (the lock screen shows them); age, sex and height are encrypted with the
+ * rest of the data and prefill the programme designer.
+ */
+function ProfileIdentityPanel() {
+  const details = useGym((s) => s.profileDetails)
+  const setProfileDetails = useGym((s) => s.setProfileDetails)
+  const setUnlocked = useSession((s) => s.setUnlocked)
+  const [meta] = useState(activeProfile)
+  const [gyms] = useState(listGyms)
+
+  const [name, setName] = useState(meta?.name ?? '')
+  const [gym, setGym] = useState(meta?.gym ?? '')
+  const [age, setAge] = useState(details?.age ? String(details.age) : '')
+  const [sex, setSex] = useState<'hombre' | 'mujer' | 'otro' | ''>(details?.sex ?? '')
+  const [height, setHeight] = useState(details?.heightCm ? String(details.heightCm) : '')
+  const [saved, setSaved] = useState(false)
+
+  const touch = <T,>(setter: (v: T) => void) => (v: T) => {
+    setter(v)
+    setSaved(false)
+  }
+
+  const save = () => {
+    const trimmedName = name.trim()
+    if (meta && trimmedName) {
+      updateProfileMeta(meta.id, { name: trimmedName, gym })
+      setUnlocked(trimmedName)
+    }
+    const next: ProfileDetails = {}
+    const ageN = Math.round(Number(age))
+    if (age.trim() && Number.isFinite(ageN) && ageN > 0) next.age = ageN
+    if (sex) next.sex = sex
+    const heightN = Math.round(Number(height))
+    if (height.trim() && Number.isFinite(heightN) && heightN > 0) next.heightCm = heightN
+    setProfileDetails(Object.keys(next).length > 0 ? next : null)
+    setSaved(true)
+  }
+
+  return (
+    <Panel padding="lg" className="flex flex-col gap-4">
+      <div className="flex items-center gap-3">
+        <Avatar name={name || (meta?.name ?? '?')} seed={meta?.id ?? name} size="lg" />
+        <p className="max-w-[46ch] text-2xs text-ink-3">
+          Name and gym appear on the lock screen. Age, sex and height are encrypted with your
+          training data and prefill the programme designer.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <Input label="Name" value={name} onChange={(e) => touch(setName)(e.target.value)} />
+        <Combobox
+          label="Gym"
+          value={gym}
+          onValueChange={touch(setGym)}
+          options={gyms}
+          placeholder="Search or add yours"
+          createLabel="Add gym"
+        />
+      </div>
+
+      <div className="grid grid-cols-3 gap-3">
+        <Input
+          label="Age"
+          value={age}
+          onChange={(e) => touch(setAge)(e.target.value)}
+          inputMode="numeric"
+          placeholder="—"
+        />
+        <FormSelect
+          label="Sex"
+          value={sex}
+          onValueChange={(v) => touch(setSex)(v as typeof sex)}
+          placeholder="—"
+          options={(['hombre', 'mujer', 'otro'] as const).map((v) => ({
+            value: v,
+            label: SEX_LABELS[v],
+          }))}
+        />
+        <Input
+          label="Height"
+          value={height}
+          onChange={(e) => touch(setHeight)(e.target.value)}
+          inputMode="numeric"
+          suffix="cm"
+          placeholder="—"
+        />
+      </div>
+
+      <div className="flex items-center gap-3">
+        <Button onClick={save} disabled={!name.trim()}>
+          Save details
+        </Button>
+        {saved && (
+          <span role="status" className="text-2xs text-good">
+            Saved.
+          </span>
+        )}
+      </div>
+    </Panel>
+  )
+}
+
+/**
+ * Device admin. It manages the public directory only — names, gyms, avatars —
+ * because everything else is sealed under each profile's passphrase. Deleting
+ * a profile removes its ciphertext without needing to open it.
+ */
+function DeviceProfilesSection() {
+  const setLocked = useSession((s) => s.setLocked)
+  const [profiles, setProfiles] = useState(listProfiles)
+  const [gyms, setGyms] = useState(listGyms)
+  const [selfId] = useState(() => activeProfile()?.id ?? null)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editName, setEditName] = useState('')
+  const [editGym, setEditGym] = useState('')
+  const [confirmId, setConfirmId] = useState<string | null>(null)
+
+  const refresh = () => {
+    setProfiles(listProfiles())
+    setGyms(listGyms())
+  }
+
+  const startEdit = (id: string, name: string, gym?: string) => {
+    setEditingId(id)
+    setEditName(name)
+    setEditGym(gym ?? '')
+    setConfirmId(null)
+  }
+
+  const saveEdit = () => {
+    if (editingId && editName.trim()) {
+      updateProfileMeta(editingId, { name: editName, gym: editGym })
+      refresh()
+    }
+    setEditingId(null)
+  }
+
+  return (
+    <Section
+      title="Profiles on this device"
+      hint={pluralize(profiles.length, 'profile')}
+      action={
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => {
+            void lockProfile().then(setLocked)
+          }}
+        >
+          New profile
+        </Button>
+      }
+    >
+      <Panel padding="lg" className="flex flex-col gap-1">
+        <ul className="divide-y divide-line">
+          {profiles.map((p) => (
+            <li key={p.id} className="py-3 first:pt-0 last:pb-0">
+              {editingId === p.id ? (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault()
+                    saveEdit()
+                  }}
+                  className="flex flex-col gap-3"
+                >
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    {/* Explicit ids: the identity form above already owns f-name/f-gym. */}
+                    <Input
+                      id={`edit-name-${p.id}`}
+                      label="Name"
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      autoFocus
+                    />
+                    <Combobox
+                      id={`edit-gym-${p.id}`}
+                      label="Gym"
+                      value={editGym}
+                      onValueChange={setEditGym}
+                      options={gyms}
+                      placeholder="Search or add"
+                      createLabel="Add gym"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button type="submit" size="sm" disabled={!editName.trim()}>
+                      Save
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => setEditingId(null)}>
+                      Cancel
+                    </Button>
+                  </div>
+                </form>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <Avatar name={p.name} seed={p.id} />
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-center gap-2">
+                      <span className="truncate text-sm font-semibold text-ink">{p.name}</span>
+                      {p.id === selfId && (
+                        <span className="rounded-full bg-brand px-2 py-0.5 text-2xs font-medium text-brand-ink">
+                          You
+                        </span>
+                      )}
+                    </span>
+                    <span className="block truncate text-2xs text-ink-3">
+                      {p.gym ?? 'Independent'} ·{' '}
+                      <span className="num">since {formatShortDate(p.createdAt.slice(0, 10))}</span>
+                    </span>
+                  </span>
+
+                  {confirmId === p.id ? (
+                    <span className="flex shrink-0 items-center gap-2">
+                      <Button variant="ghost" size="sm" onClick={() => setConfirmId(null)}>
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => {
+                          void deleteProfileById(p.id).then(refresh)
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    </span>
+                  ) : p.id === selfId ? (
+                    <span className="shrink-0 text-2xs text-ink-3">Edit under Profile</span>
+                  ) : (
+                    <span className="flex shrink-0 items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        aria-label={`Edit ${p.name}`}
+                        onClick={() => startEdit(p.id, p.name, p.gym)}
+                      >
+                        <PencilSimple size={15} />
+                        Edit
+                      </Button>
+                      <Button
+                        variant="dangerQuiet"
+                        size="sm"
+                        aria-label={`Delete ${p.name}`}
+                        onClick={() => {
+                          setConfirmId(p.id)
+                          setEditingId(null)
+                        }}
+                      >
+                        <Trash size={15} />
+                      </Button>
+                    </span>
+                  )}
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+
+        <p className="border-t border-line pt-3 text-2xs text-ink-3">
+          This directory — names, gyms, avatars — is shared on the device. Each profile's training
+          data stays encrypted under its own passphrase and cannot be read or edited from here.
+          Deleting a profile erases its encrypted data permanently.
+        </p>
+      </Panel>
+    </Section>
   )
 }

@@ -86,6 +86,13 @@ export type Goal = 'adelgazar' | 'musculo' | 'recomp' | 'fuerza' | 'general' | '
 export type Level = 'principiante' | 'intermedio' | 'avanzado'
 export type DurationKey = 'mensual' | 'trimestral' | 'semestral' | 'anual'
 
+/** Personal details kept inside the encrypted profile snapshot. */
+export interface ProfileDetails {
+  age?: number
+  sex?: 'hombre' | 'mujer' | 'otro'
+  heightCm?: number
+}
+
 export interface OnboardingInput {
   age: number
   sex: 'hombre' | 'mujer' | 'otro'

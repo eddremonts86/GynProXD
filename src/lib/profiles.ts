@@ -22,6 +22,8 @@ import { EMPTY_SNAPSHOT, hydrateGym, snapshotGym, useGym, type GymSnapshot } fro
 export interface ProfileMeta {
   id: string
   name: string
+  /** Gym the person trains at. Plaintext by design: shown before unlock. */
+  gym?: string
   createdAt: string
   kdf: { salt: string; iterations: number }
   /** A small encrypted sentinel, used to verify a passphrase on unlock. */
@@ -31,6 +33,8 @@ export interface ProfileMeta {
 interface Registry {
   profiles: ProfileMeta[]
   lastActiveId?: string
+  /** Device-wide gym catalogue, so new profiles can pick an existing one. */
+  gyms?: string[]
 }
 
 const REGISTRY_KEY = 'forma-profiles'
@@ -60,18 +64,89 @@ function writeRegistry(registry: Registry): void {
   localStorage.setItem(REGISTRY_KEY, JSON.stringify(registry))
 }
 
-export function listProfiles(): { id: string; name: string; createdAt: string }[] {
-  return readRegistry().profiles.map(({ id, name, createdAt }) => ({ id, name, createdAt }))
+export interface ProfileSummary {
+  id: string
+  name: string
+  gym?: string
+  createdAt: string
+}
+
+export function listProfiles(): ProfileSummary[] {
+  return readRegistry().profiles.map(({ id, name, gym, createdAt }) => ({
+    id,
+    name,
+    gym,
+    createdAt,
+  }))
+}
+
+/** Every gym known on this device: the catalogue plus any profile's gym. */
+export function listGyms(): string[] {
+  const registry = readRegistry()
+  const seen = new Map<string, string>()
+  for (const gym of [...(registry.gyms ?? []), ...registry.profiles.map((p) => p.gym ?? '')]) {
+    const trimmed = gym.trim()
+    if (trimmed && !seen.has(trimmed.toLowerCase())) seen.set(trimmed.toLowerCase(), trimmed)
+  }
+  return [...seen.values()].sort((a, b) => a.localeCompare(b))
+}
+
+function rememberGym(registry: Registry, gym: string | undefined): void {
+  const trimmed = gym?.trim()
+  if (!trimmed) return
+  const gyms = registry.gyms ?? []
+  if (!gyms.some((g) => g.toLowerCase() === trimmed.toLowerCase())) {
+    registry.gyms = [...gyms, trimmed]
+  }
 }
 
 export function lastActiveProfileId(): string | undefined {
   return readRegistry().lastActiveId
 }
 
-export function activeProfile(): { id: string; name: string } | null {
+export function activeProfile(): { id: string; name: string; gym?: string } | null {
   if (!activeId) return null
   const meta = readRegistry().profiles.find((p) => p.id === activeId)
-  return meta ? { id: meta.id, name: meta.name } : null
+  return meta ? { id: meta.id, name: meta.name, gym: meta.gym } : null
+}
+
+/**
+ * Edits a profile's public record: name and gym. These live outside the
+ * encryption on purpose (the lock screen shows them), so any unlocked user
+ * can administer them. Training data stays sealed under each passphrase.
+ */
+export function updateProfileMeta(id: string, patch: { name?: string; gym?: string }): boolean {
+  const registry = readRegistry()
+  const meta = registry.profiles.find((p) => p.id === id)
+  if (!meta) return false
+  if (patch.name !== undefined) {
+    const trimmed = patch.name.trim()
+    if (trimmed) meta.name = trimmed
+  }
+  if (patch.gym !== undefined) {
+    const trimmed = patch.gym.trim()
+    if (trimmed) {
+      meta.gym = trimmed
+      rememberGym(registry, trimmed)
+    } else {
+      delete meta.gym
+    }
+  }
+  writeRegistry(registry)
+  return true
+}
+
+/** Removes any profile and its ciphertext. Locks first if it is the active one. */
+export async function deleteProfileById(id: string): Promise<void> {
+  if (id === activeId) {
+    await deleteActiveProfile()
+    return
+  }
+  const registry = readRegistry()
+  registry.profiles = registry.profiles.filter((p) => p.id !== id)
+  if (registry.lastActiveId === id) delete registry.lastActiveId
+  writeRegistry(registry)
+  localStorage.removeItem(DATA_PREFIX + id)
 }
 
 /** Plaintext data from before profiles existed, offered to the first profile. */
@@ -136,13 +211,15 @@ async function startSession(id: string, key: CryptoKey, data: Partial<GymSnapsho
 export async function createProfile(
   name: string,
   passphrase: string,
-  options?: { importLegacy?: boolean },
+  options?: { importLegacy?: boolean; gym?: string },
 ): Promise<void> {
   const salt = randomBytes(16)
   const key = await deriveKey(passphrase, salt, KDF_ITERATIONS)
+  const gym = options?.gym?.trim()
   const meta: ProfileMeta = {
     id: `profile-${Date.now()}-${toBase64(randomBytes(6)).replace(/[^a-zA-Z0-9]/g, '')}`,
     name: name.trim(),
+    ...(gym ? { gym } : {}),
     createdAt: new Date().toISOString(),
     kdf: { salt: toBase64(salt), iterations: KDF_ITERATIONS },
     check: await encryptJson(key, SENTINEL),
@@ -155,6 +232,7 @@ export async function createProfile(
 
   const registry = readRegistry()
   registry.profiles.push(meta)
+  rememberGym(registry, gym)
   writeRegistry(registry)
 
   if (options?.importLegacy) localStorage.removeItem(LEGACY_KEY)

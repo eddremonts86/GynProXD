@@ -20,6 +20,7 @@ import { useSession } from '@/store/useSession'
 import { activeProfile, lockProfile, resumeSession } from '@/lib/profiles'
 import { SignOut } from '@phosphor-icons/react'
 import { IconButton } from '@/ui/Button'
+import { Avatar } from '@/ui/Avatar'
 import { cn } from '@/lib/utils'
 
 interface NavItem {
@@ -128,10 +129,17 @@ function MobileChrome({ pathname }: { pathname: string }) {
 function ProfileFooter() {
   const profileName = useSession((s) => s.profileName)
   const setLocked = useSession((s) => s.setLocked)
+  const meta = activeProfile()
   return (
     <div className="flex items-center justify-between gap-2 pt-1">
-      <span className="min-w-0 truncate px-1 text-2xs text-ink-3">
-        {profileName ?? 'Local only'}
+      <span className="flex min-w-0 items-center gap-2">
+        {profileName && <Avatar name={profileName} seed={meta?.id ?? profileName} size="sm" />}
+        <span className="min-w-0 flex-col">
+          <span className="block truncate text-2xs font-medium text-ink-2">
+            {profileName ?? 'Local only'}
+          </span>
+          {meta?.gym && <span className="block truncate text-2xs text-ink-3">{meta.gym}</span>}
+        </span>
       </span>
       <span className="flex shrink-0 items-center">
         <ThemeToggle />
