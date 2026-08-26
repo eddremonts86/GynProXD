@@ -15,7 +15,21 @@ node scripts/audit/test-profiles.mjs   -> profile isolation ok
 node scripts/audit/test-gym-flow.mjs   -> gym flow ok (now also asserts
                                           the operator has no Inbox and
                                           /inbox bounces to the panel)
+node scripts/audit/test-gate.mjs       -> gate flow ok (validation
+                                          cascade, focus, reveal toggle,
+                                          mode-switch clearing, role
+                                          tags, role landing)
 ```
+
+## Follow-up run (same day)
+
+Every recommendation and deferred finding was closed: test-gate.mjs
+added to the battery; admin inbox copy made role-aware; admin user rows
+wrap on mobile instead of crushing names; the mobile nav item is 'Gym';
+vite.config uses import.meta.dirname; deprecated baseUrl removed from
+both tsconfigs; the dead helper left in test-gym-flow.mjs pruned;
+ATTRIBUTION.md records third-party asset terms at repo level. Full
+battery re-run green (58 unit tests + 6 Playwright scripts).
 
 ## Live-browser proof (this run)
 
