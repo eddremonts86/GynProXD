@@ -12,5 +12,5 @@ export async function ensureProfile(page, base, name = 'Walker', pass = 'walk-pa
     await page.getByLabel('Passphrase', { exact: true }).fill(pass)
     await page.getByRole('button', { name: 'Unlock' }).click()
   }
-  await page.getByRole('link', { name: 'Forma, go to today' }).waitFor({ timeout: 10000 })
+  await page.getByRole('link', { name: 'enForma, go to today' }).waitFor({ timeout: 10000 })
 }
