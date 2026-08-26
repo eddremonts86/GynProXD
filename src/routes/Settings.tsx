@@ -32,6 +32,7 @@ import {
   enableNotifications,
   notificationsEnabled,
   notificationsSupported,
+  type NotifyChannel,
 } from '../lib/notify'
 
 type Feedback = { tone: 'good' | 'danger'; text: string } | null
@@ -436,40 +437,66 @@ function ProfileIdentityPanel() {
   )
 }
 
-/** System notifications for gym messages, honest about their local reach. */
+/** System notifications, honest about their local reach. */
 function NotificationsSection() {
-  const [enabled, setEnabled] = useState(notificationsEnabled)
-  const [blocked, setBlocked] = useState(false)
   if (!notificationsSupported()) return null
 
   return (
     <Section title="Notifications">
-      <Panel padding="lg" className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex min-w-0 flex-col gap-0.5">
-          <span className="text-sm font-semibold text-ink">Gym messages</span>
-          <span className="max-w-[52ch] text-2xs text-ink-3">
-            {blocked
-              ? 'Your browser has notifications blocked for enForma. Allow them in the site settings and try again.'
-              : 'A system notification when your gym sends something new, shown while enForma is open on this device.'}
-          </span>
-        </div>
-        <Switch
-          aria-label="Notify about gym messages"
-          checked={enabled}
-          onCheckedChange={(on) => {
-            if (!on) {
-              disableNotifications()
-              setEnabled(false)
-              return
-            }
-            void enableNotifications().then((ok) => {
-              setEnabled(ok)
-              setBlocked(!ok)
-            })
-          }}
+      <Panel padding="none" className="divide-y divide-line">
+        <NotificationToggle
+          channel="gym"
+          title="Gym messages"
+          description="A system notification when your gym sends something new, shown while enForma is open on this device."
+        />
+        <NotificationToggle
+          channel="training"
+          title="Training nudges"
+          description="A reminder when your fitness test is eight weeks old, checked when you unlock this profile."
         />
       </Panel>
     </Section>
+  )
+}
+
+function NotificationToggle({
+  channel,
+  title,
+  description,
+}: {
+  channel: NotifyChannel
+  title: string
+  description: string
+}) {
+  const [enabled, setEnabled] = useState(() => notificationsEnabled(channel))
+  const [blocked, setBlocked] = useState(false)
+
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 p-5">
+      <div className="flex min-w-0 flex-col gap-0.5">
+        <span className="text-sm font-semibold text-ink">{title}</span>
+        <span className="max-w-[52ch] text-2xs text-ink-3">
+          {blocked
+            ? 'Your browser has notifications blocked for enForma. Allow them in the site settings and try again.'
+            : description}
+        </span>
+      </div>
+      <Switch
+        aria-label={`Notify about ${title.toLowerCase()}`}
+        checked={enabled}
+        onCheckedChange={(on) => {
+          if (!on) {
+            disableNotifications(channel)
+            setEnabled(false)
+            return
+          }
+          void enableNotifications(channel).then((ok) => {
+            setEnabled(ok)
+            setBlocked(!ok)
+          })
+        }}
+      />
+    </div>
   )
 }
 

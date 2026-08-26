@@ -24,8 +24,11 @@ import { ProfileGate } from '@/components/profile-gate'
 import { GymBanner } from '@/components/gym-banner'
 import { useSession } from '@/store/useSession'
 import { useMessages } from '@/store/useMessages'
+import { useGym } from '@/store/useGym'
 import { unreadCount } from '@/lib/messages'
-import { notifyUnread } from '@/lib/notify'
+import { notifyRetestDue, notifyUnread } from '@/lib/notify'
+import { testAgeDays, testIsStale } from '@/lib/fitness-test'
+import { todayIso } from '@/lib/dates'
 import { activeProfile, lockProfile, resumeSession, type ProfileRole } from '@/lib/profiles'
 import { SignOut } from '@phosphor-icons/react'
 import { IconButton } from '@/ui/Button'
@@ -280,6 +283,17 @@ export function AppShell() {
     }
     seenUnread.current = unread
   }, [unread, status, gym])
+
+  /* Retest nudge, checked when a profile comes up rather than on a timer:
+     a local-first app has no scheduler, and the marker in notify.ts keeps
+     it to one notification per stale test. */
+  const fitnessTest = useGym((s) => s.fitnessTest)
+  useEffect(() => {
+    if (status !== 'unlocked' || !fitnessTest) return
+    if (!testIsStale(fitnessTest, todayIso())) return
+    const weeks = Math.floor(testAgeDays(fitnessTest, todayIso()) / 7)
+    void notifyRetestDue(fitnessTest.takenAt, weeks)
+  }, [status, fitnessTest])
 
   /* One resume attempt per boot: a refreshed tab keeps its unlocked profile. */
   useEffect(() => {

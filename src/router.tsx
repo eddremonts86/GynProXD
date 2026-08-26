@@ -31,6 +31,9 @@ const MenuPage = React.lazy(() => import('./routes/Menu').then((m) => ({ default
 const ChallengesPage = React.lazy(() =>
   import('./routes/Challenges').then((m) => ({ default: m.ChallengesPage })),
 )
+const FitnessTestPage = React.lazy(() =>
+  import('./routes/FitnessTest').then((m) => ({ default: m.FitnessTestPage })),
+)
 
 const rootRoute = createRootRoute({ component: AppShell })
 
@@ -59,6 +62,7 @@ export const router = createRouter({
     lazyRoute('/menu', MenuPage),
     lazyRoute('/gym', GymPanelPage),
     lazyRoute('/admin', AdminPage),
+    lazyRoute('/fitness-test', FitnessTestPage),
     lazyRoute('/onboarding', OnboardingPage),
     lazyRoute('/generated/$id', GeneratedPlanPage),
   ]),

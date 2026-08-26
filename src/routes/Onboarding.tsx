@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { ArrowRight, CircleNotch, MagicWand, Sparkle, Warning } from '@phosphor-icons/react'
 import { PageHeader, Section } from '../ui/PageHeader'
 import { Panel } from '../ui/Panel'
@@ -20,6 +20,7 @@ import {
   LEVEL_LABELS,
   SEX_LABELS,
   TRAINING_PLACE_OPTIONS,
+  formatShortDate,
 } from '../lib/labels'
 import { cn } from '@/lib/utils'
 import type { DurationKey, Goal, Level, OnboardingInput } from '../lib/types'
@@ -33,19 +34,21 @@ export function OnboardingPage() {
   const [designing, setDesigning] = useState(false)
 
   const [text, setText] = useState('')
-  /* Saved profile details (Settings -> Profile) seed the form once. */
+  /* Saved profile details (Settings -> Profile) seed the form once, and a
+     fitness-test result seeds level + effort the same way. */
   const [details] = useState(() => useGym.getState().profileDetails)
+  const [test] = useState(() => useGym.getState().fitnessTest)
   const [age, setAge] = useState(details?.age ? String(details.age) : '35')
   const [sex, setSex] = useState<'hombre' | 'mujer' | 'otro'>(details?.sex ?? 'otro')
   const [weight, setWeight] = useState('80')
   const [target, setTarget] = useState('')
   const [height, setHeight] = useState(details?.heightCm ? String(details.heightCm) : '175')
   const [goal, setGoal] = useState<Goal>('general')
-  const [level, setLevel] = useState<Level>('principiante')
+  const [level, setLevel] = useState<Level>(test?.strength ?? 'principiante')
   const [days, setDays] = useState('3')
   const [mins, setMins] = useState('60')
   const [place, setPlace] = useState('hibrido')
-  const [effort, setEffort] = useState('3')
+  const [effort, setEffort] = useState(test ? String(test.suggestedEffort) : '3')
   const [duration, setDuration] = useState<DurationKey>('trimestral')
 
   const parsed = useMemo(() => parseOnboarding(text), [text])
@@ -266,6 +269,19 @@ export function OnboardingPage() {
                     className="xl:col-span-1"
                   />
                 </div>
+                <p className="mt-3 text-2xs text-ink-3">
+                  {test ? (
+                    <>Experience and effort are prefilled from your fitness test ({formatShortDate(test.takenAt)}).</>
+                  ) : (
+                    <>
+                      Not sure about experience or effort?{' '}
+                      <Link to="/fitness-test" className="text-brand underline underline-offset-2">
+                        Take the 5-minute fitness test
+                      </Link>
+                      .
+                    </>
+                  )}
+                </p>
               </fieldset>
             </Panel>
           </Section>

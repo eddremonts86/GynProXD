@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { motion, useReducedMotion } from 'motion/react'
 import {
   ArrowRight,
@@ -50,6 +50,7 @@ import {
 import { isoDaysAgo, todayIso } from '../lib/dates'
 import { bodyweightDelta, rangeVolume, setVolume, weeklyVolumeSeries, workoutTotals } from '../lib/stats'
 import { summarizeSession } from '../lib/session-summary'
+import { testAgeDays, testIsStale } from '../lib/fitness-test'
 import { INTENSITIES, INTENSITY_HELP } from '../lib/intensity'
 import {
   cardFromPlannedDay,
@@ -180,6 +181,8 @@ function TodayOverview({
   const startWorkout = useGym((s) => s.startWorkout)
   const startWorkoutFromPlan = useGym((s) => s.startWorkoutFromPlan)
 
+  const fitnessTest = useGym((s) => s.fitnessTest)
+
   const [weighInOpen, setWeighInOpen] = useState(false)
   const [intensity, setIntensity] = useState<Intensity>('II')
   const day = todayDayOfWeek()
@@ -233,6 +236,16 @@ function TodayOverview({
   return (
     <div className="flex flex-col gap-8">
       <PageHeader title="Today" description={formatLongDate(todayIso())} />
+
+      {fitnessTest && testIsStale(fitnessTest, todayIso()) && (
+        <p className="flex flex-wrap items-center gap-1.5 text-2xs text-ink-3">
+          <Timer size={14} />
+          Your fitness test is {Math.floor(testAgeDays(fitnessTest, todayIso()) / 7)} weeks old.
+          <Link to="/fitness-test" className="text-brand underline underline-offset-2">
+            Retest in five minutes
+          </Link>
+        </p>
+      )}
 
       {finished && (
         <FinishSummary
@@ -433,6 +446,15 @@ function TodayOverview({
               Start an empty session
             </Button>
           </div>
+          {!fitnessTest && (
+            <p className="text-2xs text-ink-3">
+              Not sure where you stand?{' '}
+              <Link to="/fitness-test" className="text-brand underline underline-offset-2">
+                Take the 5-minute fitness test
+              </Link>{' '}
+              first and the designer starts from your real level.
+            </p>
+          )}
         </Panel>
       )}
 
