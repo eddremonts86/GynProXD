@@ -90,7 +90,7 @@ export function Combobox({
               'data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 duration-100',
             )}
           >
-            <Primitive.Empty className="px-2 py-1.5 text-2xs text-ink-3">
+            <Primitive.Empty className="px-2.5 py-2 text-2xs text-ink-3">
               Type to add the first one.
             </Primitive.Empty>
             <Primitive.List>
@@ -101,7 +101,7 @@ export function Combobox({
                     key={isCreate ? `__create__${item}` : item}
                     value={item}
                     className={cn(
-                      'flex w-full cursor-default items-center gap-1.5 rounded-md px-2 py-1.5 text-sm select-none',
+                      'flex w-full cursor-default items-center gap-1.5 rounded-md px-2.5 py-2 text-sm select-none',
                       'data-highlighted:bg-accent data-highlighted:text-accent-foreground',
                       isCreate && 'text-ink-2',
                     )}
