@@ -106,7 +106,7 @@ export function SettingsPage() {
     <div className="flex flex-col gap-8">
       <PageHeader
         title="Settings"
-        description="enForma runs entirely in this browser. Profiles are encrypted locally and nothing is uploaded."
+        description="Profiles are encrypted on this device. Nothing leaves it unless you turn on sync, and even then the server only ever holds sealed rows."
       />
 
       <Tabs
