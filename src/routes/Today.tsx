@@ -993,9 +993,25 @@ function ActiveSession({
                 </>
               )}
               {current.targetSets && (
-                <Tag tone={current.sets.length >= current.targetSets ? 'good' : 'outline'}>
-                  {current.sets.length}/{current.targetSets} sets
-                </Tag>
+                <span
+                  className="flex items-center gap-1.5"
+                  aria-label={`${current.sets.length} of ${current.targetSets} target sets logged`}
+                >
+                  <span className="flex items-center gap-1" aria-hidden="true">
+                    {Array.from({ length: current.targetSets }, (_, i) => (
+                      <span
+                        key={i}
+                        className={cn(
+                          'size-2.5 rounded-full transition-colors duration-200',
+                          i < current.sets.length ? 'bg-good' : 'bg-line',
+                        )}
+                      />
+                    ))}
+                  </span>
+                  <span className="num text-2xs text-ink-3">
+                    {current.sets.length}/{current.targetSets} sets
+                  </span>
+                </span>
               )}
               {rule !== 'none' && <Tag tone="brand">{PROGRESSION_LABELS[rule]}</Tag>}
               {options?.supersetGroup && <Tag>Superset {options.supersetGroup}</Tag>}
@@ -1282,6 +1298,13 @@ function SessionHeader({
           Finish
         </Button>
       </div>
+
+      {ec && (
+        <p className="flex items-center gap-1.5 pb-2.5 text-2xs text-ink-3">
+          <CheckCircle size={13} weight="fill" className="shrink-0 text-brand" />
+          Saved as an extra-credit session when you finish.
+        </p>
+      )}
 
       {rest && (
         <div className="flex max-w-2xl items-center gap-3 border-t border-line py-2.5">
