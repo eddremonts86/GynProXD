@@ -1,6 +1,6 @@
 # Darebee study: what to steal and how to build it
 
-Status: implemented — phases 0–8 shipped 2026-08-26; phase 9 week one shipped 2026-08-27
+Status: implemented — phases 0–9 shipped (0–8 on 2026-08-26, phase 9 on 2026-08-27)
 Date: 2026-08-26
 
 Decisions locked with Edd 2026-08-26: scope is phases 0–8 (phase 9 stays a
@@ -342,9 +342,10 @@ plus the deviations worth knowing:
 - **8** `collection.ts` + 3 bundled hubs + the `collection` bus kind;
   members get them as library filter chips, gym-curated first.
 
-**Phase 9 — week one shipped 2026-08-27.** *Above the Treeline*: original
-content, thirty days walking up out of a valley, of which the first seven
-are written. Decisions taken with Edd: English (the plan said Spanish,
+**Phase 9 — shipped 2026-08-27, all thirty days.** *Above the Treeline*:
+original content, thirty days walking up out of a valley, written in two
+passes — week one first to settle the tone, then chapters 8–30 once it
+held. Decisions taken with Edd: English (the plan said Spanish,
 written before the UI language was settled — the app is English throughout);
 seven days first rather than thirty, per this plan's own warning about
 proving the narrative before building more; mountain survival rather than
@@ -359,7 +360,14 @@ prose does.
 `lib/story.ts` holds the engine (current day is the first unfinished one, so
 catching up works and skipping does not; per-field track fallback so a track
 may change only the prose). `data/story-treeline.ts` holds the content.
-Progress lives in the encrypted snapshot. Remaining: chapters 8–30.
+Progress lives in the encrypted snapshot. 31 distinct movements, all from
+the bundled catalogue; no two heavy days ever land back to back (10 heavy,
+9 steady, 11 light). The arc runs valley → moraine → headwall → a member
+turning back on day 18 → storm → summit, so the light days are earned by
+the story rather than inserted into it.
+
+Nothing remains in this plan. The map and inventory stay unbuilt on
+purpose; revisit only if members actually finish the thirty days.
 
 **Phase 0 — prerequisites (S)**: commit the recipes work sitting
 untracked on `dev`; move `seedFrom` to `src/lib/seed.ts` (recipes re-import,

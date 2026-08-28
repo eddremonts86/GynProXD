@@ -53,11 +53,12 @@ function StoryIntro({ onStart }: { onStart: () => void }) {
         <p className="max-w-[62ch] text-sm leading-relaxed text-ink-2">
           Thirty days walking up out of a valley, one chapter and one session a day. There are no
           rest days: a heavy day is always followed by a light one, so the streak never has to
-          break. Three days in, you pick the job you do for the rest of the climb.
+          break. Three days in, you pick the job you do for the rest of the climb — and it changes
+          both what you read and what you train.
         </p>
         <div className="flex flex-wrap gap-1.5">
-          <Tag tone="outline">{pluralize(program.days.length, 'day')} written</Tag>
-          <Tag tone="outline">of {program.totalDays} planned</Tag>
+          <Tag tone="outline">{pluralize(program.days.length, 'day')}</Tag>
+          <Tag tone="outline">3 tracks</Tag>
           <Tag tone="outline">No rest days</Tag>
         </div>
         <div>
@@ -147,11 +148,11 @@ function StoryRun({ progress }: { progress: StoryProgress }) {
           <Panel padding="lg" className="flex flex-col gap-3">
             <h2 className="flex items-center gap-2 text-lg text-ink">
               <CheckCircle size={20} weight="fill" className="text-good" />
-              The hut at the col
+              You stood on it
             </h2>
             <p className="max-w-[60ch] text-sm leading-relaxed text-ink-2">
-              Seven days done — every chapter written so far. The rest of the climb is still being
-              written; your progress is saved and the next chapters will pick up where you stopped.
+              Thirty days, valley to summit, every one of them marked. The mountain is exactly as it
+              was — what changed is the person who walked out of that turning circle.
             </p>
           </Panel>
         </motion.div>
