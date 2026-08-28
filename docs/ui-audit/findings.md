@@ -39,6 +39,24 @@
 | R-10 | `docs/impeccable/design-system.md` | Describes the retired "Noir Warm" system (Instrument Serif, amber) while the app ships "Soft Signal" (`src/index.css`) | Superseded-note added in this pass; a full rewrite of that doc is docs work beyond the UI batch |
 | — | `docs/plans/2026-08-26-backend-sync.md` | Push notifications and multi-device sync still need the phase-two backend | Separate project-sized effort |
 
+## Resolution (same day)
+
+| ID | Outcome | Commit |
+|----|---------|--------|
+| R-01 | Fixed — "Weeks trained, last 12" | `deae1f3` |
+| R-04 | Fixed — zero-reach publish copy explains read-time delivery | `deae1f3` |
+| R-05 | Fixed — disabled score button explains itself | `deae1f3` |
+| R-02 | Fixed — aurora tile message mode before the first session, verified in browser | `0ae0c5a` |
+| R-03 | Fixed — muscle code layered under every photo (thumb + library card), verified | `4982e82`-adjacent (`Library.tsx` in the thumb commit) |
+| R-11 | Fixed — walker lands on `/admin`; re-walk captured the real panel | same commit as R-03 |
+| F-A | Shipped — Consistency calendar with `dailySetSeries` + 2 unit tests; verified in browser with a real driven session (which also re-verified the guided-session flow after the storage refactor). Sub-minute sessions round up instead of "0 min" | `4982e82` |
+| R-06 | Fixed — Story intro balanced with a thin Mountains glyph, verified | `a73845c` |
+| R-10 | Fixed — superseded note on the Noir Warm doc | `a73845c` |
+
+Post-fix verification: full gate green after every batch (oxlint clean, 154/154 vitest,
+build + PWA generated), and a full 47-shot re-walk with 0 gaps, 0 console errors,
+0 failed requests, 0 px overflow.
+
 ## Considered and kept as-is
 
 - Em-dashes in UI copy (Story intro, inbox nudge, gym panel header): the product's voice uses
