@@ -28,7 +28,6 @@ if (!SERVER || !GYM || OPERATORS.length === 0 || !EMAIL || !PASSWORD) {
   process.exit(1)
 }
 
-const j = (r) => r.json()
 const call = async (path, options = {}) => {
   const res = await fetch(SERVER + path, {
     method: options.method ?? 'GET',
