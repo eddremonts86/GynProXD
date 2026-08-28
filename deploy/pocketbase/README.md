@@ -1,14 +1,26 @@
 # enForma sync server
 
-PocketBase 0.40.1: one binary, SQLite inside, the two collections and their
-owner-only rules created by `pb_migrations/` on first boot.
+PocketBase 0.40.1: one binary, SQLite inside. `pb_migrations/` creates the
+schema on first boot — encrypted training rows, per-account key material,
+gyms and the gym message bus — and `pb_hooks/` enforces that only a gym's
+operators can publish to it.
 
 ## Coolify
 
 Point a compose service at this directory (`docker-compose.yml`). First boot:
-open `/_/` on the service URL, create the superuser, and set SMTP under
-Settings → Mail so verification and password reset can send. Give members the
-service URL — each device enters it once in Settings → Data → Sync.
+
+1. Open `/_/` on the service URL and create the superuser.
+2. Settings → Mail: set SMTP so the password-reset email sends, and replace
+   the users collection's reset template body with one that shows `{TOKEN}`
+   as plain text — the app's "Forgot your password?" asks the member to paste
+   it. The stock template links to PocketBase's own reset UI, which would
+   bypass the app's key re-wrap and must not be used.
+3. Gyms are yours to grant: once a gym is verified (and has paid), create a
+   row in `gyms` with the operator's user account under `operators`. The
+   operator's next sync carries the gym role onto every device they sign into.
+
+Members never see this server: the app proxies `/pb` on its own origin
+(`SYNC_PROXY_TARGET` / `SYNC_UPSTREAM_HOST` env vars on the app service).
 
 ## Local development
 
@@ -16,7 +28,7 @@ service URL — each device enters it once in Settings → Data → Sync.
 mkdir -p deploy/pocketbase/.local && cd deploy/pocketbase/.local
 curl -sL -o pb.zip "https://github.com/pocketbase/pocketbase/releases/download/v0.40.1/pocketbase_0.40.1_darwin_arm64.zip"
 unzip -oq pb.zip
-./pocketbase serve --http=127.0.0.1:8090 --dir=./pb_data --migrationsDir=../pb_migrations
+./pocketbase serve --http=127.0.0.1:8090 --dir=./pb_data --migrationsDir=../pb_migrations --hooksDir=../pb_hooks
 ```
 
 `pnpm dev` proxies `/pb` there (override with `POCKETBASE_URL` in `.env.local`),
@@ -24,7 +36,9 @@ so the in-app default server address `/pb` just works.
 
 ## What the server can and cannot see
 
-Rows arrive as plaintext merge metadata (owner, collection, record id, client
-timestamps) plus the training data as AES-GCM ciphertext sealed by the
-profile passphrase. The server authenticates devices and merges rows; it can
-never read a workout. Deleting an account cascades to its rows.
+Training rows arrive as plaintext merge metadata (owner, collection, record
+id, client timestamps) plus the body as AES-GCM ciphertext under a random
+data key that only the member's password or recovery code can unwrap — the
+login credential is a separate derivation, so the server never holds anything
+that decrypts. Gym messages are broadcast material and are stored readable,
+scoped to each gym's members. Deleting an account cascades to its rows.

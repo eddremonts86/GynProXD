@@ -15,9 +15,12 @@ profile's `gym` field names the gym it operates — the same field a member
 uses to say where they train.
 
 Verifying that a gym is real — and charging it, since publishing is a paid
-surface — cannot be enforced by a device-local role and lands with the
-phase-5 server-side bus (docs/plans/2026-08-26-backend-sync.md), where the
-server, not the device, grants the gym role.
+surface — cannot be enforced by a device-local role. Since phase 5 (shipped
+2026-08-28) the server is the authority for synced accounts: `gyms` rows are
+created only by the platform superuser, operators are listed on the gym row,
+and an operator account carries the gym role onto every device it signs into.
+The payment step itself is still manual (the superuser grants after charging);
+automating it is future work.
 
 Trust model: whoever holds the device and a profile's passphrase is that
 actor. Roles gate navigation and panels, not cryptography. Training data

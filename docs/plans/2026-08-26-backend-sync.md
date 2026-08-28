@@ -1,7 +1,22 @@
 # Backend, sync and push: what it takes to leave the browser
 
-Status: phases 1–4 shipped; phases 5–7 (gym bus server-side, push, shared fetches) pending
-Date: 2026-08-26; phase 1 landed 2026-08-28, phases 2–4 landed 2026-08-28
+Status: phases 1–5 shipped, plus email password reset; phases 6–7 (push, shared fetches) pending
+Date: 2026-08-26; phase 1 landed 2026-08-28, phases 2–5 and the reset flow landed 2026-08-28
+
+Phase 5 + reset, shipped 2026-08-28. The data key became random and permanent,
+wrapped by the password-derived KEK (`wrapped_dk`, mirrored locally for
+offline unlock) and by the recovery code — so the gate's "Forgot your
+password?" flow (emailed code + recovery code) rotates the wrap and loses
+nothing. The gym bus lives on the server: `gyms` rows are superuser-created
+(verified, eventually paid), operators publish through a hook-enforced rule,
+members read exactly their gym, and the client merges the server bus into the
+device bus after every sync — operator role travels with the account, a
+member's gym registers by name match, inbox/banner/notifications unchanged.
+RSVP/read state stays device-local; the standing menu page and offer
+redemption aggregation stay device-local this phase. Verified on the replica:
+operator granted by superuser, publish from one device, inbox delivery on a
+second, password reset on a third ending signed-in with role and history
+intact (reset email caught by Mailpit).
 
 Shipped 2026-08-28 (phases 2–4): PocketBase 0.40.1 config + owner-only schema
 in `deploy/pocketbase/`, the `/pb` dev proxy, and `src/lib/sync.ts` — accounts
