@@ -1,7 +1,16 @@
 # Backend, sync and push: what it takes to leave the browser
 
-Status: phase 1 shipped; phases 2 to 7 need a server that does not exist yet
-Date: 2026-08-26, phase 1 landed 2026-08-28
+Status: phases 1–4 shipped; phases 5–7 (gym bus server-side, push, shared fetches) pending
+Date: 2026-08-26; phase 1 landed 2026-08-28, phases 2–4 landed 2026-08-28
+
+Shipped 2026-08-28 (phases 2–4): PocketBase 0.40.1 config + owner-only schema
+in `deploy/pocketbase/`, the `/pb` dev proxy, and `src/lib/sync.ts` — accounts
+(email+password), the one-time recovery code wrapping the data key, link with
+passphrase or recovery code (local rows re-encrypted onto the account key),
+and per-record envelope pull/push with LWW and tombstones. Verified end to
+end with two isolated browser contexts: A trains and creates the account, B
+links with a different local passphrase and pulls A's history, B trains and
+pushes, A pulls both, B relinks using only the recovery code.
 
 Decisions locked with Edd 2026-08-26, after the study was first drafted:
 one multi-tenant server (not an instance per gym); email + password login

@@ -323,7 +323,8 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
       </div>
 
       <p className="max-w-sm text-center text-2xs text-ink-3">
-        Local only. No cloud. A forgotten passphrase cannot be recovered.
+        Local first: nothing leaves this device unless you turn on sync in Settings. A forgotten
+        passphrase cannot be recovered.
       </p>
     </div>
   )

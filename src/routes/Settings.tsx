@@ -24,6 +24,7 @@ import { PageHeader, Section } from '../ui/PageHeader'
 import { Tabs, TabPanel } from '../ui/Tabs'
 import { Collapse } from '../ui/Collapse'
 import { InstallAppButton } from '@/components/install-app-button'
+import { SyncSection } from '@/components/sync-section'
 import { SEX_LABELS, formatShortDate, pluralize } from '../lib/labels'
 import { todayIso } from '../lib/dates'
 import { Switch } from '@/components/ui/switch'
@@ -234,6 +235,8 @@ export function SettingsPage() {
             Restoring replaces everything currently stored. Export first if you want to keep it.
           </p>
         </Panel>
+
+        <SyncSection />
 
         <Panel padding="lg">
         <Collapse header={<span className="text-danger">Danger zone</span>}>

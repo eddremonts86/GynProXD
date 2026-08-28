@@ -30,6 +30,7 @@ import { notifyRetestDue, notifyUnread } from '@/lib/notify'
 import { testAgeDays, testIsStale } from '@/lib/fitness-test'
 import { todayIso } from '@/lib/dates'
 import { activeProfile, lockProfile, resumeSession, type ProfileRole } from '@/lib/profiles'
+import { readSyncLink, syncNow } from '@/lib/sync'
 import { SignOut } from '@phosphor-icons/react'
 import { IconButton } from '@/ui/Button'
 import { Avatar } from '@/ui/Avatar'
@@ -257,6 +258,12 @@ function ProfileFooter() {
   )
 }
 
+/* Linked profiles catch up in the background on unlock; failures stay quiet
+   here because Settings → Data shows them where they can be acted on. */
+function syncQuietly(profileId: string): void {
+  if (readSyncLink(profileId)) void syncNow(profileId)
+}
+
 export function AppShell() {
   const pathname = useRouterState({ select: (s) => s.location.pathname })
   const status = useSession((s) => s.status)
@@ -301,7 +308,10 @@ export function AppShell() {
     void resumeSession().then((resumed) => {
       if (resumed) {
         const meta = activeProfile()
-        if (meta) setUnlocked(meta)
+        if (meta) {
+          setUnlocked(meta)
+          syncQuietly(meta.id)
+        }
       }
       else setLocked()
     })
@@ -319,6 +329,7 @@ export function AppShell() {
           if (meta) {
             setUnlocked(meta)
             landFor(meta.role)
+            syncQuietly(meta.id)
           }
         }}
       />
