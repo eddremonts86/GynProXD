@@ -49,24 +49,31 @@ function StoryIntro({ onStart }: { onStart: () => void }) {
     <div className="flex flex-col gap-8">
       <PageHeader title={program.name} description={program.tagline} />
 
-      <Panel padding="lg" className="flex flex-col gap-4">
-        <p className="max-w-[62ch] text-sm leading-relaxed text-ink-2">
-          Thirty days walking up out of a valley, one chapter and one session a day. There are no
-          rest days: a heavy day is always followed by a light one, so the streak never has to
-          break. Three days in, you pick the job you do for the rest of the climb — and it changes
-          both what you read and what you train.
-        </p>
-        <div className="flex flex-wrap gap-1.5">
-          <Tag tone="outline">{pluralize(program.days.length, 'day')}</Tag>
-          <Tag tone="outline">3 tracks</Tag>
-          <Tag tone="outline">No rest days</Tag>
+      <Panel
+        padding="lg"
+        className="flex flex-col gap-4 lg:grid lg:grid-cols-[1fr_auto] lg:items-center lg:gap-10"
+      >
+        <div className="flex flex-col gap-4">
+          <p className="max-w-[62ch] text-sm leading-relaxed text-ink-2">
+            Thirty days walking up out of a valley, one chapter and one session a day. There are no
+            rest days: a heavy day is always followed by a light one, so the streak never has to
+            break. Three days in, you pick the job you do for the rest of the climb — and it
+            changes both what you read and what you train.
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            <Tag tone="outline">{pluralize(program.days.length, 'day')}</Tag>
+            <Tag tone="outline">3 tracks</Tag>
+            <Tag tone="outline">No rest days</Tag>
+          </div>
+          <div>
+            <Button size="lg" onClick={onStart}>
+              Start the climb
+              <ArrowRight size={18} weight="bold" />
+            </Button>
+          </div>
         </div>
-        <div>
-          <Button size="lg" onClick={onStart}>
-            Start the climb
-            <ArrowRight size={18} weight="bold" />
-          </Button>
-        </div>
+        {/* Quiet horizon glyph so the wide card does not trail into a void. */}
+        <Mountains size={120} weight="thin" aria-hidden="true" className="hidden pr-4 text-line-strong lg:block" />
       </Panel>
 
       <Section title="The three jobs" hint="You choose on day 3">

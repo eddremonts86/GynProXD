@@ -1,3 +1,9 @@
+> **Superseded (2026-08-28).** This documents the retired "Noir Warm" iteration
+> (Instrument Serif, amber on noir). The shipped system is **Soft Signal**: warm
+> chalk surfaces, monochrome chrome, colour living only in the aurora hero tiles,
+> Doto dot-matrix hero figures, and a single documented radius scale. Its source
+> of truth is `src/index.css`. This file is kept as history.
+
 # Forma Design System — Noir Warm Editorial
 
 > **Forma** evolved from GynProXD. Hybrid calisthenics + barbell, local-first, warm human editorial, 3D plate.
