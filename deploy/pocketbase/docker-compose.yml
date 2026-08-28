@@ -5,14 +5,17 @@ services:
   pocketbase:
     build: .
     restart: unless-stopped
-    ports:
-      - '8090:8090'
+    # No host port on purpose: the platform proxy (Traefik) is the only door,
+    # so the raw API is never exposed on a public interface.
     environment:
       # Phase 7 shared fetches + the push public key served by /api/enforma/capabilities.
       MINIMAX_API_KEY: ${MINIMAX_API_KEY:-}
       MINIMAX_BASE_URL: ${MINIMAX_BASE_URL:-}
       SPOONACULAR_API_KEY: ${SPOONACULAR_API_KEY:-}
       VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
+      # Seeds the superuser on boot; the push service uses the same pair.
+      PB_SUPERUSER_EMAIL: ${PB_SUPERUSER_EMAIL:-}
+      PB_SUPERUSER_PASSWORD: ${PB_SUPERUSER_PASSWORD:-}
     volumes:
       - pb_data:/pb/pb_data
     healthcheck:
