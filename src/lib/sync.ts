@@ -657,7 +657,13 @@ export async function requestToJoin(profileId: string, gym: GymOption): Promise<
   await request(l.server, '/api/collections/gym_join_requests/records', {
     method: 'POST',
     token: l.token,
-    body: { owner: l.userId, gym: gym.id, status: 'pending' },
+    body: {
+      owner: l.userId,
+      gym: gym.id,
+      status: 'pending',
+      member_name: activeProfile()?.name ?? '',
+      member_email: l.email,
+    },
   })
 }
 
@@ -689,9 +695,11 @@ export async function leaveGym(profileId: string): Promise<void> {
 /** Pending requests for the gyms this account operates, with member identity. */
 export async function pendingJoinRequests(profileId: string): Promise<JoinRequestRow[]> {
   const l = link(profileId)
-  const list = await request<ListPayload<JoinRequestRow & { expand?: { owner?: { name?: string; email?: string } } }>>(
+  const list = await request<
+    ListPayload<JoinRequestRow & { member_name?: string; member_email?: string }>
+  >(
     l.server,
-    `/api/collections/gym_join_requests/records?perPage=100&sort=created&expand=owner&filter=${encodeURIComponent(`status = "pending"`)}`,
+    `/api/collections/gym_join_requests/records?perPage=100&sort=created&filter=${encodeURIComponent(`status = "pending"`)}`,
     { token: l.token },
   )
   return list.items.map((r) => ({
@@ -699,8 +707,8 @@ export async function pendingJoinRequests(profileId: string): Promise<JoinReques
     gym: r.gym,
     owner: r.owner,
     status: r.status,
-    memberName: r.expand?.owner?.name,
-    memberEmail: r.expand?.owner?.email,
+    memberName: r.member_name,
+    memberEmail: r.member_email,
   }))
 }
 
@@ -929,7 +937,13 @@ async function syncGymBus(profileId: string, link: SyncLink): Promise<void> {
         await request(link.server, '/api/collections/gym_join_requests/records', {
           method: 'POST',
           token: link.token,
-          body: { owner: link.userId, gym: wanted.id, status: 'pending' },
+          body: {
+            owner: link.userId,
+            gym: wanted.id,
+            status: 'pending',
+            member_name: mine.name,
+            member_email: link.email,
+          },
         }).catch(() => {})
       }
     }
