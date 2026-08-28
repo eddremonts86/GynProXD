@@ -15,6 +15,7 @@ import {
   emptyCache,
   loadProfileRecords,
   persistProfile,
+  reencryptProfileRecords,
   writeAllRecords,
   type RecordCache,
 } from './record-store'
@@ -399,6 +400,77 @@ export async function lockProfile(): Promise<void> {
   } catch {
     // Nothing to clear in private mode.
   }
+}
+
+/* ------------------------------------------------------------------------ */
+/* Sync hooks. The engine in sync.ts moves ciphertext envelopes; these are    */
+/* the few controlled touches it needs on the live session and the registry. */
+
+/** Flushes pending edits to disk so sync pushes what the user actually sees. */
+export async function flushActiveProfile(): Promise<void> {
+  await persistNow()
+}
+
+/** The unlocked profile's key, for wrapping under a recovery code. */
+export function activeProfileKey(): CryptoKey | null {
+  return activeKey
+}
+
+/** The KDF material a new device needs to derive this profile's key. */
+export function profileCrypto(
+  id: string,
+): { salt: string; iterations: number; check: CipherBlob } | null {
+  const meta = readRegistry().profiles.find((p) => p.id === id)
+  return meta ? { salt: meta.kdf.salt, iterations: meta.kdf.iterations, check: meta.check } : null
+}
+
+/**
+ * Moves the active profile onto an account's crypto identity: local rows are
+ * re-encrypted under the account key so every linked device decrypts every
+ * row, and the registry keeps the account's salt and sentinel so the same
+ * passphrase keeps opening this profile here.
+ */
+export async function adoptRemoteIdentity(
+  id: string,
+  remote: { salt: string; iterations: number; check: CipherBlob },
+  key: CryptoKey,
+): Promise<void> {
+  if (id !== activeId || !activeKey) throw new Error('profile must be unlocked')
+  await persistNow()
+  await reencryptProfileRecords(id, activeKey, key)
+
+  const registry = readRegistry()
+  const meta = registry.profiles.find((p) => p.id === id)
+  if (!meta) throw new Error('profile missing from registry')
+  meta.kdf = { salt: remote.salt, iterations: remote.iterations }
+  meta.check = remote.check
+  writeRegistry(registry)
+
+  activeKey = key
+  activeCache = emptyCache()
+  const { snapshot, cache } = await loadProfileRecords(id, key)
+  activeCache = cache
+  hydrateGym(snapshot)
+  try {
+    sessionStorage.setItem(SESSION_RAW_KEY, await exportKeyBase64(key))
+  } catch {
+    // Private mode: a refresh will ask for the passphrase again.
+  }
+}
+
+/**
+ * Re-reads the active profile's rows after sync applied remote writes. The
+ * in-flight session stays device-local on disk, so a mid-workout pull cannot
+ * clobber the set being logged.
+ */
+export async function reloadActiveFromDisk(): Promise<void> {
+  if (!activeKey || !activeId) return
+  const { snapshot, cache } = await loadProfileRecords(activeId, activeKey)
+  /* A set logged while sync ran lives only in memory; memory wins that race
+     and the next autosave writes it back to disk. */
+  const inFlight = snapshotGym().activeWorkout
+  activeCache = cache
+  hydrateGym({ ...snapshot, activeWorkout: inFlight ?? snapshot.activeWorkout })
 }
 
 /** Deletes the active profile and every byte of its data. Cannot be undone. */

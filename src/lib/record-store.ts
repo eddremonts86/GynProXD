@@ -226,3 +226,67 @@ export function clearProfileRecords(profileId: string): void {
   for (const key of envelopeKeys(profileId)) localStorage.removeItem(key)
   localStorage.removeItem(activeStorageKey(profileId))
 }
+
+/** A row as sync moves it: plaintext metadata, body still ciphertext. */
+export interface EnvelopeRow {
+  meta: RecordMeta
+  blob?: CipherBlob
+}
+
+/**
+ * Every envelope on disk, ciphertext untouched. Sync pushes these as they
+ * are: the server needs the metadata to merge and must never see the body.
+ */
+export function listEnvelopes(profileId: string): EnvelopeRow[] {
+  const rows: EnvelopeRow[] = []
+  for (const localKey of envelopeKeys(profileId)) {
+    const raw = localStorage.getItem(localKey)
+    if (!raw) continue
+    try {
+      const envelope = JSON.parse(raw) as Envelope
+      if (!envelope?.id || !envelope.collection) continue
+      rows.push({ meta: metaOf(envelope), ...(envelope.blob ? { blob: envelope.blob } : {}) })
+    } catch {
+      /* An unreadable envelope is a local problem; sync skips it. */
+    }
+  }
+  return rows
+}
+
+/** Writes a row another device won. The caller has already decided the merge. */
+export function writeRemoteEnvelope(profileId: string, row: EnvelopeRow): void {
+  writeEnvelope(profileId, row.meta, row.blob)
+}
+
+/**
+ * Re-encrypts every row body under a new key, metadata untouched. Used when a
+ * profile joins an account whose data lives under a different passphrase: the
+ * local rows move to that key so both devices decrypt one another.
+ */
+export async function reencryptProfileRecords(
+  profileId: string,
+  oldKey: CryptoKey,
+  newKey: CryptoKey,
+): Promise<void> {
+  for (const row of listEnvelopes(profileId)) {
+    if (!row.blob) continue
+    try {
+      const value = await decryptJson<unknown>(oldKey, row.blob)
+      writeEnvelope(profileId, row.meta, await encryptJson(newKey, value))
+    } catch {
+      /* A row the old key cannot read cannot be carried over; leave it. */
+    }
+  }
+  const rawActive = localStorage.getItem(activeStorageKey(profileId))
+  if (rawActive) {
+    try {
+      const active = await decryptJson<Workout>(oldKey, JSON.parse(rawActive) as CipherBlob)
+      localStorage.setItem(
+        activeStorageKey(profileId),
+        JSON.stringify(await encryptJson(newKey, active)),
+      )
+    } catch {
+      localStorage.removeItem(activeStorageKey(profileId))
+    }
+  }
+}
