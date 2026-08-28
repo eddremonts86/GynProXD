@@ -29,6 +29,7 @@ import { PageHeader, Section } from '../ui/PageHeader'
 import { EmptyState } from '../ui/EmptyState'
 import { ExercisePicker } from '@/components/exercise-picker'
 import { ExerciseOfTheDay } from '@/components/exercise-of-the-day'
+import { SetPlan } from '@/components/set-plan'
 import { MealSuggestions } from '@/components/meal-suggestions'
 import {
   Dialog,
@@ -697,6 +698,7 @@ function ActiveSession({
   const finishWorkout = useGym((s) => s.finishWorkout)
   const discardWorkout = useGym((s) => s.discardWorkout)
   const setSessionIntensity = useGym((s) => s.setSessionIntensity)
+  const removeSet = useGym((s) => s.removeSet)
 
   const reduceMotion = useReducedMotion()
   const elapsed = useElapsedSeconds(workout.startedAt)
@@ -716,6 +718,7 @@ function ActiveSession({
   const [prFlash, setPrFlash] = useState(false)
   const [confirmDiscard, setConfirmDiscard] = useState(false)
   const [ec, setEc] = useState(false)
+  const [confirmEmptyFinish, setConfirmEmptyFinish] = useState(false)
 
   const plannedOptions = useCallback(
     (exerciseId: string): PlannedExercise | null => {
@@ -869,8 +872,14 @@ function ActiveSession({
           elapsed={elapsed}
           sets={0}
           volume={0}
-          onFinish={() => finishWorkout()}
-          canFinish={false}
+          onFinish={() => setConfirmEmptyFinish(true)}
+          emptyFinish
+          confirmEmptyFinish={confirmEmptyFinish}
+          onCancelEmptyFinish={() => setConfirmEmptyFinish(false)}
+          onDiscardEmpty={() => {
+            discardWorkout()
+            setRestLeft(null)
+          }}
           ec={ec}
           onToggleEc={() => setEc((v) => !v)}
           intensity={workout.intensity ?? null}
@@ -912,11 +921,21 @@ function ActiveSession({
         sets={totals.sets}
         volume={totals.volume}
         onFinish={() => {
+          if (totals.sets === 0) {
+            setConfirmEmptyFinish(true)
+            return
+          }
           finishWorkout({ ec })
           onFinished(workout.id)
           setRestLeft(null)
         }}
-        canFinish={totals.sets > 0}
+        emptyFinish={totals.sets === 0}
+        confirmEmptyFinish={confirmEmptyFinish}
+        onCancelEmptyFinish={() => setConfirmEmptyFinish(false)}
+        onDiscardEmpty={() => {
+          discardWorkout()
+          setRestLeft(null)
+        }}
         ec={ec}
         onToggleEc={() => setEc((v) => !v)}
         intensity={workout.intensity ?? null}
@@ -981,9 +1000,9 @@ function ActiveSession({
 
       {/* Focus card: everything needed for the set in front of you. */}
       <Panel padding="none" className="overflow-hidden">
-        <div className="flex items-start gap-4 border-b border-line p-5">
+        <div className="grid grid-cols-[auto_1fr] items-start gap-x-4 gap-y-3 border-b border-line p-5 sm:grid-cols-[auto_1fr_auto]">
           {currentExercise && <ExerciseThumb exercise={currentExercise} size="lg" />}
-          <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+          <div className="flex min-w-0 flex-col gap-1.5">
             <h2 className="text-xl text-ink">{currentExercise?.name ?? current.exerciseId}</h2>
             <div className="flex flex-wrap items-center gap-1.5">
               {currentExercise && (
@@ -1023,144 +1042,70 @@ function ActiveSession({
             )}
           </div>
           {currentExercise && (
-            <IconButton
-              aria-label="Swap this movement for another"
+            <Button
+              size="sm"
+              variant="secondary"
               onClick={() => setSwapOpen(true)}
+              className="col-span-2 justify-self-start sm:col-span-1 sm:justify-self-end"
             >
-              <ArrowsLeftRight size={16} />
-            </IconButton>
+              <ArrowsLeftRight size={14} />
+              Swap movement
+            </Button>
           )}
         </div>
 
         {suggestion && (
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-line bg-brand-soft px-5 py-3">
-            <TrendUp size={16} weight="bold" className="shrink-0 text-brand" />
-            <span className="num text-sm font-semibold text-brand">
-              {suggestion.weight > 0 ? `${suggestion.weight}kg` : 'Bodyweight'} × {suggestion.reps}
+          <p className="flex items-start gap-2 border-b border-line bg-brand-soft px-5 py-2.5 text-2xs text-ink-2">
+            <TrendUp size={14} weight="bold" className="mt-px shrink-0 text-brand" />
+            <span>
+              <span className="font-semibold">Pre-filled from your last session.</span>{' '}
+              {suggestion.reason}
             </span>
-            <span className="min-w-0 flex-1 text-2xs text-ink-3">{suggestion.reason}</span>
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={() => {
-                setWeight(String(suggestion.weight))
-                if (isTimed) setDuration(String(Math.max(10, suggestion.reps * 3)))
-                else setReps(String(suggestion.reps))
-              }}
-            >
-              Use it
-            </Button>
-          </div>
+          </p>
         )}
 
-        <div className="flex max-w-2xl flex-col gap-4 p-5">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <NumberField
-              label="Weight"
-              unit="kg"
-              value={weight}
-              onValueChange={setWeight}
-              step={2.5}
-              decimals={1}
-              max={500}
-            />
-            {isTimed ? (
-              <NumberField
-                label="Time"
-                unit="sec"
-                value={duration}
-                onValueChange={setDuration}
-                step={5}
-                min={1}
-                max={3600}
-              />
-            ) : (
-              <NumberField
-                label="Reps"
-                value={reps}
-                onValueChange={setReps}
-                step={1}
-                min={1}
-                max={200}
-              />
-            )}
-          </div>
+        <SetPlan
+          logged={current.sets}
+          targetSets={current.targetSets}
+          isTimed={isTimed}
+          isUnilateral={isUnilateral}
+          weight={weight}
+          reps={reps}
+          duration={duration}
+          side={side}
+          onWeight={setWeight}
+          onReps={setReps}
+          onDuration={setDuration}
+          onSide={setSide}
+          canLog={canLog}
+          hint={
+            weight === ''
+              ? currentExercise && isBodyweight(currentExercise)
+                ? 'Enter 0 — this one is bodyweight.'
+                : 'Set a weight first.'
+              : isTimed
+                ? 'Set how many seconds you held it.'
+                : 'Set how many reps you did.'
+          }
+          onLog={handleLogSet}
+          onUndo={(i) => removeSet(current.exerciseId, i)}
+          onAddSet={() => {
+            const rest = workout.exercises.filter((e) => e.exerciseId !== current.exerciseId)
+            const next = rest.find((e) => (e.targetSets ?? 1) > e.sets.length) ?? rest[0]
+            if (next) selectExercise(next.exerciseId)
+          }}
+        />
 
-          {isUnilateral && (
-            <fieldset className="flex items-center gap-2">
-              <legend className="sr-only">Side</legend>
-              {(['L', 'R'] as const).map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => setSide(s)}
-                  aria-pressed={side === s}
-                  className={cn(
-                    'h-11 flex-1 rounded-md border text-sm font-medium transition-colors duration-150',
-                    side === s
-                      ? 'border-brand bg-brand text-brand-ink'
-                      : 'border-line bg-surface text-ink-3 hover:border-line-strong hover:text-ink',
-                  )}
-                >
-                  {s === 'L' ? 'Left' : 'Right'}
-                </button>
-              ))}
-            </fieldset>
-          )}
-
-          <Button size="lg" onClick={handleLogSet} disabled={!canLog} className="w-full">
-            Log set
-          </Button>
-
-          {!canLog && (
-            <p className="text-center text-2xs text-ink-3">
-              {weight === ''
-                ? currentExercise && isBodyweight(currentExercise)
-                  ? 'Enter 0 — this one is bodyweight.'
-                  : 'Set a weight first.'
-                : isTimed
-                  ? 'Set how many seconds you held it.'
-                  : 'Set how many reps you did.'}
-            </p>
-          )}
-
-          {prFlash && (
-            <motion.p
-              initial={reduceMotion ? false : { opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex items-center justify-center gap-1.5 text-sm font-medium text-good"
-            >
-              <CheckCircle size={16} weight="fill" />
-              Personal record on this movement
-            </motion.p>
-          )}
-
-          {current.sets.length > 0 && (
-            <ul className="flex flex-wrap gap-1.5 border-t border-line pt-4">
-              {current.sets.map((s, i) => {
-                const pr = isNewRecord(current.exerciseId, s, workouts, current.sets.slice(0, i))
-                return (
-                  <motion.li
-                    key={`${i}-${s.weight}-${s.reps}-${s.durationSec ?? 0}-${s.side ?? ''}`}
-                    initial={reduceMotion ? false : { opacity: 0, scale: 0.94 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                    className={cn(
-                      'num inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium',
-                      pr
-                        ? 'border-good/40 bg-good-soft text-good'
-                        : 'border-line bg-surface-2 text-ink-2',
-                    )}
-                  >
-                    <span className="opacity-60">{i + 1}</span>
-                    {describeSet(s)}
-                    {pr && <CheckCircle size={12} weight="fill" />}
-                  </motion.li>
-                )
-              })}
-            </ul>
-          )}
-        </div>
+        {prFlash && (
+          <motion.p
+            initial={reduceMotion ? false : { opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center justify-center gap-1.5 border-t border-line py-3 text-sm font-medium text-good"
+          >
+            <CheckCircle size={16} weight="fill" />
+            Personal record on this movement
+          </motion.p>
+        )}
       </Panel>
 
       <SessionLog workout={workout} currentId={current.exerciseId} onSelect={selectExercise} />
@@ -1239,7 +1184,10 @@ function SessionHeader({
   sets,
   volume,
   onFinish,
-  canFinish,
+  emptyFinish,
+  confirmEmptyFinish,
+  onCancelEmptyFinish,
+  onDiscardEmpty,
   ec,
   onToggleEc,
   intensity,
@@ -1250,7 +1198,11 @@ function SessionHeader({
   sets: number
   volume: number
   onFinish: () => void
-  canFinish: boolean
+  /** Nothing logged yet: finishing would throw the session away. */
+  emptyFinish: boolean
+  confirmEmptyFinish: boolean
+  onCancelEmptyFinish: () => void
+  onDiscardEmpty: () => void
   ec: boolean
   onToggleEc: () => void
   intensity: Intensity | null
@@ -1259,45 +1211,89 @@ function SessionHeader({
 }) {
   return (
     <div className="sticky top-14 z-20 -mx-4 border-b border-line bg-bg/90 px-4 backdrop-blur-md md:-mx-8 md:px-8 lg:top-0">
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-3 py-3">
-        <div className="flex items-baseline gap-1.5">
-          <span className="num-dot text-3xl leading-none text-ink">
-            {elapsed === null ? '--:--' : formatClock(elapsed)}
-          </span>
-          <span className="text-2xs text-ink-3">elapsed</span>
+      {/* Two bands rather than one wrapping row: what the session has done
+          so far, then the controls that act on it. On a phone they stack in
+          that order instead of stranding Finish on a line of its own. */}
+      <div className="flex flex-col gap-2.5 py-3 lg:flex-row lg:items-center lg:gap-6">
+        <div className="flex items-center gap-5">
+          <div className="flex items-baseline gap-1.5">
+            <span className="num-dot text-3xl leading-none text-ink">
+              {elapsed === null ? '--:--' : formatClock(elapsed)}
+            </span>
+            <span className="text-2xs text-ink-3">elapsed</span>
+          </div>
+          {/* Finish rides with the clock on a phone: the sticky bar is scarce
+              space and a full-width button would eat a third of it. */}
+          <Button
+            onClick={onFinish}
+            variant={emptyFinish ? 'secondary' : 'primary'}
+            size="sm"
+            className="order-last ml-auto lg:hidden"
+          >
+            Finish
+          </Button>
+          <div className="flex items-baseline gap-1.5">
+            <span className="num text-lg leading-none font-semibold text-ink">{sets}</span>
+            <span className="text-2xs text-ink-3">sets</span>
+          </div>
+          <div className="hidden items-baseline gap-1.5 sm:flex">
+            <span className="num text-lg leading-none font-semibold text-ink">
+              {volume.toLocaleString('en-GB')}
+            </span>
+            <span className="text-2xs text-ink-3">kg volume</span>
+          </div>
         </div>
-        <div className="flex items-baseline gap-1.5">
-          <span className="num text-lg leading-none font-semibold text-ink">{sets}</span>
-          <span className="text-2xs text-ink-3">sets</span>
-        </div>
-        <div className="hidden items-baseline gap-1.5 sm:flex">
-          <span className="num text-lg leading-none font-semibold text-ink">
-            {volume.toLocaleString('en-GB')}
-          </span>
-          <span className="text-2xs text-ink-3">kg volume</span>
-        </div>
-        <div className="ml-auto hidden sm:block">
+
+        <div className="flex flex-wrap items-center gap-2 lg:ml-auto">
           <IntensityPicker value={intensity} onChange={onIntensity} size="sm" />
+          <button
+            type="button"
+            onClick={onToggleEc}
+            aria-pressed={ec}
+            title="Mark this session as one where you went past what the plan asked"
+            className={cn(
+              'flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 text-xs font-medium transition-all duration-150 active:scale-[0.98]',
+              ec
+                ? 'border-brand bg-brand text-brand-ink'
+                : 'border-line bg-surface text-ink-3 hover:border-line-strong hover:text-ink',
+            )}
+          >
+            {ec ? <CheckCircle size={14} weight="fill" /> : <Plus size={14} weight="bold" />}
+            Pushed hard
+          </button>
+          {/* Still empty: Finish stays reachable but stops looking like the
+              thing to do, and pressing it explains itself below. */}
+          <Button
+            onClick={onFinish}
+            variant={emptyFinish ? 'secondary' : 'primary'}
+            className="ml-auto hidden lg:ml-0 lg:inline-flex"
+          >
+            Finish
+          </Button>
         </div>
-        <button
-          type="button"
-          onClick={onToggleEc}
-          aria-pressed={ec}
-          title="Mark this session as one where you went past what the plan asked"
-          className={cn(
-            'flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 text-xs font-medium transition-colors duration-150 max-sm:ml-auto',
-            ec
-              ? 'border-brand bg-brand text-brand-ink'
-              : 'border-line bg-surface text-ink-3 hover:border-line-strong hover:text-ink',
-          )}
-        >
-          {ec ? <CheckCircle size={14} weight="fill" /> : <Plus size={14} weight="bold" />}
-          Pushed hard
-        </button>
-        <Button onClick={onFinish} disabled={!canFinish}>
-          Finish
-        </Button>
       </div>
+
+      {ec && (
+        <p className="flex items-center gap-1.5 pb-2.5 text-2xs text-ink-3">
+          <CheckCircle size={13} weight="fill" className="shrink-0 text-brand" />
+          Saved as a session you pushed on, once you finish.
+        </p>
+      )}
+
+      {confirmEmptyFinish && (
+        <div className="flex flex-wrap items-center gap-3 border-t border-line py-2.5">
+          <p className="min-w-0 flex-1 text-2xs text-ink-2">
+            Nothing is logged yet, so there is nothing to save. Finishing now just discards this
+            session.
+          </p>
+          <Button size="sm" variant="ghost" onClick={onCancelEmptyFinish}>
+            Keep training
+          </Button>
+          <Button size="sm" variant="danger" onClick={onDiscardEmpty}>
+            Discard it
+          </Button>
+        </div>
+      )}
 
       {ec && (
         <p className="flex items-center gap-1.5 pb-2.5 text-2xs text-ink-3">

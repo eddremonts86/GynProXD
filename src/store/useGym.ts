@@ -49,6 +49,7 @@ interface GymState {
   setSessionIntensity: (intensity: Intensity) => void
   discardWorkout: () => void
   addSet: (exerciseId: string, weight: number, reps: number, opts?: { durationSec?: number; side?: 'L' | 'R' }) => void
+  removeSet: (exerciseId: string, index: number) => void
   addExerciseToSession: (exerciseId: string) => void
   removeExerciseFromSession: (exerciseId: string) => void
   finishWorkout: (opts?: { ec?: boolean }) => void
@@ -246,6 +247,18 @@ export const useGym = create<GymState>()((set, get) => ({
             w.exercises.push(ex)
           }
           ex.sets.push({ weight, reps, durationSec: opts?.durationSec, side: opts?.side })
+          return { activeWorkout: w }
+        }),
+
+      /* Undo a logged set. Mis-taps happen mid-session and retyping the whole
+         thing to fix one number is worse than the mistake. */
+      removeSet: (exerciseId, index) =>
+        set((s) => {
+          if (!s.activeWorkout) return s
+          const w = structuredClone(s.activeWorkout)
+          const ex = w.exercises.find((e) => e.exerciseId === exerciseId)
+          if (!ex || index < 0 || index >= ex.sets.length) return s
+          ex.sets.splice(index, 1)
           return { activeWorkout: w }
         }),
 
