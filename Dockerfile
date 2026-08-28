@@ -3,7 +3,8 @@
 # the deterministic generator by design (see lib/ai-plan.ts).
 FROM node:26-alpine AS build
 WORKDIR /app
-RUN corepack enable
+# Node 25+ stopped bundling corepack, so pnpm is installed outright.
+RUN npm install -g pnpm@11
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 COPY . .
