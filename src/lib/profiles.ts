@@ -21,6 +21,7 @@ import {
 } from './record-store'
 import { withRecordIds } from './records'
 import { EMPTY_SNAPSHOT, hydrateGym, snapshotGym, useGym, type GymSnapshot } from '../store/useGym'
+import { useSession } from '../store/useSession'
 
 /**
  * Local profiles. Each person on this device gets their own encrypted store:
@@ -146,6 +147,46 @@ export function activeProfile(): {
 function activeRole(): ProfileRole | null {
   if (!activeId) return null
   return readRegistry().profiles.find((p) => p.id === activeId)?.role ?? 'member'
+}
+
+/**
+ * Sets a profile's role on the authority of the sync server, not the UI —
+ * an operator listed on a gym, or an account granted platform admin. This
+ * bypasses updateProfileMeta's self-promotion guard on purpose: the guard
+ * exists to stop a member editing roles from the interface, whereas this is
+ * the server's own answer being cached locally. Refreshes the live session
+ * so the rails and route guards react without a reload. No-op if unchanged.
+ */
+/**
+ * Caches the server-confirmed gym NAME on a profile for display and local bus
+ * filtering. Membership itself is the server's users.gym, established by code
+ * or approval; this only mirrors the name so the inbox and rails read right.
+ */
+export function setActiveGymName(id: string, gymName: string): boolean {
+  const registry = readRegistry()
+  const meta = registry.profiles.find((p) => p.id === id)
+  if (!meta) return false
+  const trimmed = gymName.trim()
+  const current = meta.gym ?? ''
+  if (current === trimmed) return false
+  if (trimmed) meta.gym = trimmed
+  else delete meta.gym
+  writeRegistry(registry)
+  if (id === activeId) useSession.getState().refreshMeta({ gym: trimmed })
+  return true
+}
+
+export function adoptServerRole(id: string, role: ProfileRole): boolean {
+  const registry = readRegistry()
+  const meta = registry.profiles.find((p) => p.id === id)
+  if (!meta) return false
+  const current = meta.role ?? 'member'
+  if (current === role) return false
+  if (role === 'member') delete meta.role
+  else meta.role = role
+  writeRegistry(registry)
+  if (id === activeId) useSession.getState().refreshMeta({ role })
+  return true
 }
 
 /**

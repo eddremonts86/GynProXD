@@ -17,11 +17,12 @@ import {
   activeProfile,
   activeProfileKey,
   adoptRemoteIdentity,
+  adoptServerRole,
   createLinkedProfile,
   flushActiveProfile,
   profileCrypto,
   reloadActiveFromDisk,
-  updateProfileMeta,
+  setActiveGymName,
 } from './profiles'
 import { useMessages, type PublishInput } from '../store/useMessages'
 import type { GymMessage, TemplateKind } from './messages'
@@ -599,6 +600,151 @@ export function activeAuthHeader(): Record<string, string> | null {
   return link?.token ? { authorization: link.token } : null
 }
 
+/* --------------------------------------------------------- gym membership */
+
+export interface GymOption {
+  id: string
+  name: string
+}
+
+export interface JoinRequestRow {
+  id: string
+  gym: string
+  owner: string
+  status: string
+  memberName?: string
+  memberEmail?: string
+}
+
+function link(profileId: string): SyncLink {
+  const l = readSyncLink(profileId)
+  if (!l?.token) throw new Error('Sync is not signed in on this device.')
+  return l
+}
+
+/** Gyms whose name contains the query, for the join picker. */
+export async function searchGyms(profileId: string, query: string): Promise<GymOption[]> {
+  const l = link(profileId)
+  const q = query.trim()
+  const filter = q ? `&filter=${encodeURIComponent(`name ~ "${q.replace(/"/g, '')}"`)}` : ''
+  const list = await request<ListPayload<GymOption>>(
+    l.server,
+    `/api/collections/gyms/records?perPage=25&sort=name${filter}`,
+    { token: l.token },
+  )
+  return list.items.map((g) => ({ id: g.id, name: g.name }))
+}
+
+/** Instant join with the gym's code. Resolves the gym's name into the profile. */
+export async function joinWithCode(
+  profileId: string,
+  gym: GymOption,
+  code: string,
+): Promise<void> {
+  const l = link(profileId)
+  await request(l.server, '/api/enforma/join-with-code', {
+    method: 'POST',
+    token: l.token,
+    body: { gym: gym.id, code: code.trim() },
+  })
+  setActiveGymName(profileId, gym.name)
+  await syncNow(profileId)
+}
+
+/** File a pending request for the operator to approve. */
+export async function requestToJoin(profileId: string, gym: GymOption): Promise<void> {
+  const l = link(profileId)
+  await request(l.server, '/api/collections/gym_join_requests/records', {
+    method: 'POST',
+    token: l.token,
+    body: { owner: l.userId, gym: gym.id, status: 'pending' },
+  })
+}
+
+/** The caller's own pending/decided requests, newest first. */
+export async function myJoinRequests(profileId: string): Promise<JoinRequestRow[]> {
+  const l = link(profileId)
+  const list = await request<ListPayload<JoinRequestRow>>(
+    l.server,
+    `/api/collections/gym_join_requests/records?perPage=25&sort=-updated&filter=${encodeURIComponent(`owner = "${l.userId}"`)}`,
+    { token: l.token },
+  )
+  return list.items
+}
+
+/** Leave the current gym (allowed directly; only joining is gated). */
+export async function leaveGym(profileId: string): Promise<void> {
+  const l = link(profileId)
+  await request(l.server, `/api/collections/users/records/${l.userId}`, {
+    method: 'PATCH',
+    token: l.token,
+    body: { gym: '' },
+  })
+  setActiveGymName(profileId, '')
+  await syncNow(profileId)
+}
+
+/* ---- operator side ---- */
+
+/** Pending requests for the gyms this account operates, with member identity. */
+export async function pendingJoinRequests(profileId: string): Promise<JoinRequestRow[]> {
+  const l = link(profileId)
+  const list = await request<ListPayload<JoinRequestRow & { expand?: { owner?: { name?: string; email?: string } } }>>(
+    l.server,
+    `/api/collections/gym_join_requests/records?perPage=100&sort=created&expand=owner&filter=${encodeURIComponent(`status = "pending"`)}`,
+    { token: l.token },
+  )
+  return list.items.map((r) => ({
+    id: r.id,
+    gym: r.gym,
+    owner: r.owner,
+    status: r.status,
+    memberName: r.expand?.owner?.name,
+    memberEmail: r.expand?.owner?.email,
+  }))
+}
+
+export async function decideJoinRequest(
+  profileId: string,
+  requestId: string,
+  approve: boolean,
+): Promise<void> {
+  const l = link(profileId)
+  await request(l.server, `/api/collections/gym_join_requests/records/${requestId}`, {
+    method: 'PATCH',
+    token: l.token,
+    body: { status: approve ? 'approved' : 'denied' },
+  })
+}
+
+/** The operator's current join code (null if none set yet). */
+export async function gymJoinCode(profileId: string, gymId: string): Promise<string | null> {
+  const l = link(profileId)
+  const res = await request<{ code: string | null }>(
+    l.server,
+    `/api/enforma/gym/code?gym=${encodeURIComponent(gymId)}`,
+    { token: l.token },
+  )
+  return res.code
+}
+
+export async function setGymJoinCode(profileId: string, gymId: string, code: string): Promise<void> {
+  const l = link(profileId)
+  await request(l.server, '/api/enforma/gym/set-code', {
+    method: 'POST',
+    token: l.token,
+    body: { gym: gymId, code: code.trim() },
+  })
+}
+
+/** The id of the gym this operator account runs, for the code/requests UI. */
+export async function operatedGymId(profileId: string): Promise<string | null> {
+  const l = readSyncLink(profileId)
+  if (!l?.token) return null
+  const gyms = await fetchGyms(l).catch(() => [])
+  return gyms.find((g) => g.operators?.includes(l.userId))?.id ?? null
+}
+
 /** Refreshes an expired session. Nothing about the data or keys changes. */
 export async function reauthSync(profileId: string, password: string): Promise<void> {
   const link = readSyncLink(profileId)
@@ -731,36 +877,61 @@ const BUS_CURSOR_PREFIX = 'forma-sync-bus-'
  *    server can address them, c) new messages merge into the device bus,
  *    where the existing inbox, banner and notification paths pick them up.
  */
+async function isPlatformAdmin(link: SyncLink): Promise<boolean> {
+  const list = await request<ListPayload<{ id: string }>>(
+    link.server,
+    '/api/collections/platform_admins/records?perPage=1',
+    { token: link.token },
+  ).catch(() => null)
+  return (list?.items?.length ?? 0) > 0
+}
+
 async function syncGymBus(profileId: string, link: SyncLink): Promise<void> {
   const gyms = await fetchGyms(link)
   const meta = activeProfile()
   const mine = meta && meta.id === profileId ? meta : null
-
   const operated = gyms.find((g) => g.operators?.includes(link.userId))
-  if (operated && mine && (mine.role !== 'gym' || !sameName(mine.gym, operated.name))) {
-    updateProfileMeta(profileId, { role: 'gym', gym: operated.name })
+
+  /* Role is the server's to decide, adopted onto this device. Platform admin
+     wins; then gym operator; a former operator drops back to member. A purely
+     local device-admin (no server backing) is left untouched. */
+  if (await isPlatformAdmin(link)) {
+    adoptServerRole(profileId, 'admin')
+  } else if (operated) {
+    if (mine?.role !== 'admin') adoptServerRole(profileId, 'gym')
+  } else if (mine?.role === 'gym') {
+    adoptServerRole(profileId, 'member')
   }
 
-  let memberGym = operated ?? gyms.find((g) => sameName(g.name, mine?.gym))
-  if (!operated && !memberGym && mine) {
-    /* A device the account just signed into knows the training history but
-       not the gym: that lives on the account. Adopt it, or the inbox stays
-       silent on every new device. */
+  if (operated) {
+    setActiveGymName(profileId, operated.name)
+  }
+
+  /* Confirmed membership is whatever the server says users.gym is — set only
+     by the code or approval routes, never pushed from here. */
+  let memberGym = operated
+  if (!operated) {
     const me = await request<{ gym?: string }>(
       link.server,
       `/api/collections/users/records/${link.userId}`,
       { token: link.token },
     ).catch(() => null)
     memberGym = gyms.find((g) => g.id === me?.gym)
-    if (memberGym) updateProfileMeta(profileId, { gym: memberGym.name })
-  }
-  if (!operated && memberGym) {
-    /* Idempotent: tells the server which gym may address this account. */
-    await request(link.server, `/api/collections/users/records/${link.userId}`, {
-      method: 'PATCH',
-      token: link.token,
-      body: { gym: memberGym.id },
-    }).catch(() => {})
+    setActiveGymName(profileId, memberGym?.name ?? '')
+
+    /* Bridge the old "type your gym name" habit to the approval queue: a
+       synced member who named a gym locally but has no confirmed membership
+       gets a pending request filed once (idempotent via the unique index). */
+    if (!memberGym && mine?.gym) {
+      const wanted = gyms.find((g) => sameName(g.name, mine.gym))
+      if (wanted) {
+        await request(link.server, '/api/collections/gym_join_requests/records', {
+          method: 'POST',
+          token: link.token,
+          body: { owner: link.userId, gym: wanted.id, status: 'pending' },
+        }).catch(() => {})
+      }
+    }
   }
   if (!memberGym) return
 

@@ -22,6 +22,7 @@ import {
 } from '../lib/messages'
 import { listProfiles } from '../lib/profiles'
 import { publishToServer } from '../lib/sync'
+import { GymJoinCode, GymRequests } from '@/components/gym-operator-tools'
 import { formatShortDate, pluralize } from '../lib/labels'
 import { todayIso } from '../lib/dates'
 import { generatedExercises } from '../data/exercises-generated'
@@ -303,6 +304,7 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
           { value: 'sent', label: 'Sent', count: sent.length },
           { value: 'menu', label: 'Menu', count: savedMenu ? countItems(savedMenu) : 0 },
           { value: 'members', label: 'Members', count: members.length },
+          { value: 'requests', label: 'Requests' },
         ]}
       >
         <TabPanel value="compose" className="flex flex-col gap-6">
@@ -763,7 +765,8 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
           <MenuEditor gym={gym} profileId={profileId} />
         </TabPanel>
 
-        <TabPanel value="members">
+        <TabPanel value="members" className="flex flex-col gap-4">
+          <GymJoinCode />
           <Panel padding="lg">
             {members.length === 0 ? (
               <p className="max-w-[40ch] text-sm text-ink-3">
@@ -786,6 +789,10 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
               </ul>
             )}
           </Panel>
+        </TabPanel>
+
+        <TabPanel value="requests">
+          <GymRequests />
         </TabPanel>
       </Tabs>
     </div>

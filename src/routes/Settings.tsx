@@ -23,6 +23,7 @@ import { Tabs, TabPanel } from '../ui/Tabs'
 import { Collapse } from '../ui/Collapse'
 import { InstallAppButton } from '@/components/install-app-button'
 import { SyncSection } from '@/components/sync-section'
+import { GymMembership } from '@/components/gym-membership'
 import { SEX_LABELS } from '../lib/labels'
 import { todayIso } from '../lib/dates'
 import { Switch } from '@/components/ui/switch'
@@ -166,6 +167,8 @@ export function SettingsPage() {
             )}
           </div>
         </Panel>
+
+        <GymMembership />
 
         <Panel padding="lg" className="flex flex-wrap items-center justify-between gap-4">
           <p className="max-w-[46ch] text-sm text-ink-3">
