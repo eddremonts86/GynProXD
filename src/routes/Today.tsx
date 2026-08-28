@@ -7,6 +7,7 @@ import {
   Barbell,
   CaretDown,
   CheckCircle,
+  ListBullets,
   Plus,
   ShareNetwork,
   SkipForward,
@@ -1302,6 +1303,12 @@ function SessionHeader({
 
         <div className="flex flex-wrap items-center gap-2 lg:ml-auto">
           <IntensityPicker value={intensity} onChange={onIntensity} size="sm" />
+          {sets > 0 && (
+            <Button size="sm" variant="secondary" onClick={onOpenLog}>
+              <ListBullets size={14} />
+              All sets
+            </Button>
+          )}
           <button
             type="button"
             onClick={onToggleEc}
@@ -1333,8 +1340,8 @@ function SessionHeader({
         <p className="flex items-center gap-1.5 pb-2.5 text-2xs text-ink-3">
           <CheckCircle size={13} weight="fill" className="shrink-0 text-brand" />
           {autoEc
-            ? 'You went past the target, so this is marked as a session you pushed on.'
-            : 'Saved as a session you pushed on, once you finish.'}
+            ? 'Past the target, so this counts as pushed hard.'
+            : 'Saved as pushed hard when you finish.'}
         </p>
       )}
 
