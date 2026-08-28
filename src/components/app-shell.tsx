@@ -187,7 +187,10 @@ function DesktopRail({ pathname }: { pathname: string }) {
 function MobileChrome({ pathname }: { pathname: string }) {
   return (
     <>
-      <header data-print="hide" className="sticky top-0 z-30 flex h-14 items-center justify-between bg-bg/85 px-4 backdrop-blur-md lg:hidden">
+      <header
+        data-print="hide"
+        className="sticky top-0 z-30 flex h-[calc(3.5rem+env(safe-area-inset-top))] items-center justify-between bg-bg/85 px-4 pt-[env(safe-area-inset-top)] backdrop-blur-md lg:hidden"
+      >
         <Link to="/" aria-label="enForma, go to today" className="flex items-center gap-2">
           <Mark className="size-7" />
           <span className="text-base leading-none font-semibold tracking-tight text-ink">enForma</span>
@@ -213,8 +216,8 @@ function MobileChrome({ pathname }: { pathname: string }) {
                 aria-current={active ? 'page' : undefined}
                 className={cn(
                   'flex min-h-12 flex-1 flex-col items-center justify-center gap-0.5 rounded-full text-2xs font-medium',
-                  'transition-colors duration-150',
-                  active ? 'bg-brand text-brand-ink' : 'text-ink-3',
+                  'transition-[background-color,color,transform] duration-150 active:scale-95',
+                  active ? 'bg-brand text-brand-ink' : 'text-ink-3 active:bg-surface-2',
                 )}
               >
                 <item.icon size={20} weight={active ? 'fill' : 'regular'} />

@@ -135,17 +135,25 @@ export default defineConfig(({ mode }) => {
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'pwa-192x192.png', 'pwa-512x512.png', 'apple-touch-icon.png'],
       manifest: {
+        id: '/',
         name: 'enForma',
         short_name: 'enForma',
         description: 'Plan, train and track offline. Your data stays in this browser.',
         theme_color: '#ecebe8',
         background_color: '#ecebe8',
         display: 'standalone',
+        /* Prefer the most app-like container the platform offers, falling back
+           to plain standalone. */
+        display_override: ['standalone', 'minimal-ui'],
+        /* Launch back into the running window instead of spawning a new one. */
+        launch_handler: { client_mode: 'navigate-existing' },
+        categories: ['health', 'fitness', 'sports'],
         scope: '/',
         start_url: '/',
         icons: [
           { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
           { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
           { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },

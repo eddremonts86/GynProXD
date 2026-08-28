@@ -246,6 +246,9 @@
     font-family: var(--font-sans);
     scrollbar-gutter: stable;
     -webkit-text-size-adjust: 100%;
+    /* No rubber-band chaining or browser pull-to-refresh: the app owns the
+       gesture, the way an installed app does. */
+    overscroll-behavior-y: none;
   }
 
   body {
@@ -255,6 +258,44 @@
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    overscroll-behavior-y: none;
+    /* Chrome, not a web page: no long-press callout, and UI text is not
+       selectable (real inputs and content opt back in below). */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Text people actually read or edit stays selectable. */
+  input,
+  textarea,
+  [contenteditable="true"],
+  .select-text,
+  .select-all {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  /* Kill the 300ms tap delay and double-tap zoom on everything tappable. */
+  a,
+  button,
+  label,
+  summary,
+  [role="button"],
+  [role="tab"],
+  [role="switch"],
+  [role="option"] {
+    touch-action: manipulation;
+  }
+
+  /* iOS zooms the page when a focused field is under 16px. Bumping the font on
+     coarse pointers only keeps the desktop design untouched. */
+  @media (pointer: coarse) {
+    input,
+    textarea,
+    select {
+      font-size: 16px;
+    }
   }
 
   h1,
@@ -338,6 +379,20 @@
     radial-gradient(140% 120% at 45% 50%, var(--aurora-orange-mid) 0%, var(--aurora-orange-deep) 80%);
 }
 
+/**
+ * Cross-fade between screens on navigation (router defaultViewTransition). Fast
+ * and quiet — the point is that a screen change reads as an app view swap, not
+ * a page reload. The sticky chrome is excluded so the header and bottom nav
+ * stay put through the fade rather than flashing.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 180ms;
+    animation-timing-function: var(--ease-out-expo);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -346,6 +401,13 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* View transitions are motion too: snap instead of fade. */
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }
 

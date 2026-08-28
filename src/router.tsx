@@ -64,6 +64,11 @@ function lazyRoute<const P extends string>(path: P, Component: React.ComponentTy
 }
 
 export const router = createRouter({
+  /* A cross-fade between screens on navigation — the small thing that reads as
+     "app", not "web page". The transition is defined in index.css and is a
+     no-op under prefers-reduced-motion. */
+  defaultViewTransition: true,
+  scrollRestoration: true,
   routeTree: rootRoute.addChildren([
     lazyRoute('/', TodayPage),
     lazyRoute('/planner', PlannerPage),
