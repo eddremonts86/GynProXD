@@ -3,9 +3,12 @@
 FROM alpine:3.22
 
 ARG PB_VERSION=0.40.1
+# BuildKit sets this to amd64/arm64 — the real Hetzner box is arm64, and an
+# amd64 binary only APPEARS to work locally because Docker Desktop emulates it.
+ARG TARGETARCH
 
 RUN apk add --no-cache ca-certificates unzip wget \
-  && wget -q "https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_amd64.zip" -O /tmp/pb.zip \
+  && wget -q "https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_${TARGETARCH}.zip" -O /tmp/pb.zip \
   && unzip /tmp/pb.zip -d /pb \
   && rm /tmp/pb.zip \
   && apk del unzip wget

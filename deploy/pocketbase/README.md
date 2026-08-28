@@ -39,7 +39,7 @@ subscription.
 
 ```bash
 mkdir -p deploy/pocketbase/.local && cd deploy/pocketbase/.local
-curl -sL -o pb.zip "https://github.com/pocketbase/pocketbase/releases/download/v0.40.1/pocketbase_0.40.1_darwin_arm64.zip"
+curl -sL -o pb.zip "https://github.com/pocketbase/pocketbase/releases/download/v0.40.1/pocketbase_0.40.1_darwin_arm64.zip" # (pick your OS/arch asset)
 unzip -oq pb.zip
 ./pocketbase serve --http=127.0.0.1:8090 --dir=./pb_data --migrationsDir=../pb_migrations --hooksDir=../pb_hooks
 ```
