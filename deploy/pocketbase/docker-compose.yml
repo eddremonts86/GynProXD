@@ -1,0 +1,19 @@
+# enForma sync server for Coolify: point a service at this compose file.
+# First boot: open /_/ on the service URL and create the superuser, then set
+# the SMTP settings (Settings → Mail) so verification and password reset send.
+services:
+  pocketbase:
+    build: .
+    restart: unless-stopped
+    ports:
+      - '8090:8090'
+    volumes:
+      - pb_data:/pb/pb_data
+    healthcheck:
+      test: ['CMD', 'wget', '-q', '--spider', 'http://127.0.0.1:8090/api/health']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  pb_data:

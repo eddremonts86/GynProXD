@@ -53,8 +53,21 @@ export default defineConfig(({ mode }) => {
       }
     : undefined
 
-  const apiProxy =
-    aiProxy || recipeProxy ? { ...(aiProxy ?? {}), ...(recipeProxy ?? {}) } : undefined
+  /**
+   * The sync server (PocketBase). In dev the app talks to /pb and the proxy
+   * forwards to a local instance (deploy/pocketbase/.local, or wherever
+   * POCKETBASE_URL points); in production the server address is whatever the
+   * device has configured in Settings, so no key or URL is baked in here.
+   */
+  const pbProxy: Record<string, ProxyOptions> = {
+    '/pb': {
+      target: env.POCKETBASE_URL || 'http://127.0.0.1:8090',
+      changeOrigin: true,
+      rewrite: (p) => p.replace(/^\/pb/, ''),
+    },
+  }
+
+  const apiProxy = { ...pbProxy, ...(aiProxy ?? {}), ...(recipeProxy ?? {}) }
 
   return {
   define: {
