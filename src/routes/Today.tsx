@@ -718,7 +718,9 @@ function ActiveSession({
   const [swapOpen, setSwapOpen] = useState(false)
   const [prFlash, setPrFlash] = useState(false)
   const [confirmDiscard, setConfirmDiscard] = useState(false)
-  const [ec, setEc] = useState(false)
+  /* null until the member says otherwise: the flag is derived from whether
+     they went past a target, and an explicit tap pins it either way. */
+  const [ecOverride, setEcOverride] = useState<boolean | null>(null)
   const [confirmEmptyFinish, setConfirmEmptyFinish] = useState(false)
 
   const plannedOptions = useCallback(
@@ -772,6 +774,12 @@ function ActiveSession({
     },
     [plans, workouts],
   )
+
+  /* Any movement taken past its target means the session was pushed. */
+  const wentPastTarget = workout.exercises.some(
+    (e) => (e.targetSets ?? 0) > 0 && e.sets.length > (e.targetSets ?? 0),
+  )
+  const ec = ecOverride ?? wentPastTarget
 
   /* Rest countdown. One timeout per tick keeps drift invisible at this scale. */
   useEffect(() => {
@@ -885,7 +893,8 @@ function ActiveSession({
             setRestLeft(null)
           }}
           ec={ec}
-          onToggleEc={() => setEc((v) => !v)}
+          onToggleEc={() => setEcOverride(!ec)}
+          autoEc={false}
           intensity={workout.intensity ?? null}
           onIntensity={setSessionIntensity}
         />
@@ -941,7 +950,8 @@ function ActiveSession({
           setRestLeft(null)
         }}
         ec={ec}
-        onToggleEc={() => setEc((v) => !v)}
+        onToggleEc={() => setEcOverride(!ec)}
+        autoEc={ecOverride === null && wentPastTarget}
         intensity={workout.intensity ?? null}
         onIntensity={setSessionIntensity}
         rest={
@@ -1016,25 +1026,7 @@ function ActiveSession({
                 </>
               )}
               {current.targetSets && (
-                <span
-                  className="flex items-center gap-1.5"
-                  aria-label={`${current.sets.length} of ${current.targetSets} target sets logged`}
-                >
-                  <span className="flex items-center gap-1" aria-hidden="true">
-                    {Array.from({ length: current.targetSets }, (_, i) => (
-                      <span
-                        key={i}
-                        className={cn(
-                          'size-2.5 rounded-full transition-colors duration-200',
-                          i < current.sets.length ? 'bg-good' : 'bg-line',
-                        )}
-                      />
-                    ))}
-                  </span>
-                  <span className="num text-2xs text-ink-3">
-                    {current.sets.length}/{current.targetSets} sets
-                  </span>
-                </span>
+                <SetProgress done={current.sets.length} target={current.targetSets} />
               )}
               {rule !== 'none' && <Tag tone="brand">{PROGRESSION_LABELS[rule]}</Tag>}
               {options?.supersetGroup && <Tag>Superset {options.supersetGroup}</Tag>}
@@ -1140,6 +1132,42 @@ function ActiveSession({
   )
 }
 
+/**
+ * Dots for the target, then one more per set beyond it. Filling only to the
+ * target left seven-of-four looking like four-of-four with an odd caption.
+ */
+function SetProgress({ done, target }: { done: number; target: number }) {
+  const extra = Math.max(0, done - target)
+  return (
+    <span
+      className="flex items-center gap-1.5"
+      aria-label={
+        extra > 0
+          ? `${done} sets logged, ${extra} past the target of ${target}`
+          : `${done} of ${target} target sets logged`
+      }
+    >
+      <span className="flex items-center gap-1" aria-hidden="true">
+        {Array.from({ length: target }, (_, i) => (
+          <span
+            key={i}
+            className={cn(
+              'size-2.5 rounded-full transition-colors duration-200',
+              i < done ? 'bg-good' : 'bg-line',
+            )}
+          />
+        ))}
+        {Array.from({ length: extra }, (_, i) => (
+          <span key={`x-${i}`} className="size-2.5 rounded-full bg-brand ring-1 ring-brand/30" />
+        ))}
+      </span>
+      <span className="num text-2xs text-ink-3">
+        {extra > 0 ? `${done} sets · ${extra} extra` : `${done}/${target} sets`}
+      </span>
+    </span>
+  )
+}
+
 function IntensityPicker({
   value,
   onChange,
@@ -1193,6 +1221,7 @@ function SessionHeader({
   onDiscardEmpty,
   ec,
   onToggleEc,
+  autoEc,
   intensity,
   onIntensity,
   rest,
@@ -1208,6 +1237,8 @@ function SessionHeader({
   onDiscardEmpty: () => void
   ec: boolean
   onToggleEc: () => void
+  /** Turned on by going past a target rather than by a tap. */
+  autoEc: boolean
   intensity: Intensity | null
   onIntensity: (i: Intensity) => void
   rest?: RestState | null
@@ -1279,7 +1310,9 @@ function SessionHeader({
       {ec && (
         <p className="flex items-center gap-1.5 pb-2.5 text-2xs text-ink-3">
           <CheckCircle size={13} weight="fill" className="shrink-0 text-brand" />
-          Saved as a session you pushed on, once you finish.
+          {autoEc
+            ? 'You went past the target, so this is marked as a session you pushed on.'
+            : 'Saved as a session you pushed on, once you finish.'}
         </p>
       )}
 
@@ -1296,13 +1329,6 @@ function SessionHeader({
             Discard it
           </Button>
         </div>
-      )}
-
-      {ec && (
-        <p className="flex items-center gap-1.5 pb-2.5 text-2xs text-ink-3">
-          <CheckCircle size={13} weight="fill" className="shrink-0 text-brand" />
-          Saved as a session you pushed on, once you finish.
-        </p>
       )}
 
       {rest && (

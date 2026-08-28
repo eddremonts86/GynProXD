@@ -1,8 +1,12 @@
-import { ArrowCounterClockwise, Check } from '@phosphor-icons/react'
+import { ArrowCounterClockwise, Check, Warning } from '@phosphor-icons/react'
 import { Button } from '../ui/Button'
 import { NumberField } from '../ui/NumberField'
+import { pluralize } from '../lib/labels'
 import { cn } from '@/lib/utils'
 import type { SetEntry } from '../lib/types'
+
+/** Sets past the target where "bonus" turns into "be careful". */
+const OVERREACH = 3
 
 /**
  * The session's work laid out as rows rather than one anonymous input.
@@ -67,6 +71,7 @@ export function SetPlan({
 }: SetPlanProps) {
   const done = logged.length
   const target = targetSets ?? 0
+  const extra = target > 0 ? Math.max(0, done - target) : 0
   /* Rows beyond the target still show once logged: going over is not an error. */
   const upcoming = Math.max(0, target - done)
   const activeIsExtra = done >= target
@@ -74,13 +79,27 @@ export function SetPlan({
   return (
     <div className="flex flex-col">
       <ol className="divide-y divide-line">
-        {logged.map((s, i) => (
+        {logged.map((s, i) => {
+          const beyondTarget = target > 0 && i >= target
+          return (
           <li key={i} className="flex items-center gap-3 px-5 py-3">
-            <span className="num flex size-7 shrink-0 items-center justify-center rounded-full bg-good-soft text-2xs font-semibold text-good">
+            <span
+              className={cn(
+                'num flex size-7 shrink-0 items-center justify-center rounded-full text-2xs font-semibold',
+                beyondTarget ? 'bg-brand-soft text-brand' : 'bg-good-soft text-good',
+              )}
+            >
               <Check size={13} weight="bold" />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block text-2xs text-ink-3">Set {i + 1}</span>
+              <span className="flex items-center gap-1.5 text-2xs text-ink-3">
+                Set {i + 1}
+                {beyondTarget && (
+                  <span className="rounded-full bg-brand-soft px-1.5 text-[10px] font-semibold text-brand">
+                    extra
+                  </span>
+                )}
+              </span>
               <span className="num block truncate text-sm text-ink">{describe(s, isTimed)}</span>
             </span>
             <Button
@@ -93,7 +112,8 @@ export function SetPlan({
               Undo
             </Button>
           </li>
-        ))}
+          )
+        })}
 
         {/* The row you are on: pre-filled, editable, one tap to confirm. */}
         <li className="flex flex-col gap-3 bg-surface-2/60 px-5 py-4">
@@ -194,9 +214,24 @@ export function SetPlan({
         ))}
       </ol>
 
-      {activeIsExtra && target > 0 && (
+      {activeIsExtra && target > 0 && extra < OVERREACH && (
         <p className="border-t border-line px-5 py-3 text-2xs text-ink-3">
-          Target met. Anything more is a bonus — log it or finish the movement.
+          Target met. Anything more is a bonus — log it or move on.
+        </p>
+      )}
+
+      {/* Past a few extra sets this stops being a bonus. Said plainly, once,
+          without blocking anything: it is the member's call, not the app's. */}
+      {extra >= OVERREACH && (
+        <p className="flex items-start gap-2 border-t border-line bg-danger-soft px-5 py-3 text-2xs text-ink-2">
+          <Warning size={14} weight="bold" className="mt-px shrink-0 text-danger" />
+          <span>
+            <span className="font-semibold">
+              {pluralize(extra, 'set')} past the target.
+            </span>{' '}
+            Volume beyond the plan piles up fatigue faster than progress, and that is where most
+            avoidable strains come from. A good place to stop.
+          </span>
         </p>
       )}
 
