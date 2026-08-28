@@ -35,6 +35,8 @@ import { SetPlan } from '@/components/set-plan'
 import { SessionLogDialog } from '@/components/session-log-dialog'
 import { MealSuggestions } from '@/components/meal-suggestions'
 import { DishOfTheDay } from '@/components/dish-of-the-day'
+import { ChallengeToday } from '@/components/challenge-today'
+import { StoryToday } from '@/components/story-today'
 import {
   Dialog,
   DialogContent,
@@ -482,6 +484,11 @@ function TodayOverview({
           )}
         </Panel>
       )}
+
+      {/* The member's other daily commitments, each present only while it is
+          running: the challenge to act on, the story chapter to read. */}
+      <ChallengeToday />
+      <StoryToday />
 
       <ExerciseOfTheDay />
 
