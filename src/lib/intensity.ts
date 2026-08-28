@@ -12,7 +12,7 @@ export const INTENSITIES: Intensity[] = ['I', 'II', 'III']
 export const INTENSITY_SETS: Record<Intensity, number> = { I: 2, II: 3, III: 4 }
 
 export const INTENSITY_HELP: Record<Intensity, string> = {
-  I: 'Short on time: 2 target sets per movement.',
-  II: 'The standard day: 3 target sets per movement.',
-  III: 'Big day: 4 target sets per movement.',
+  I: '2 sets per movement — short on time',
+  II: '3 sets per movement — the standard day',
+  III: '4 sets per movement — a big day',
 }

@@ -7,6 +7,7 @@ import { muscleMaxVolume, muscleVolume } from '../lib/muscle-volume'
 import { isoDaysAgo } from '../lib/dates'
 import { sessionCountsByExercise, weeklyVolumeSeries, workoutTotals } from '../lib/stats'
 import { cardFromWorkout, renderSessionCard, shareOrDownloadPng } from '../lib/session-card'
+import { INTENSITY_SETS } from '../lib/intensity'
 import { Button, IconButton } from '../ui/Button'
 import { Panel } from '../ui/Panel'
 import { Tag } from '../ui/Tag'
@@ -418,8 +419,10 @@ function SessionList() {
                   <span className="min-w-0 flex-1">
                     <span className="flex items-center gap-1.5 text-sm font-medium text-ink">
                       {formatLongDate(w.date)}
-                      {w.intensity && <Tag tone="outline">{w.intensity}</Tag>}
-                      {w.ec && <Tag tone="brand">EC</Tag>}
+                      {w.intensity && (
+                        <Tag tone="outline">{INTENSITY_SETS[w.intensity]} sets each</Tag>
+                      )}
+                      {w.ec && <Tag tone="brand">Extra credit</Tag>}
                     </span>
                     <span className="num block truncate text-2xs text-ink-3">
                       {pluralize(w.exercises.length, 'movement')}, {pluralize(t.sets, 'set')},{' '}

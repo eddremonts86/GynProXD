@@ -52,7 +52,7 @@ import { bodyweightDelta, rangeVolume, setVolume, weeklyVolumeSeries, workoutTot
 import { summarizeSession } from '../lib/session-summary'
 import { testAgeDays, testIsStale } from '../lib/fitness-test'
 import { alternativesFor } from '../lib/alternatives'
-import { INTENSITIES, INTENSITY_HELP } from '../lib/intensity'
+import { INTENSITIES, INTENSITY_HELP, INTENSITY_SETS } from '../lib/intensity'
 import {
   cardFromPlannedDay,
   cardFromWorkout,
@@ -596,8 +596,10 @@ function FinishSummary({
           <div className="flex items-center gap-2">
             <CheckCircle size={20} weight="fill" className="text-good" />
             <h2 className="text-base font-semibold text-ink">Session finished</h2>
-            {workout.intensity && <Tag tone="outline">{workout.intensity}</Tag>}
-            {workout.ec && <Tag tone="brand">EC</Tag>}
+            {workout.intensity && (
+              <Tag tone="outline">{INTENSITY_SETS[workout.intensity]} sets each</Tag>
+            )}
+            {workout.ec && <Tag tone="brand">Extra credit</Tag>}
           </div>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
             {facts.map((f) => (
@@ -660,7 +662,7 @@ function RecentSessions() {
               <span className="min-w-0">
                 <span className="flex items-center gap-1.5 text-sm font-medium text-ink">
                   {formatLongDate(w.date)}
-                  {w.ec && <Tag tone="brand">EC</Tag>}
+                  {w.ec && <Tag tone="brand">Extra credit</Tag>}
                 </span>
                 <span className="block truncate text-2xs text-ink-3">
                   {w.exercises
@@ -1184,23 +1186,25 @@ function IntensityPicker({
   size?: 'sm' | 'md'
 }) {
   return (
-    <div role="group" aria-label="Session intensity" className="flex items-center gap-1">
+    <div role="group" aria-label="Target sets per movement" className="flex items-center gap-1.5">
+      <span className="shrink-0 text-2xs text-ink-3">Sets each</span>
       {INTENSITIES.map((i) => (
         <button
           key={i}
           type="button"
           onClick={() => onChange(i)}
           aria-pressed={value === i}
+          aria-label={INTENSITY_HELP[i]}
           title={INTENSITY_HELP[i]}
           className={cn(
-            'shrink-0 rounded-full border font-semibold transition-colors duration-150',
+            'num shrink-0 rounded-full border font-semibold transition-colors duration-150',
             size === 'sm' ? 'min-h-8 px-2.5 text-2xs' : 'min-h-9 px-3 text-xs',
             value === i
               ? 'border-brand bg-brand text-brand-ink'
               : 'border-line bg-surface text-ink-3 hover:border-line-strong hover:text-ink',
           )}
         >
-          {i}
+          {INTENSITY_SETS[i]}
         </button>
       ))}
     </div>
@@ -1263,15 +1267,16 @@ function SessionHeader({
           type="button"
           onClick={onToggleEc}
           aria-pressed={ec}
-          title="Extra credit: pushed beyond the plan"
+          title="Mark this session as one where you pushed past the plan"
           className={cn(
-            'min-h-9 shrink-0 rounded-full border px-3 text-xs font-semibold transition-colors duration-150 max-sm:ml-auto',
+            'flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 text-xs font-medium transition-colors duration-150 max-sm:ml-auto',
             ec
               ? 'border-brand bg-brand text-brand-ink'
               : 'border-line bg-surface text-ink-3 hover:border-line-strong hover:text-ink',
           )}
         >
-          EC
+          {ec ? <CheckCircle size={14} weight="fill" /> : <Plus size={14} weight="bold" />}
+          Extra credit
         </button>
         <Button onClick={onFinish} disabled={!canFinish}>
           Finish

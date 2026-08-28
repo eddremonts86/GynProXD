@@ -26,10 +26,12 @@ describe('cardFromWorkout', () => {
     expect(cardFromWorkout({ ...workout, exercises: [{ exerciseId: 'bench', sets: [{ weight: 60, reps: 8 }] }] }).exercises[0].detail).toBe('1 set · top 60kg × 8')
   })
 
-  it('carries intensity, EC and totals into the footer', () => {
+  it('carries the dose, the extra credit and the totals into the footer', () => {
+    /* Spelled out rather than 'II' / 'EC': the poster is read by people who
+       have never opened the app. */
     const footer = cardFromWorkout(workout).footer
-    expect(footer).toContain('Intensity II')
-    expect(footer).toContain('EC')
+    expect(footer).toContain('3 sets each')
+    expect(footer).toContain('Extra credit')
     expect(footer).toContain('2 sets')
   })
 })
@@ -43,6 +45,7 @@ describe('cardFromPlannedDay', () => {
     expect(card.title).toBe('Monday')
     expect(card.subtitle).toBe('Push day')
     expect(card.exercises).toHaveLength(2)
-    expect(card.footer.join(' ')).toContain('I — 2 sets')
+    expect(card.footer.join(' ')).toContain('Easy 2 sets')
+    expect(card.footer.join(' ')).toContain('Big day 4')
   })
 })

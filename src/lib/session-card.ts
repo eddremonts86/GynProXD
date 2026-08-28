@@ -64,8 +64,8 @@ export function cardFromWorkout(workout: Workout): SessionCardInput {
     return cardExercise(e.exerciseId, `${pluralize(e.sets.length, 'set')} · ${topText}`)
   })
   const footer = [formatLongDate(workout.date)]
-  if (workout.intensity) footer.push(`Intensity ${workout.intensity}`)
-  if (workout.ec) footer.push('EC')
+  if (workout.intensity) footer.push(`${INTENSITY_SETS[workout.intensity]} sets each`)
+  if (workout.ec) footer.push('Extra credit')
   footer.push(
     pluralize(totals.sets, 'set'),
     `${Math.round(totals.volume).toLocaleString('en-GB')} kg`,
@@ -83,10 +83,12 @@ export function cardFromPlannedDay(
     title: dayLabel,
     subtitle: planName,
     exercises: exercises.map((pe) => cardExercise(pe.exerciseId, '')),
+    /* The poster carries the whole dose ladder so one printed sheet serves
+       every member, the way a gym wall poster has to. */
     footer: [
-      `I — ${INTENSITY_SETS.I} sets`,
-      `II — ${INTENSITY_SETS.II} sets`,
-      `III — ${INTENSITY_SETS.III} sets`,
+      `Easy ${INTENSITY_SETS.I} sets`,
+      `Normal ${INTENSITY_SETS.II}`,
+      `Big day ${INTENSITY_SETS.III}`,
       'rest ≤ 90s',
     ],
   }
