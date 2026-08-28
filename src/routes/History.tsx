@@ -4,8 +4,14 @@ import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from 'rec
 import { useGym } from '../store/useGym'
 import { e1rmSeries, exerciseById } from '../lib/exercises'
 import { muscleMaxVolume, muscleVolume } from '../lib/muscle-volume'
-import { isoDaysAgo } from '../lib/dates'
-import { sessionCountsByExercise, weeklyVolumeSeries, workoutTotals } from '../lib/stats'
+import { isoDaysAgo, todayIso } from '../lib/dates'
+import {
+  dailySetSeries,
+  sessionCountsByExercise,
+  weeklyVolumeSeries,
+  workoutTotals,
+  type CalendarDay,
+} from '../lib/stats'
 import { cardFromWorkout, renderSessionCard, shareOrDownloadPng } from '../lib/session-card'
 import { INTENSITY_SETS } from '../lib/intensity'
 import { Button, IconButton } from '../ui/Button'
@@ -31,12 +37,15 @@ function describeSet(s: SetEntry): string {
   return `${load} × ${work}${s.side ? ` ${s.side}` : ''}`
 }
 
-/** Whole minutes of a finished session, or null before durations were tracked. */
+/**
+ * Whole minutes of a finished session, or null before durations were tracked.
+ * Sub-minute sessions round up so the row never claims "0 min".
+ */
 function sessionMinutes(w: Workout): number | null {
   if (!w.startedAt || !w.endedAt) return null
   const ms = Date.parse(w.endedAt) - Date.parse(w.startedAt)
   if (!Number.isFinite(ms) || ms <= 0) return null
-  return Math.round(ms / 60000)
+  return Math.max(1, Math.round(ms / 60000))
 }
 
 const axisTick = { fontSize: 11, fill: 'var(--ink-3)' }
@@ -93,12 +102,111 @@ export function HistoryPage() {
         </Panel>
       </div>
 
+      <ConsistencyCalendar />
       <WeeklyVolumeChart />
       <StrengthChart />
       {bodyweight.length >= 2 && <BodyweightChart />}
       <MuscleBalance />
       <SessionList />
     </div>
+  )
+}
+
+const CALENDAR_WEEKS = 26
+/* Blend steps toward the chart green; fraction-of-best keeps the scale honest
+   whether someone logs 6 sets a day or 26. */
+const CALENDAR_MIX = [35, 55, 75, 100]
+
+function calendarTone(sets: number, best: number): string | undefined {
+  if (sets <= 0 || best <= 0) return undefined
+  const step = Math.min(4, Math.max(1, Math.ceil((sets / best) * 4)))
+  return `color-mix(in srgb, var(--chart-1) ${CALENDAR_MIX[step - 1]}%, var(--surface-2))`
+}
+
+/** Short month label above the first column whose Monday enters a new month. */
+function monthLabels(columns: CalendarDay[][]): (string | null)[] {
+  let last = ''
+  return columns.map((col) => {
+    const month = new Date(`${col[0].date}T00:00:00`).toLocaleDateString('en-GB', {
+      month: 'short',
+    })
+    if (month === last) return null
+    last = month
+    return month
+  })
+}
+
+function ConsistencyCalendar() {
+  const workouts = useGym((s) => s.workouts)
+  const today = todayIso()
+
+  const { columns, months, best, active } = useMemo(() => {
+    const days = dailySetSeries(workouts, CALENDAR_WEEKS)
+    const columns: CalendarDay[][] = []
+    for (let i = 0; i < days.length; i += 7) columns.push(days.slice(i, i + 7))
+    return {
+      columns,
+      months: monthLabels(columns),
+      best: Math.max(...days.map((d) => d.sets)),
+      active: days.filter((d) => d.sets > 0).length,
+    }
+  }, [workouts])
+
+  return (
+    <Section title="Consistency" hint={`Last ${CALENDAR_WEEKS} weeks`}>
+      <Panel padding="md">
+        <div
+          role="img"
+          aria-label={`Training calendar, last ${CALENDAR_WEEKS} weeks: trained on ${pluralize(active, 'day')}.`}
+          className="overflow-x-auto"
+        >
+          <div aria-hidden="true" className="flex w-max gap-[3px]">
+            <div className="mr-1.5 flex flex-col gap-[3px] pt-[19px]">
+              {['M', '', 'W', '', 'F', '', ''].map((d, i) => (
+                <span key={i} className="flex h-3 items-center text-2xs leading-none text-ink-3">
+                  {d}
+                </span>
+              ))}
+            </div>
+            {columns.map((col, i) => (
+              <div key={col[0].date} className="flex flex-col gap-[3px]">
+                <span className="h-4 text-2xs whitespace-nowrap text-ink-3">{months[i]}</span>
+                {col.map((day) => (
+                  <span
+                    key={day.date}
+                    title={
+                      day.sets > 0
+                        ? `${pluralize(day.sets, 'set')} · ${formatLongDate(day.date)}`
+                        : `Rest · ${formatLongDate(day.date)}`
+                    }
+                    className={cn(
+                      'size-3 rounded-[3px] bg-surface-2',
+                      day.date > today && 'invisible',
+                    )}
+                    style={{ background: calendarTone(day.sets, best) }}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
+          <div
+            aria-hidden="true"
+            className="mt-3 flex items-center justify-end gap-1 text-2xs text-ink-3"
+          >
+            Less
+            <span className="size-3 rounded-[3px] bg-surface-2" />
+            {CALENDAR_MIX.map((mix) => (
+              <span
+                key={mix}
+                className="size-3 rounded-[3px]"
+                style={{ background: `color-mix(in srgb, var(--chart-1) ${mix}%, var(--surface-2))` }}
+              />
+            ))}
+            More
+          </div>
+        </div>
+      </Panel>
+    </Section>
   )
 }
 

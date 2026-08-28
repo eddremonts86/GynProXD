@@ -76,6 +76,40 @@ export function weeklyVolumeSeries(workouts: Workout[], weeks = 12, today = new 
   return points
 }
 
+export interface CalendarDay {
+  /** Local yyyy-mm-dd. */
+  date: string
+  sets: number
+}
+
+/**
+ * One point per day across the last `weeks` calendar weeks (Monday-based),
+ * oldest first, the current partial week included. Fixed length for the same
+ * reason weeklyVolumeSeries is: the consistency calendar keeps its shape
+ * through empty stretches.
+ */
+export function dailySetSeries(workouts: Workout[], weeks = 26, today = new Date()): CalendarDay[] {
+  const first = mondayOf(today)
+  first.setDate(first.getDate() - 7 * (weeks - 1))
+
+  const days: CalendarDay[] = []
+  const byDate = new Map<string, CalendarDay>()
+  for (let i = 0; i < weeks * 7; i++) {
+    const d = new Date(first)
+    d.setDate(first.getDate() + i)
+    const day: CalendarDay = { date: toLocalIso(d), sets: 0 }
+    days.push(day)
+    byDate.set(day.date, day)
+  }
+
+  for (const w of workouts) {
+    const day = byDate.get(w.date)
+    if (day) day.sets += workoutTotals(w).sets
+  }
+
+  return days
+}
+
 /**
  * Times each exercise was performed across all sessions. Feeds the strength
  * chart's exercise ordering, the library's done filter and done-count chips.

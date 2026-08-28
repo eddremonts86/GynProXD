@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { bodyweightDelta, rangeVolume, sessionCountsByExercise, weeklyVolumeSeries } from './stats'
+import {
+  bodyweightDelta,
+  dailySetSeries,
+  rangeVolume,
+  sessionCountsByExercise,
+  weeklyVolumeSeries,
+} from './stats'
 import type { Workout } from './types'
 
 const workout = (date: string, weight: number, reps: number): Workout => ({
@@ -21,6 +27,30 @@ describe('weeklyVolumeSeries', () => {
     expect(series[1]).toMatchObject({ volume: 800, sessions: 1 })
     expect(series[2]).toMatchObject({ volume: 0, sessions: 0 })
     expect(series[3]).toMatchObject({ volume: 700, sets: 2, sessions: 2 })
+  })
+})
+
+describe('dailySetSeries', () => {
+  it('spans full Monday-based weeks, oldest first, with sets summed per day', () => {
+    // 2026-08-25 is a Tuesday; a 2-week window starts Monday 2026-08-17.
+    const today = new Date(2026, 7, 25)
+    const days = dailySetSeries(
+      [workout('2026-08-24', 100, 5), workout('2026-08-24', 50, 4), workout('2026-08-10', 80, 10)],
+      2,
+      today,
+    )
+    expect(days).toHaveLength(14)
+    expect(days[0].date).toBe('2026-08-17')
+    expect(days[13].date).toBe('2026-08-30')
+    expect(days.find((d) => d.date === '2026-08-24')).toMatchObject({ sets: 2 })
+    // The 2026-08-10 session predates the window and is not counted anywhere.
+    expect(days.reduce((n, d) => n + d.sets, 0)).toBe(2)
+  })
+
+  it('keeps every day at zero without workouts', () => {
+    const days = dailySetSeries([], 4, new Date(2026, 7, 25))
+    expect(days).toHaveLength(28)
+    expect(days.every((d) => d.sets === 0)).toBe(true)
   })
 })
 
