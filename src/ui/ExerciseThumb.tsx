@@ -43,7 +43,10 @@ export function ExerciseThumb({ exercise, size = 'md', className }: ExerciseThum
   const src = candidates[index]
 
   const frame = cn(
-    'shrink-0 overflow-hidden border border-line bg-surface-2',
+    // `block` is load-bearing: the frame is a <span>, and an inline span
+    // ignores width/height/aspect-ratio, so its absolutely-positioned photo
+    // would collapse to 0×0 (as the fill size does inside a plain div).
+    'block shrink-0 overflow-hidden border border-line bg-surface-2',
     frameSize[size],
     className,
   )
