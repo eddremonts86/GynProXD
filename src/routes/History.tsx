@@ -422,7 +422,7 @@ function SessionList() {
                       {w.intensity && (
                         <Tag tone="outline">{INTENSITY_SETS[w.intensity]} sets each</Tag>
                       )}
-                      {w.ec && <Tag tone="brand">Extra credit</Tag>}
+                      {w.ec && <Tag tone="brand">Pushed hard</Tag>}
                     </span>
                     <span className="num block truncate text-2xs text-ink-3">
                       {pluralize(w.exercises.length, 'movement')}, {pluralize(t.sets, 'set')},{' '}

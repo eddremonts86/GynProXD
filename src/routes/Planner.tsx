@@ -354,7 +354,7 @@ export function PlannerPage() {
                     <p className="flex items-start gap-1.5 text-2xs text-ink-3">
                       <Plus size={12} weight="bold" className="mt-0.5 shrink-0 text-brand" />
                       <span>
-                        <span className="font-semibold">Extra credit</span> — {dayEcNote}
+                        <span className="font-semibold">If you have more</span> — {dayEcNote}
                       </span>
                     </p>
                   )}

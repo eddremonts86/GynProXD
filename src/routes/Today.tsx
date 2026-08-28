@@ -404,7 +404,7 @@ function TodayOverview({
             <p className="flex items-start gap-2 border-t border-line bg-brand-soft px-5 py-3 text-2xs text-ink-2">
               <Plus size={13} weight="bold" className="mt-0.5 shrink-0 text-brand" />
               <span>
-                <span className="font-semibold">Extra credit</span> — {primary.ecNote}
+                <span className="font-semibold">If you have more</span> — {primary.ecNote}
               </span>
             </p>
           )}
@@ -599,7 +599,7 @@ function FinishSummary({
             {workout.intensity && (
               <Tag tone="outline">{INTENSITY_SETS[workout.intensity]} sets each</Tag>
             )}
-            {workout.ec && <Tag tone="brand">Extra credit</Tag>}
+            {workout.ec && <Tag tone="brand">Pushed hard</Tag>}
           </div>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
             {facts.map((f) => (
@@ -662,7 +662,7 @@ function RecentSessions() {
               <span className="min-w-0">
                 <span className="flex items-center gap-1.5 text-sm font-medium text-ink">
                   {formatLongDate(w.date)}
-                  {w.ec && <Tag tone="brand">Extra credit</Tag>}
+                  {w.ec && <Tag tone="brand">Pushed hard</Tag>}
                 </span>
                 <span className="block truncate text-2xs text-ink-3">
                   {w.exercises
@@ -1283,7 +1283,7 @@ function SessionHeader({
           type="button"
           onClick={onToggleEc}
           aria-pressed={ec}
-          title="Mark this session as one where you pushed past the plan"
+          title="Mark this session as one where you went past what the plan asked"
           className={cn(
             'flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 text-xs font-medium transition-colors duration-150 max-sm:ml-auto',
             ec
@@ -1292,7 +1292,7 @@ function SessionHeader({
           )}
         >
           {ec ? <CheckCircle size={14} weight="fill" /> : <Plus size={14} weight="bold" />}
-          Extra credit
+          Pushed hard
         </button>
         <Button onClick={onFinish} disabled={!canFinish}>
           Finish
@@ -1302,7 +1302,7 @@ function SessionHeader({
       {ec && (
         <p className="flex items-center gap-1.5 pb-2.5 text-2xs text-ink-3">
           <CheckCircle size={13} weight="fill" className="shrink-0 text-brand" />
-          Saved as an extra-credit session when you finish.
+          Saved as a session you pushed on, once you finish.
         </p>
       )}
 

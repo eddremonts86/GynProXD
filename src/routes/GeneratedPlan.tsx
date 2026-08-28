@@ -477,7 +477,7 @@ function DayDetailDialog({ day, onClose }: { day: GeneratedDay | null; onClose: 
               <DialogDescription>
                 {formatLongDate(day.date)}, {pluralize(day.exercises.length, 'movement')}. Tap a
                 movement for photos and instructions.
-                {day.ecNote && ` Extra credit: ${day.ecNote}`}
+                {day.ecNote && ` If you have more: ${day.ecNote}`}
               </DialogDescription>
             </DialogHeader>
 

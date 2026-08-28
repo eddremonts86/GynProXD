@@ -55,7 +55,7 @@ export interface Workout {
   startedAt?: string
   /** ISO timestamp, written when the session is finished. */
   endedAt?: string
-  /** Self-assigned extra credit: the member pushed beyond the plan. */
+  /** The member declared they went past what the plan asked. */
   ec?: boolean
   /** The volume dial the session ran at. Absent on freeform sessions. */
   intensity?: Intensity
@@ -82,7 +82,7 @@ export interface PlannedExercise {
 export interface PlannedDay {
   day: DayOfWeek
   exercises: PlannedExercise[]
-  /** One optional line of extra credit for the day. Absent on older plans. */
+  /** One optional "if you have more" line for the day. Absent on older plans. */
   ecNote?: string
 }
 

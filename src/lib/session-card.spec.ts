@@ -26,12 +26,12 @@ describe('cardFromWorkout', () => {
     expect(cardFromWorkout({ ...workout, exercises: [{ exerciseId: 'bench', sets: [{ weight: 60, reps: 8 }] }] }).exercises[0].detail).toBe('1 set · top 60kg × 8')
   })
 
-  it('carries the dose, the extra credit and the totals into the footer', () => {
+  it('carries the dose, the push flag and the totals into the footer', () => {
     /* Spelled out rather than 'II' / 'EC': the poster is read by people who
-       have never opened the app. */
+       have never opened the app, and "credit" reads as currency. */
     const footer = cardFromWorkout(workout).footer
     expect(footer).toContain('3 sets each')
-    expect(footer).toContain('Extra credit')
+    expect(footer).toContain('Pushed hard')
     expect(footer).toContain('2 sets')
   })
 })

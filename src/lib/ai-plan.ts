@@ -188,7 +188,7 @@ ${catalogue}
 - progression per movement: "linear" (add 2.5 kg each session), "double" (build reps to the top of the range, then add weight), or "none" (stretches, easy accessories). Beginners: mostly linear on compounds.
 - supersetGroup pairs accessories back to back: "A", "B", "C" or null. Never superset the main compound.
 - timed is true only for holds such as planks. unilateral is true only for one-side-at-a-time movements.
-- ecNote per day: ONE short optional extra-credit line for anyone who finishes with something left, at most 120 characters. Concrete and additive, e.g. "Add a fourth set on the first movement" or "Finish with a 90 second plank". Never required, never medical advice.
+- ecNote per day: ONE short optional line for anyone who finishes the day with something left, at most 120 characters. Concrete and additive, e.g. "Add a fourth set on the first movement" or "Finish with a 90 second plank". Never required, never medical advice.
 
 Reply with ONE minified JSON object on a single line, nothing else, exactly this shape:
 {"planName":"...","coachNotes":"...","blocks":[{"days":[{"day":"mon","ecNote":"...","exercises":[{"exerciseId":"...","progression":"linear","supersetGroup":null,"timed":false,"unilateral":false}]}]}]}

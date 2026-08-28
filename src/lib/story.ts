@@ -38,7 +38,7 @@ export interface StoryDay {
   chapter: string
   weight: DayWeight
   movements: StoryMovement[]
-  /** Optional extra credit, same contract as the rest of the app. */
+  /** Optional "if you have more" line, same contract as the rest of the app. */
   ecNote?: string
   /** Present only on the day the fork is offered. */
   offersChoice?: boolean

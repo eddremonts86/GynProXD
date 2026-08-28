@@ -107,7 +107,7 @@ function pickExercise(
 }
 
 /**
- * Extra credit for the standard template: one optional line per day, so a
+ * The "if you have more" line for the standard template: one per day, so a
  * plan built without the coach still offers something to the member who
  * finishes with fuel left. Additive and never required — the same contract
  * the coach is held to.
@@ -229,7 +229,7 @@ export function assemblePlan(
           date: toLocalIso(date),
           day: d.day,
           exercises,
-          /* A deload week is the one week extra credit would undo. */
+          /* A deload week is the one week extra work would undo. */
           ecNote: isDeload ? undefined : d.ecNote,
         }
       })

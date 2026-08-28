@@ -254,7 +254,7 @@ function DayCard({
 
       {day.ecNote && (
         <p className="flex items-start gap-2 border-t border-line bg-brand-soft px-5 py-3 text-2xs text-ink-2">
-          <span className="font-semibold">Extra credit</span> — {day.ecNote}
+          <span className="font-semibold">If you have more</span> — {day.ecNote}
         </p>
       )}
 

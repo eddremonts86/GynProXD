@@ -65,7 +65,7 @@ export function cardFromWorkout(workout: Workout): SessionCardInput {
   })
   const footer = [formatLongDate(workout.date)]
   if (workout.intensity) footer.push(`${INTENSITY_SETS[workout.intensity]} sets each`)
-  if (workout.ec) footer.push('Extra credit')
+  if (workout.ec) footer.push('Pushed hard')
   footer.push(
     pluralize(totals.sets, 'set'),
     `${Math.round(totals.volume).toLocaleString('en-GB')} kg`,
