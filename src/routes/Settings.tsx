@@ -30,11 +30,17 @@ import { todayIso } from '../lib/dates'
 import { Switch } from '@/components/ui/switch'
 import {
   disableNotifications,
+  disablePush,
   enableNotifications,
+  enablePush,
+  needsHomeScreenForPush,
   notificationsEnabled,
   notificationsSupported,
+  pushEnabled,
+  pushSupported,
   type NotifyChannel,
 } from '../lib/notify'
+import { readSyncLink } from '../lib/sync'
 
 type Feedback = { tone: 'good' | 'danger'; text: string } | null
 
@@ -468,6 +474,7 @@ function NotificationsSection() {
           title="Gym messages"
           description="A system notification when your gym sends something new, shown while enForma is open on this device."
         />
+        <PushToggle />
         <NotificationToggle
           channel="training"
           title="Training nudges"
@@ -475,6 +482,58 @@ function NotificationsSection() {
         />
       </Panel>
     </Section>
+  )
+}
+
+/**
+ * Real Web Push: the gym's messages reach this device with the app closed.
+ * Shown only when it can actually work — a linked profile in a browser that
+ * has a push manager — and honest about the iOS install requirement.
+ */
+function PushToggle() {
+  const profileId = activeProfile()?.id ?? null
+  const [enabled, setEnabled] = useState(() => (profileId ? pushEnabled(profileId) : false))
+  const [note, setNote] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+
+  if (!profileId || !pushSupported() || !readSyncLink(profileId)) return null
+  const iosHint = needsHomeScreenForPush()
+
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 p-5">
+      <div className="flex min-w-0 flex-col gap-0.5">
+        <span className="text-sm font-semibold text-ink">Gym messages while the app is closed</span>
+        <span className="max-w-[52ch] text-2xs text-ink-3">
+          {note ??
+            (iosHint
+              ? 'On iPhone, install enForma first: Share → Add to Home Screen. iOS only delivers push to installed apps.'
+              : 'Delivered through your sync account to this device, even with enForma closed.')}
+        </span>
+      </div>
+      <Switch
+        aria-label="Push gym messages to this device"
+        checked={enabled}
+        disabled={busy}
+        onCheckedChange={(on) => {
+          setNote(null)
+          if (!on) {
+            setBusy(true)
+            void disablePush(profileId).finally(() => {
+              setEnabled(false)
+              setBusy(false)
+            })
+            return
+          }
+          setBusy(true)
+          void enablePush(profileId)
+            .then((result) => {
+              setEnabled(result.ok)
+              if (!result.ok) setNote(result.message)
+            })
+            .finally(() => setBusy(false))
+        }}
+      />
+    </div>
   )
 }
 

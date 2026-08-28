@@ -7,6 +7,8 @@ import {
   type ProgrammeStructure,
 } from './plan-generator'
 import { GOAL_LABELS, LEVEL_LABELS, SEX_LABELS, TRAINING_PLACE_OPTIONS } from './labels'
+import { serverCapabilities } from './capabilities'
+import { activeAuthHeader } from './sync'
 import type {
   DayOfWeek,
   DurationKey,
@@ -27,7 +29,14 @@ import type {
  * or a response that fails validation all land on the deterministic generator.
  */
 
-export const aiCoachEnabled = __AI_COACH__
+/**
+ * The coach exists when the dev proxy carries a key (build flag) or the sync
+ * server says it does — the latter only helps a signed-in member, since the
+ * server route is auth-gated to keep the key from being burned anonymously.
+ */
+export function aiCoachEnabled(): boolean {
+  return __AI_COACH__ || (serverCapabilities().coach && activeAuthHeader() !== null)
+}
 
 /**
  * Text-01 measured at roughly two minutes for a three-block programme; the
@@ -205,7 +214,7 @@ async function designWithCoach(
   try {
     const res = await fetch('/api/minimax/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...(activeAuthHeader() ?? {}) },
       signal: controller.signal,
       body: JSON.stringify({
         model: __AI_COACH_MODEL__,
@@ -258,7 +267,7 @@ export async function buildProgramme(
   input: OnboardingInput,
   requested: DurationKey,
 ): Promise<GeneratedPlan> {
-  if (aiCoachEnabled && !coachSwitchedOff()) {
+  if (aiCoachEnabled() && !coachSwitchedOff()) {
     const { estimate, weeks } = resolveDuration(input, requested)
     const blockCount = Math.min(Math.max(1, Math.ceil(weeks / 4)), 3)
     const structure = await designWithCoach(input, blockCount, estimate.rateKgPerWeek)

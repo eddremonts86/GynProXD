@@ -35,6 +35,22 @@ server {
     proxy_read_timeout 90s;
   }
 
+  # Phase 7: the shared fetches (AI coach, recipe search, daily dish) live as
+  # custom routes on the sync server, same paths the dev proxy uses — so the
+  # client code has one URL per job in every environment. The coach can take
+  # minutes; its timeout says so.
+  location ~ ^/api/(minimax|recipes|enforma)/ {
+    resolver 127.0.0.11 valid=30s ipv6=off;
+    set $sync_target "${SYNC_PROXY_TARGET}";
+    proxy_pass $sync_target;
+    proxy_http_version 1.1;
+    proxy_set_header Host "${SYNC_UPSTREAM_HOST}";
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_buffering off;
+    proxy_read_timeout 200s;
+  }
+
   # SPA: every route is index.html.
   location / {
     try_files $uri $uri/ /index.html;

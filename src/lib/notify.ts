@@ -1,9 +1,12 @@
+import { readSyncLink } from './sync'
+import { refreshCapabilities, serverCapabilities } from './capabilities'
+
 /**
- * System notifications for gym messages. Local-first honesty: these fire
- * while enForma is open (or resuming), because true remote push needs a
- * server (VAPID + subscription store). If that backend ever lands, its
- * `push` listener plugs into the same service worker and this module keeps
- * the display side. See docs/PANELS.md.
+ * Notifications, in two layers. Local ones fire while enForma is open — the
+ * original local-first behaviour, no server involved. Since phase 6, linked
+ * profiles can also subscribe this device to real Web Push: the sync server's
+ * sender delivers gym messages while the app is closed, and src/sw.ts shows
+ * them. See docs/PANELS.md.
  */
 
 /**
@@ -96,4 +99,119 @@ export async function notifyRetestDue(takenAt: string, weeks: number): Promise<v
     `Your fitness test is ${weeks} weeks old. Five minutes will tell you what changed.`,
     'training',
   )
+}
+
+/* ------------------------------------------------------------------------ */
+/* Web Push (phase 6): gym messages reach this device while the app is       */
+/* closed. Push travels through the sync account — the subscription is a row */
+/* the server's sender reads — so it exists only for linked profiles.        */
+
+const PUSH_PREF_PREFIX = 'forma-push-'
+
+export function pushSupported(): boolean {
+  return (
+    notificationsSupported() &&
+    typeof navigator !== 'undefined' &&
+    'serviceWorker' in navigator &&
+    typeof window !== 'undefined' &&
+    'PushManager' in window
+  )
+}
+
+/** iOS only delivers Web Push to apps installed on the Home Screen. */
+export function needsHomeScreenForPush(): boolean {
+  if (typeof navigator === 'undefined') return false
+  const ua = navigator.userAgent
+  const isIos = /iPad|iPhone|iPod/.test(ua) || (ua.includes('Mac') && navigator.maxTouchPoints > 1)
+  const standalone =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    (navigator as { standalone?: boolean }).standalone === true
+  return isIos && !standalone
+}
+
+export function pushEnabled(profileId: string): boolean {
+  return localStorage.getItem(PUSH_PREF_PREFIX + profileId) === 'on'
+}
+
+function applicationServerKey(base64Url: string): Uint8Array {
+  const padded = base64Url + '='.repeat((4 - (base64Url.length % 4)) % 4)
+  const raw = atob(padded.replace(/-/g, '+').replace(/_/g, '/'))
+  const bytes = new Uint8Array(raw.length)
+  for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i)
+  return bytes
+}
+
+export type PushResult = { ok: true } | { ok: false; message: string }
+
+export async function enablePush(profileId: string): Promise<PushResult> {
+  if (!pushSupported()) return { ok: false, message: 'This browser cannot receive push.' }
+  const link = readSyncLink(profileId)
+  if (!link?.token) {
+    return { ok: false, message: 'Push travels through your sync account — turn on sync first.' }
+  }
+  await refreshCapabilities(link.server)
+  const vapid = serverCapabilities().push
+  if (!vapid) return { ok: false, message: 'The sync server has no push delivery configured.' }
+  if (!(await enableNotifications('gym'))) {
+    return { ok: false, message: 'Notification permission was not granted.' }
+  }
+  const registration = await navigator.serviceWorker.getRegistration()
+  if (!registration) {
+    return { ok: false, message: 'No service worker here — push works in the installed build.' }
+  }
+  let subscription: PushSubscription
+  try {
+    subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: applicationServerKey(vapid) as BufferSource,
+    })
+  } catch {
+    return { ok: false, message: 'The browser refused the push subscription.' }
+  }
+  const keys = subscription.toJSON().keys ?? {}
+  const res = await fetch(`${link.server}/api/collections/push_subs/records`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: link.token },
+    body: JSON.stringify({
+      owner: link.userId,
+      endpoint: subscription.endpoint,
+      p256dh: keys.p256dh ?? '',
+      auth: keys.auth ?? '',
+    }),
+  })
+  /* 400 here is the unique endpoint index: this device is already registered. */
+  if (!res.ok && res.status !== 400) {
+    return { ok: false, message: 'Registering the subscription on the server failed.' }
+  }
+  localStorage.setItem(PUSH_PREF_PREFIX + profileId, 'on')
+  return { ok: true }
+}
+
+export async function disablePush(profileId: string): Promise<void> {
+  localStorage.setItem(PUSH_PREF_PREFIX + profileId, 'off')
+  try {
+    const registration = await navigator.serviceWorker.getRegistration()
+    const subscription = await registration?.pushManager.getSubscription()
+    if (!subscription) return
+    const link = readSyncLink(profileId)
+    if (link?.token) {
+      const filter = encodeURIComponent(`endpoint = "${subscription.endpoint}"`)
+      const list = (await fetch(
+        `${link.server}/api/collections/push_subs/records?perPage=1&filter=${filter}`,
+        { headers: { authorization: link.token } },
+      )
+        .then((r) => r.json())
+        .catch(() => null)) as { items?: { id: string }[] } | null
+      const id = list?.items?.[0]?.id
+      if (id) {
+        await fetch(`${link.server}/api/collections/push_subs/records/${id}`, {
+          method: 'DELETE',
+          headers: { authorization: link.token },
+        }).catch(() => {})
+      }
+    }
+    await subscription.unsubscribe()
+  } catch {
+    /* The pref is off; a dead subscription gets dropped by the sender's 410. */
+  }
 }

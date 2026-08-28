@@ -1,4 +1,5 @@
-import { extractJson } from './ai-plan'
+import { aiCoachEnabled, extractJson } from './ai-plan'
+import { activeAuthHeader } from './sync'
 import { GOAL_LABELS } from './labels'
 import { rankSuggestions, type RecipeSuggestion } from './recipes'
 import type { NutritionTarget } from './nutrition-target'
@@ -96,14 +97,14 @@ export async function annotateSuggestions(
   input: OnboardingInput,
 ): Promise<RecipeSuggestion[]> {
   const fallback = rankSuggestions(items, target)
-  if (!__AI_COACH__ || coachSwitchedOff() || items.length === 0) return fallback
+  if (!aiCoachEnabled() || coachSwitchedOff() || items.length === 0) return fallback
 
   const controller = new AbortController()
   const timer = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
   try {
     const res = await fetch('/api/minimax/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...(activeAuthHeader() ?? {}) },
       signal: controller.signal,
       body: JSON.stringify({
         model: __AI_COACH_MODEL__,

@@ -1,5 +1,7 @@
 import { mealTargets, type NutritionTarget } from './nutrition-target'
 import { seedFrom } from './seed'
+import { serverCapabilities } from './capabilities'
+import { activeAuthHeader } from './sync'
 
 /**
  * Recipe suggestions from two free sources. TheMealDB is keyless and allows
@@ -9,7 +11,10 @@ import { seedFrom } from './seed'
  * ever invented, and anything malformed is dropped rather than repaired.
  */
 
-export const recipeSearchEnabled = __RECIPE_SEARCH__
+/** Dev-proxy key, or the sync server's — the latter needs a signed-in member. */
+export function recipeSearchEnabled(): boolean {
+  return __RECIPE_SEARCH__ || (serverCapabilities().recipes && activeAuthHeader() !== null)
+}
 
 export type RecipeSource = 'mealdb' | 'spoonacular' | 'sample'
 
@@ -110,6 +115,20 @@ export function parseMealDbDetail(raw: unknown): RecipeSuggestion | null {
  * gym's worth of devices converges on the same plate without coordinating.
  */
 export async function fetchDailyDish(dateIso: string): Promise<RecipeSuggestion | null> {
+  /* The sync server computes and caches the same pick once for everyone
+     (phase 7); a device that cannot reach it converges on its own. */
+  try {
+    const res = await fetch(`/pb/api/enforma/daily-dish?date=${encodeURIComponent(dateIso)}`, {
+      signal: AbortSignal.timeout(4000),
+    })
+    if (res.ok) {
+      const dish = (await res.json()) as RecipeSuggestion
+      if (dish && dish.id && dish.title && dish.imageUrl) return { ...dish, source: 'mealdb' }
+    }
+  } catch {
+    /* Offline or no server: fall through to the direct calls. */
+  }
+
   const category = dailyCategoryFor(dateIso)
   const listRes = await fetch(`${MEALDB_BASE}/filter.php?c=${encodeURIComponent(category)}`)
   if (!listRes.ok) return null
@@ -188,7 +207,10 @@ export async function fetchSuggestions(
   target: NutritionTarget,
   dateIso: string,
 ): Promise<RecipeSuggestion[]> {
-  const res = await fetch(`/api/recipes/spoonacular/recipes/complexSearch?${spoonacularQuery(target, dateIso)}`)
+  const res = await fetch(
+    `/api/recipes/spoonacular/recipes/complexSearch?${spoonacularQuery(target, dateIso)}`,
+    { headers: activeAuthHeader() ?? {} },
+  )
   if (!res.ok) return []
   return parseSpoonacularResults(await res.json())
 }

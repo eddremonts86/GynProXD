@@ -442,7 +442,7 @@ export function OnboardingPage() {
               )}
             </Button>
 
-            {designing && aiCoachEnabled && (
+            {designing && aiCoachEnabled() && (
               <p className="rounded-md bg-surface-2 p-3 text-2xs leading-relaxed text-ink-2">
                 The coach usually takes a minute or two. You can keep using enForma; the programme
                 will be waiting under Planner when it is ready.
@@ -451,7 +451,7 @@ export function OnboardingPage() {
 
             <p className="flex items-start gap-1.5 text-2xs text-ink-3">
               <Sparkle size={13} className="mt-px shrink-0" />
-              {aiCoachEnabled
+              {aiCoachEnabled()
                 ? 'The AI coach designs the split and movements. Timelines and safe rates stay computed locally and are never up for negotiation.'
                 : 'The AI coach is offline, so the standard template builder will design this programme.'}
             </p>

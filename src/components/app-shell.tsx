@@ -31,6 +31,7 @@ import { testAgeDays, testIsStale } from '@/lib/fitness-test'
 import { todayIso } from '@/lib/dates'
 import { activeProfile, lockProfile, resumeSession, type ProfileRole } from '@/lib/profiles'
 import { readSyncLink, syncNow } from '@/lib/sync'
+import { refreshCapabilities } from '@/lib/capabilities'
 import { SignOut } from '@phosphor-icons/react'
 import { IconButton } from '@/ui/Button'
 import { Avatar } from '@/ui/Avatar'
@@ -259,9 +260,12 @@ function ProfileFooter() {
 }
 
 /* Linked profiles catch up in the background on unlock; failures stay quiet
-   here because Settings → Data shows them where they can be acted on. */
+   here because Settings → Data shows them where they can be acted on. The
+   capability probe rides along so coach/recipe copy tells today's truth. */
 function syncQuietly(profileId: string): void {
-  if (readSyncLink(profileId)) void syncNow(profileId)
+  const link = readSyncLink(profileId)
+  void refreshCapabilities(link?.server ?? '/pb')
+  if (link) void syncNow(profileId)
 }
 
 export function AppShell() {

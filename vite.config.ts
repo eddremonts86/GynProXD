@@ -59,12 +59,21 @@ export default defineConfig(({ mode }) => {
    * POCKETBASE_URL points); in production the server address is whatever the
    * device has configured in Settings, so no key or URL is baked in here.
    */
+  const pbTarget = env.POCKETBASE_URL || 'http://127.0.0.1:8090'
   const pbProxy: Record<string, ProxyOptions> = {
     '/pb': {
-      target: env.POCKETBASE_URL || 'http://127.0.0.1:8090',
+      target: pbTarget,
       changeOrigin: true,
       rewrite: (p) => p.replace(/^\/pb/, ''),
     },
+    /* Same-path shared fetches (phase 7). With a local key the direct proxies
+       above win; without one, dev behaves like production and asks the sync
+       server, which answers 503 honestly when it has no key either. */
+    '/api/enforma': { target: pbTarget, changeOrigin: true },
+    ...(env.MINIMAX_API_KEY ? {} : { '/api/minimax': { target: pbTarget, changeOrigin: true } }),
+    ...(env.SPOONACULAR_API_KEY
+      ? {}
+      : { '/api/recipes': { target: pbTarget, changeOrigin: true } }),
   }
 
   const apiProxy = { ...pbProxy, ...(aiProxy ?? {}), ...(recipeProxy ?? {}) }
@@ -110,6 +119,12 @@ export default defineConfig(({ mode }) => {
     react(),
     tailwindcss(),
     VitePWA({
+      /* Phase 6 needs a real worker file for the push and notificationclick
+         listeners, so generateSW became injectManifest; src/sw.ts recreates
+         the precache and runtime-cache behaviour workbox generated before. */
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'pwa-192x192.png', 'pwa-512x512.png', 'apple-touch-icon.png'],
       manifest: {
@@ -127,30 +142,8 @@ export default defineConfig(({ mode }) => {
           { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
-      workbox: {
+      injectManifest: {
         globPatterns: ['**/*.{js,css,html,woff2}', 'favicon.svg', 'pwa-*.png', 'apple-touch-icon.png'],
-        runtimeCaching: [
-          {
-            urlPattern: ({ url }) => url.pathname.startsWith('/repdb/'),
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'movement-artwork',
-              expiration: { maxEntries: 500, maxAgeSeconds: 60 * 60 * 24 * 180 },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-          {
-            // Movements without local artwork fall back to dataset photos, which
-            // stay available offline once they have been looked at.
-            urlPattern: /^https:\/\/cdn\.jsdelivr\.net\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'movement-photos',
-              expiration: { maxEntries: 400, maxAgeSeconds: 60 * 60 * 24 * 90 },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-        ],
       },
       // The service worker only earns its keep in a real build; in dev it just
       // fights HMR and floods the console with registration failures.

@@ -587,6 +587,18 @@ export async function signInFromGate(input: GateSignInInput): Promise<void> {
   if (!result.ok) throw new Error(result.message)
 }
 
+/**
+ * The Authorization header for server features gated to signed-in members
+ * (AI coach, recipe search) — or null when the active profile has no live
+ * account session, which is the caller's cue to fall back locally.
+ */
+export function activeAuthHeader(): Record<string, string> | null {
+  const meta = activeProfile()
+  if (!meta) return null
+  const link = readSyncLink(meta.id)
+  return link?.token ? { authorization: link.token } : null
+}
+
 /** Refreshes an expired session. Nothing about the data or keys changes. */
 export async function reauthSync(profileId: string, password: string): Promise<void> {
   const link = readSyncLink(profileId)

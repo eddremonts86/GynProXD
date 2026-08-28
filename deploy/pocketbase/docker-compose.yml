@@ -7,6 +7,12 @@ services:
     restart: unless-stopped
     ports:
       - '8090:8090'
+    environment:
+      # Phase 7 shared fetches + the push public key served by /api/enforma/capabilities.
+      MINIMAX_API_KEY: ${MINIMAX_API_KEY:-}
+      MINIMAX_BASE_URL: ${MINIMAX_BASE_URL:-}
+      SPOONACULAR_API_KEY: ${SPOONACULAR_API_KEY:-}
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
     volumes:
       - pb_data:/pb/pb_data
     healthcheck:
@@ -15,5 +21,22 @@ services:
       timeout: 5s
       retries: 3
 
+  # Phase 6: watches the gym bus and delivers Web Push while the app is closed.
+  push:
+    build: ./push
+    restart: unless-stopped
+    depends_on:
+      - pocketbase
+    environment:
+      PB_URL: http://pocketbase:8090
+      PB_SUPERUSER_EMAIL: ${PB_SUPERUSER_EMAIL:-}
+      PB_SUPERUSER_PASSWORD: ${PB_SUPERUSER_PASSWORD:-}
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:sync@enforma.local}
+    volumes:
+      - push_state:/state
+
 volumes:
   pb_data:
+  push_state:

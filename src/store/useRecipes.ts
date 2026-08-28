@@ -112,7 +112,7 @@ export const useRecipes = create<RecipesState>()((set, get) => ({
     set({ loadingSuggestions: true })
     try {
       const target = nutritionTargetFor(input)
-      const fetched = recipeSearchEnabled ? await fetchSuggestions(target, today) : []
+      const fetched = recipeSearchEnabled() ? await fetchSuggestions(target, today) : []
       const base = fetched.length > 0 ? fetched : rankSuggestions(SAMPLE_SUGGESTIONS, target)
       const items = await annotateSuggestions(base, target, input)
       const next = { date: today, key, items }
