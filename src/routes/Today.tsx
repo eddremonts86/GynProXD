@@ -14,7 +14,7 @@ import {
   X,
 } from '@phosphor-icons/react'
 import { useGym } from '../store/useGym'
-import { bestE1rm, exerciseById, isBodyweight, lastPerformance } from '../lib/exercises'
+import { bestE1rm, exerciseById, lastPerformance } from '../lib/exercises'
 import { isPersonalRecord, suggestNext } from '../lib/progression'
 import { Button, IconButton } from '../ui/Button'
 import { Panel } from '../ui/Panel'
@@ -53,6 +53,7 @@ import { bodyweightDelta, rangeVolume, setVolume, weeklyVolumeSeries, workoutTot
 import { summarizeSession } from '../lib/session-summary'
 import { testAgeDays, testIsStale } from '../lib/fitness-test'
 import { alternativesFor } from '../lib/alternatives'
+import { isTimedByNature, isUnilateralByNature, loadIsOptional } from '../lib/movement-shape'
 import { INTENSITIES, INTENSITY_HELP, INTENSITY_SETS } from '../lib/intensity'
 import {
   cardFromPlannedDay,
@@ -733,8 +734,11 @@ function ActiveSession({
   const current = workout.exercises.find((e) => e.exerciseId === currentId) ?? workout.exercises[0]
   const currentExercise = current ? exerciseById(current.exerciseId) : undefined
   const options = current ? plannedOptions(current.exerciseId) : null
-  const isTimed = !!options?.timed
-  const isUnilateral = !!options?.unilateral
+  /* The plan can force either on; otherwise the movement's own nature
+     decides, so a squat never asks which leg and a plank never asks reps. */
+  const isTimed = !!options?.timed || isTimedByNature(currentExercise)
+  const isUnilateral = !!options?.unilateral || isUnilateralByNature(currentExercise)
+  const weightOptional = loadIsOptional(currentExercise)
   const rule = options?.progression ?? 'none'
   const suggestion = useMemo(
     () => (current ? suggestNext(rule, exerciseById(current.exerciseId), workouts) : null),
@@ -819,8 +823,8 @@ function ActiveSession({
 
   const canLog =
     !!current &&
-    Number(weight) >= 0 &&
-    weight !== '' &&
+    (weightOptional || (weight !== '' && Number(weight) >= 0)) &&
+    (weight === '' || Number(weight) >= 0) &&
     (isTimed ? Number(duration) > 0 : Number(reps) > 0)
 
   const handleLogSet = () => {
@@ -1078,13 +1082,12 @@ function ActiveSession({
           onDuration={setDuration}
           onSide={setSide}
           canLog={canLog}
+          weightOptional={weightOptional}
           hint={
-            weight === ''
-              ? currentExercise && isBodyweight(currentExercise)
-                ? 'Enter 0 — this one is bodyweight.'
-                : 'Set a weight first.'
-              : isTimed
-                ? 'Set how many seconds you held it.'
+            isTimed
+              ? 'Set how many seconds it lasted.'
+              : Number(reps) > 0
+                ? 'Set a weight first.'
                 : 'Set how many reps you did.'
           }
           onLog={handleLogSet}

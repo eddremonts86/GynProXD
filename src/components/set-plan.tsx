@@ -31,6 +31,8 @@ export interface SetPlanProps {
   onDuration: (v: string) => void
   onSide: (s: 'L' | 'R') => void
   canLog: boolean
+  /** Cardio and stretching carry no load, so kilos are not required. */
+  weightOptional?: boolean
   hint?: string
   onLog: () => void
   onUndo: (index: number) => void
@@ -57,6 +59,7 @@ export function SetPlan({
   onDuration,
   onSide,
   canLog,
+  weightOptional,
   hint,
   onLog,
   onUndo,
@@ -108,7 +111,7 @@ export function SetPlan({
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <NumberField
-              label="Weight"
+              label={weightOptional ? 'Weight (optional)' : 'Weight'}
               unit="kg"
               value={weight}
               onValueChange={onWeight}
