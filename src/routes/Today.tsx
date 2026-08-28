@@ -1008,7 +1008,7 @@ function ActiveSession({
           className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-dashed border-line px-3 text-xs font-medium text-ink-3 transition-colors hover:border-line-strong hover:text-ink"
         >
           <Plus size={14} weight="bold" />
-          Add
+          Add movement
         </button>
       </div>
 
@@ -1158,7 +1158,7 @@ function SetProgress({ done, target }: { done: number; target: number }) {
           />
         ))}
         {Array.from({ length: extra }, (_, i) => (
-          <span key={`x-${i}`} className="size-2.5 rounded-full bg-brand ring-1 ring-brand/30" />
+          <span key={`x-${i}`} className="size-2.5 rounded-full bg-over" />
         ))}
       </span>
       <span className="num text-2xs text-ink-3">

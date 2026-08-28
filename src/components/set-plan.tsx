@@ -86,7 +86,7 @@ export function SetPlan({
             <span
               className={cn(
                 'num flex size-7 shrink-0 items-center justify-center rounded-full text-2xs font-semibold',
-                beyondTarget ? 'bg-brand-soft text-brand' : 'bg-good-soft text-good',
+                beyondTarget ? 'bg-over-soft text-over' : 'bg-good-soft text-good',
               )}
             >
               <Check size={13} weight="bold" />
@@ -95,7 +95,7 @@ export function SetPlan({
               <span className="flex items-center gap-1.5 text-2xs text-ink-3">
                 Set {i + 1}
                 {beyondTarget && (
-                  <span className="rounded-full bg-brand-soft px-1.5 text-[10px] font-semibold text-brand">
+                  <span className="rounded-full bg-over-soft px-1.5 text-[10px] font-semibold text-over">
                     extra
                   </span>
                 )}
@@ -215,8 +215,9 @@ export function SetPlan({
       </ol>
 
       {activeIsExtra && target > 0 && extra < OVERREACH && (
-        <p className="border-t border-line px-5 py-3 text-2xs text-ink-3">
-          Target met. Anything more is a bonus — log it or move on.
+        <p className="border-t border-line bg-over-soft px-5 py-3 text-2xs text-ink-2">
+          <span className="font-semibold text-over">Target met.</span> Anything more is a bonus —
+          log it or move on.
         </p>
       )}
 
