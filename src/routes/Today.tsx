@@ -270,9 +270,13 @@ function TodayOverview({
         <AuroraTile
           tone="green"
           label="Training volume, last 7 days"
-          value={metrics.thisWeek.toLocaleString('en-GB')}
-          unit="kg"
-          sub={`${pluralize(metrics.sessions, 'session')}, ${pluralize(metrics.sets, 'set')}`}
+          value={workouts.length > 0 ? metrics.thisWeek.toLocaleString('en-GB') : undefined}
+          unit={workouts.length > 0 ? 'kg' : undefined}
+          sub={
+            workouts.length > 0
+              ? `${pluralize(metrics.sessions, 'session')}, ${pluralize(metrics.sets, 'set')}`
+              : 'Nothing logged yet. Your first session draws the baseline.'
+          }
           foot={
             metrics.hadLastWeek && metrics.volumeDelta !== 0 ? (
               <TrendPill delta={metrics.volumeDelta} unit="kg" window="vs previous week" />
