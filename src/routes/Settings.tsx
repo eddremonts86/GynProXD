@@ -1,15 +1,13 @@
 import { useRef, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { DownloadSimple, PencilSimple, Trash, UploadSimple, WarningCircle } from '@phosphor-icons/react'
+import { DownloadSimple, UploadSimple, WarningCircle } from '@phosphor-icons/react'
 import { useGym } from '../store/useGym'
 import { useRecipes } from '../store/useRecipes'
 import { useSession } from '../store/useSession'
 import {
   activeProfile,
   deleteActiveProfile,
-  deleteProfileById,
   listGyms,
-  listProfiles,
   lockProfile,
   updateProfileMeta,
 } from '../lib/profiles'
@@ -25,7 +23,7 @@ import { Tabs, TabPanel } from '../ui/Tabs'
 import { Collapse } from '../ui/Collapse'
 import { InstallAppButton } from '@/components/install-app-button'
 import { SyncSection } from '@/components/sync-section'
-import { SEX_LABELS, formatShortDate, pluralize } from '../lib/labels'
+import { SEX_LABELS } from '../lib/labels'
 import { todayIso } from '../lib/dates'
 import { Switch } from '@/components/ui/switch'
 import {
@@ -181,7 +179,9 @@ export function SettingsPage() {
         </TabPanel>
 
         <TabPanel value="device" className="flex flex-col gap-8">
-          <DeviceProfilesSection />
+          {/* Managing OTHER profiles is the device admin's job and lives in
+              /admin, role-gated. A member's Settings only ever touches their
+              own profile — anything wider was a cross-user privilege leak. */}
           <NotificationsSection />
         </TabPanel>
 
@@ -578,168 +578,3 @@ function NotificationToggle({
   )
 }
 
-/**
- * Device admin. It manages the public directory only — names, gyms, avatars —
- * because everything else is sealed under each profile's passphrase. Deleting
- * a profile removes its ciphertext without needing to open it.
- */
-function DeviceProfilesSection() {
-  const setLocked = useSession((s) => s.setLocked)
-  const [profiles, setProfiles] = useState(listProfiles)
-  const [gyms, setGyms] = useState(listGyms)
-  const [selfId] = useState(() => activeProfile()?.id ?? null)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [editName, setEditName] = useState('')
-  const [editGym, setEditGym] = useState('')
-  const [confirmId, setConfirmId] = useState<string | null>(null)
-
-  const refresh = () => {
-    setProfiles(listProfiles())
-    setGyms(listGyms())
-  }
-
-  const startEdit = (id: string, name: string, gym?: string) => {
-    setEditingId(id)
-    setEditName(name)
-    setEditGym(gym ?? '')
-    setConfirmId(null)
-  }
-
-  const saveEdit = () => {
-    if (editingId && editName.trim()) {
-      updateProfileMeta(editingId, { name: editName, gym: editGym })
-      refresh()
-    }
-    setEditingId(null)
-  }
-
-  return (
-    <Section
-      title="Profiles on this device"
-      hint={pluralize(profiles.length, 'profile')}
-      action={
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => {
-            void lockProfile().then(setLocked)
-          }}
-        >
-          New profile
-        </Button>
-      }
-    >
-      <Panel padding="lg" className="flex flex-col gap-1">
-        <ul className="divide-y divide-line">
-          {profiles.map((p) => (
-            <li key={p.id} className="py-3 first:pt-0 last:pb-0">
-              {editingId === p.id ? (
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault()
-                    saveEdit()
-                  }}
-                  className="flex flex-col gap-3"
-                >
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    {/* Explicit ids: the identity form above already owns f-name/f-gym. */}
-                    <Input
-                      id={`edit-name-${p.id}`}
-                      label="Name"
-                      value={editName}
-                      onChange={(e) => setEditName(e.target.value)}
-                      autoFocus
-                    />
-                    <Combobox
-                      id={`edit-gym-${p.id}`}
-                      label="Gym"
-                      value={editGym}
-                      onValueChange={setEditGym}
-                      options={gyms}
-                      placeholder="Search or add"
-                      createLabel="Add gym"
-                    />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button type="submit" size="sm" disabled={!editName.trim()}>
-                      Save
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={() => setEditingId(null)}>
-                      Cancel
-                    </Button>
-                  </div>
-                </form>
-              ) : (
-                <div className="flex items-center gap-3">
-                  <Avatar name={p.name} seed={p.id} />
-                  <span className="min-w-0 flex-1">
-                    <span className="flex items-center gap-2">
-                      <span className="truncate text-sm font-semibold text-ink">{p.name}</span>
-                      {p.id === selfId && (
-                        <span className="rounded-full bg-brand px-2 py-0.5 text-2xs font-medium text-brand-ink">
-                          You
-                        </span>
-                      )}
-                    </span>
-                    <span className="block truncate text-2xs text-ink-3">
-                      {p.gym ?? 'Independent'} ·{' '}
-                      <span className="num">since {formatShortDate(p.createdAt.slice(0, 10))}</span>
-                    </span>
-                  </span>
-
-                  {confirmId === p.id ? (
-                    <span className="flex shrink-0 items-center gap-2">
-                      <Button variant="ghost" size="sm" onClick={() => setConfirmId(null)}>
-                        Cancel
-                      </Button>
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        onClick={() => {
-                          void deleteProfileById(p.id).then(refresh)
-                        }}
-                      >
-                        Delete
-                      </Button>
-                    </span>
-                  ) : p.id === selfId ? (
-                    <span className="shrink-0 text-2xs text-ink-3">Edit under Profile</span>
-                  ) : (
-                    <span className="flex shrink-0 items-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        aria-label={`Edit ${p.name}`}
-                        onClick={() => startEdit(p.id, p.name, p.gym)}
-                      >
-                        <PencilSimple size={15} />
-                        Edit
-                      </Button>
-                      <Button
-                        variant="dangerQuiet"
-                        size="sm"
-                        aria-label={`Delete ${p.name}`}
-                        onClick={() => {
-                          setConfirmId(p.id)
-                          setEditingId(null)
-                        }}
-                      >
-                        <Trash size={15} />
-                      </Button>
-                    </span>
-                  )}
-                </div>
-              )}
-            </li>
-          ))}
-        </ul>
-
-        <p className="border-t border-line pt-3 text-2xs text-ink-3">
-          This directory — names, gyms, avatars — is shared on the device. Each profile's training
-          data stays encrypted under its own passphrase and cannot be read or edited from here.
-          Deleting a profile erases its encrypted data permanently.
-        </p>
-      </Panel>
-    </Section>
-  )
-}

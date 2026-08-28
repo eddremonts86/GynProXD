@@ -142,15 +142,29 @@ export function activeProfile(): {
     : null
 }
 
+/** The active profile's role, straight from the registry. */
+function activeRole(): ProfileRole | null {
+  if (!activeId) return null
+  return readRegistry().profiles.find((p) => p.id === activeId)?.role ?? 'member'
+}
+
 /**
- * Edits a profile's public record: name and gym. These live outside the
- * encryption on purpose (the lock screen shows them), so any unlocked user
- * can administer them. Training data stays sealed under each passphrase.
+ * A profile's public record (name, gym) lives outside the encryption because
+ * the lock screen shows it. Editing it is allowed only for your own profile,
+ * or for anyone when the active profile is the device admin — administering
+ * other people is an admin act, not something every unlocked member may do.
+ * The role field is admin-only regardless of whose profile it is: a member
+ * must never be able to promote themselves.
  */
 export function updateProfileMeta(
   id: string,
   patch: { name?: string; gym?: string; role?: ProfileRole },
 ): boolean {
+  const isAdmin = activeRole() === 'admin'
+  const isSelf = id === activeId
+  if (!isSelf && !isAdmin) return false
+  if (patch.role !== undefined && !isAdmin) return false
+
   const registry = readRegistry()
   const meta = registry.profiles.find((p) => p.id === id)
   if (!meta) return false
@@ -175,8 +189,9 @@ export function updateProfileMeta(
   return true
 }
 
-/** Renames a gym in the catalogue and on every profile pointing at it. */
+/** Renames a gym in the catalogue and on every profile pointing at it. Admin-only. */
 export function renameGymEverywhere(from: string, to: string): void {
+  if (activeRole() !== 'admin') return
   const target = to.trim()
   if (!target) return
   const key = from.trim().toLowerCase()
@@ -189,8 +204,9 @@ export function renameGymEverywhere(from: string, to: string): void {
   writeRegistry(registry)
 }
 
-/** Drops a gym from the catalogue and unassigns every member of it. */
+/** Drops a gym from the catalogue and unassigns every member of it. Admin-only. */
 export function deleteGymEverywhere(name: string): void {
+  if (activeRole() !== 'admin') return
   const key = name.trim().toLowerCase()
   const registry = readRegistry()
   registry.gyms = (registry.gyms ?? []).filter((g) => g.toLowerCase() !== key)
@@ -200,19 +216,24 @@ export function deleteGymEverywhere(name: string): void {
   writeRegistry(registry)
 }
 
-/** Adds a gym to the device catalogue without touching any profile. */
+/** Adds a gym to the device catalogue without touching any profile. Admin-only. */
 export function addGymToCatalogue(name: string): void {
+  if (activeRole() !== 'admin') return
   const registry = readRegistry()
   rememberGym(registry, name)
   writeRegistry(registry)
 }
 
-/** Removes any profile and its ciphertext. Locks first if it is the active one. */
+/**
+ * Removes a profile and its ciphertext. Deleting your own is always allowed;
+ * deleting someone else's is an admin act. Locks first if it is the active one.
+ */
 export async function deleteProfileById(id: string): Promise<void> {
   if (id === activeId) {
     await deleteActiveProfile()
     return
   }
+  if (activeRole() !== 'admin') return
   const registry = readRegistry()
   registry.profiles = registry.profiles.filter((p) => p.id !== id)
   if (registry.lastActiveId === id) delete registry.lastActiveId
