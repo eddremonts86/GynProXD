@@ -325,7 +325,7 @@ function TodayOverview({
         </Panel>
         <Panel padding="md">
           <Stat
-            label="Weeks trained"
+            label="Weeks trained, last 12"
             value={`${metrics.weeksTrained}/12`}
             spark={
               metrics.weeksTrained > 0 ? (

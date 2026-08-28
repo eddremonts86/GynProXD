@@ -246,8 +246,12 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
         : undefined,
       banner: bannerOn ? { minutes: Number(bannerMinutes) } : undefined,
     })
-    const reach = everyone ? pluralize(members.length, 'member') : pluralize(picked.length, 'member')
-    setPublished(`Published to ${reach}. It is now under Sent.`)
+    const reachCount = everyone ? members.length : picked.length
+    setPublished(
+      reachCount === 0
+        ? 'Published. No members on this device yet — it sits under Sent and delivers as they join.'
+        : `Published to ${pluralize(reachCount, 'member')}. It is now under Sent.`,
+    )
     setError(null)
     setTitle('')
     setBody('')

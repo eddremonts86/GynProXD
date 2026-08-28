@@ -136,10 +136,13 @@ export function FitnessTestPage() {
         </div>
       </Section>
 
-      <div>
+      <div className="flex flex-wrap items-center gap-3">
         <Button disabled={!complete} onClick={save}>
           Score my test
         </Button>
+        {!complete && (
+          <p className="text-2xs text-ink-3">Count at least one rep in each station to score it.</p>
+        )}
       </div>
     </div>
   )
