@@ -17,6 +17,7 @@ import { INTENSITY_SETS } from '../lib/intensity'
 import { todayIso } from '../lib/dates'
 import type { ActiveChallenge, Challenge } from '../lib/challenge'
 import type { FitnessTestResult } from '../lib/fitness-test'
+import type { StoryProgress, TrackId } from '../lib/story'
 
 export const DAYS: DayOfWeek[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
 export const DAY_LABELS: Record<DayOfWeek, string> = {
@@ -79,6 +80,12 @@ interface GymState {
   challenges: ActiveChallenge[]
   fitnessTest: FitnessTestResult | null
   setFitnessTest: (result: FitnessTestResult | null) => void
+  story: StoryProgress | null
+  startStory: (programId: string) => void
+  leaveStory: () => void
+  chooseStoryTrack: (track: TrackId) => void
+  toggleStoryDay: (day: number) => void
+  startWorkoutFromExercises: (exerciseIds: string[], intensity?: Intensity) => void
   startChallenge: (challenge: Challenge) => void
   abandonChallenge: (challengeId: string) => void
   toggleChallengeDay: (challengeId: string, dateIso: string) => void
@@ -102,8 +109,45 @@ export const useGym = create<GymState>()((set, get) => ({
       profileDetails: null,
       challenges: [],
       fitnessTest: null,
+      story: null,
 
       setFitnessTest: (result) => set({ fitnessTest: result }),
+
+      /* One story at a time: two parallel narratives would be two streaks
+         competing, which is how both get abandoned. */
+      startStory: (programId) =>
+        set({ story: { programId, startedAt: today(), completedDays: [] } }),
+
+      leaveStory: () => set({ story: null }),
+
+      chooseStoryTrack: (track) =>
+        set((s) => (s.story ? { story: { ...s.story, track } } : s)),
+
+      toggleStoryDay: (day) =>
+        set((s) => {
+          if (!s.story) return s
+          const completedDays = s.story.completedDays.includes(day)
+            ? s.story.completedDays.filter((d) => d !== day)
+            : [...s.story.completedDays, day]
+          return { story: { ...s.story, completedDays } }
+        }),
+
+      /* Start a session from an arbitrary movement list — a story day owns
+         its movements rather than living in a weekly plan. */
+      startWorkoutFromExercises: (exerciseIds, intensity) =>
+        set({
+          activeWorkout: {
+            id: crypto.randomUUID(),
+            date: today(),
+            startedAt: new Date().toISOString(),
+            intensity,
+            exercises: exerciseIds.map((exerciseId) => ({
+              exerciseId,
+              sets: [],
+              targetSets: intensity ? INTENSITY_SETS[intensity] : undefined,
+            })),
+          },
+        }),
 
       /* Day one is the day you join. The definition is copied in, so a
          gym-published challenge keeps working if its message is deleted. */
@@ -269,6 +313,7 @@ export const useGym = create<GymState>()((set, get) => ({
           profileDetails: null,
           challenges: [],
           fitnessTest: null,
+          story: null,
         }),
 
       setProfileDetails: (details) => set({ profileDetails: details }),
@@ -446,6 +491,7 @@ export interface GymSnapshot {
   profileDetails: ProfileDetails | null
   challenges: ActiveChallenge[]
   fitnessTest: FitnessTestResult | null
+  story: StoryProgress | null
 }
 
 export const EMPTY_SNAPSHOT: GymSnapshot = {
@@ -458,6 +504,7 @@ export const EMPTY_SNAPSHOT: GymSnapshot = {
   profileDetails: null,
   challenges: [],
   fitnessTest: null,
+  story: null,
 }
 
 export function snapshotGym(state: GymState = useGym.getState()): GymSnapshot {
@@ -471,6 +518,7 @@ export function snapshotGym(state: GymState = useGym.getState()): GymSnapshot {
     profileDetails: state.profileDetails,
     challenges: state.challenges,
     fitnessTest: state.fitnessTest,
+    story: state.story,
   }
 }
 
@@ -486,6 +534,7 @@ export function hydrateGym(snapshot: Partial<GymSnapshot> | null | undefined): v
     profileDetails: snapshot?.profileDetails ?? null,
     challenges: snapshot?.challenges ?? [],
     fitnessTest: snapshot?.fitnessTest ?? null,
+    story: snapshot?.story ?? null,
   }
   populateByIdCache([...generatedExercises, ...next.customExercises])
   useGym.setState(next)

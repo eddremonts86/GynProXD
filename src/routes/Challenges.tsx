@@ -8,6 +8,7 @@ import { repsForDay, totalReps, type Challenge } from '../lib/challenge'
 import { exerciseById } from '../lib/exercises'
 import { SAMPLE_CHALLENGES } from '../data/sample-challenges'
 import { ChallengeCard } from '../components/challenge-card'
+import { StoryTeaser } from './Story'
 import { Button } from '../ui/Button'
 import { ExerciseThumb } from '../ui/ExerciseThumb'
 import { Panel } from '../ui/Panel'
@@ -49,6 +50,10 @@ export function ChallengesPage() {
         title="Challenges"
         description="One movement, thirty days, a number per day. Your progress stays on this profile."
       />
+
+      <Section title="Programme" hint="A story, one day at a time">
+        <StoryTeaser />
+      </Section>
 
       {challenges.length === 0 ? (
         <EmptyState

@@ -1,6 +1,6 @@
 # Darebee study: what to steal and how to build it
 
-Status: implemented — phases 0–8 shipped 2026-08-26 (phase 9 still a plan)
+Status: implemented — phases 0–8 shipped 2026-08-26; phase 9 week one shipped 2026-08-27
 Date: 2026-08-26
 
 Decisions locked with Edd 2026-08-26: scope is phases 0–8 (phase 9 stays a
@@ -342,7 +342,24 @@ plus the deviations worth knowing:
 - **8** `collection.ts` + 3 bundled hubs + the `collection` bus kind;
   members get them as library filter chips, gym-curated first.
 
-Phase 9 keeps its own plan below and has not been started.
+**Phase 9 — week one shipped 2026-08-27.** *Above the Treeline*: original
+content, thirty days walking up out of a valley, of which the first seven
+are written. Decisions taken with Edd: English (the plan said Spanish,
+written before the UI language was settled — the app is English throughout);
+seven days first rather than thirty, per this plan's own warning about
+proving the narrative before building more; mountain survival rather than
+fantasy, so the effort in the story is the effort in the gym; and only two
+mechanics — the day-3 track choice (Load / Pace / Line) and rotation instead
+of rest days.
+
+Deliberately **not** built, on the same warning: the travel-costs-reps map
+and the inventory. Both are engines, and neither earns its cost before the
+prose does.
+
+`lib/story.ts` holds the engine (current day is the first unfinished one, so
+catching up works and skipping does not; per-field track fallback so a track
+may change only the prose). `data/story-treeline.ts` holds the content.
+Progress lives in the encrypted snapshot. Remaining: chapters 8–30.
 
 **Phase 0 — prerequisites (S)**: commit the recipes work sitting
 untracked on `dev`; move `seedFrom` to `src/lib/seed.ts` (recipes re-import,

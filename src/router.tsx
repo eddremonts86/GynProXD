@@ -34,6 +34,9 @@ const NotFoundPage = React.lazy(() =>
 const ChallengesPage = React.lazy(() =>
   import('./routes/Challenges').then((m) => ({ default: m.ChallengesPage })),
 )
+const StoryPage = React.lazy(() =>
+  import('./routes/Story').then((m) => ({ default: m.StoryPage })),
+)
 const FitnessTestPage = React.lazy(() =>
   import('./routes/FitnessTest').then((m) => ({ default: m.FitnessTestPage })),
 )
@@ -65,6 +68,7 @@ export const router = createRouter({
     lazyRoute('/', TodayPage),
     lazyRoute('/planner', PlannerPage),
     lazyRoute('/challenges', ChallengesPage),
+    lazyRoute('/story', StoryPage),
     lazyRoute('/library', LibraryPage),
     lazyRoute('/history', HistoryPage),
     lazyRoute('/settings', SettingsPage),
