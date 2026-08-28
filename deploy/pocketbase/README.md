@@ -22,6 +22,19 @@ Point a compose service at this directory (`docker-compose.yml`). First boot:
 Members never see this server: the app proxies `/pb` on its own origin
 (`SYNC_PROXY_TARGET` / `SYNC_UPSTREAM_HOST` env vars on the app service).
 
+Environment for the compose (set as Coolify env vars on this service):
+
+| var | feeds | purpose |
+|---|---|---|
+| `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` | both | Web Push identity; the public key is served by `/api/enforma/capabilities` |
+| `PB_SUPERUSER_EMAIL` / `PB_SUPERUSER_PASSWORD` | push | the sender reads subscriptions and the bus privileged |
+| `MINIMAX_API_KEY` (+ optional `MINIMAX_BASE_URL`) | pocketbase | the AI coach route, auth-gated |
+| `SPOONACULAR_API_KEY` | pocketbase | the recipe search route, auth-gated, day-cached |
+
+Generate VAPID keys once (`npx web-push generate-vapid-keys` or any P-256
+tool) and never rotate them casually: rotating invalidates every existing
+subscription.
+
 ## Local development
 
 ```bash

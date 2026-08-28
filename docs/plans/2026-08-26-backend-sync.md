@@ -1,7 +1,26 @@
 # Backend, sync and push: what it takes to leave the browser
 
-Status: phases 1–5 shipped, plus email password reset; phases 6–7 (push, shared fetches) pending
-Date: 2026-08-26; phase 1 landed 2026-08-28, phases 2–5 and the reset flow landed 2026-08-28
+Status: all seven phases shipped (plus email password reset)
+Date: 2026-08-26; phase 1 landed 2026-08-28, phases 2–7 and the reset flow landed 2026-08-28
+
+Phases 6–7, shipped 2026-08-28. Push: generateSW became injectManifest with
+src/sw.ts (same precache and runtime caches, plus the push and
+notificationclick listeners), owner-scoped `push_subs` rows, and a sender
+service in the PocketBase compose that watches the gym bus, delivers
+VAPID-signed pushes and deletes subscriptions the gateway reports dead —
+verified on the replica up to and including a real FCM response (a dead
+token was cleaned up end to end). A successful delivery to a live browser
+is the one step that needs a real installed browser; the Settings toggle
+carries the iOS "add to Home Screen first" warning the plan demanded.
+Shared fetches: the coach, recipe search and daily dish are PocketBase
+routes on the same paths the dev proxy uses (keys server-side, coach and
+recipes auth-gated, same-for-everyone answers cached once in shared_cache);
+verified live through the deployed app origin — a real MiniMax reply, a
+Spoonacular search at 603 ms whose replay served from cache in 15 ms, and
+the shared daily dish. Client capability flags are runtime now: production
+UI promises the coach only when the server actually has it. JSVM lesson
+recorded: PocketBase runs each hook handler in an isolated VM, so helpers
+live inside their handlers.
 
 Phase 5 + reset, shipped 2026-08-28. The data key became random and permanent,
 wrapped by the password-derived KEK (`wrapped_dk`, mirrored locally for
