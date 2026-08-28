@@ -61,13 +61,19 @@ self.addEventListener('push', (event) => {
     payload = { body: event.data?.text() }
   }
   event.waitUntil(
-    self.registration.showNotification(payload.title ?? 'enForma', {
-      body: payload.body ?? '',
-      icon: '/pwa-192x192.png',
-      badge: '/pwa-192x192.png',
-      tag: payload.tag,
-      data: { url: payload.url ?? '/inbox' },
-    }),
+    Promise.all([
+      self.registration.showNotification(payload.title ?? 'enForma', {
+        body: payload.body ?? '',
+        icon: '/pwa-192x192.png',
+        badge: '/pwa-192x192.png',
+        tag: payload.tag,
+        data: { url: payload.url ?? '/inbox' },
+      }),
+      /* Open tabs hear about it too, so the inbox refreshes while you look. */
+      self.clients
+        .matchAll({ type: 'window' })
+        .then((clients) => clients.forEach((c) => c.postMessage({ type: 'gym-push' }))),
+    ]),
   )
 })
 

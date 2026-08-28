@@ -306,6 +306,19 @@ export function AppShell() {
     void notifyRetestDue(fitnessTest.takenAt, weeks)
   }, [status, fitnessTest])
 
+  /* A push that arrives while a tab is open also refreshes it: the worker
+     posts a message and the bus pulls, so the inbox updates as you look. */
+  useEffect(() => {
+    if (!('serviceWorker' in navigator)) return
+    const onMessage = (event: MessageEvent) => {
+      if ((event.data as { type?: string } | null)?.type !== 'gym-push') return
+      const meta = activeProfile()
+      if (meta) syncQuietly(meta.id)
+    }
+    navigator.serviceWorker.addEventListener('message', onMessage)
+    return () => navigator.serviceWorker.removeEventListener('message', onMessage)
+  }, [])
+
   /* One resume attempt per boot: a refreshed tab keeps its unlocked profile. */
   useEffect(() => {
     if (status !== 'boot') return
