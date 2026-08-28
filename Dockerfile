@@ -14,7 +14,7 @@ FROM nginx:1.29-alpine
 # Rendered by the image's envsubst entrypoint; the defaults match the local
 # replica and any Coolify deployment overrides them with plain env vars.
 ENV SYNC_PROXY_TARGET=http://coolify-proxy
-ENV SYNC_UPSTREAM_HOST=gynproxd-sync.localhost
+ENV SYNC_UPSTREAM_HOST=enforma-sync.localhost
 COPY deploy/nginx.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=build /app/dist /usr/share/nginx/html
 EXPOSE 80

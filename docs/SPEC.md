@@ -1,4 +1,4 @@
-# GynProXD — Spec v0.1
+# GynProXD — Spec v0.1 (the project is enForma since 2026-08-26; kept as the historical record)
 
 ## Objective
 

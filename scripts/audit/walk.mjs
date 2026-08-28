@@ -109,7 +109,7 @@ await browser.close()
 await writeFile(REPORT, JSON.stringify(findings, null, 2))
 console.log(`[walk] report written to ${REPORT}`)
 
-let md = `# Walk Report — GynProXD\n\n`
+let md = `# Walk Report — enForma\n\n`
 md += `- Base: ${BASE}\n`
 md += `- Date: ${findings.startedAt}\n`
 md += `- Viewports: ${VIEWPORTS.map((v) => `${v.name} (${v.width}x${v.height})`).join(', ')}\n`
