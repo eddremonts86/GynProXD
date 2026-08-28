@@ -190,9 +190,24 @@ function StrengthChart() {
       }
     >
       {series.length < 2 ? (
-        <p className="rounded-xl border border-dashed border-line px-4 py-10 text-center text-sm text-ink-3">
-          Log this movement in at least two sessions to see a trend.
-        </p>
+        /* One point is not a trend, but saying so while showing the number
+           beats an empty box that reads as "did my session save?". */
+        <div className="flex flex-col items-center gap-1.5 rounded-xl border border-dashed border-line px-4 py-8 text-center">
+          {series.length === 1 ? (
+            <>
+              <span className="num text-2xl leading-none font-semibold text-ink">
+                {Math.round(series[0].e1rm)}
+                <span className="ml-1 text-sm font-normal text-ink-3">kg</span>
+              </span>
+              <span className="num text-2xs text-ink-3">{formatShortDate(series[0].date)}</span>
+              <span className="text-sm text-ink-3">One session. One more draws the trend.</span>
+            </>
+          ) : (
+            <span className="text-sm text-ink-3">
+              Log this movement in at least two sessions to see a trend.
+            </span>
+          )}
+        </div>
       ) : (
         <Panel padding="md">
           <ChartContainer config={e1rmConfig} className="h-56 w-full">

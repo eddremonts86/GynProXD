@@ -92,16 +92,14 @@ export function estimatePlan(
 
   const estimatedMonths = Math.ceil(estimatedWeeks / 4.3)
 
-  let recommendedDuration: DurationKey = 'trimestral'
-  const entries = Object.entries(DURATION_WEEKS) as [DurationKey, number][]
-  let bestDiff = Infinity
-  for (const [k, weeks] of entries) {
-    const diff = Math.abs(weeks - estimatedWeeks)
-    if (diff < bestDiff) {
-      bestDiff = diff
-      recommendedDuration = k
-    }
-  }
+  /* The shortest option that actually fits the goal, not the nearest one:
+     recommending a duration below estimatedWeeks contradicts the estimate we
+     just showed. Past the longest option there is nothing left to suggest. */
+  const entries = (Object.entries(DURATION_WEEKS) as [DurationKey, number][]).sort(
+    (a, b) => a[1] - b[1],
+  )
+  const recommendedDuration: DurationKey =
+    entries.find(([, weeks]) => weeks >= estimatedWeeks)?.[0] ?? entries[entries.length - 1][0]
 
   const requestedWeeks = DURATION_WEEKS[requested] ?? 12
   const isUnrealistic = !openEnded && requestedWeeks < estimatedWeeks * 0.7

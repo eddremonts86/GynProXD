@@ -22,7 +22,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog'
-import { EQUIPMENT_LABELS, MUSCLE_LABELS } from '../lib/labels'
+import { EQUIPMENT_LABELS, MUSCLE_LABELS, MUSCLE_SHORT } from '../lib/labels'
 import { cn } from '@/lib/utils'
 import type { Equipment, Exercise, MuscleGroup } from '../lib/types'
 
@@ -324,10 +324,15 @@ function MovementCard({
   onOpen: () => void
 }) {
   const [hovered, setHovered] = useState(false)
-  const [failed, setFailed] = useState(false)
+  const [endFailed, setEndFailed] = useState(false)
+  /* Walk the same candidate cascade ExerciseThumb uses: the CDN photo first,
+     then the bundled illustration, then the typographic tile. Without this a
+     cold or blocked CDN leaves a permanently empty card. */
+  const [attempt, setAttempt] = useState(0)
   const frames = exercisePhotoFrames(exercise)
-  const base = exerciseImageCandidates(exercise)[0]
-  const src = hovered && frames && !failed ? frames.end : base
+  const candidates = exerciseImageCandidates(exercise)
+  const base = candidates[attempt]
+  const src = hovered && frames && !endFailed && attempt === 0 ? frames.end : base
   const isCustom = exercise.id.startsWith('custom-')
 
   return (
@@ -346,13 +351,16 @@ function MovementCard({
           alt={`${exercise.name}, ${exercise.muscle} with ${exercise.equipment}`}
           loading="lazy"
           decoding="async"
-          onError={() => (src === frames?.end ? setFailed(true) : undefined)}
+          onError={() => {
+            if (src === frames?.end) setEndFailed(true)
+            else setAttempt((i) => i + 1)
+          }}
           className="aspect-[4/3] w-full bg-surface-2 object-cover"
         />
       ) : (
         <span className="flex aspect-[4/3] w-full items-center justify-center bg-surface-2">
           <span className="num text-lg font-semibold tracking-widest text-ink-3">
-            {exercise.muscle.slice(0, 3).toUpperCase()}
+            {MUSCLE_SHORT[exercise.muscle]}
           </span>
         </span>
       )}

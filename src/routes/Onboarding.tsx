@@ -10,6 +10,7 @@ import { FormSelect } from '../ui/FormSelect'
 import { Textarea } from '@/components/ui/textarea'
 import { estimatePlan } from '../lib/plan-estimate'
 import { aiCoachEnabled, buildProgramme } from '../lib/ai-plan'
+import { showNotification } from '../lib/notify'
 import { mergeWithDefaults, parseOnboarding } from '../lib/onboarding-parse'
 import { useGym } from '../store/useGym'
 import {
@@ -98,9 +99,17 @@ export function OnboardingPage() {
     try {
       const plan = await buildProgramme(input, duration)
       addGeneratedPlan(plan)
-      /* Only pull the user to the result if they are still here waiting. */
+      /* Only pull the user to the result if they are still here waiting.
+         The coach can take minutes; someone who wandered off would otherwise
+         never learn their programme landed, so tell them where it is. */
       if (window.location.pathname === '/onboarding') {
         void navigate({ to: '/generated/$id', params: { id: plan.id } })
+      } else {
+        void showNotification(
+          'Your programme is ready',
+          `${plan.weeklyTemplate.name} is waiting under Planner.`,
+          'training',
+        )
       }
     } finally {
       setDesigning(false)

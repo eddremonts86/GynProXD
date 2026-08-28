@@ -130,6 +130,10 @@ export function PlannerPage() {
     () => selectedPlan?.days.find((d) => d.day === selectedDay)?.exercises ?? [],
     [selectedPlan, selectedDay],
   )
+  const dayEcNote = useMemo(
+    () => selectedPlan?.days.find((d) => d.day === selectedDay)?.ecNote,
+    [selectedPlan, selectedDay],
+  )
 
   if (plans.length === 0 && generatedPlans.length === 0) {
     return (
@@ -346,6 +350,14 @@ export function PlannerPage() {
                     {selectedDate === todayIso() && <Tag tone="brand">Today</Tag>}
                   </span>
                   <p className="text-sm text-ink-3">{pluralize(dayExercises.length, 'movement')}</p>
+                  {dayEcNote && (
+                    <p className="flex items-start gap-1.5 text-2xs text-ink-3">
+                      <Plus size={12} weight="bold" className="mt-0.5 shrink-0 text-brand" />
+                      <span>
+                        <span className="font-semibold">Extra credit</span> — {dayEcNote}
+                      </span>
+                    </p>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   <Button variant="secondary" onClick={() => setPickerOpen(true)}>

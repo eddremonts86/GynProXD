@@ -6,6 +6,7 @@ import {
   DownloadSimple,
   PaperPlaneTilt,
   Plus,
+  Printer,
   Trash,
   UsersThree,
 } from '@phosphor-icons/react'
@@ -246,7 +247,7 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
       banner: bannerOn ? { minutes: Number(bannerMinutes) } : undefined,
     })
     const reach = everyone ? pluralize(members.length, 'member') : pluralize(picked.length, 'member')
-    setPublished(`Published to ${reach}.`)
+    setPublished(`Published to ${reach}. It is now under Sent.`)
     setError(null)
     setTitle('')
     setBody('')
@@ -690,6 +691,14 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
                       }
                       headerExtras={
                         <>
+                        {(m.kind === 'challenge' || m.kind === 'collection') && (
+                          <IconButton
+                            aria-label={`Print ${m.title} for the wall`}
+                            onClick={() => window.print()}
+                          >
+                            <Printer size={15} />
+                          </IconButton>
+                        )}
                         {m.kind === 'challenge' && m.challenge && (
                           <IconButton
                             aria-label={`Download ${m.title} as a wall poster`}

@@ -28,6 +28,9 @@ const GymPanelPage = React.lazy(() =>
 )
 const AdminPage = React.lazy(() => import('./routes/Admin').then((m) => ({ default: m.AdminPage })))
 const MenuPage = React.lazy(() => import('./routes/Menu').then((m) => ({ default: m.MenuPage })))
+const NotFoundPage = React.lazy(() =>
+  import('./routes/NotFound').then((m) => ({ default: m.NotFoundPage })),
+)
 const ChallengesPage = React.lazy(() =>
   import('./routes/Challenges').then((m) => ({ default: m.ChallengesPage })),
 )
@@ -35,7 +38,14 @@ const FitnessTestPage = React.lazy(() =>
   import('./routes/FitnessTest').then((m) => ({ default: m.FitnessTestPage })),
 )
 
-const rootRoute = createRootRoute({ component: AppShell })
+const rootRoute = createRootRoute({
+  component: AppShell,
+  notFoundComponent: () => (
+    <React.Suspense fallback={<RouteFallback />}>
+      <NotFoundPage />
+    </React.Suspense>
+  ),
+})
 
 /** `const P` keeps the literal path so `navigate({ to })` stays type-checked. */
 function lazyRoute<const P extends string>(path: P, Component: React.ComponentType) {

@@ -341,3 +341,58 @@
     scroll-behavior: auto !important;
   }
 }
+
+/**
+ * Print. A gym prints two things: a challenge calendar and a day's movements,
+ * to go on a wall. Everything that only makes sense on a screen — navigation,
+ * buttons, banners — is dropped, and the sheet goes to ink on white so it does
+ * not burn a cartridge on the dark theme.
+ */
+@media print {
+  :root {
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #ffffff;
+    --ink: #000000;
+    --ink-2: #1a1a1a;
+    --ink-3: #444444;
+    --line: #bbbbbb;
+    --line-strong: #888888;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* Screen-only chrome. */
+  nav,
+  aside,
+  [data-print="hide"],
+  button:not([data-print="keep"]) {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: none !important;
+  }
+
+  /* Panels become plain framed blocks; shadows and fills waste toner. */
+  [class*="shadow-"] {
+    box-shadow: none !important;
+  }
+
+  a[href]::after {
+    content: "";
+  }
+
+  /* Never split a movement row or a calendar across two sheets. */
+  li,
+  figure,
+  table {
+    break-inside: avoid;
+  }
+}

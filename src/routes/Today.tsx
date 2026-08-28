@@ -14,9 +14,8 @@ import {
   X,
 } from '@phosphor-icons/react'
 import { useGym } from '../store/useGym'
-import { exerciseById, lastPerformance } from '../lib/exercises'
+import { bestE1rm, exerciseById, isBodyweight, lastPerformance } from '../lib/exercises'
 import { isPersonalRecord, suggestNext } from '../lib/progression'
-import { bestE1rm } from '../lib/exercises'
 import { Button, IconButton } from '../ui/Button'
 import { Panel } from '../ui/Panel'
 import { Tag } from '../ui/Tag'
@@ -1098,7 +1097,9 @@ function ActiveSession({
           {!canLog && (
             <p className="text-center text-2xs text-ink-3">
               {weight === ''
-                ? 'Set a weight first. Use 0 for bodyweight movements.'
+                ? currentExercise && isBodyweight(currentExercise)
+                  ? 'Enter 0 — this one is bodyweight.'
+                  : 'Set a weight first.'
                 : isTimed
                   ? 'Set how many seconds you held it.'
                   : 'Set how many reps you did.'}

@@ -433,6 +433,22 @@ function ProfileIdentityPanel() {
           </span>
         )}
       </div>
+
+      {/* Two things people only discover once it is too late: that no gym
+          means no announcements, and that the only copy of this profile is
+          the one on this device. */}
+      <div className="flex flex-col gap-1.5 border-t border-line pt-4">
+        {!gym.trim() && (
+          <p className="text-2xs text-ink-3">
+            You are not linked to a gym, so no announcements, menus or challenges reach you. Pick
+            one above to start receiving them.
+          </p>
+        )}
+        <p className="text-2xs text-ink-3">
+          This profile lives only on this device and a forgotten passphrase cannot be recovered.
+          Keep a copy under <span className="font-semibold text-ink-2">Data → Export a backup</span>.
+        </p>
+      </div>
     </Panel>
   )
 }

@@ -185,7 +185,7 @@ function DesktopRail({ pathname }: { pathname: string }) {
 function MobileChrome({ pathname }: { pathname: string }) {
   return (
     <>
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-between bg-bg/85 px-4 backdrop-blur-md lg:hidden">
+      <header data-print="hide" className="sticky top-0 z-30 flex h-14 items-center justify-between bg-bg/85 px-4 backdrop-blur-md lg:hidden">
         <Link to="/" aria-label="enForma, go to today" className="flex items-center gap-2">
           <Mark className="size-7" />
           <span className="text-base leading-none font-semibold tracking-tight text-ink">enForma</span>
@@ -335,7 +335,7 @@ export function AppShell() {
       </a>
       <DesktopRail pathname={pathname} />
       <MobileChrome pathname={pathname} />
-      <main id="main" className="lg:pl-60">
+      <main id="main" className="lg:pl-60 print:pl-0">
         <div className="mx-auto w-full max-w-[76rem] px-4 py-6 pb-32 md:px-8 md:py-10 lg:pb-12">
           {/* Pulled up out of the content padding so it sits level with the
               rail's wordmark, reading as the top bar's right side. */}

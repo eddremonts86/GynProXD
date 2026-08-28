@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { estimatePlan } from './plan-estimate'
+import { DURATION_WEEKS, estimatePlan } from './plan-estimate'
 import type { OnboardingInput } from './types'
 
 const base: OnboardingInput = {
@@ -15,6 +15,38 @@ const base: OnboardingInput = {
   equipment: 'hibrido',
   effort: 3,
 }
+
+describe('recommendedDuration', () => {
+  /* B-01: it used to pick the nearest option, which could sit below the
+     estimate — telling you the goal needs 7 months and then suggesting 6. */
+  it('never recommends a duration shorter than the estimate', () => {
+    for (const targetWeightKg of [80, 90, 100, 110, 120, 130]) {
+      const r = estimatePlan({ ...base, targetWeightKg }, 'mensual')
+      const recommended = DURATION_WEEKS[r.recommendedDuration]
+      const longest = Math.max(...Object.values(DURATION_WEEKS))
+      if (r.estimatedWeeks <= longest) {
+        expect(recommended).toBeGreaterThanOrEqual(r.estimatedWeeks)
+      } else {
+        expect(recommended).toBe(longest)
+      }
+    }
+  })
+
+  it('picks the shortest option that still fits', () => {
+    /* 140 -> 130 at 0.7 kg/week is about 15 weeks: too long for trimestral
+       (12), so semestral (24) is right and anual would be overkill. */
+    const r = estimatePlan({ ...base, targetWeightKg: 130 }, 'mensual')
+    expect(r.estimatedWeeks).toBeGreaterThan(12)
+    expect(r.estimatedWeeks).toBeLessThanOrEqual(24)
+    expect(r.recommendedDuration).toBe('semestral')
+  })
+
+  it('falls back to the longest option when nothing fits', () => {
+    const r = estimatePlan(base, 'mensual')
+    expect(r.estimatedWeeks).toBeGreaterThan(DURATION_WEEKS.anual)
+    expect(r.recommendedDuration).toBe('anual')
+  })
+})
 
 describe('estimatePlan', () => {
   it('estimates realistic months for 60kg loss', () => {
