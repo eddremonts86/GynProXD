@@ -14,13 +14,17 @@ import {
 import { recordKey, type Collection, type RecordMeta } from './records'
 import { listEnvelopes, writeRemoteEnvelope, type EnvelopeRow } from './record-store'
 import {
+  activeProfile,
   activeProfileKey,
   adoptRemoteIdentity,
   createLinkedProfile,
   flushActiveProfile,
   profileCrypto,
   reloadActiveFromDisk,
+  updateProfileMeta,
 } from './profiles'
+import { useMessages, type PublishInput } from '../store/useMessages'
+import type { GymMessage, TemplateKind } from './messages'
 
 /**
  * Cross-device sync against a PocketBase instance (deploy/pocketbase).
@@ -244,7 +248,10 @@ interface SyncStatePayload {
   salt: string
   iterations: number
   check: CipherBlob
+  /** The data key wrapped under the recovery code. */
   wrapped_key: CipherBlob
+  /** The same data key wrapped under the password-derived KEK. */
+  wrapped_dk: CipherBlob | null
   recovery_salt: string
 }
 
@@ -323,6 +330,8 @@ export async function syncNow(profileId: string): Promise<SyncResult> {
 
     writeSyncLink(profileId, { ...link, cursor, lastSyncAt: new Date().toISOString() })
     if (pulled > 0) await reloadActiveFromDisk()
+    /* The gym bus rides along, best-effort: training sync never fails on it. */
+    await syncGymBus(profileId, link).catch(() => {})
     return { ok: true, pulled, pushed }
   } catch (error) {
     if (error instanceof SyncError) {
@@ -400,9 +409,15 @@ export async function createSyncAccount(
   })
   const auth = await authenticate(server, input.email, input.password)
 
-  const encSalt = randomBytes(16)
-  const key = await deriveKey(input.password, encSalt, KDF_ITERATIONS)
+  /* The data key is random and permanent. The password only ever wraps it,
+     so a reset or a future password change re-wraps one blob and leaves
+     every encrypted row alone. */
+  const key = await importKeyBase64(toBase64(randomBytes(32)))
   const check = await encryptJson(key, 'forma')
+
+  const encSalt = randomBytes(16)
+  const kek = await deriveKey(input.password, encSalt, KDF_ITERATIONS)
+  const wrappedDk = await encryptJson(kek, await exportKeyBase64(key))
 
   const recoveryCode = generateRecoveryCode()
   const recoverySalt = randomBytes(16)
@@ -418,15 +433,16 @@ export async function createSyncAccount(
       iterations: KDF_ITERATIONS,
       check,
       wrapped_key: wrapped,
+      wrapped_dk: wrappedDk,
       recovery_salt: toBase64(recoverySalt),
     },
   })
 
-  /* Local rows re-encrypt onto the password-derived key; the old passphrase
-     stops being a thing anyone has to remember. */
+  /* Local rows re-encrypt onto the data key; the old passphrase stops being
+     a thing anyone has to remember. */
   await adoptRemoteIdentity(
     profileId,
-    { salt: toBase64(encSalt), iterations: KDF_ITERATIONS, check },
+    { salt: toBase64(encSalt), iterations: KDF_ITERATIONS, check, wrap: wrappedDk },
     key,
   )
 
@@ -487,7 +503,19 @@ async function openAccount(input: LinkAccountInput): Promise<{
       throw new Error('That recovery code does not open this account.')
     }
   } else {
-    key = await deriveKey(input.password, fromBase64(state.salt), state.iterations)
+    if (!state.wrapped_dk) {
+      throw new Error(
+        'This account predates the current sync format. Turn sync on again from the device that has your history.',
+      )
+    }
+    const kek = await deriveKey(input.password, fromBase64(state.salt), state.iterations)
+    try {
+      key = await importKeyBase64(await decryptJson<string>(kek, state.wrapped_dk))
+    } catch {
+      throw new Error(
+        'That password signs in but cannot decrypt this account — was it changed outside enForma?',
+      )
+    }
   }
   try {
     await decryptJson<string>(key, state.check)
@@ -511,7 +539,12 @@ export async function linkSyncAccount(profileId: string, input: LinkAccountInput
   const { probe, state, key } = await openAccount(input)
   await adoptRemoteIdentity(
     profileId,
-    { salt: state.salt, iterations: state.iterations, check: state.check },
+    {
+      salt: state.salt,
+      iterations: state.iterations,
+      check: state.check,
+      wrap: state.wrapped_dk ?? undefined,
+    },
     key,
   )
   writeSyncLink(profileId, probe)
@@ -541,7 +574,12 @@ export async function signInFromGate(input: GateSignInInput): Promise<void> {
   })
   const profileId = await createLinkedProfile(
     input.name,
-    { salt: state.salt, iterations: state.iterations, check: state.check },
+    {
+      salt: state.salt,
+      iterations: state.iterations,
+      check: state.check,
+      wrap: state.wrapped_dk ?? undefined,
+    },
     key,
   )
   writeSyncLink(profileId, probe)
@@ -555,4 +593,229 @@ export async function reauthSync(profileId: string, password: string): Promise<v
   if (!link) throw new Error('Sync is not set up here.')
   const auth = await authenticate(link.server, link.email, password)
   writeSyncLink(profileId, { ...link, token: auth.token, userId: auth.record.id })
+}
+
+/* ------------------------------------------------------- password reset */
+
+/** Asks the server to email a reset token. Never says whether the email exists. */
+export async function requestPasswordReset(email: string, server = ''): Promise<void> {
+  await request(normalizeServer(server), '/api/collections/users/request-password-reset', {
+    method: 'POST',
+    body: { email: email.trim() },
+  })
+}
+
+export interface ResetPasswordInput {
+  name: string
+  email: string
+  /** From the reset email. */
+  token: string
+  newPassword: string
+  /** The signup recovery code — the only thing that can save the data. */
+  recoveryCode: string
+  server?: string
+}
+
+/**
+ * Resets the password without losing a row. The server accepts the new
+ * login credential; the recovery code unwraps the permanent data key; the
+ * key is re-wrapped under the new password and the account's salt rotates.
+ * Ends signed in on this device with the history pulled.
+ */
+export async function resetPasswordFromGate(input: ResetPasswordInput): Promise<void> {
+  const server = normalizeServer(input.server ?? '')
+  const email = input.email.trim()
+  const authPass = await authPassOf(email, input.newPassword)
+  await request(server, '/api/collections/users/confirm-password-reset', {
+    method: 'POST',
+    body: { token: input.token.trim(), password: authPass, passwordConfirm: authPass },
+  })
+
+  const { probe, state, key } = await openAccount({
+    server,
+    email,
+    password: input.newPassword,
+    recoveryCode: input.recoveryCode,
+  })
+
+  const newSalt = randomBytes(16)
+  const kek = await deriveKey(input.newPassword, newSalt, KDF_ITERATIONS)
+  const wrappedDk = await encryptJson(kek, await exportKeyBase64(key))
+  await request(server, `/api/collections/sync_state/records/${state.id}`, {
+    method: 'PATCH',
+    token: probe.token,
+    body: { salt: toBase64(newSalt), iterations: KDF_ITERATIONS, wrapped_dk: wrappedDk },
+  })
+
+  const profileId = await createLinkedProfile(
+    input.name,
+    { salt: toBase64(newSalt), iterations: KDF_ITERATIONS, check: state.check, wrap: wrappedDk },
+    key,
+  )
+  writeSyncLink(profileId, probe)
+  const result = await syncNow(profileId)
+  if (!result.ok) throw new Error(result.message)
+}
+
+/* ----------------------------------------------------- phase 5: gym bus */
+
+interface GymRow {
+  id: string
+  name: string
+  operators: string[]
+}
+
+interface WireMessage {
+  id: string
+  gym: string
+  author: string
+  kind: string
+  title: string
+  body: string
+  payload: Partial<GymMessage> | null
+  created: string
+  updated: string
+}
+
+const sameName = (a: string | undefined, b: string | undefined): boolean =>
+  !!a && !!b && a.trim().toLowerCase() === b.trim().toLowerCase()
+
+async function fetchGyms(link: SyncLink): Promise<GymRow[]> {
+  const list = await request<ListPayload<GymRow>>(
+    link.server,
+    '/api/collections/gyms/records?perPage=200',
+    { token: link.token },
+  )
+  return list.items
+}
+
+function messageFromWire(wire: WireMessage, gymName: string): GymMessage {
+  /* The wire stores absent optionals as null; the local shape wants them gone. */
+  const payload = Object.fromEntries(
+    Object.entries(wire.payload ?? {}).filter(([, value]) => value !== null),
+  ) as Partial<GymMessage>
+  return {
+    audience: 'all',
+    ...payload,
+    id: `srv-${wire.id}`,
+    gym: gymName,
+    authorId: `srv-${wire.author}`,
+    createdAt: new Date(wire.created.replace(' ', 'T')).toISOString(),
+    kind: wire.kind as TemplateKind,
+    title: wire.title,
+    ...(wire.body ? { body: wire.body } : {}),
+    readBy: [],
+    rsvp: {},
+    saved: [],
+  }
+}
+
+const BUS_CURSOR_PREFIX = 'forma-sync-bus-'
+
+/**
+ * The server side of the gym bus, ridden after every training sync:
+ * a) an account that operates a gym carries the operator role onto this
+ *    device, b) a member's chosen gym is registered on their account so the
+ *    server can address them, c) new messages merge into the device bus,
+ *    where the existing inbox, banner and notification paths pick them up.
+ */
+async function syncGymBus(profileId: string, link: SyncLink): Promise<void> {
+  const gyms = await fetchGyms(link)
+  const meta = activeProfile()
+  const mine = meta && meta.id === profileId ? meta : null
+
+  const operated = gyms.find((g) => g.operators?.includes(link.userId))
+  if (operated && mine && (mine.role !== 'gym' || !sameName(mine.gym, operated.name))) {
+    updateProfileMeta(profileId, { role: 'gym', gym: operated.name })
+  }
+
+  const memberGym = operated ?? gyms.find((g) => sameName(g.name, mine?.gym))
+  if (!operated && memberGym) {
+    /* Idempotent: tells the server which gym may address this account. */
+    await request(link.server, `/api/collections/users/records/${link.userId}`, {
+      method: 'PATCH',
+      token: link.token,
+      body: { gym: memberGym.id },
+    }).catch(() => {})
+  }
+  if (!memberGym) return
+
+  const cursorKey = BUS_CURSOR_PREFIX + profileId
+  let cursor = ''
+  try {
+    cursor = localStorage.getItem(cursorKey) ?? ''
+  } catch {
+    /* Private mode: a full re-pull is just slower, not wrong. */
+  }
+  const nameOf = (id: string) => gyms.find((g) => g.id === id)?.name ?? memberGym.name
+
+  let newCursor = cursor
+  const incoming: GymMessage[] = []
+  for (let page = 1; ; page++) {
+    const filter = cursor ? `&filter=${encodeURIComponent(`updated > "${cursor}"`)}` : ''
+    const list = await request<ListPayload<WireMessage>>(
+      link.server,
+      `/api/collections/gym_messages/records?perPage=200&sort=updated&page=${page}${filter}`,
+      { token: link.token },
+    )
+    for (const wire of list.items) {
+      incoming.push(messageFromWire(wire, nameOf(wire.gym)))
+      if (wire.updated > newCursor) newCursor = wire.updated
+    }
+    if (list.page >= list.totalPages || list.items.length === 0) break
+  }
+
+  if (incoming.length > 0) useMessages.getState().merge(incoming)
+  if (newCursor !== cursor) {
+    try {
+      localStorage.setItem(cursorKey, newCursor)
+    } catch {
+      /* Same trade as above. */
+    }
+  }
+}
+
+/**
+ * Publishes to every device of the gym's members. Returns the bus id to use
+ * for the local copy, or null when this profile cannot reach the server bus
+ * (not linked, offline, or not an operator of that gym) — the caller then
+ * publishes device-only, which is the honest fallback.
+ */
+export async function publishToServer(
+  profileId: string,
+  input: PublishInput,
+): Promise<string | null> {
+  const link = readSyncLink(profileId)
+  if (!link?.token) return null
+  try {
+    const gyms = await fetchGyms(link)
+    const gym = gyms.find(
+      (g) => g.operators?.includes(link.userId) && sameName(g.name, input.gym),
+    )
+    if (!gym) return null
+    const row = await request<{ id: string }>(link.server, '/api/collections/gym_messages/records', {
+      method: 'POST',
+      token: link.token,
+      body: {
+        gym: gym.id,
+        author: link.userId,
+        kind: input.kind,
+        title: input.title,
+        body: input.body ?? '',
+        payload: {
+          audience: input.audience,
+          event: input.event ?? null,
+          menu: input.menu ?? null,
+          offer: input.offer ?? null,
+          challenge: input.challenge ?? null,
+          collection: input.collection ?? null,
+          banner: input.banner ?? null,
+          link: input.link ?? null,
+        },
+      },
+    })
+    return `srv-${row.id}`
+  } catch {
+    return null
+  }
 }

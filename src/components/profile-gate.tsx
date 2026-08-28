@@ -15,7 +15,7 @@ import {
   unlockProfile,
   type ProfileRole,
 } from '@/lib/profiles'
-import { signInFromGate } from '@/lib/sync'
+import { requestPasswordReset, resetPasswordFromGate, signInFromGate } from '@/lib/sync'
 import { formatShortDate } from '@/lib/labels'
 import { cn } from '@/lib/utils'
 
@@ -26,7 +26,17 @@ import { cn } from '@/lib/utils'
  * that points at the wrong field teaches people to distrust it.
  */
 
-type ErrorField = 'unlock' | 'name' | 'gym' | 'pass' | 'confirm' | 'email' | 'apass' | 'signin'
+type ErrorField =
+  | 'unlock'
+  | 'name'
+  | 'gym'
+  | 'pass'
+  | 'confirm'
+  | 'email'
+  | 'apass'
+  | 'signin'
+  | 'token'
+  | 'recovery'
 interface GateError {
   field: ErrorField
   text: string
@@ -49,11 +59,14 @@ function RevealToggle({ shown, onToggle }: { shown: boolean; onToggle: () => voi
 
 export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
   const [profiles] = useState(listProfiles)
-  const [mode, setMode] = useState<'unlock' | 'create' | 'signin'>(
+  const [mode, setMode] = useState<'unlock' | 'create' | 'signin' | 'reset'>(
     profiles.length > 0 ? 'unlock' : 'create',
   )
   const [email, setEmail] = useState('')
   const [accountPassword, setAccountPassword] = useState('')
+  const [resetStep, setResetStep] = useState<'request' | 'confirm'>('request')
+  const [resetToken, setResetToken] = useState('')
+  const [recovery, setRecovery] = useState('')
   const [selectedId, setSelectedId] = useState<string>(
     () => lastActiveProfileId() ?? profiles[0]?.id ?? '',
   )
@@ -116,6 +129,64 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
       onUnlocked()
     } catch (err) {
       failWith('signin', err instanceof Error ? err.message : 'Signing in failed.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const requestReset = async () => {
+    if (busy) return
+    if (email.trim().length === 0) {
+      failWith('email', 'The account email is where the reset code goes.', 'f-email')
+      return
+    }
+    setBusy(true)
+    setError(null)
+    try {
+      await requestPasswordReset(email)
+      setResetStep('confirm')
+    } catch (err) {
+      failWith('email', err instanceof Error ? err.message : 'Requesting the reset failed.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const confirmReset = async () => {
+    if (busy) return
+    if (name.trim().length === 0) {
+      failWith('name', 'Give this device a profile name.', 'f-name')
+      return
+    }
+    if (resetToken.trim().length === 0) {
+      failWith('token', 'Paste the reset code from the email.', 'f-reset-code')
+      return
+    }
+    if (accountPassword.length < 8) {
+      failWith('apass', 'The new password needs at least 8 characters.', 'f-new-password')
+      return
+    }
+    if (accountPassword !== confirm) {
+      failWith('confirm', 'The passwords do not match.', 'f-repeat-new-password')
+      return
+    }
+    if (recovery.trim().length === 0) {
+      failWith('recovery', 'Without the recovery code a reset cannot recover your training.', 'f-recovery-code')
+      return
+    }
+    setBusy(true)
+    setError(null)
+    try {
+      await resetPasswordFromGate({
+        name,
+        email: email.trim(),
+        token: resetToken,
+        newPassword: accountPassword,
+        recoveryCode: recovery,
+      })
+      onUnlocked()
+    } catch (err) {
+      failWith('recovery', err instanceof Error ? err.message : 'The reset failed.')
     } finally {
       setBusy(false)
     }
@@ -309,19 +380,156 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
               )}
             </Button>
 
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setMode(profiles.length > 0 ? 'unlock' : 'create')
+                  setError(null)
+                  setShowPass(false)
+                  setPassphrase('')
+                  setAccountPassword('')
+                }}
+              >
+                Back
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setMode('reset')
+                  setResetStep('request')
+                  setError(null)
+                  setShowPass(false)
+                  setAccountPassword('')
+                }}
+              >
+                Forgot your password?
+              </Button>
+            </div>
+          </form>
+        ) : mode === 'reset' ? (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              void (resetStep === 'request' ? requestReset() : confirmReset())
+            }}
+            className="flex flex-col gap-4"
+          >
+            <div className="flex flex-col gap-1">
+              <h1 className="text-xl text-ink">Reset your password</h1>
+              <p className="text-2xs text-ink-3">
+                {resetStep === 'request'
+                  ? 'A reset code goes to your account email. You will also need your recovery code — it is the only thing that can re-open the training data.'
+                  : `Code sent to ${email.trim()}. Check the inbox, then set the new password.`}
+              </p>
+            </div>
+
+            {resetStep === 'request' ? (
+              <>
+                <Input
+                  label="Email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value)
+                    setError(null)
+                  }}
+                  error={errorFor('email')}
+                  autoFocus
+                />
+                <Button type="submit" size="lg" disabled={busy} className="w-full">
+                  {busy ? (
+                    <CircleNotch size={18} weight="bold" className="animate-spin" />
+                  ) : (
+                    'Email me a reset code'
+                  )}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Input
+                  label="Name"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value)
+                    setError(null)
+                  }}
+                  error={errorFor('name')}
+                  hint="How this profile appears on this device's lock screen."
+                  autoFocus
+                />
+                <Input
+                  label="Reset code"
+                  value={resetToken}
+                  onChange={(e) => {
+                    setResetToken(e.target.value)
+                    setError(null)
+                  }}
+                  error={errorFor('token')}
+                  hint="From the email that just arrived."
+                />
+                <Input
+                  label="New password"
+                  type={showPass ? 'text' : 'password'}
+                  value={accountPassword}
+                  onChange={(e) => {
+                    setAccountPassword(e.target.value)
+                    setError(null)
+                  }}
+                  error={errorFor('apass')}
+                  hint="At least 8 characters."
+                  trailing={
+                    <RevealToggle shown={showPass} onToggle={() => setShowPass((v) => !v)} />
+                  }
+                />
+                <Input
+                  label="Repeat new password"
+                  type={showPass ? 'text' : 'password'}
+                  value={confirm}
+                  onChange={(e) => {
+                    setConfirm(e.target.value)
+                    setError(null)
+                  }}
+                  error={errorFor('confirm')}
+                />
+                <Input
+                  label="Recovery code"
+                  value={recovery}
+                  onChange={(e) => {
+                    setRecovery(e.target.value)
+                    setError(null)
+                  }}
+                  error={errorFor('recovery')}
+                  hint="The 25-character code shown when sync was turned on."
+                />
+                <Button type="submit" size="lg" disabled={busy} className="w-full">
+                  {busy ? (
+                    <CircleNotch size={18} weight="bold" className="animate-spin" />
+                  ) : (
+                    'Reset and sign in'
+                  )}
+                </Button>
+              </>
+            )}
+
             <Button
               variant="ghost"
               size="sm"
               className="self-center"
               onClick={() => {
-                setMode(profiles.length > 0 ? 'unlock' : 'create')
+                setMode('signin')
+                setResetStep('request')
                 setError(null)
                 setShowPass(false)
-                setPassphrase('')
+                setResetToken('')
+                setRecovery('')
                 setAccountPassword('')
+                setConfirm('')
               }}
             >
-              Back
+              Back to sign in
             </Button>
           </form>
         ) : (

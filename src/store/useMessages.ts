@@ -45,7 +45,10 @@ export interface PublishInput {
 
 interface MessagesState {
   messages: GymMessage[]
-  publish: (input: PublishInput) => GymMessage
+  /** `id` comes from the server bus when a publish also went out to it. */
+  publish: (input: PublishInput & { id?: string }) => GymMessage
+  /** Upserts rows pulled from the server bus, keeping local read/RSVP state. */
+  merge: (incoming: GymMessage[]) => number
   remove: (id: string) => void
   removeByGym: (gym: string) => void
   renameGym: (from: string, to: string) => void
@@ -63,7 +66,7 @@ export const useMessages = create<MessagesState>()((set, get) => ({
   publish: (input) => {
     const message: GymMessage = {
       ...input,
-      id: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      id: input.id ?? `msg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       createdAt: new Date().toISOString(),
       readBy: [],
       rsvp: {},
@@ -73,6 +76,35 @@ export const useMessages = create<MessagesState>()((set, get) => ({
     persist(messages)
     set({ messages })
     return message
+  },
+
+  merge: (incoming) => {
+    if (incoming.length === 0) return 0
+    const current = get().messages
+    const byId = new Map(current.map((m) => [m.id, m]))
+    let added = 0
+    for (const message of incoming) {
+      const existing = byId.get(message.id)
+      if (existing) {
+        /* Content may have been edited upstream; what this device knows about
+           its own people (reads, answers, saves) is not the server's to reset. */
+        byId.set(message.id, {
+          ...message,
+          readBy: existing.readBy,
+          rsvp: existing.rsvp,
+          saved: existing.saved,
+          joined: existing.joined,
+          bannerDismissedBy: existing.bannerDismissedBy,
+        })
+      } else {
+        byId.set(message.id, message)
+        added += 1
+      }
+    }
+    const messages = [...byId.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    persist(messages)
+    set({ messages })
+    return added
   },
 
   remove: (id) => {

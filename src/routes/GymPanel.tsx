@@ -21,6 +21,7 @@ import {
   type TemplateKind,
 } from '../lib/messages'
 import { listProfiles } from '../lib/profiles'
+import { publishToServer } from '../lib/sync'
 import { formatShortDate, pluralize } from '../lib/labels'
 import { todayIso } from '../lib/dates'
 import { generatedExercises } from '../data/exercises-generated'
@@ -228,13 +229,13 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
       setError('Pick at least one member, or send to everyone.')
       return
     }
-    publish({
+    const input = {
       gym,
       authorId: profileId,
       kind,
       title: draft.title,
       body: draft.body,
-      audience: everyone ? 'all' : picked,
+      audience: (everyone ? 'all' : picked) as 'all' | string[],
       event: draft.event,
       menu: draft.menu,
       offer: draft.offer,
@@ -245,13 +246,20 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
         ? { ...draft.collection, id: `coll-${gym.trim().toLowerCase()}-${Date.now()}` }
         : undefined,
       banner: bannerOn ? { minutes: Number(bannerMinutes) } : undefined,
+    }
+    /* Server bus first when this operator account can reach it: the same id
+       on both sides keeps the later pull from duplicating the sent copy. */
+    void publishToServer(profileId, input).then((serverId) => {
+      publish(serverId ? { ...input, id: serverId } : input)
+      const reachCount = everyone ? members.length : picked.length
+      setPublished(
+        serverId
+          ? `Published to ${gym} on every device. It is now under Sent.`
+          : reachCount === 0
+            ? 'Published. No members on this device yet — it sits under Sent and delivers as they join.'
+            : `Published to ${pluralize(reachCount, 'member')} on this device. It is now under Sent.`,
+      )
     })
-    const reachCount = everyone ? members.length : picked.length
-    setPublished(
-      reachCount === 0
-        ? 'Published. No members on this device yet — it sits under Sent and delivers as they join.'
-        : `Published to ${pluralize(reachCount, 'member')}. It is now under Sent.`,
-    )
     setError(null)
     setTitle('')
     setBody('')

@@ -42,6 +42,12 @@ export interface ProfileMeta {
   kdf: { salt: string; iterations: number }
   /** A small encrypted sentinel, used to verify a passphrase on unlock. */
   check: CipherBlob
+  /**
+   * Synced profiles only: the account's random data key, wrapped by the
+   * password-derived KEK. Unlock unwraps instead of deriving directly, so a
+   * password rotation re-wraps one blob and never re-encrypts a row.
+   */
+  wrap?: CipherBlob
 }
 
 interface Registry {
@@ -352,7 +358,16 @@ export async function createProfile(
 export async function unlockProfile(id: string, passphrase: string): Promise<boolean> {
   const meta = readRegistry().profiles.find((p) => p.id === id)
   if (!meta) return false
-  const key = await deriveKey(passphrase, fromBase64(meta.kdf.salt), meta.kdf.iterations)
+  const derived = await deriveKey(passphrase, fromBase64(meta.kdf.salt), meta.kdf.iterations)
+  let key = derived
+  if (meta.wrap) {
+    /* Synced profile: the secret derives a KEK that unwraps the data key. */
+    try {
+      key = await importKeyBase64(await decryptJson<string>(derived, meta.wrap))
+    } catch {
+      return false
+    }
+  }
   try {
     await decryptJson<string>(key, meta.check)
   } catch {
@@ -435,7 +450,7 @@ export function profileCrypto(
  */
 export async function adoptRemoteIdentity(
   id: string,
-  remote: { salt: string; iterations: number; check: CipherBlob },
+  remote: { salt: string; iterations: number; check: CipherBlob; wrap?: CipherBlob },
   key: CryptoKey,
 ): Promise<void> {
   if (id !== activeId || !activeKey) throw new Error('profile must be unlocked')
@@ -447,6 +462,8 @@ export async function adoptRemoteIdentity(
   if (!meta) throw new Error('profile missing from registry')
   meta.kdf = { salt: remote.salt, iterations: remote.iterations }
   meta.check = remote.check
+  if (remote.wrap) meta.wrap = remote.wrap
+  else delete meta.wrap
   writeRegistry(registry)
 
   activeKey = key
@@ -469,7 +486,7 @@ export async function adoptRemoteIdentity(
  */
 export async function createLinkedProfile(
   name: string,
-  remote: { salt: string; iterations: number; check: CipherBlob },
+  remote: { salt: string; iterations: number; check: CipherBlob; wrap?: CipherBlob },
   key: CryptoKey,
 ): Promise<string> {
   const meta: ProfileMeta = {
@@ -478,6 +495,7 @@ export async function createLinkedProfile(
     createdAt: new Date().toISOString(),
     kdf: { salt: remote.salt, iterations: remote.iterations },
     check: remote.check,
+    ...(remote.wrap ? { wrap: remote.wrap } : {}),
   }
   const cache = await writeAllRecords(meta.id, key, EMPTY_SNAPSHOT)
 
