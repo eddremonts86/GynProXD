@@ -33,14 +33,15 @@ registerRoute(
   }),
 )
 
-// Movements without local artwork fall back to dataset photos, which stay
-// available offline once they have been looked at.
+// Movement photos, now served first-party through the /exercise-img proxy,
+// stay available offline once they have been looked at. (The old direct
+// jsdelivr origin is kept too, for any cache warmed before the proxy landed.)
 registerRoute(
-  ({ url }) => url.origin === 'https://cdn.jsdelivr.net',
+  ({ url }) => url.pathname.startsWith('/exercise-img/') || url.origin === 'https://cdn.jsdelivr.net',
   new CacheFirst({
     cacheName: 'movement-photos',
     plugins: [
-      new ExpirationPlugin({ maxEntries: 400, maxAgeSeconds: 60 * 60 * 24 * 90 }),
+      new ExpirationPlugin({ maxEntries: 500, maxAgeSeconds: 60 * 60 * 24 * 90 }),
       new CacheableResponsePlugin({ statuses: [0, 200] }),
     ],
   }),

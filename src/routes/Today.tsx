@@ -34,6 +34,7 @@ import { ExerciseOfTheDay } from '@/components/exercise-of-the-day'
 import { SetPlan } from '@/components/set-plan'
 import { SessionLogDialog } from '@/components/session-log-dialog'
 import { MealSuggestions } from '@/components/meal-suggestions'
+import { DishOfTheDay } from '@/components/dish-of-the-day'
 import {
   Dialog,
   DialogContent,
@@ -484,7 +485,10 @@ function TodayOverview({
 
       <ExerciseOfTheDay />
 
+      {/* Plan-aligned plates when a programme exists; the daily dish is always
+          here so food is never buried on a page the member has to go find. */}
       <MealSuggestions />
+      <DishOfTheDay />
 
       <RecentSessions />
 

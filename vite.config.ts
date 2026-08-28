@@ -66,6 +66,13 @@ export default defineConfig(({ mode }) => {
       changeOrigin: true,
       rewrite: (p) => p.replace(/^\/pb/, ''),
     },
+    /* Movement photos, first-party so blockers cannot eat cdn.jsdelivr.net
+       (matches the production nginx /exercise-img proxy). */
+    '/exercise-img': {
+      target: 'https://cdn.jsdelivr.net',
+      changeOrigin: true,
+      rewrite: (p) => p.replace(/^\/exercise-img/, '/gh/yuhonas/free-exercise-db@main/exercises'),
+    },
     /* Same-path shared fetches (phase 7). With a local key the direct proxies
        above win; without one, dev behaves like production and asks the sync
        server, which answers 503 honestly when it has no key either. */
