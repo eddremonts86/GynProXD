@@ -1,7 +1,7 @@
 # Backend, sync and push: what it takes to leave the browser
 
-Status: study (no code yet)
-Date: 2026-08-26
+Status: phase 1 shipped; phases 2 to 7 need a server that does not exist yet
+Date: 2026-08-26, phase 1 landed 2026-08-28
 
 Decisions locked with Edd 2026-08-26, after the study was first drafted:
 one multi-tenant server (not an instance per gym); email + password login
@@ -168,11 +168,27 @@ Order corrected after drawing the flow: push moved from second to last.
 Before the gym bus lives on the server there is almost nothing to notify —
 building push earlier is fitting a doorbell nobody can ring.
 
-**Phase 1 — record-shaped local store (no server).** Give every entity an
-`id` and `updatedAt`; replace the monolithic `persistNow()` with per-record
-writes; add tombstones. Ships alone as a refactor with no visible change, and
-it is the prerequisite that makes everything after it safe. The only phase
-that can start today: it depends on no pending decision.
+**Phase 1 — record-shaped local store (no server). Shipped 2026-08-28.**
+`lib/records.ts` holds the shape and the merge arithmetic, `lib/record-store.ts`
+the encrypted rows on disk, one localStorage key each. What landed:
+
+- Every row carries `id`, `createdAt`, `updatedAt`, and a `deletedAt` tombstone
+  instead of vanishing. Weigh-ins gained an id; plan ids became random rather
+  than `plan-${Date.now()}`, which two devices can collide on.
+- Metadata is plaintext, the body is encrypted per row. A server that stores
+  ciphertext still has to merge on id and updatedAt. The cost is that the
+  timestamps leak training frequency, which no sync design avoids.
+- Saves only touch rows whose content actually changed, so `updatedAt` keeps
+  meaning "when this changed" rather than "when the app last saved". Verified
+  in the browser: logging a set rewrites the device-local session key and not
+  one stored row. It used to re-encrypt the entire history.
+- `activeWorkout` is deliberately not a row. It stays device-local, because a
+  laptop syncing its own idea of "active" would wipe a workout mid-set.
+- Profiles stored as a single blob are broken into rows on first unlock, with
+  `createdAt` staggered by position so nobody's history reshuffles. The blob is
+  removed only once every row is written, so an interrupted migration re-runs.
+- A test pins live order against rebuilt order for every collection: if a
+  reducer ever changes which end it inserts at, the suite says so.
 
 **Phase 2 — PocketBase on Coolify.** One Go binary with SQLite, auth and
 access rules, next to the existing apps. SMTP for account verification and

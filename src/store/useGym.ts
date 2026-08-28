@@ -15,6 +15,7 @@ import { generatedExercises } from '../data/exercises-generated'
 import { populateByIdCache } from '../lib/exercises'
 import { INTENSITY_SETS } from '../lib/intensity'
 import { todayIso } from '../lib/dates'
+import { withRecordIds } from '../lib/records'
 import type { ActiveChallenge, Challenge } from '../lib/challenge'
 import type { FitnessTestResult } from '../lib/fitness-test'
 import type { StoryProgress, TrackId } from '../lib/story'
@@ -332,7 +333,9 @@ export const useGym = create<GymState>()((set, get) => ({
       setProfileDetails: (details) => set({ profileDetails: details }),
 
       logBodyweight: (kg) =>
-        set((s) => ({ bodyweight: [{ date: today(), kg }, ...s.bodyweight] })),
+        set((s) => ({
+          bodyweight: [{ id: crypto.randomUUID(), date: today(), kg }, ...s.bodyweight],
+        })),
 
       importData: (json) => {
         try {
@@ -358,7 +361,9 @@ export const useGym = create<GymState>()((set, get) => ({
           set({
             workouts: d.workouts as Workout[],
             ...(customs ? { customExercises: customs } : {}),
-            ...(Array.isArray(d.bodyweight) ? { bodyweight: d.bodyweight as BodyweightEntry[] } : {}),
+            ...(Array.isArray(d.bodyweight)
+              ? { bodyweight: withRecordIds(d.bodyweight as BodyweightEntry[]) }
+              : {}),
             ...(Array.isArray(d.plans) ? { plans: d.plans as WeeklyPlan[] } : {}),
             ...(Array.isArray(d.generatedPlans) ? { generatedPlans: d.generatedPlans as GeneratedPlan[] } : {}),
             ...(Array.isArray(d.challenges) ? { challenges: d.challenges as ActiveChallenge[] } : {}),
@@ -370,14 +375,17 @@ export const useGym = create<GymState>()((set, get) => ({
       },
 
       createPlan: (name) => {
-        const id = `plan-${Date.now()}`
+        /* Random rather than clock-based: a row id has to be unique across
+           every device, not just within one millisecond on this one. */
+        const id = `plan-${crypto.randomUUID()}`
         const plan: WeeklyPlan = {
           id,
           name: name.trim() || 'My Plan',
           days: createEmptyDays(),
           createdAt: new Date().toISOString(),
         }
-        set((s) => ({ plans: [...s.plans, plan] }))
+        /* Newest first, the same order a reload rebuilds from the stored rows. */
+        set((s) => ({ plans: [plan, ...s.plans] }))
         return id
       },
 
@@ -483,7 +491,7 @@ export const useGym = create<GymState>()((set, get) => ({
            with the programme it came from. */
         const newPlan: WeeklyPlan = {
           ...structuredClone(gen.weeklyTemplate),
-          id: `plan-${Date.now()}`,
+          id: `plan-${crypto.randomUUID()}`,
           createdAt: new Date().toISOString(),
         }
         set((s) => ({ plans: [newPlan, ...s.plans] }))
@@ -540,7 +548,7 @@ export function hydrateGym(snapshot: Partial<GymSnapshot> | null | undefined): v
   const next: GymSnapshot = {
     customExercises: snapshot?.customExercises ?? [],
     workouts: snapshot?.workouts ?? [],
-    bodyweight: snapshot?.bodyweight ?? [],
+    bodyweight: withRecordIds(snapshot?.bodyweight ?? []),
     activeWorkout: snapshot?.activeWorkout ?? null,
     plans: snapshot?.plans ?? [],
     generatedPlans: snapshot?.generatedPlans ?? [],

@@ -202,7 +202,7 @@ export function assemblePlan(
   const weeklyDays = blocks[0]
 
   const weeklyTemplate: WeeklyPlan = {
-    id: `plan-gen-${Date.now()}`,
+    id: `plan-gen-${crypto.randomUUID()}`,
     name: structure.name ?? `${GOAL_PLAN_NAMES[input.goal]} · ${DURATION_LABELS[approvedDuration]}`,
     days: weeklyDays,
     createdAt: new Date().toISOString(),
@@ -237,7 +237,7 @@ export function assemblePlan(
   }
 
   return {
-    id: `gen-${Date.now()}`,
+    id: `gen-${crypto.randomUUID()}`,
     createdAt: new Date().toISOString(),
     source: structure.source,
     coachNotes: structure.coachNotes,

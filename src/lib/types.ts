@@ -63,6 +63,8 @@ export interface Workout {
 }
 
 export interface BodyweightEntry {
+  /** Row id. Absent on weigh-ins logged before the store became record-shaped. */
+  id?: string
   date: string
   kg: number
 }

@@ -10,6 +10,15 @@ import {
   fromBase64,
   type CipherBlob,
 } from './crypto'
+import {
+  clearProfileRecords,
+  emptyCache,
+  loadProfileRecords,
+  persistProfile,
+  writeAllRecords,
+  type RecordCache,
+} from './record-store'
+import { withRecordIds } from './records'
 import { EMPTY_SNAPSHOT, hydrateGym, snapshotGym, useGym, type GymSnapshot } from '../store/useGym'
 
 /**
@@ -42,7 +51,9 @@ interface Registry {
 }
 
 const REGISTRY_KEY = 'forma-profiles'
-const DATA_PREFIX = 'forma-data-'
+/* The whole snapshot as one encrypted blob. Superseded by per-record rows;
+   still read once, to break an existing profile apart on first unlock. */
+const LEGACY_BLOB_PREFIX = 'forma-data-'
 const LEGACY_KEY = 'gynproxd-v2'
 const SESSION_ID_KEY = 'forma-session-profile'
 const SESSION_RAW_KEY = 'forma-session-key'
@@ -50,6 +61,7 @@ const SENTINEL = 'forma'
 
 let activeKey: CryptoKey | null = null
 let activeId: string | null = null
+let activeCache: RecordCache = emptyCache()
 let unsubscribe: (() => void) | null = null
 let saveTimer: number | null = null
 
@@ -198,7 +210,8 @@ export async function deleteProfileById(id: string): Promise<void> {
   registry.profiles = registry.profiles.filter((p) => p.id !== id)
   if (registry.lastActiveId === id) delete registry.lastActiveId
   writeRegistry(registry)
-  localStorage.removeItem(DATA_PREFIX + id)
+  clearProfileRecords(id)
+  localStorage.removeItem(LEGACY_BLOB_PREFIX + id)
 }
 
 /** Plaintext data from before profiles existed, offered to the first profile. */
@@ -222,8 +235,30 @@ export function legacySnapshot(): Partial<GymSnapshot> | null {
 
 async function persistNow(): Promise<void> {
   if (!activeKey || !activeId) return
-  const blob = await encryptJson(activeKey, snapshotGym())
-  localStorage.setItem(DATA_PREFIX + activeId, JSON.stringify(blob))
+  await persistProfile(activeId, activeKey, snapshotGym(), activeCache)
+}
+
+/**
+ * Reads a profile's training data, breaking an older single-blob profile into
+ * rows the first time it is opened. The blob is removed only once every row
+ * is written, so an interrupted migration re-runs instead of losing data.
+ */
+async function readSnapshot(
+  id: string,
+  key: CryptoKey,
+): Promise<{ snapshot: GymSnapshot; cache: RecordCache }> {
+  const legacy = localStorage.getItem(LEGACY_BLOB_PREFIX + id)
+  if (!legacy) return loadProfileRecords(id, key)
+
+  const stored = await decryptJson<Partial<GymSnapshot>>(key, JSON.parse(legacy) as CipherBlob)
+  const snapshot: GymSnapshot = {
+    ...EMPTY_SNAPSHOT,
+    ...stored,
+    bodyweight: withRecordIds(stored.bodyweight ?? []),
+  }
+  const cache = await writeAllRecords(id, key, snapshot)
+  localStorage.removeItem(LEGACY_BLOB_PREFIX + id)
+  return { snapshot, cache }
 }
 
 function scheduleSave(): void {
@@ -251,9 +286,15 @@ function bindAutosave(): void {
   window.addEventListener('pagehide', flushOnPageHide)
 }
 
-async function startSession(id: string, key: CryptoKey, data: Partial<GymSnapshot>): Promise<void> {
+async function startSession(
+  id: string,
+  key: CryptoKey,
+  data: Partial<GymSnapshot>,
+  cache: RecordCache,
+): Promise<void> {
   activeKey = key
   activeId = id
+  activeCache = cache
   hydrateGym(data)
   bindAutosave()
   const registry = readRegistry()
@@ -286,10 +327,13 @@ export async function createProfile(
     check: await encryptJson(key, SENTINEL),
   }
 
-  const data: Partial<GymSnapshot> =
-    options?.importLegacy ? (legacySnapshot() ?? EMPTY_SNAPSHOT) : EMPTY_SNAPSHOT
-  const blob = await encryptJson(key, { ...EMPTY_SNAPSHOT, ...data })
-  localStorage.setItem(DATA_PREFIX + meta.id, JSON.stringify(blob))
+  const imported = options?.importLegacy ? (legacySnapshot() ?? EMPTY_SNAPSHOT) : EMPTY_SNAPSHOT
+  const data: GymSnapshot = {
+    ...EMPTY_SNAPSHOT,
+    ...imported,
+    bodyweight: withRecordIds(imported.bodyweight ?? []),
+  }
+  const cache = await writeAllRecords(meta.id, key, data)
 
   const registry = readRegistry()
   registry.profiles.push(meta)
@@ -297,7 +341,7 @@ export async function createProfile(
   writeRegistry(registry)
 
   if (options?.importLegacy) localStorage.removeItem(LEGACY_KEY)
-  await startSession(meta.id, key, data)
+  await startSession(meta.id, key, data, cache)
 }
 
 /** Resolves false on a wrong passphrase; throws only on storage corruption. */
@@ -310,11 +354,8 @@ export async function unlockProfile(id: string, passphrase: string): Promise<boo
   } catch {
     return false
   }
-  const raw = localStorage.getItem(DATA_PREFIX + id)
-  const data = raw
-    ? await decryptJson<GymSnapshot>(key, JSON.parse(raw) as CipherBlob)
-    : EMPTY_SNAPSHOT
-  await startSession(id, key, data)
+  const { snapshot, cache } = await readSnapshot(id, key)
+  await startSession(id, key, snapshot, cache)
   return true
 }
 
@@ -326,13 +367,11 @@ export async function resumeSession(): Promise<boolean> {
     if (!id || !raw) return false
     if (!readRegistry().profiles.some((p) => p.id === id)) return false
     const key = await importKeyBase64(raw)
-    const stored = localStorage.getItem(DATA_PREFIX + id)
-    const data = stored
-      ? await decryptJson<GymSnapshot>(key, JSON.parse(stored) as CipherBlob)
-      : EMPTY_SNAPSHOT
+    const { snapshot, cache } = await readSnapshot(id, key)
     activeKey = key
     activeId = id
-    hydrateGym(data)
+    activeCache = cache
+    hydrateGym(snapshot)
     bindAutosave()
     return true
   } catch {
@@ -352,6 +391,7 @@ export async function lockProfile(): Promise<void> {
   window.removeEventListener('pagehide', flushOnPageHide)
   activeKey = null
   activeId = null
+  activeCache = emptyCache()
   hydrateGym(EMPTY_SNAPSHOT)
   try {
     sessionStorage.removeItem(SESSION_ID_KEY)
@@ -369,6 +409,7 @@ export async function deleteActiveProfile(): Promise<void> {
   registry.profiles = registry.profiles.filter((p) => p.id !== id)
   if (registry.lastActiveId === id) delete registry.lastActiveId
   writeRegistry(registry)
-  localStorage.removeItem(DATA_PREFIX + id)
+  clearProfileRecords(id)
+  localStorage.removeItem(LEGACY_BLOB_PREFIX + id)
   await lockProfile()
 }
