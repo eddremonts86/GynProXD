@@ -15,9 +15,18 @@ Point a compose service at this directory (`docker-compose.yml`). First boot:
    as plain text — the app's "Forgot your password?" asks the member to paste
    it. The stock template links to PocketBase's own reset UI, which would
    bypass the app's key re-wrap and must not be used.
-3. Gyms are yours to grant: once a gym is verified (and has paid), create a
-   row in `gyms` with the operator's user account under `operators`. The
-   operator's next sync carries the gym role onto every device they sign into.
+3. Gyms are yours to grant: once a gym is verified (and has paid), run
+
+   ```bash
+   PB_SU_EMAIL=… PB_SU_PASSWORD=… node scripts/admin/grant-gym.mjs \
+     --server https://<sync-domain> --gym "Iron House" --operators coach@example.com
+   ```
+
+   (idempotent; the operator must have signed up in the app first). Their next
+   sync carries the gym role onto every device they sign into.
+4. SMTP: Resend works on port 587 with STARTTLS (Hetzner blocks outbound 465),
+   username `resend`, password = the API key. The sender address must belong
+   to a domain verified in Resend.
 
 Members never see this server: the app proxies `/pb` on its own origin
 (`SYNC_PROXY_TARGET` / `SYNC_UPSTREAM_HOST` env vars on the app service).
