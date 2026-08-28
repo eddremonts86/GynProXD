@@ -5,6 +5,7 @@ import {
   ArrowRight,
   ArrowsLeftRight,
   Barbell,
+  CaretDown,
   CheckCircle,
   Plus,
   ShareNetwork,
@@ -30,6 +31,7 @@ import { EmptyState } from '../ui/EmptyState'
 import { ExercisePicker } from '@/components/exercise-picker'
 import { ExerciseOfTheDay } from '@/components/exercise-of-the-day'
 import { SetPlan } from '@/components/set-plan'
+import { SessionLogDialog } from '@/components/session-log-dialog'
 import { MealSuggestions } from '@/components/meal-suggestions'
 import {
   Dialog,
@@ -722,6 +724,7 @@ function ActiveSession({
      they went past a target, and an explicit tap pins it either way. */
   const [ecOverride, setEcOverride] = useState<boolean | null>(null)
   const [confirmEmptyFinish, setConfirmEmptyFinish] = useState(false)
+  const [logOpen, setLogOpen] = useState(false)
 
   const plannedOptions = useCallback(
     (exerciseId: string): PlannedExercise | null => {
@@ -895,6 +898,7 @@ function ActiveSession({
           ec={ec}
           onToggleEc={() => setEcOverride(!ec)}
           autoEc={false}
+          onOpenLog={() => setLogOpen(true)}
           intensity={workout.intensity ?? null}
           onIntensity={setSessionIntensity}
         />
@@ -952,6 +956,7 @@ function ActiveSession({
         ec={ec}
         onToggleEc={() => setEcOverride(!ec)}
         autoEc={ecOverride === null && wentPastTarget}
+        onOpenLog={() => setLogOpen(true)}
         intensity={workout.intensity ?? null}
         onIntensity={setSessionIntensity}
         rest={
@@ -1103,7 +1108,13 @@ function ActiveSession({
         )}
       </Panel>
 
-      <SessionLog workout={workout} currentId={current.exerciseId} onSelect={selectExercise} />
+      <SessionLogDialog
+        open={logOpen}
+        onOpenChange={setLogOpen}
+        workout={workout}
+        elapsed={elapsed}
+        onSelect={selectExercise}
+      />
 
       <SessionPicker
         open={pickerOpen}
@@ -1222,6 +1233,7 @@ function SessionHeader({
   ec,
   onToggleEc,
   autoEc,
+  onOpenLog,
   intensity,
   onIntensity,
   rest,
@@ -1239,6 +1251,7 @@ function SessionHeader({
   onToggleEc: () => void
   /** Turned on by going past a target rather than by a tap. */
   autoEc: boolean
+  onOpenLog: () => void
   intensity: Intensity | null
   onIntensity: (i: Intensity) => void
   rest?: RestState | null
@@ -1266,10 +1279,19 @@ function SessionHeader({
           >
             Finish
           </Button>
-          <div className="flex items-baseline gap-1.5">
+          <button
+            type="button"
+            onClick={onOpenLog}
+            disabled={sets === 0}
+            aria-label={sets === 0 ? 'No sets logged yet' : `See all ${sets} logged sets`}
+            className="flex items-baseline gap-1.5 rounded-md transition-colors enabled:hover:text-ink disabled:cursor-default"
+          >
             <span className="num text-lg leading-none font-semibold text-ink">{sets}</span>
-            <span className="text-2xs text-ink-3">sets</span>
-          </div>
+            <span className="flex items-center gap-0.5 text-2xs text-ink-3">
+              sets
+              {sets > 0 && <CaretDown size={10} weight="bold" />}
+            </span>
+          </button>
           <div className="hidden items-baseline gap-1.5 sm:flex">
             <span className="num text-lg leading-none font-semibold text-ink">
               {volume.toLocaleString('en-GB')}
@@ -1359,55 +1381,6 @@ function SessionHeader({
         </div>
       )}
     </div>
-  )
-}
-
-function SessionLog({
-  workout,
-  currentId,
-  onSelect,
-}: {
-  workout: Workout
-  currentId: string
-  onSelect: (id: string) => void
-}) {
-  const logged = workout.exercises.filter((e) => e.sets.length > 0)
-  if (logged.length === 0) return null
-
-  return (
-    <Section title="Logged so far" hint={pluralize(logged.length, 'movement')}>
-      <ul className="flex flex-col gap-2">
-        {logged.map((e) => {
-          const ex = exerciseById(e.exerciseId)
-          return (
-            <li key={e.exerciseId}>
-              <button
-                type="button"
-                onClick={() => onSelect(e.exerciseId)}
-                className={cn(
-                  'flex w-full items-center gap-3 rounded-md border px-4 py-3 text-left transition-colors duration-150',
-                  e.exerciseId === currentId
-                    ? 'border-brand/40 bg-brand-soft'
-                    : 'border-line bg-surface hover:border-line-strong hover:bg-surface-2',
-                )}
-              >
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium text-ink">
-                    {ex?.name ?? e.exerciseId}
-                  </span>
-                  <span className="num mt-0.5 block truncate text-2xs text-ink-3">
-                    {e.sets.map(describeSet).join('   ')}
-                  </span>
-                </span>
-                <span className="num shrink-0 text-2xs text-ink-3">
-                  {pluralize(e.sets.length, 'set')}
-                </span>
-              </button>
-            </li>
-          )
-        })}
-      </ul>
-    </Section>
   )
 }
 
