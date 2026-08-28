@@ -12,6 +12,20 @@ end with two isolated browser contexts: A trains and creates the account, B
 links with a different local passphrase and pulls A's history, B trains and
 pushes, A pulls both, B relinks using only the recovery code.
 
+Amended later the same day, after Edd pushed back on the flow ("a normal user
+has to do all this?"): the passphrase disappeared as a user-facing concept.
+One password does both jobs, Bitwarden-style — the server receives only an
+email-salted derivation (`authPassOf`), the data key is the same password
+under the account's random salt, and a synced profile unlocks locally with
+that password. The second device signs in from the lock screen (name, email,
+password) and the server address left the flow entirely: the app talks to
+`/pb` on its own origin (nginx forwards to PocketBase through the platform
+proxy; an Advanced field remains for self-hosters). The recovery code now
+guards a lost password. Known gap: password reset via email needs a custom
+flow (PB's own reset would break the derivation) and is not built yet.
+Deployed and verified on the Hetzner replica, gynproxd.localhost against
+gynproxd-sync.localhost.
+
 Decisions locked with Edd 2026-08-26, after the study was first drafted:
 one multi-tenant server (not an instance per gym); email + password login
 (so SMTP is required infrastructure); the E2E key stays derived from the

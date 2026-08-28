@@ -77,15 +77,12 @@ async function gap(what, err) {
   console.log(`  GAP ${text}`)
 }
 
-/** Create a profile from the gate's create form. Assumes the form is visible. */
-async function createProfile(page, { name, role, gym }) {
+/**
+ * Create a profile from the gate's create form. The gate only makes members;
+ * the first profile on a fresh context becomes the device admin on its own.
+ */
+async function createProfile(page, { name, gym }) {
   await page.fill('#f-name', name)
-  if (role !== 'member') {
-    // FormSelect trigger shows the current option's label.
-    await page.getByText('Member — I train here').first().click()
-    const optionLabel = role === 'gym' ? 'Gym — I run a gym' : 'Administrator — I manage this device'
-    await page.getByRole('option', { name: optionLabel }).click()
-  }
   if (gym) {
     await page.fill('#f-gym', gym)
     await page.waitForTimeout(300)
@@ -98,6 +95,16 @@ async function createProfile(page, { name, role, gym }) {
   await page.fill('#f-repeat-passphrase', PASS)
   await page.getByRole('button', { name: 'Create profile' }).click()
   await page.waitForTimeout(1200)
+}
+
+/** Unlock an existing profile from the gate's list. */
+async function unlockAs(page, name) {
+  await page.goto(BASE + '/', { waitUntil: 'load' })
+  await page.waitForTimeout(600)
+  await page.getByRole('button', { name: new RegExp(name, 'i') }).first().click()
+  await page.fill('#f-passphrase', PASS)
+  await page.getByRole('button', { name: /^unlock/i }).click()
+  await page.waitForTimeout(1500)
 }
 
 /** Lock the active profile from Settings and land back on the gate. */
@@ -167,9 +174,32 @@ async function main() {
     await gap('gate validation shot', e)
   }
 
-  console.log('gym operator')
+  console.log('device owner (first profile is the admin)')
   try {
-    await createProfile(page, { name: 'Iron Boss', role: 'gym', gym: 'Iron House' })
+    await createProfile(page, { name: 'Root Admin' })
+    const msAdmin0 = await visit(page, '/admin', 'admin-landing')
+    await shoot(page, 'admin-landing', { path: '/admin', ms: msAdmin0 })
+  } catch (e) {
+    await gap('admin fixture', e)
+  }
+
+  console.log('gym operator (member first, promoted from the admin panel)')
+  try {
+    await lockProfile(page)
+    await shoot(page, 'gate-unlock-list', { path: '/' })
+    await gateToCreate(page)
+    await createProfile(page, { name: 'Iron Boss', gym: 'Iron House' })
+    await lockProfile(page)
+    await unlockAs(page, 'Root Admin')
+    await page.goto(BASE + '/admin', { waitUntil: 'load' })
+    await page.waitForTimeout(700)
+    await page.getByLabel('Role for Iron Boss').click()
+    await page.getByRole('option', { name: 'Gym' }).click()
+    freshBucket('admin-panel')
+    await page.waitForTimeout(600)
+    await shoot(page, 'admin-panel', { path: '/admin' })
+    await lockProfile(page)
+    await unlockAs(page, 'Iron Boss')
     freshBucket('gym-panel')
     await page.waitForTimeout(600)
     await shoot(page, 'gym-panel-compose', { path: '/gym' })
@@ -194,24 +224,11 @@ async function main() {
     await gap('gym fixture', e)
   }
 
-  console.log('admin')
-  try {
-    await lockProfile(page)
-    await shoot(page, 'gate-unlock-list', { path: '/' })
-    await gateToCreate(page)
-    await createProfile(page, { name: 'Root Admin', role: 'admin' })
-    // Creation returns to the route it started from, so land on the panel explicitly.
-    const msAdmin = await visit(page, '/admin', 'admin-panel')
-    await shoot(page, 'admin-panel', { path: '/admin', ms: msAdmin })
-  } catch (e) {
-    await gap('admin fixture', e)
-  }
-
   console.log('member (Iron House)')
   try {
     await lockProfile(page)
     await gateToCreate(page)
-    await createProfile(page, { name: 'Jorge', role: 'member', gym: 'Iron House' })
+    await createProfile(page, { name: 'Jorge', gym: 'Iron House' })
   } catch (e) {
     await gap('member fixture', e)
   }
@@ -281,7 +298,12 @@ async function main() {
   wirePage(page2)
   try {
     await visit(page2, '/', 'solo-gate')
-    await createProfile(page2, { name: 'Solo Sam', role: 'member' })
+    // The fresh context's first profile is its admin; Sam must be second to
+    // stay a plain member.
+    await createProfile(page2, { name: 'Device Owner' })
+    await lockProfile(page2)
+    await gateToCreate(page2)
+    await createProfile(page2, { name: 'Solo Sam' })
     for (const [path, label] of [
       ['/inbox', 'solo-inbox-bump'],
       ['/menu', 'solo-menu-empty'],

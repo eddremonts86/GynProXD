@@ -8,9 +8,16 @@ is honest about what that allows and what it cannot do.
 ## Roles
 
 `ProfileMeta.role` in the plaintext registry: `member` (default), `gym`,
-`admin`. Roles are picked at profile creation and changed only from the
-admin panel. A `gym`-role profile's `gym` field names the gym it operates —
-the same field a member uses to say where they train.
+`admin`. Since 2026-08-28 roles are not self-service: the gate only creates
+members, whoever sets up a fresh device becomes its administrator, and gym
+and admin are assigned exclusively from the admin panel. A `gym`-role
+profile's `gym` field names the gym it operates — the same field a member
+uses to say where they train.
+
+Verifying that a gym is real — and charging it, since publishing is a paid
+surface — cannot be enforced by a device-local role and lands with the
+phase-5 server-side bus (docs/plans/2026-08-26-backend-sync.md), where the
+server, not the device, grants the gym role.
 
 Trust model: whoever holds the device and a profile's passphrase is that
 actor. Roles gate navigation and panels, not cryptography. Training data
