@@ -892,14 +892,15 @@ async function syncGymBus(profileId: string, link: SyncLink): Promise<void> {
   const mine = meta && meta.id === profileId ? meta : null
   const operated = gyms.find((g) => g.operators?.includes(link.userId))
 
-  /* Role is the server's to decide, adopted onto this device. Platform admin
-     wins; then gym operator; a former operator drops back to member. A purely
-     local device-admin (no server backing) is left untouched. */
+  /* For a synced profile the server is authoritative on role, overriding the
+     local "first profile is the device admin" heuristic (which only governs
+     offline, single-device use). Platform admin wins; then gym operator;
+     otherwise member. */
   if (await isPlatformAdmin(link)) {
     adoptServerRole(profileId, 'admin')
   } else if (operated) {
-    if (mine?.role !== 'admin') adoptServerRole(profileId, 'gym')
-  } else if (mine?.role === 'gym') {
+    adoptServerRole(profileId, 'gym')
+  } else {
     adoptServerRole(profileId, 'member')
   }
 
