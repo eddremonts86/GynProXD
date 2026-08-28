@@ -346,17 +346,27 @@ function MovementCard({
       className="flex h-full w-full flex-col overflow-hidden rounded-xl bg-surface text-left shadow-[var(--shadow-panel)] transition-shadow duration-150 hover:shadow-[var(--shadow-tile)]"
     >
       {base ? (
-        <img
-          src={src}
-          alt={`${exercise.name}, ${exercise.muscle} with ${exercise.equipment}`}
-          loading="lazy"
-          decoding="async"
-          onError={() => {
-            if (src === frames?.end) setEndFailed(true)
-            else setAttempt((i) => i + 1)
-          }}
-          className="aspect-[4/3] w-full bg-surface-2 object-cover"
-        />
+        /* Muscle code under the photo: the card is branded from the first
+           paint instead of an empty box while the CDN streams in. */
+        <span className="relative block aspect-[4/3] w-full overflow-hidden bg-surface-2">
+          <span
+            aria-hidden="true"
+            className="num absolute inset-0 flex items-center justify-center text-lg font-semibold tracking-widest text-ink-3"
+          >
+            {MUSCLE_SHORT[exercise.muscle]}
+          </span>
+          <img
+            src={src}
+            alt={`${exercise.name}, ${exercise.muscle} with ${exercise.equipment}`}
+            loading="lazy"
+            decoding="async"
+            onError={() => {
+              if (src === frames?.end) setEndFailed(true)
+              else setAttempt((i) => i + 1)
+            }}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        </span>
       ) : (
         <span className="flex aspect-[4/3] w-full items-center justify-center bg-surface-2">
           <span className="num text-lg font-semibold tracking-widest text-ink-3">

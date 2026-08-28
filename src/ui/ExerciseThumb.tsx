@@ -58,16 +58,29 @@ export function ExerciseThumb({ exercise, size = 'md', className }: ExerciseThum
     )
   }
 
+  /* The muscle code sits under the photo, so the frame is branded from the
+     first paint and the CDN's arrival simply covers it. */
   return (
-    <img
-      src={src}
-      alt={`${exercise.name}, ${exercise.muscle} with ${exercise.equipment}`}
-      loading="lazy"
-      decoding="async"
-      width={pixelSize[size]}
-      height={pixelSize[size]}
-      onError={() => setAttempt({ id: exercise.id, index: index + 1 })}
-      className={cn(frame, 'object-cover')}
-    />
+    <span className={cn(frame, 'relative')}>
+      <span
+        aria-hidden="true"
+        className={cn(
+          'num absolute inset-0 flex items-center justify-center font-semibold tracking-widest text-ink-3',
+          codeSize[size],
+        )}
+      >
+        {MUSCLE_SHORT[exercise.muscle]}
+      </span>
+      <img
+        src={src}
+        alt={`${exercise.name}, ${exercise.muscle} with ${exercise.equipment}`}
+        loading="lazy"
+        decoding="async"
+        width={pixelSize[size]}
+        height={pixelSize[size]}
+        onError={() => setAttempt({ id: exercise.id, index: index + 1 })}
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+    </span>
   )
 }
