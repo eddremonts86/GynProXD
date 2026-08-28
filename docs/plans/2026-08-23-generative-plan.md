@@ -1,7 +1,14 @@
 # Plan: Generative Onboarding → Realistic Periodized Program (Forma)
 
 - **Date:** 2026-08-23
-- **Status:** draft — awaiting approval to build
+- **Status:** implemented — all build steps shipped (status corrected 2026-08-29;
+  the doc had been left in "draft" long after it was built). The estimate engine
+  lives in `src/lib/plan-estimate.ts` (realistic weeks, `isUnrealistic` rejection,
+  `recommendedDuration`), the generator in `src/lib/plan-generator.ts` (3 training
+  days, deload every 4th week, movement rotation with anchored staples), the parser
+  in `src/lib/onboarding-parse.ts`, the optional AI coach in `src/lib/ai-plan.ts`,
+  and the UX in `src/routes/Onboarding.tsx` + `src/routes/GeneratedPlan.tsx`. The
+  verification specs named in §7 exist and pass.
 - **Scope:** local-first, no backend, no LLM required (deterministic). Optional on-device LLM later.
 - **Renamed app:** Forma (Noir Warm)
 

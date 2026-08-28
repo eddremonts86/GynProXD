@@ -55,10 +55,11 @@ that password. The second device signs in from the lock screen (name, email,
 password) and the server address left the flow entirely: the app talks to
 `/pb` on its own origin (nginx forwards to PocketBase through the platform
 proxy; an Advanced field remains for self-hosters). The recovery code now
-guards a lost password. Known gap: password reset via email needs a custom
-flow (PB's own reset would break the derivation) and is not built yet.
-Deployed and verified on the Hetzner replica, gynproxd.localhost against
-gynproxd-sync.localhost.
+guards a lost password. Email password reset — the custom flow that keeps the
+data (emailed token + recovery code re-wraps the key) — shipped later and runs
+in production over Resend SMTP (see PANELS/permissions notes). Deployed and
+verified on the Hetzner replica and, since 2026-08-29, in production at
+enforma.eduardoinerarte.dk / enforma-sync.eduardoinerarte.dk.
 
 Decisions locked with Edd 2026-08-26, after the study was first drafted:
 one multi-tenant server (not an instance per gym); email + password login
