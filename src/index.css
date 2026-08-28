@@ -288,16 +288,6 @@
     touch-action: manipulation;
   }
 
-  /* iOS zooms the page when a focused field is under 16px. Bumping the font on
-     coarse pointers only keeps the desktop design untouched. */
-  @media (pointer: coarse) {
-    input,
-    textarea,
-    select {
-      font-size: 16px;
-    }
-  }
-
   h1,
   h2,
   h3,
@@ -360,6 +350,18 @@
   input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
+  }
+}
+
+/* iOS zooms the page when a focused field is under 16px. Bumping the font on
+   coarse pointers keeps the desktop design untouched. Unlayered on purpose:
+   it must beat Tailwind's `text-sm` utility, which lives in a cascade layer
+   and would otherwise hold the field at 13px and let iOS zoom on focus. */
+@media (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  textarea,
+  select {
+    font-size: 16px;
   }
 }
 
