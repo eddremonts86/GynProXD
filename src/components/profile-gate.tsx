@@ -1,10 +1,9 @@
 import { useState } from 'react'
-import { ArrowRight, CircleNotch, Eye, EyeSlash, Plus } from '@phosphor-icons/react'
+import { ArrowRight, CircleNotch, CloudCheck, Eye, EyeSlash, Plus } from '@phosphor-icons/react'
 import { Wordmark } from '@/components/brand'
 import { Avatar } from '@/ui/Avatar'
 import { Button, IconButton } from '@/ui/Button'
 import { Combobox } from '@/ui/Combobox'
-import { FormSelect } from '@/ui/FormSelect'
 import { Input } from '@/ui/Input'
 import { Tag } from '@/ui/Tag'
 import {
@@ -16,6 +15,7 @@ import {
   unlockProfile,
   type ProfileRole,
 } from '@/lib/profiles'
+import { signInFromGate } from '@/lib/sync'
 import { formatShortDate } from '@/lib/labels'
 import { cn } from '@/lib/utils'
 
@@ -26,7 +26,7 @@ import { cn } from '@/lib/utils'
  * that points at the wrong field teaches people to distrust it.
  */
 
-type ErrorField = 'unlock' | 'name' | 'gym' | 'pass' | 'confirm'
+type ErrorField = 'unlock' | 'name' | 'gym' | 'pass' | 'confirm' | 'email' | 'apass' | 'signin'
 interface GateError {
   field: ErrorField
   text: string
@@ -49,7 +49,11 @@ function RevealToggle({ shown, onToggle }: { shown: boolean; onToggle: () => voi
 
 export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
   const [profiles] = useState(listProfiles)
-  const [mode, setMode] = useState<'unlock' | 'create'>(profiles.length > 0 ? 'unlock' : 'create')
+  const [mode, setMode] = useState<'unlock' | 'create' | 'signin'>(
+    profiles.length > 0 ? 'unlock' : 'create',
+  )
+  const [email, setEmail] = useState('')
+  const [accountPassword, setAccountPassword] = useState('')
   const [selectedId, setSelectedId] = useState<string>(
     () => lastActiveProfileId() ?? profiles[0]?.id ?? '',
   )
@@ -57,7 +61,6 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
   const [name, setName] = useState('')
   const [gym, setGym] = useState('')
   const [gyms] = useState(listGyms)
-  const [role, setRole] = useState<ProfileRole>('member')
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState<GateError | null>(null)
   const [showPass, setShowPass] = useState(false)
@@ -88,15 +91,41 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
     }
   }
 
+  const signIn = async () => {
+    if (busy) return
+    if (name.trim().length === 0) {
+      failWith('name', 'Give this device a profile name.', 'f-name')
+      return
+    }
+    if (email.trim().length === 0) {
+      failWith('email', 'The account email is needed to sign in.', 'f-email')
+      return
+    }
+    if (accountPassword.length === 0) {
+      failWith('apass', 'The account password is needed to sign in.', 'f-account-password')
+      return
+    }
+    setBusy(true)
+    setError(null)
+    try {
+      await signInFromGate({
+        name,
+        email: email.trim(),
+        password: accountPassword,
+      })
+      onUnlocked()
+    } catch (err) {
+      failWith('signin', err instanceof Error ? err.message : 'Signing in failed.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
   const create = async () => {
     if (busy) return
     const trimmed = name.trim()
     if (trimmed.length === 0) {
       failWith('name', 'Give the profile a name.', 'f-name')
-      return
-    }
-    if (role === 'gym' && gym.trim().length === 0) {
-      failWith('gym', 'A gym profile needs the name of the gym it runs.', 'f-gym')
       return
     }
     if (passphrase.length < 4) {
@@ -110,7 +139,7 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
     setBusy(true)
     setError(null)
     try {
-      await createProfile(trimmed, passphrase, { importLegacy: hasLegacy, gym, role })
+      await createProfile(trimmed, passphrase, { importLegacy: hasLegacy, gym })
       onUnlocked()
     } finally {
       setBusy(false)
@@ -191,19 +220,108 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
               )}
             </Button>
 
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setMode('create')
+                  setError(null)
+                  setShowPass(false)
+                  setPassphrase('')
+                }}
+              >
+                <Plus size={14} weight="bold" />
+                New profile
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setMode('signin')
+                  setError(null)
+                  setShowPass(false)
+                  setPassphrase('')
+                }}
+              >
+                <CloudCheck size={14} weight="bold" />
+                Sign in to sync
+              </Button>
+            </div>
+          </form>
+        ) : mode === 'signin' ? (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              void signIn()
+            }}
+            className="flex flex-col gap-4"
+          >
+            <div className="flex flex-col gap-1">
+              <h1 className="text-xl text-ink">Sign in to sync</h1>
+              <p className="text-2xs text-ink-3">
+                Your training pulls onto this device. One password signs you in and decrypts it —
+                the server only ever holds sealed rows.
+              </p>
+            </div>
+
+            <Input
+              label="Name"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value)
+                setError(null)
+              }}
+              error={errorFor('name')}
+              hint="How this profile appears on this device's lock screen."
+              autoFocus
+            />
+            <Input
+              label="Email"
+              type="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value)
+                setError(null)
+              }}
+              error={errorFor('email')}
+            />
+            <Input
+              label="Account password"
+              type={showPass ? 'text' : 'password'}
+              value={accountPassword}
+              onChange={(e) => {
+                setAccountPassword(e.target.value)
+                setError(null)
+              }}
+              error={errorFor('apass') ?? errorFor('signin')}
+              trailing={<RevealToggle shown={showPass} onToggle={() => setShowPass((v) => !v)} />}
+            />
+
+            <Button type="submit" size="lg" disabled={busy} className="w-full">
+              {busy ? (
+                <CircleNotch size={18} weight="bold" className="animate-spin" />
+              ) : (
+                <>
+                  Sign in and pull my training
+                  <ArrowRight size={18} weight="bold" />
+                </>
+              )}
+            </Button>
+
             <Button
               variant="ghost"
               size="sm"
               className="self-center"
               onClick={() => {
-                setMode('create')
+                setMode(profiles.length > 0 ? 'unlock' : 'create')
                 setError(null)
                 setShowPass(false)
                 setPassphrase('')
+                setAccountPassword('')
               }}
             >
-              <Plus size={14} weight="bold" />
-              New profile
+              Back
             </Button>
           </form>
         ) : (
@@ -217,9 +335,14 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
             <div className="flex flex-col gap-1">
               <h1 className="text-xl text-ink">Create your profile</h1>
               <p className="text-2xs text-ink-3">
-                Your training data is encrypted with this passphrase and never leaves the device.
-                There is no reset: write it down, and export backups from Settings.
+                Your training data is encrypted with this passphrase. There is no reset: write it
+                down, and export backups from Settings.
               </p>
+              {profiles.length === 0 && (
+                <p className="text-2xs text-ink-3">
+                  The first profile on a device is its administrator.
+                </p>
+              )}
             </div>
 
             <Input
@@ -232,38 +355,19 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
               error={errorFor('name')}
               autoFocus
             />
-            <FormSelect
-              label="Profile type"
-              value={role}
+            <Combobox
+              label="Gym"
+              value={gym}
               onValueChange={(v) => {
-                setRole(v as ProfileRole)
+                setGym(v)
                 setError(null)
               }}
-              options={[
-                { value: 'member', label: 'Member — I train here' },
-                { value: 'gym', label: 'Gym — I run a gym' },
-                { value: 'admin', label: 'Administrator — I manage this device' },
-              ]}
+              options={gyms}
+              placeholder="Search or add yours"
+              createLabel="Add gym"
+              error={errorFor('gym')}
+              hint="Leave empty if you train on your own."
             />
-            {role !== 'admin' && (
-              <Combobox
-                label="Gym"
-                value={gym}
-                onValueChange={(v) => {
-                  setGym(v)
-                  setError(null)
-                }}
-                options={gyms}
-                placeholder="Search or add yours"
-                createLabel="Add gym"
-                error={errorFor('gym')}
-                hint={
-                  role === 'gym'
-                    ? 'The gym this profile runs. Members who pick it become your audience.'
-                    : 'Leave empty if you train on your own.'
-                }
-              />
-            )}
             <Input
               label="Passphrase"
               type={showPass ? 'text' : 'password'}
@@ -302,22 +406,37 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
               )}
             </Button>
 
-            {profiles.length > 0 && (
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              {profiles.length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setMode('unlock')
+                    setError(null)
+                    setShowPass(false)
+                    setPassphrase('')
+                    setConfirm('')
+                  }}
+                >
+                  Back to profiles
+                </Button>
+              )}
               <Button
                 variant="ghost"
                 size="sm"
-                className="self-center"
                 onClick={() => {
-                  setMode('unlock')
+                  setMode('signin')
                   setError(null)
                   setShowPass(false)
                   setPassphrase('')
                   setConfirm('')
                 }}
               >
-                Back to profiles
+                <CloudCheck size={14} weight="bold" />
+                Sign in to sync
               </Button>
-            )}
+            </div>
           </form>
         )}
       </div>

@@ -1,5 +1,7 @@
 import {
+  KDF_ITERATIONS,
   decryptJson,
+  deriveBitsBase64,
   deriveKey,
   encryptJson,
   exportKeyBase64,
@@ -14,6 +16,7 @@ import { listEnvelopes, writeRemoteEnvelope, type EnvelopeRow } from './record-s
 import {
   activeProfileKey,
   adoptRemoteIdentity,
+  createLinkedProfile,
   flushActiveProfile,
   profileCrypto,
   reloadActiveFromDisk,
@@ -211,10 +214,22 @@ interface AuthPayload {
   record: { id: string }
 }
 
+/**
+ * The server-facing credential. One password does both jobs — signs devices
+ * in and decrypts the data — without the server ever being able to do the
+ * second: what travels is a derivation salted by the email, the data key is
+ * the same password under the account's random salt, and neither yields the
+ * other or the password itself.
+ */
+export async function authPassOf(email: string, password: string): Promise<string> {
+  const salt = new TextEncoder().encode(`enforma-auth:${email.trim().toLowerCase()}`)
+  return deriveBitsBase64(password, salt, KDF_ITERATIONS)
+}
+
 async function authenticate(server: string, email: string, password: string): Promise<AuthPayload> {
   return request<AuthPayload>(server, '/api/collections/users/auth-with-password', {
     method: 'POST',
-    body: { identity: email, password },
+    body: { identity: email, password: await authPassOf(email, password) },
   })
 }
 
@@ -361,24 +376,33 @@ export interface CreateAccountInput {
 }
 
 /**
- * Creates the account from the device that owns the data: signs up, uploads
- * the KDF material and the key wrapped under a fresh recovery code, then
- * pushes every row. Returns the code — it is shown once and never stored.
+ * Creates the account from the device that owns the data. One password from
+ * here on: the account's data key is derived from it under a fresh salt, the
+ * local rows move onto that key (so this profile now unlocks with the
+ * password), the login credential is a separate derivation, and the key also
+ * gets wrapped under a one-time recovery code. Then every row is pushed.
  */
 export async function createSyncAccount(
   profileId: string,
   input: CreateAccountInput,
 ): Promise<{ recoveryCode: string }> {
-  const crypto = profileCrypto(profileId)
-  const key = activeProfileKey()
-  if (!crypto || !key) throw new Error('The profile must be unlocked to set up sync.')
+  if (!profileCrypto(profileId) || !activeProfileKey())
+    throw new Error('The profile must be unlocked to set up sync.')
   const server = normalizeServer(input.server)
 
   await request(server, '/api/collections/users/records', {
     method: 'POST',
-    body: { email: input.email, password: input.password, passwordConfirm: input.password },
+    body: {
+      email: input.email,
+      password: await authPassOf(input.email, input.password),
+      passwordConfirm: await authPassOf(input.email, input.password),
+    },
   })
   const auth = await authenticate(server, input.email, input.password)
+
+  const encSalt = randomBytes(16)
+  const key = await deriveKey(input.password, encSalt, KDF_ITERATIONS)
+  const check = await encryptJson(key, 'forma')
 
   const recoveryCode = generateRecoveryCode()
   const recoverySalt = randomBytes(16)
@@ -390,13 +414,21 @@ export async function createSyncAccount(
     token: auth.token,
     body: {
       owner: auth.record.id,
-      salt: crypto.salt,
-      iterations: crypto.iterations,
-      check: crypto.check,
+      salt: toBase64(encSalt),
+      iterations: KDF_ITERATIONS,
+      check,
       wrapped_key: wrapped,
       recovery_salt: toBase64(recoverySalt),
     },
   })
+
+  /* Local rows re-encrypt onto the password-derived key; the old passphrase
+     stops being a thing anyone has to remember. */
+  await adoptRemoteIdentity(
+    profileId,
+    { salt: toBase64(encSalt), iterations: KDF_ITERATIONS, check },
+    key,
+  )
 
   writeSyncLink(profileId, {
     server,
@@ -413,18 +445,20 @@ export interface LinkAccountInput {
   server: string
   email: string
   password: string
-  /** The account passphrase — or, when forgotten, the signup recovery code. */
-  passphrase?: string
+  /** Kept for the future password-reset flow: unwraps the key without it. */
   recoveryCode?: string
 }
 
 /**
- * Joins this profile to an existing account: verifies the secret against the
- * account's sentinel, re-encrypts local rows under the account key, then
- * merges both histories. The profile unlocks with the account passphrase
- * from here on.
+ * Signs into an account and proves the secret can actually decrypt it:
+ * authenticates, fetches the account's KDF material, derives (or unwraps)
+ * the key and verifies it against the sentinel before anyone touches rows.
  */
-export async function linkSyncAccount(profileId: string, input: LinkAccountInput): Promise<void> {
+async function openAccount(input: LinkAccountInput): Promise<{
+  probe: SyncLink
+  state: SyncStatePayload
+  key: CryptoKey
+}> {
   const server = normalizeServer(input.server)
   const auth = await authenticate(server, input.email, input.password)
   const probe: SyncLink = {
@@ -437,7 +471,7 @@ export async function linkSyncAccount(profileId: string, input: LinkAccountInput
   const state = await fetchSyncState(probe)
   if (!state) {
     throw new Error(
-      'That account holds no training data yet. Create the sync account from the device that has your history.',
+      'That account holds no training data yet. Turn on sync from the device that has your history.',
     )
   }
 
@@ -453,7 +487,7 @@ export async function linkSyncAccount(profileId: string, input: LinkAccountInput
       throw new Error('That recovery code does not open this account.')
     }
   } else {
-    key = await deriveKey(input.passphrase ?? '', fromBase64(state.salt), state.iterations)
+    key = await deriveKey(input.password, fromBase64(state.salt), state.iterations)
   }
   try {
     await decryptJson<string>(key, state.check)
@@ -461,12 +495,52 @@ export async function linkSyncAccount(profileId: string, input: LinkAccountInput
     throw new Error(
       input.recoveryCode
         ? 'That recovery code does not open this account.'
-        : 'That passphrase does not open this account.',
+        : 'That password signs in but cannot decrypt this account — was it changed outside enForma?',
     )
   }
+  return { probe, state, key }
+}
 
+/**
+ * Joins this profile to an existing account: verifies the secret against the
+ * account's sentinel, re-encrypts local rows under the account key, then
+ * merges both histories. The profile unlocks with the account passphrase
+ * from here on.
+ */
+export async function linkSyncAccount(profileId: string, input: LinkAccountInput): Promise<void> {
+  const { probe, state, key } = await openAccount(input)
   await adoptRemoteIdentity(
     profileId,
+    { salt: state.salt, iterations: state.iterations, check: state.check },
+    key,
+  )
+  writeSyncLink(profileId, probe)
+  const result = await syncNow(profileId)
+  if (!result.ok) throw new Error(result.message)
+}
+
+export interface GateSignInInput {
+  name: string
+  email: string
+  password: string
+  /** Self-hosters pointing elsewhere; everyone else gets the app's own /pb. */
+  server?: string
+}
+
+/**
+ * The one-step second device: sign in from the lock screen with the same
+ * email and password as anywhere, and the training appears. Creates a local
+ * profile already carrying the account's crypto identity — no throwaway
+ * profile, no manual linking, no server address, no extra secret.
+ */
+export async function signInFromGate(input: GateSignInInput): Promise<void> {
+  const { probe, state, key } = await openAccount({
+    server: input.server ?? '',
+    email: input.email,
+    password: input.password,
+  })
+  const profileId = await createLinkedProfile(
+    input.name,
     { salt: state.salt, iterations: state.iterations, check: state.check },
     key,
   )

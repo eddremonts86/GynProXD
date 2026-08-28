@@ -1,0 +1,42 @@
+server {
+  listen 80;
+  server_name _;
+  root /usr/share/nginx/html;
+  index index.html;
+
+  gzip on;
+  gzip_types text/css application/javascript application/json image/svg+xml;
+
+  # The service worker must never be served stale, or updates wedge.
+  location = /sw.js {
+    add_header Cache-Control "no-cache";
+  }
+
+  # Hashed assets are immutable by name.
+  location /assets/ {
+    add_header Cache-Control "public, max-age=31536000, immutable";
+  }
+
+  # The sync server on the app's own origin: members never see a server
+  # address. Requests to /pb forward to PocketBase through the platform proxy
+  # (SYNC_PROXY_TARGET, e.g. Coolify's Traefik) using the sync service's host
+  # (SYNC_UPSTREAM_HOST). Resolved per request so the app still boots and
+  # serves training offline when the proxy is absent.
+  location /pb/ {
+    resolver 127.0.0.11 valid=30s ipv6=off;
+    set $sync_target "${SYNC_PROXY_TARGET}";
+    rewrite ^/pb/(.*)$ /$1 break;
+    proxy_pass $sync_target;
+    proxy_http_version 1.1;
+    proxy_set_header Host "${SYNC_UPSTREAM_HOST}";
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_buffering off;
+    proxy_read_timeout 90s;
+  }
+
+  # SPA: every route is index.html.
+  location / {
+    try_files $uri $uri/ /index.html;
+  }
+}

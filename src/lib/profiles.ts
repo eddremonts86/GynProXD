@@ -317,7 +317,10 @@ export async function createProfile(
   const salt = randomBytes(16)
   const key = await deriveKey(passphrase, salt, KDF_ITERATIONS)
   const gym = options?.gym?.trim()
-  const role = options?.role
+  /* The gate only creates members. Whoever sets up a fresh device becomes its
+     administrator; every later role change happens in the admin panel, so gym
+     and admin cannot be self-assigned at the door. */
+  const role = options?.role ?? (readRegistry().profiles.length === 0 ? 'admin' : undefined)
   const meta: ProfileMeta = {
     id: `profile-${Date.now()}-${toBase64(randomBytes(6)).replace(/[^a-zA-Z0-9]/g, '')}`,
     name: name.trim(),
@@ -456,6 +459,34 @@ export async function adoptRemoteIdentity(
   } catch {
     // Private mode: a refresh will ask for the passphrase again.
   }
+}
+
+/**
+ * A profile born from a sync account: it starts empty and already carries the
+ * account's salt and sentinel, so the same passphrase opens it here and the
+ * pulled rows decrypt without any re-encryption. This is the second device's
+ * one-step sign-in.
+ */
+export async function createLinkedProfile(
+  name: string,
+  remote: { salt: string; iterations: number; check: CipherBlob },
+  key: CryptoKey,
+): Promise<string> {
+  const meta: ProfileMeta = {
+    id: `profile-${Date.now()}-${toBase64(randomBytes(6)).replace(/[^a-zA-Z0-9]/g, '')}`,
+    name: name.trim() || 'Me',
+    createdAt: new Date().toISOString(),
+    kdf: { salt: remote.salt, iterations: remote.iterations },
+    check: remote.check,
+  }
+  const cache = await writeAllRecords(meta.id, key, EMPTY_SNAPSHOT)
+
+  const registry = readRegistry()
+  registry.profiles.push(meta)
+  writeRegistry(registry)
+
+  await startSession(meta.id, key, EMPTY_SNAPSHOT, cache)
+  return meta.id
 }
 
 /**

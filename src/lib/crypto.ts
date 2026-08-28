@@ -56,6 +56,32 @@ export async function deriveKey(
   )
 }
 
+/**
+ * Deterministic bytes from a secret, for material that is sent rather than
+ * kept — the sync login credential. Same KDF as the data key but a different
+ * salt, so holding one never yields the other.
+ */
+export async function deriveBitsBase64(
+  secret: string,
+  salt: Uint8Array,
+  iterations = KDF_ITERATIONS,
+  length = 32,
+): Promise<string> {
+  const material = await subtle.importKey(
+    'raw',
+    new TextEncoder().encode(secret),
+    'PBKDF2',
+    false,
+    ['deriveBits'],
+  )
+  const bits = await subtle.deriveBits(
+    { name: 'PBKDF2', hash: 'SHA-256', salt: salt as BufferSource, iterations },
+    material,
+    length * 8,
+  )
+  return toBase64(new Uint8Array(bits))
+}
+
 export async function encryptJson(key: CryptoKey, value: unknown): Promise<CipherBlob> {
   const iv = randomBytes(12)
   const plaintext = new TextEncoder().encode(JSON.stringify(value))
