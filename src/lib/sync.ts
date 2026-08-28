@@ -741,7 +741,19 @@ async function syncGymBus(profileId: string, link: SyncLink): Promise<void> {
     updateProfileMeta(profileId, { role: 'gym', gym: operated.name })
   }
 
-  const memberGym = operated ?? gyms.find((g) => sameName(g.name, mine?.gym))
+  let memberGym = operated ?? gyms.find((g) => sameName(g.name, mine?.gym))
+  if (!operated && !memberGym && mine) {
+    /* A device the account just signed into knows the training history but
+       not the gym: that lives on the account. Adopt it, or the inbox stays
+       silent on every new device. */
+    const me = await request<{ gym?: string }>(
+      link.server,
+      `/api/collections/users/records/${link.userId}`,
+      { token: link.token },
+    ).catch(() => null)
+    memberGym = gyms.find((g) => g.id === me?.gym)
+    if (memberGym) updateProfileMeta(profileId, { gym: memberGym.name })
+  }
   if (!operated && memberGym) {
     /* Idempotent: tells the server which gym may address this account. */
     await request(link.server, `/api/collections/users/records/${link.userId}`, {
