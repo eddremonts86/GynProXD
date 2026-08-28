@@ -157,6 +157,119 @@ const selfOperate = await api(`/api/collections/gyms/records/${gym.id}`, {
 })
 check('a user cannot add themselves as an operator', !selfOperate.ok, `status ${selfOperate.status}`)
 
+// --- cross-tenant: an operator of one gym cannot touch another ---
+// A second gym G2 with its own operator O2, and a member M2 of G2.
+const O2 = await user(`audit-op2-${TS}@test.local`)
+const M2 = await user(`audit-m2-${TS}@test.local`)
+const gym2 = (
+  await api('/api/collections/gyms/records', {
+    method: 'POST',
+    token: su.data.token,
+    body: { name: `Audit Gym 2 ${TS}`, operators: [O2.id] },
+  })
+).data
+await api(`/api/collections/users/records/${M2.id}`, {
+  method: 'PATCH',
+  token: M2.token,
+  body: { gym: gym2.id },
+})
+const g2msg = await api('/api/collections/gym_messages/records', {
+  method: 'POST',
+  token: O2.token,
+  body: { gym: gym2.id, author: O2.id, kind: 'announcement', title: 'g2 only' },
+})
+check('operator O2 can publish to their own gym G2', g2msg.ok, `status ${g2msg.status}`)
+
+const crossPublish = await api('/api/collections/gym_messages/records', {
+  method: 'POST',
+  token: O.token,
+  body: { gym: gym2.id, author: O.id, kind: 'announcement', title: 'trespass' },
+})
+check('operator of G1 cannot publish to G2', !crossPublish.ok, `status ${crossPublish.status}`)
+
+const crossDelete = await api(`/api/collections/gym_messages/records/${g2msg.data.id}`, {
+  method: 'DELETE',
+  token: O.token,
+})
+check("operator of G1 cannot delete G2's message", !crossDelete.ok, `status ${crossDelete.status}`)
+
+const crossRead = await api('/api/collections/gym_messages/records?perPage=50', { token: O.token })
+const readsG2 = (crossRead.data.items ?? []).some((m) => m.gym === gym2.id)
+check("operator of G1 cannot read G2's bus", !readsG2)
+
+const crossGrant = await api(`/api/collections/gyms/records/${gym2.id}`, {
+  method: 'PATCH',
+  token: O.token,
+  body: { operators: [O2.id, O.id] },
+})
+check('operator of G1 cannot add themselves to G2', !crossGrant.ok, `status ${crossGrant.status}`)
+
+const crossRename = await api(`/api/collections/gyms/records/${gym2.id}`, {
+  method: 'PATCH',
+  token: O.token,
+  body: { name: `Hijacked ${TS}` },
+})
+check("operator of G1 cannot rename G2", !crossRename.ok, `status ${crossRename.status}`)
+
+const m1ReadsG2 = await api('/api/collections/gym_messages/records?perPage=50', { token: M.token })
+const m1SeesG2 = (m1ReadsG2.data.items ?? []).some((m) => m.gym === gym2.id)
+check("a member of G1 cannot read G2's bus", !m1SeesG2)
+
+// Messages are immutable once published: even the owning operator cannot edit.
+const editOwn = await api(`/api/collections/gym_messages/records/${realMsg.data.id}`, {
+  method: 'PATCH',
+  token: O.token,
+  body: { title: 'edited' },
+})
+check('published messages are immutable (no edit, even by author)', !editOwn.ok, `status ${editOwn.status}`)
+
+const opDeletesOwn = await api(`/api/collections/gym_messages/records/${realMsg.data.id}`, {
+  method: 'DELETE',
+  token: O.token,
+})
+check('an operator can delete their own gym message', opDeletesOwn.ok, `status ${opDeletesOwn.status}`)
+
+// --- self-service membership (a KNOWN product gap, reported not asserted) ---
+// An account can PATCH its own users.gym to any gym id and then read that
+// gym's broadcast bus, with no approval from the gym. This is inherited from
+// the local-first model (you type your gym's name) and is NOT a data leak —
+// the bus carries announcements/menus/offers, no member PII — but it means a
+// gym cannot vet its audience, and offer codes are visible to anyone who
+// joins. Closing it is a product decision (join code / operator approval),
+// so it is surfaced here, deliberately, rather than asserted or silently fixed.
+{
+  // A dedicated gym with a LIVE message, so the demonstration is real and not
+  // an empty-bus false negative (the other gyms get emptied by earlier tests).
+  const opX = await user(`audit-opx-${TS}@test.local`)
+  const gymX = (
+    await api('/api/collections/gyms/records', {
+      method: 'POST',
+      token: su.data.token,
+      body: { name: `Audit Gym X ${TS}`, operators: [opX.id] },
+    })
+  ).data
+  await api('/api/collections/gym_messages/records', {
+    method: 'POST',
+    token: opX.token,
+    body: { gym: gymX.id, author: opX.id, kind: 'offer', title: 'members offer', body: 'code SECRET-20' },
+  })
+  const intruder = await user(`audit-intruder-${TS}@test.local`)
+  const patch = await api(`/api/collections/users/records/${intruder.id}`, {
+    method: 'PATCH',
+    token: intruder.token,
+    body: { gym: gymX.id },
+  })
+  const re = await api('/api/collections/users/auth-with-password', {
+    method: 'POST',
+    body: { identity: intruder.email, password: 'auditpass123' },
+  })
+  const reads = await api('/api/collections/gym_messages/records?perPage=50', { token: re.data.token })
+  const grabbed = (reads.data.items ?? []).some((m) => m.gym === gymX.id)
+  console.log(
+    `NOTE  self-service membership: PATCH users.gym accepted=${patch.ok}, intruder then reads that gym's bus=${grabbed}. Anyone can subscribe to any gym without approval (broadcast content incl. offer codes, no member PII). Closing it is a product decision (join code / operator approval) — tracked, not fixed here.`,
+  )
+}
+
 // --- push subscriptions are private ---
 await api('/api/collections/push_subs/records', {
   method: 'POST',
