@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { nutritionTargetFor } from './nutrition-target'
 import {
+  catalogueQuery,
   dishTotals,
   parseDish,
   parseDishList,
@@ -189,5 +190,19 @@ describe('rankSuggestions', () => {
     }
     const ranked = rankSuggestions([noMacros, mk('b', 400, 38)], target)
     expect(ranked[ranked.length - 1].id).toBe('c')
+  })
+})
+
+describe('catalogueQuery', () => {
+  it('sends only the filters that are set', () => {
+    expect(catalogueQuery({})).toBe('')
+    expect(catalogueQuery({ q: 'chicken' })).toBe('q=chicken')
+    expect(catalogueQuery({ sort: 'name' })).toBe('')
+    expect(catalogueQuery({ sort: 'protein', page: 2 })).toBe('sort=protein&page=2')
+  })
+
+  it('drops zeroed macro filters rather than sending them', () => {
+    expect(catalogueQuery({ minProtein: 0, maxKcal: 0 })).toBe('')
+    expect(catalogueQuery({ minProtein: 25, maxKcal: 400 })).toBe('minProtein=25&maxKcal=400')
   })
 })

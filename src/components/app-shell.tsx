@@ -10,6 +10,7 @@ import {
   BellSimple,
   CalendarBlank,
   ChartLineUp,
+  ForkKnife,
   GearSix,
   ListMagnifyingGlass,
   ShieldCheck,
@@ -50,6 +51,7 @@ const NAV: NavItem[] = [
   { label: 'Planner', to: '/planner', icon: CalendarBlank, owns: ['/onboarding', '/generated'] },
   { label: 'Challenges', to: '/challenges', icon: Trophy },
   { label: 'Library', to: '/library', icon: ListMagnifyingGlass },
+  { label: 'Recipes', to: '/recipes', icon: ForkKnife, owns: ['/recipe'] },
   { label: 'History', to: '/history', icon: ChartLineUp },
 ]
 

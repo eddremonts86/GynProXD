@@ -330,33 +330,49 @@ function TodayOverview({
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <Panel padding="md">
-          <Stat label="Sessions, last 7 days" value={metrics.sessions} />
-        </Panel>
-        <Panel padding="md">
-          <Stat label="Sets, last 7 days" value={metrics.sets} />
-        </Panel>
-        <Panel padding="md">
+      {/* One surface split by hairlines rather than four floating boxes: these
+          four numbers are one glance at the week, not four separate cards. */}
+      <Panel padding="none">
+        <div className="grid grid-cols-2 divide-x divide-y divide-line lg:grid-cols-4 lg:divide-y-0">
           <Stat
+            className="p-4 md:p-5"
+            label="Sessions, last 7 days"
+            value={metrics.sessions}
+            hint={metrics.sessions === 0 ? 'None logged' : undefined}
+          />
+          <Stat
+            className="p-4 md:p-5"
+            label="Sets, last 7 days"
+            value={metrics.sets}
+            hint={
+              metrics.sets === 0
+                ? 'None logged'
+                : metrics.hadLastWeek
+                  ? `${metrics.volumeDelta >= 0 ? '+' : ''}${metrics.volumeDelta} kg vs last week`
+                  : undefined
+            }
+          />
+          <Stat
+            className="p-4 md:p-5"
             label="Weeks trained, last 12"
             value={`${metrics.weeksTrained}/12`}
+            hint={metrics.weeksTrained === 0 ? 'Your first week starts it' : undefined}
             spark={
               metrics.weeksTrained > 0 ? (
                 <SparkArea data={metrics.volumeSpark} color="var(--chart-1)" />
               ) : undefined
             }
           />
-        </Panel>
-        <Panel padding="md">
           <Stat
+            className="p-4 md:p-5"
             label="Weight, 30 days"
             value={weightDelta === null ? '--' : weightDelta > 0 ? `+${weightDelta}` : weightDelta}
             unit={weightDelta === null ? undefined : 'kg'}
-            spark={<SparkArea data={weightSpark} color="var(--chart-2)" />}
+            hint={weightDelta === null ? 'No weigh-ins yet' : undefined}
+            spark={weightSpark.length > 1 ? <SparkArea data={weightSpark} color="var(--chart-2)" /> : undefined}
           />
-        </Panel>
-      </div>
+        </div>
+      </Panel>
 
       <ConsistencyToday />
 

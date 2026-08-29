@@ -34,6 +34,9 @@ const NotFoundPage = React.lazy(() =>
 const ChallengesPage = React.lazy(() =>
   import('./routes/Challenges').then((m) => ({ default: m.ChallengesPage })),
 )
+const RecipesPage = React.lazy(() =>
+  import('./routes/Recipes').then((m) => ({ default: m.RecipesPage })),
+)
 const RecipePage = React.lazy(() =>
   import('./routes/Recipe').then((m) => ({ default: m.RecipePage })),
 )
@@ -103,6 +106,7 @@ export const router = createRouter({
     lazyRoute('/fitness-test', FitnessTestPage),
     lazyRoute('/onboarding', OnboardingPage),
     lazyRoute('/generated/$id', GeneratedPlanPage),
+    lazyRoute('/recipes', RecipesPage),
     recipeRoute,
   ]),
 })

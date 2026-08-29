@@ -153,6 +153,53 @@ export async function fetchDailyDish(dateIso: string): Promise<RecipeSuggestion 
   }
 }
 
+export interface RecipePage {
+  items: RecipeSuggestion[]
+  page: number
+  hasMore: boolean
+  /** Size of the whole catalogue, when the server can count it. */
+  total: number | null
+}
+
+export interface CatalogueQuery {
+  q?: string
+  category?: string
+  minProtein?: number
+  maxKcal?: number
+  sort?: 'name' | 'protein' | 'light' | 'quick'
+  page?: number
+}
+
+export function catalogueQuery(query: CatalogueQuery): string {
+  const params = new URLSearchParams()
+  if (query.q) params.set('q', query.q)
+  if (query.category) params.set('category', query.category)
+  if (query.minProtein) params.set('minProtein', String(query.minProtein))
+  if (query.maxKcal) params.set('maxKcal', String(query.maxKcal))
+  if (query.sort && query.sort !== 'name') params.set('sort', query.sort)
+  if (query.page) params.set('page', String(query.page))
+  return params.toString()
+}
+
+/** A page of the catalogue. Null means the server could not be reached. */
+export async function fetchCatalogue(query: CatalogueQuery): Promise<RecipePage | null> {
+  try {
+    const res = await fetch(`/pb/api/enforma/recipes?${catalogueQuery(query)}`, {
+      signal: AbortSignal.timeout(10000),
+    })
+    if (!res.ok) return null
+    const raw = (await res.json()) as Record<string, unknown>
+    return {
+      items: parseDishList(raw),
+      page: typeof raw.page === 'number' ? raw.page : 0,
+      hasMore: raw.hasMore === true,
+      total: typeof raw.total === 'number' ? raw.total : null,
+    }
+  } catch {
+    return null
+  }
+}
+
 /** One recipe by id, so the recipe page survives a refresh or a shared link. */
 export async function fetchRecipe(id: string): Promise<RecipeSuggestion | null> {
   try {

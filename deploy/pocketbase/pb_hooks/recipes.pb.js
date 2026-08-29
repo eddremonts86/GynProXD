@@ -110,6 +110,72 @@ routerAdd('GET', '/api/enforma/recipes/suggestions', (e) => {
 })
 
 /**
+ * Browsing the catalogue: text search, category, macro filters, paged. Public
+ * like the daily dish — the catalogue holds no personal data. Vendor rows are
+ * hidden once their 24 hours are up, exactly as everywhere else.
+ */
+routerAdd('GET', '/api/enforma/recipes', (e) => {
+  const lib = require(`${__hooks}/utils/recipes_lib.js`)
+  const q = e.request.url.query()
+
+  const PER_PAGE = 24
+  const page = Math.max(0, Math.min(200, parseInt(q.get('page') || '0', 10) || 0))
+  const term = (q.get('q') || '').trim().slice(0, 80)
+  const category = (q.get('category') || '').trim().slice(0, 40)
+  const minProtein = parseInt(q.get('minProtein') || '', 10)
+  const maxKcal = parseInt(q.get('maxKcal') || '', 10)
+  const sort = q.get('sort') || 'name'
+
+  const conditions = ["(provider = 'pd' || fetchedAt >= {:cutoff})"]
+  const params = { cutoff: lib.freshCutoff() }
+  if (term) {
+    conditions.push('title ~ {:term}')
+    params.term = '%' + term + '%'
+  }
+  if (category) {
+    conditions.push('category = {:category}')
+    params.category = category
+  }
+  if (Number.isFinite(minProtein) && minProtein > 0) {
+    conditions.push('proteinG >= {:minProtein}')
+    params.minProtein = minProtein
+  }
+  if (Number.isFinite(maxKcal) && maxKcal > 0) {
+    conditions.push('kcal > 0 && kcal <= {:maxKcal}')
+    params.maxKcal = maxKcal
+  }
+
+  const ORDER = {
+    name: 'title',
+    protein: '-proteinG,title',
+    light: 'kcal,title',
+    quick: 'readyInMinutes,title',
+  }
+  const order = ORDER[sort] || ORDER.name
+
+  /* One extra row is the cheapest way to know whether a next page exists. */
+  const rows = $app.findRecordsByFilter(
+    'recipes',
+    conditions.join(' && '),
+    order,
+    PER_PAGE + 1,
+    page * PER_PAGE,
+    params,
+  )
+  const hasMore = rows.length > PER_PAGE
+  const items = (hasMore ? rows.slice(0, PER_PAGE) : rows).map(lib.dishFromRecord)
+
+  let total = null
+  try {
+    total = $app.countRecords('recipes')
+  } catch {
+    /* Older PocketBase: the page simply does not show a grand total. */
+  }
+
+  return e.json(200, { items: items, page: page, perPage: PER_PAGE, hasMore: hasMore, total: total })
+})
+
+/**
  * One recipe by id, for the recipe page and its deep links. Public like the
  * daily dish: the catalogue is not personal data. A fatsecret row past its
  * 24 hours is treated as gone rather than served stale.
