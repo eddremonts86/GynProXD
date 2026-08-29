@@ -30,3 +30,6 @@ docs/ui-audit/evidence/
 # PocketBase local dev runtime (binary + data)
 deploy/pocketbase/.local/
 pb_data/
+
+# Recorded vendor API responses: content we may not redistribute.
+deploy/pocketbase/fixtures/
