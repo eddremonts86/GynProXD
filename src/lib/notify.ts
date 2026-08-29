@@ -24,12 +24,40 @@ export function notificationsSupported(): boolean {
   return typeof Notification !== 'undefined'
 }
 
+/**
+ * Effective state: a channel delivers only when the browser has granted
+ * permission AND the preference is not switched off. The preference is
+ * opt-out — absent means on — so once permission is granted both channels
+ * work without a second trip to Settings.
+ */
 export function notificationsEnabled(channel: NotifyChannel = 'gym'): boolean {
   return (
     notificationsSupported() &&
     Notification.permission === 'granted' &&
-    localStorage.getItem(keyFor(channel)) === 'on'
+    localStorage.getItem(keyFor(channel)) !== 'off'
   )
+}
+
+/** The opt-out preference alone (on unless turned off), ignoring permission. */
+export function notificationsWanted(channel: NotifyChannel = 'gym'): boolean {
+  return notificationsSupported() && localStorage.getItem(keyFor(channel)) !== 'off'
+}
+
+/** Records the preference without touching browser permission. */
+export function setNotificationPref(channel: NotifyChannel, on: boolean): void {
+  localStorage.setItem(keyFor(channel), on ? 'on' : 'off')
+}
+
+/** Whether the browser has decided on permission: 'default' | 'granted' | 'denied'. */
+export function notificationPermission(): NotificationPermission {
+  return notificationsSupported() ? Notification.permission : 'denied'
+}
+
+/** Asks the browser for permission from a user gesture; true once granted. */
+export async function requestNotificationPermission(): Promise<boolean> {
+  if (!notificationsSupported()) return false
+  if (Notification.permission === 'granted') return true
+  return (await Notification.requestPermission()) === 'granted'
 }
 
 /** Turns the preference on, asking the browser if needed. */

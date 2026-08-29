@@ -28,15 +28,16 @@ import { SEX_LABELS } from '../lib/labels'
 import { todayIso } from '../lib/dates'
 import { Switch } from '@/components/ui/switch'
 import {
-  disableNotifications,
   disablePush,
-  enableNotifications,
   enablePush,
   needsHomeScreenForPush,
-  notificationsEnabled,
+  notificationPermission,
   notificationsSupported,
+  notificationsWanted,
   pushEnabled,
   pushSupported,
+  requestNotificationPermission,
+  setNotificationPref,
   type NotifyChannel,
 } from '../lib/notify'
 import { readSyncLink } from '../lib/sync'
@@ -472,6 +473,7 @@ function NotificationsSection() {
   return (
     <Section title="Notifications">
       <Panel padding="none" className="divide-y divide-line">
+        <NotificationPermissionRow />
         <NotificationToggle
           channel="gym"
           title="Gym messages"
@@ -485,6 +487,41 @@ function NotificationsSection() {
         />
       </Panel>
     </Section>
+  )
+}
+
+/**
+ * Browser permission is the one thing an app cannot switch on for you. The
+ * channels below default to on, so this asks for the grant that lets them
+ * actually deliver — once, without an unprompted popup. It disappears the
+ * moment permission is granted.
+ */
+function NotificationPermissionRow() {
+  const [permission, setPermission] = useState<NotificationPermission>(() => notificationPermission())
+  if (permission === 'granted') return null
+
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 p-5">
+      <div className="flex min-w-0 flex-col gap-0.5">
+        <span className="text-sm font-semibold text-ink">Allow notifications</span>
+        <span className="max-w-[52ch] text-2xs text-ink-3">
+          {permission === 'denied'
+            ? 'Your browser has blocked notifications for enForma. Allow them in the site settings to receive the reminders below.'
+            : 'The reminders below are on by default — let your browser deliver them.'}
+        </span>
+      </div>
+      {permission === 'default' && (
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={() =>
+            void requestNotificationPermission().then(() => setPermission(notificationPermission()))
+          }
+        >
+          Allow
+        </Button>
+      )}
+    </div>
   )
 }
 
@@ -549,32 +586,22 @@ function NotificationToggle({
   title: string
   description: string
 }) {
-  const [enabled, setEnabled] = useState(() => notificationsEnabled(channel))
-  const [blocked, setBlocked] = useState(false)
+  /* The toggle is the preference (opt-out, on by default); browser permission
+     is the separate concern the row above handles. */
+  const [enabled, setEnabled] = useState(() => notificationsWanted(channel))
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 p-5">
       <div className="flex min-w-0 flex-col gap-0.5">
         <span className="text-sm font-semibold text-ink">{title}</span>
-        <span className="max-w-[52ch] text-2xs text-ink-3">
-          {blocked
-            ? 'Your browser has notifications blocked for enForma. Allow them in the site settings and try again.'
-            : description}
-        </span>
+        <span className="max-w-[52ch] text-2xs text-ink-3">{description}</span>
       </div>
       <Switch
         aria-label={`Notify about ${title.toLowerCase()}`}
         checked={enabled}
         onCheckedChange={(on) => {
-          if (!on) {
-            disableNotifications(channel)
-            setEnabled(false)
-            return
-          }
-          void enableNotifications(channel).then((ok) => {
-            setEnabled(ok)
-            setBlocked(!ok)
-          })
+          setEnabled(on)
+          setNotificationPref(channel, on)
         }}
       />
     </div>
