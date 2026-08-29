@@ -21,8 +21,12 @@ import { Combobox } from '../ui/Combobox'
 import { FormSelect } from '../ui/FormSelect'
 import { Input } from '../ui/Input'
 import { Panel } from '../ui/Panel'
-import { PageHeader, Section } from '../ui/PageHeader'
+import { PageHeader } from '../ui/PageHeader'
 import { Tag } from '../ui/Tag'
+import { Tabs, TabPanel } from '../ui/Tabs'
+import { AdminOverview } from '../components/admin-overview'
+
+type TabValue = 'overview' | 'users' | 'gyms'
 
 const ROLE_LABELS: Record<ProfileRole, string> = {
   member: 'Member',
@@ -48,10 +52,12 @@ function AdminDesk({ selfId }: { selfId: string }) {
   const messages = useMessages((s) => s.messages)
   const removeByGym = useMessages((s) => s.removeByGym)
   const renameGymMessages = useMessages((s) => s.renameGym)
+  const menus = useMenus((s) => s.menus)
   const renameGymMenus = useMenus((s) => s.renameGym)
   const removeMenu = useMenus((s) => s.removeMenu)
   const refreshMeta = useSession((s) => s.refreshMeta)
 
+  const [tab, setTab] = useState<TabValue>('overview')
   const [profiles, setProfiles] = useState(listProfiles)
   const [gyms, setGyms] = useState(listGyms)
   const refresh = () => {
@@ -124,26 +130,21 @@ function AdminDesk({ selfId }: { selfId: string }) {
         description="The device's public layer: people, roles, gyms and the message bus. Encrypted training data stays sealed per profile."
       />
 
-      <Section title="Overview">
-        <Panel padding="lg">
-          <dl className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
-            {[
-              ['Profiles', profiles.length],
-              ['Gyms', gyms.length],
-              ['Messages', messages.length],
-              ['Gym operators', profiles.filter((p) => p.role === 'gym').length],
-            ].map(([label, value]) => (
-              <div key={label as string} className="flex flex-col gap-0.5">
-                <dt className="text-2xs text-ink-3">{label}</dt>
-                <dd className="num text-xl font-semibold text-ink">{value}</dd>
-              </div>
-            ))}
-          </dl>
-        </Panel>
-      </Section>
+      <Tabs
+        value={tab}
+        onValueChange={(v) => setTab(v as TabValue)}
+        tabs={[
+          { value: 'overview', label: 'Overview' },
+          { value: 'users', label: 'Users', count: profiles.length },
+          { value: 'gyms', label: 'Gyms', count: gyms.length },
+        ]}
+      >
+        <TabPanel value="overview">
+          <AdminOverview profiles={profiles} gyms={gyms} messages={messages} menus={menus} />
+        </TabPanel>
 
-      <Section title="Users" hint={pluralize(profiles.length, 'profile')}>
-        <Panel padding="lg">
+        <TabPanel value="users">
+          <Panel padding="lg">
           <ul className="divide-y divide-line">
             {profiles.map((p) => (
               <li key={p.id} className="py-3 first:pt-0 last:pb-0">
@@ -260,11 +261,11 @@ function AdminDesk({ selfId }: { selfId: string }) {
             Your own role stays fixed here so the device never loses its administrator by
             accident. Deleting a profile erases its encrypted data permanently.
           </p>
-        </Panel>
-      </Section>
+          </Panel>
+        </TabPanel>
 
-      <Section title="Gyms" hint={pluralize(gyms.length, 'gym')}>
-        <Panel padding="lg" className="flex flex-col gap-3">
+        <TabPanel value="gyms">
+          <Panel padding="lg" className="flex flex-col gap-3">
           {gyms.length === 0 ? (
             <p className="text-sm text-ink-3">No gyms yet. Add the first one below.</p>
           ) : (
@@ -362,8 +363,9 @@ function AdminDesk({ selfId }: { selfId: string }) {
             Renaming a gym updates the catalogue and every profile that points at it. Deleting
             unassigns its members and removes its messages.
           </p>
-        </Panel>
-      </Section>
+          </Panel>
+        </TabPanel>
+      </Tabs>
     </div>
   )
 }
