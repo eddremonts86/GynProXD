@@ -23,7 +23,7 @@ export function FitnessLevel() {
   return (
     <Section
       title="Your level"
-      hint={weeks === 0 ? 'Just tested' : `${weeks} weeks ago`}
+      hint={weeks === 0 ? 'Just tested' : `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`}
       action={
         stale ? (
           <Link to="/fitness-test" className="text-2xs font-medium text-brand underline underline-offset-2">
