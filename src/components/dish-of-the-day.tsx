@@ -4,6 +4,8 @@ import { useRecipes } from '../store/useRecipes'
 import { Panel } from '../ui/Panel'
 import { Tag } from '../ui/Tag'
 import { Section } from '../ui/PageHeader'
+import { RecipePreparation } from './recipe-preparation'
+import { RecipeAttribution } from './recipe-attribution'
 
 /**
  * One good plate a day, the same one on every device: the pick is seeded by
@@ -43,6 +45,7 @@ export function DishOfTheDay() {
             {daily.dish.coachNote && (
               <p className="max-w-[52ch] text-sm text-ink-3">{daily.dish.coachNote}</p>
             )}
+            <RecipePreparation dish={daily.dish} />
             {daily.dish.sourceUrl && (
               <a
                 href={daily.dish.sourceUrl}
@@ -57,18 +60,7 @@ export function DishOfTheDay() {
           </div>
         </Panel>
       )}
-      <p className="text-2xs text-ink-3">
-        Recipe and photo from{' '}
-        <a
-          href="https://www.themealdb.com"
-          target="_blank"
-          rel="noreferrer"
-          className="underline underline-offset-2"
-        >
-          TheMealDB
-        </a>
-        .
-      </p>
+      {daily && <RecipeAttribution items={[daily.dish]} />}
     </Section>
   )
 }

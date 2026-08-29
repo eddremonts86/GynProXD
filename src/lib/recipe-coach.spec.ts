@@ -19,9 +19,9 @@ const input: OnboardingInput = {
 }
 
 const items: RecipeSuggestion[] = [
-  { id: 'a', source: 'spoonacular', title: 'Chicken bowl', imageUrl: 'https://x/a.jpg', kcal: 550, proteinG: 52 },
-  { id: 'b', source: 'spoonacular', title: 'Salmon plate', imageUrl: 'https://x/b.jpg', kcal: 620, proteinG: 45 },
-  { id: 'c', source: 'spoonacular', title: 'Lentil stew', imageUrl: 'https://x/c.jpg', kcal: 480, proteinG: 28 },
+  { id: 'a', provider: 'fatsecret', title: 'Chicken bowl', imageUrl: 'https://x/a.jpg', kcal: 550, proteinG: 52 },
+  { id: 'b', provider: 'fatsecret', title: 'Salmon plate', imageUrl: 'https://x/b.jpg', kcal: 620, proteinG: 45 },
+  { id: 'c', provider: 'fatsecret', title: 'Lentil stew', imageUrl: 'https://x/c.jpg', kcal: 480, proteinG: 28 },
 ]
 
 describe('buildNotesPrompt', () => {

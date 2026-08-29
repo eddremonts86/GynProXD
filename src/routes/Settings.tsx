@@ -316,7 +316,17 @@ export function SettingsPage() {
             under its free-tier attribution licence.
           </p>
           <p className="max-w-[62ch] text-2xs">
-            The dish of the day, with its photo, comes from{' '}
+            Recipes, their photos, preparation steps and nutrition numbers come from USDA MyPlate
+            (public domain) and the{' '}
+            <a
+              href="https://platform.fatsecret.com"
+              target="_blank"
+              rel="noreferrer"
+              className="text-brand underline underline-offset-2"
+            >
+              fatsecret Platform API
+            </a>
+            . Offline sample dish photos from{' '}
             <a
               href="https://www.themealdb.com"
               target="_blank"
@@ -324,15 +334,6 @@ export function SettingsPage() {
               className="text-brand underline underline-offset-2"
             >
               TheMealDB
-            </a>
-            . Meal suggestions, their nutrition numbers and photos come from the{' '}
-            <a
-              href="https://spoonacular.com/food-api"
-              target="_blank"
-              rel="noreferrer"
-              className="text-brand underline underline-offset-2"
-            >
-              spoonacular API
             </a>
             .
           </p>

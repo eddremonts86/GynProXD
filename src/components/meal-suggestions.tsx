@@ -5,6 +5,7 @@ import { nutritionTargetFor } from '../lib/nutrition-target'
 import { Section } from '../ui/PageHeader'
 import { Panel } from '../ui/Panel'
 import { RecipeCard } from './recipe-card'
+import { RecipeAttribution } from './recipe-attribution'
 import type { OnboardingInput } from '../lib/types'
 
 /**
@@ -46,7 +47,6 @@ function Suggestions({ input }: { input: OnboardingInput }) {
   }, [ensureSuggestions, input])
 
   const items = suggestions?.items ?? []
-  const live = items.some((r) => r.source === 'spoonacular')
 
   return (
     <Section
@@ -62,7 +62,7 @@ function Suggestions({ input }: { input: OnboardingInput }) {
       {items.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {items.slice(0, 3).map((dish) => (
-            <RecipeCard key={`${dish.source}-${dish.id}`} dish={dish} />
+            <RecipeCard key={`${dish.provider}-${dish.id}`} dish={dish} />
           ))}
         </div>
       ) : (
@@ -73,37 +73,7 @@ function Suggestions({ input }: { input: OnboardingInput }) {
         )
       )}
 
-      {items.length > 0 && (
-        <p className="text-2xs text-ink-3">
-          {live ? (
-            <>
-              Dishes, numbers and photos from{' '}
-              <a
-                href="https://spoonacular.com/food-api"
-                target="_blank"
-                rel="noreferrer"
-                className="underline underline-offset-2"
-              >
-                spoonacular
-              </a>
-              .
-            </>
-          ) : (
-            <>
-              Sample dishes with editorial estimates; photos from{' '}
-              <a
-                href="https://www.themealdb.com"
-                target="_blank"
-                rel="noreferrer"
-                className="underline underline-offset-2"
-              >
-                TheMealDB
-              </a>
-              .
-            </>
-          )}
-        </p>
-      )}
+      {items.length > 0 && <RecipeAttribution items={items} />}
     </Section>
   )
 }

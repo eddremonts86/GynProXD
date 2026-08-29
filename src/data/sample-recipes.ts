@@ -9,7 +9,7 @@ import type { RecipeSuggestion } from '../lib/recipes'
 export const SAMPLE_SUGGESTIONS: RecipeSuggestion[] = [
   {
     id: '52772',
-    source: 'sample',
+    provider: 'sample',
     title: 'Teriyaki Chicken Casserole',
     imageUrl: 'https://www.themealdb.com/images/media/meals/wvpsxx1468256321.jpg',
     sourceUrl: 'https://www.themealdb.com/meal/52772',
@@ -20,7 +20,7 @@ export const SAMPLE_SUGGESTIONS: RecipeSuggestion[] = [
   },
   {
     id: '52773',
-    source: 'sample',
+    provider: 'sample',
     title: 'Honey Teriyaki Salmon',
     imageUrl: 'https://www.themealdb.com/images/media/meals/xxyupu1468262513.jpg',
     sourceUrl: 'https://www.themealdb.com/meal/52773',
@@ -31,7 +31,7 @@ export const SAMPLE_SUGGESTIONS: RecipeSuggestion[] = [
   },
   {
     id: '52807',
-    source: 'sample',
+    provider: 'sample',
     title: 'Baingan Bharta',
     imageUrl: 'https://www.themealdb.com/images/media/meals/urtpqw1487341253.jpg',
     sourceUrl: 'https://www.themealdb.com/meal/52807',

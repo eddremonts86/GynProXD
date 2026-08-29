@@ -1,6 +1,7 @@
 import { ArrowUpRight } from '@phosphor-icons/react'
 import { Panel } from '../ui/Panel'
 import { Tag } from '../ui/Tag'
+import { RecipePreparation } from './recipe-preparation'
 import type { RecipeSuggestion } from '../lib/recipes'
 
 /** One suggested plate: photo, the numbers that matter, the coach's sentence. */
@@ -35,6 +36,7 @@ export function RecipeCard({ dish }: { dish: RecipeSuggestion }) {
         {dish.coachNote && (
           <p className="text-2xs leading-relaxed text-ink-3">{dish.coachNote}</p>
         )}
+        <RecipePreparation dish={dish} />
         {dish.sourceUrl && (
           <a
             href={dish.sourceUrl}
