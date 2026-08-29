@@ -246,16 +246,26 @@ export function RecipesPage() {
       ) : state === 'loading' ? (
         <SkeletonGrid />
       ) : items.length === 0 ? (
-        <EmptyState
-          icon={<CookingPot size={20} />}
-          title="Nothing matches that"
-          description="Try a shorter word, another category, or drop one of the filters."
-          action={
-            <Button variant="secondary" size="sm" onClick={clearAll}>
-              Clear filters
-            </Button>
-          }
-        />
+        filtered ? (
+          <EmptyState
+            icon={<CookingPot size={20} />}
+            title="Nothing matches that"
+            description="Try a shorter word, another category, or drop one of the filters."
+            action={
+              <Button variant="secondary" size="sm" onClick={clearAll}>
+                Clear filters
+              </Button>
+            }
+          />
+        ) : (
+          /* Nothing at all, with nothing filtered: this server has no
+             catalogue yet rather than the search coming up short. */
+          <EmptyState
+            icon={<CookingPot size={20} />}
+            title="No recipes on this server yet"
+            description="The catalogue is imported into the sync server once. Until then, the app falls back to its bundled sample dishes."
+          />
+        )
       ) : (
         <>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4">
