@@ -593,6 +593,14 @@ export async function signInFromGate(input: GateSignInInput): Promise<void> {
  * (AI coach, recipe search) — or null when the active profile has no live
  * account session, which is the caller's cue to fall back locally.
  */
+/** Where this profile's sync server lives, for the calls that go direct. */
+export function activeServer(): string {
+  const meta = activeProfile()
+  if (!meta) return '/pb'
+  const link = readSyncLink(meta.id)
+  return link?.server?.trim().replace(/\/+$/, '') || '/pb'
+}
+
 export function activeAuthHeader(): Record<string, string> | null {
   const meta = activeProfile()
   if (!meta) return null

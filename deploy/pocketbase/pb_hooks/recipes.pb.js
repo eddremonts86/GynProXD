@@ -37,7 +37,7 @@ routerAdd('GET', '/api/enforma/recipes/suggestions', (e) => {
   const localQuery = () => {
     const filter =
       "category = 'main' && kcal > 0 && kcal <= {:max} && proteinG >= {:minPer}" +
-      " && (provider = 'pd' || fetchedAt >= {:cutoff})"
+      " && (provider != 'fatsecret' || fetchedAt >= {:cutoff})"
     const rows = $app.findRecordsByFilter(
       'recipes',
       filter,
@@ -126,7 +126,7 @@ routerAdd('GET', '/api/enforma/recipes', (e) => {
   const maxKcal = parseInt(q.get('maxKcal') || '', 10)
   const sort = q.get('sort') || 'name'
 
-  const conditions = ["(provider = 'pd' || fetchedAt >= {:cutoff})"]
+  const conditions = ["(provider != 'fatsecret' || fetchedAt >= {:cutoff})"]
   const params = { cutoff: lib.freshCutoff() }
   if (term) {
     conditions.push('title ~ {:term}')
@@ -214,7 +214,7 @@ routerAdd('GET', '/api/enforma/daily-dish', (e) => {
   const poolFor = (category) =>
     $app.findRecordsByFilter(
       'recipes',
-      "category = {:cat} && (provider = 'pd' || fetchedAt >= {:cutoff})",
+      "category = {:cat} && (provider != 'fatsecret' || fetchedAt >= {:cutoff})",
       'providerId',
       200,
       0,

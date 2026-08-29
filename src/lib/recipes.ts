@@ -11,7 +11,7 @@ import { activeAuthHeader } from './sync'
  * repaired. `parseDish` mirrors dishFromRecord in pb_hooks/utils/recipes_lib.
  */
 
-export type RecipeProvider = 'pd' | 'fatsecret' | 'sample'
+export type RecipeProvider = 'pd' | 'house' | 'fatsecret' | 'sample'
 
 export interface RecipeSuggestion {
   id: string
@@ -65,7 +65,10 @@ export function parseDish(raw: unknown): RecipeSuggestion | null {
   const id = asText(r?.id)
   const title = asText(r?.title)
   const imageUrl = asText(r?.imageUrl)
-  const provider = r?.provider === 'pd' || r?.provider === 'fatsecret' ? r.provider : undefined
+  const provider =
+    r?.provider === 'pd' || r?.provider === 'house' || r?.provider === 'fatsecret'
+      ? r.provider
+      : undefined
   if (!id || !title || !imageUrl || !provider) return null
   return {
     id,
@@ -126,15 +129,15 @@ export function dishTotals(dish: RecipeSuggestion): {
 }
 
 /**
- * Whether to offer a link out. Our public-domain rows carry the whole recipe —
- * photo, ingredients, steps, nutrition — so a "view the full recipe" link
- * would promise something more complete than what is already on screen, and
- * it would point at an Internet Archive snapshot of a site the government
- * retired in January 2026. The bundled samples have no steps in the app, and
- * fatsecret's terms require the credit, so those keep theirs.
+ * Whether to offer a link out. Our own rows — the public-domain import and the
+ * ones the gym writes — carry the whole recipe, so a "view the full recipe"
+ * link would promise something more complete than what is already on screen
+ * (and for the import it points at an Internet Archive snapshot of a site the
+ * government retired in January 2026). The bundled samples have no steps in
+ * the app, and fatsecret's terms require the credit, so those keep theirs.
  */
 export function showsSourceLink(provider: RecipeProvider): boolean {
-  return provider !== 'pd'
+  return provider === 'sample' || provider === 'fatsecret'
 }
 
 export function parseDishList(raw: unknown): RecipeSuggestion[] {

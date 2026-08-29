@@ -62,6 +62,7 @@ describe('parseDish', () => {
     expect(parseDish({ ...dish, imageUrl: '' })).toBeNull()
     expect(parseDish({ ...dish, title: '  ' })).toBeNull()
     expect(parseDish({ ...dish, provider: 'spoonacular' })).toBeNull()
+    expect(parseDish({ ...dish, provider: 'house' })?.provider).toBe('house')
     expect(parseDish(null)).toBeNull()
   })
 
@@ -112,8 +113,9 @@ describe('dishTotals', () => {
 })
 
 describe('showsSourceLink', () => {
-  it('is false for our own public-domain rows: the whole recipe is in the app', () => {
+  it('is false for our own rows: the whole recipe is in the app', () => {
     expect(showsSourceLink('pd')).toBe(false)
+    expect(showsSourceLink('house')).toBe(false)
   })
 
   it('is true where the source still holds something we do not, or requires it', () => {

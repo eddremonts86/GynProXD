@@ -26,6 +26,10 @@ export function RecipeAttribution({ items }: { items: RecipeSuggestion[] }) {
   if (providers.has('pd')) {
     parts.push(<span key="pd">Recipes and nutrition from USDA MyPlate (public domain)</span>)
   }
+  /* House recipes are the gym's own: nobody to credit but itself. */
+  if (providers.has('house') && providers.size === 1) {
+    parts.push(<span key="house">Written by your gym</span>)
+  }
   if (providers.has('sample')) {
     parts.push(
       <span key="sample">
