@@ -157,8 +157,14 @@ export function needsHomeScreenForPush(): boolean {
   return isIos && !standalone
 }
 
+/** Whether this device holds a live push subscription for the profile. */
 export function pushEnabled(profileId: string): boolean {
   return localStorage.getItem(PUSH_PREF_PREFIX + profileId) === 'on'
+}
+
+/** Opt-out push preference: wanted unless this device explicitly turned it off. */
+export function pushWanted(profileId: string): boolean {
+  return localStorage.getItem(PUSH_PREF_PREFIX + profileId) !== 'off'
 }
 
 function applicationServerKey(base64Url: string): Uint8Array {

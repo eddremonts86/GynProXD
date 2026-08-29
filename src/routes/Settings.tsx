@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { DownloadSimple, UploadSimple, WarningCircle } from '@phosphor-icons/react'
 import { useGym } from '../store/useGym'
@@ -36,6 +36,7 @@ import {
   notificationsWanted,
   pushEnabled,
   pushSupported,
+  pushWanted,
   requestNotificationPermission,
   setNotificationPref,
   type NotifyChannel,
@@ -468,18 +469,25 @@ function ProfileIdentityPanel() {
 
 /** System notifications, honest about their local reach. */
 function NotificationsSection() {
-  if (!notificationsSupported()) return null
+  const supported = notificationsSupported()
+  /* One permission grant serves every channel, so the section owns it and the
+     push toggle reacts to it — allowing once switches the whole panel on. */
+  const [permission, setPermission] = useState<NotificationPermission>(() => notificationPermission())
+  if (!supported) return null
 
   return (
     <Section title="Notifications">
       <Panel padding="none" className="divide-y divide-line">
-        <NotificationPermissionRow />
+        <NotificationPermissionRow
+          permission={permission}
+          onChange={() => setPermission(notificationPermission())}
+        />
         <NotificationToggle
           channel="gym"
           title="Gym messages"
           description="A system notification when your gym sends something new, shown while enForma is open on this device."
         />
-        <PushToggle />
+        <PushToggle permission={permission} />
         <NotificationToggle
           channel="training"
           title="Training nudges"
@@ -496,8 +504,13 @@ function NotificationsSection() {
  * actually deliver — once, without an unprompted popup. It disappears the
  * moment permission is granted.
  */
-function NotificationPermissionRow() {
-  const [permission, setPermission] = useState<NotificationPermission>(() => notificationPermission())
+function NotificationPermissionRow({
+  permission,
+  onChange,
+}: {
+  permission: NotificationPermission
+  onChange: () => void
+}) {
   if (permission === 'granted') return null
 
   return (
@@ -514,9 +527,7 @@ function NotificationPermissionRow() {
         <Button
           size="sm"
           variant="secondary"
-          onClick={() =>
-            void requestNotificationPermission().then(() => setPermission(notificationPermission()))
-          }
+          onClick={() => void requestNotificationPermission().then(onChange)}
         >
           Allow
         </Button>
@@ -530,14 +541,35 @@ function NotificationPermissionRow() {
  * Shown only when it can actually work — a linked profile in a browser that
  * has a push manager — and honest about the iOS install requirement.
  */
-function PushToggle() {
+function PushToggle({ permission }: { permission: NotificationPermission }) {
   const profileId = activeProfile()?.id ?? null
-  const [enabled, setEnabled] = useState(() => (profileId ? pushEnabled(profileId) : false))
+  /* On by default: the toggle carries the opt-out preference, subscription
+     happens for real behind it. */
+  const [enabled, setEnabled] = useState(() => (profileId ? pushWanted(profileId) : false))
   const [note, setNote] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
+  /* Once sync is on and permission is granted, subscribe this device without
+     making the user hunt for the toggle. Skipped where it cannot work (iOS
+     before install) or where it is already done or has been turned off. */
+  useEffect(() => {
+    if (permission !== 'granted' || !profileId) return
+    if (!pushSupported() || !readSyncLink(profileId) || needsHomeScreenForPush()) return
+    if (!pushWanted(profileId) || pushEnabled(profileId)) return
+    let cancelled = false
+    void enablePush(profileId).then((result) => {
+      if (cancelled) return
+      setEnabled(result.ok)
+      if (!result.ok) setNote(result.message)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [permission, profileId])
+
   if (!profileId || !pushSupported() || !readSyncLink(profileId)) return null
   const iosHint = needsHomeScreenForPush()
+  const awaitingPermission = enabled && permission !== 'granted'
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 p-5">
@@ -547,7 +579,9 @@ function PushToggle() {
           {note ??
             (iosHint
               ? 'On iPhone, install enForma first: Share → Add to Home Screen. iOS only delivers push to installed apps.'
-              : 'Delivered through your sync account to this device, even with enForma closed.')}
+              : awaitingPermission
+                ? 'On by default — allow notifications above to start delivery.'
+                : 'Delivered through your sync account to this device, even with enForma closed.')}
         </span>
       </div>
       <Switch
@@ -557,13 +591,12 @@ function PushToggle() {
         onCheckedChange={(on) => {
           setNote(null)
           if (!on) {
+            setEnabled(false)
             setBusy(true)
-            void disablePush(profileId).finally(() => {
-              setEnabled(false)
-              setBusy(false)
-            })
+            void disablePush(profileId).finally(() => setBusy(false))
             return
           }
+          setEnabled(true)
           setBusy(true)
           void enablePush(profileId)
             .then((result) => {
