@@ -2,6 +2,27 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Implementation notes (2026-08-29, branch `feat/recipes-local-first`).**
+> Phase A is implemented and verified against a local PocketBase 0.40.1
+> (`deploy/pocketbase/.local`, port 8091); Phase B's crawler and seeder are
+> implemented and proven on real archived pages. Deviations from the plan as
+> written, all found by running it:
+>
+> - **The archived MyPlate pages carry no course taxonomy** — no
+>   `recipeCategory` in their JSON-LD, no facet markup (verified on
+>   20-minute-chicken-creole). `myplate-seed.mjs` therefore derives the
+>   category from the title with a keyword table, which also does the job the
+>   old TheMealDB `isPlate` filter did: desserts, drinks and condiments land
+>   outside `main` and are never offered as a meal that fits a calorie plan.
+> - **The archive holds 1,241 recipe pages**, not the ~1,072 estimated.
+> - The repo's `package.json` sets `"type": "module"`, so the CommonJS hook
+>   modules cannot be require()d by a Node test harness directly (PocketBase's
+>   own JSVM is unaffected). Verification copies them to `.cjs` first.
+> - Task 4's throwaway member is created with `verified: true`.
+> - Task 0 (FatSecret signup, fixtures, IP whitelist) is still outstanding, so
+>   the vendor top-up path is implemented and syntax/unit-checked but not yet
+>   exercised against the live API. Everything else runs on real data.
+
 **Goal:** Replace TheMealDB + Spoonacular with the app's own recipe catalogue in PocketBase — public-domain rows (USDA MyPlate) owned forever, FatSecret rows as a ToS-compliant 24h rolling cache — so the external API is only a fallback when local data cannot answer.
 
 **Architecture:** A new `recipes` collection is the single catalogue behind three server endpoints (`daily-dish`, `recipes/suggestions`, plus a maintenance job). Every FatSecret fetch is stored and served locally for up to 24 hours; a nightly job refreshes recently-used rows and deletes the rest (FatSecret's terms make only IDs storable indefinitely). The permanent replica the product wants is built from USDA MyPlate content (public domain, 17 USC §105) imported once from the Internet Archive. The browser never talks to a recipe vendor again; the client consumes one normalized dish shape and gains in-app preparation steps.

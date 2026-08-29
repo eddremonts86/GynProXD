@@ -33,3 +33,6 @@ pb_data/
 
 # Recorded vendor API responses: content we may not redistribute.
 deploy/pocketbase/fixtures/
+
+# One-time import working data (images + scraped JSON).
+scripts/import/out/
