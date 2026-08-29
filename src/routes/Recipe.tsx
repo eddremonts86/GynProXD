@@ -1,8 +1,10 @@
+import type { ReactNode } from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams, useSearch } from '@tanstack/react-router'
 import { motion, useReducedMotion } from 'motion/react'
-import { ArrowLeft, ArrowUpRight, CookingPot, Minus, Plus, Users } from '@phosphor-icons/react'
+import { ArrowLeft, ArrowUpRight, CookingPot, ForkKnife, Minus, Plus, Users } from '@phosphor-icons/react'
 import { fetchRecipe, showsSourceLink, type RecipeSuggestion } from '../lib/recipes'
+import { scaleIngredient } from '../lib/recipe-scale'
 import { useRecipes } from '../store/useRecipes'
 import { RecipeFlow } from '@/components/recipe-flow'
 import { RecipeAttribution } from '@/components/recipe-attribution'
@@ -17,9 +19,11 @@ import { EmptyState } from '../ui/EmptyState'
  * steps deserve room, and a recipe you are actually cooking from should have
  * its own address you can leave open on the counter.
  *
- * Servings scale here: the catalogue stores nutrition per serving, so the
- * numbers on screen are that measurement times the portions on the stepper,
- * never an estimate of our own.
+ * Two different questions get two different controls, because conflating them
+ * is exactly what makes recipe pages confusing: how much you are eating (which
+ * moves the nutrition, and is what a plan-aligned suggestion promised) and how
+ * big a batch you are cooking (which moves the shopping list). Each sits next
+ * to the thing it changes. Both are arithmetic on what the source measured.
  */
 export function RecipePage() {
   const { id } = useParams({ from: '/recipe/$id' })
@@ -37,7 +41,10 @@ export function RecipePage() {
   const [state, setState] = useState<'loading' | 'ready' | 'missing'>(
     cached ? 'ready' : 'loading',
   )
-  const [servings, setServings] = useState(Math.max(1, p ?? 1))
+  /* What lands on your plate: drives the nutrition, seeded by the suggestion. */
+  const [plate, setPlate] = useState(Math.max(1, p ?? 1))
+  /* How many servings you are cooking: drives the ingredient amounts. */
+  const [batch, setBatch] = useState<number | null>(null)
 
   useEffect(() => {
     let live = true
@@ -57,12 +64,12 @@ export function RecipePage() {
 
   const macros = useMemo(() => {
     if (!dish) return []
-    const scale = (v: number | undefined) => (v === undefined ? undefined : Math.round(v * servings))
+    const scale = (v: number | undefined) => (v === undefined ? undefined : Math.round(v * plate))
     return [
       { label: 'kcal', value: scale(dish.kcal) },
       { label: 'g protein', value: scale(dish.proteinG) },
     ].filter((m) => m.value !== undefined)
-  }, [dish, servings])
+  }, [dish, plate])
 
   if (state === 'loading') return <RecipeSkeleton />
 
@@ -87,7 +94,11 @@ export function RecipePage() {
     )
   }
 
-  const maxServings = Math.max(1, Math.min(12, Math.round(dish.servings ?? 6)))
+  const yieldsServings = dish.servings !== undefined && dish.servings >= 1
+    ? Math.round(dish.servings)
+    : null
+  const cooking = batch ?? yieldsServings ?? 1
+  const maxPlate = Math.max(1, Math.min(12, yieldsServings ?? 6))
 
   return (
     <div className="flex flex-col gap-8">
@@ -123,33 +134,15 @@ export function RecipePage() {
           </div>
 
           <div className="flex flex-col gap-3 border-t border-line pt-5">
-            <div className="flex items-center justify-between gap-4">
-              <span className="inline-flex items-center gap-1.5 text-sm text-ink-3">
-                <Users size={15} weight="bold" />
-                Servings
-              </span>
-              <div className="flex items-center gap-1">
-                <IconButton
-                  size="xs"
-                  variant="secondary"
-                  aria-label="One serving fewer"
-                  disabled={servings <= 1}
-                  onClick={() => setServings((n) => Math.max(1, n - 1))}
-                >
-                  <Minus size={13} weight="bold" />
-                </IconButton>
-                <span className="num w-8 text-center text-lg text-ink">{servings}</span>
-                <IconButton
-                  size="xs"
-                  variant="secondary"
-                  aria-label="One serving more"
-                  disabled={servings >= maxServings}
-                  onClick={() => setServings((n) => Math.min(maxServings, n + 1))}
-                >
-                  <Plus size={13} weight="bold" />
-                </IconButton>
-              </div>
-            </div>
+            <Stepper
+              icon={<ForkKnife size={15} weight="bold" />}
+              label="On your plate"
+              unit={plate === 1 ? 'serving' : 'servings'}
+              value={plate}
+              min={1}
+              max={maxPlate}
+              onChange={setPlate}
+            />
 
             <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2">
               {macros.map((m) => (
@@ -168,9 +161,9 @@ export function RecipePage() {
               ))}
             </div>
             <p className="text-2xs text-ink-3">
-              {servings === 1
-                ? 'Per serving, as measured by the source.'
-                : `Per serving times ${servings}, as measured by the source.`}
+              {plate === 1
+                ? 'One serving, as measured by the source.'
+                : `${plate} servings of it, as measured by the source.`}
             </p>
           </div>
 
@@ -190,7 +183,13 @@ export function RecipePage() {
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] lg:gap-10">
         {dish.ingredients && dish.ingredients.length > 0 && (
-          <Ingredients items={dish.ingredients} />
+          <Ingredients
+            items={dish.ingredients}
+            factor={yieldsServings ? cooking / yieldsServings : 1}
+            cooking={yieldsServings ? cooking : null}
+            maxCooking={yieldsServings ? Math.min(24, yieldsServings * 3) : 1}
+            onCookingChange={setBatch}
+          />
         )}
 
         <section className="flex flex-col gap-3">
@@ -220,22 +219,110 @@ function BackLink() {
   )
 }
 
-/** Ticking things off as you gather them is the point of a shopping list. */
-function Ingredients({ items }: { items: string[] }) {
+/** A stepper for one number, with the unit spelled out so it cannot be misread. */
+function Stepper({
+  icon,
+  label,
+  unit,
+  value,
+  min,
+  max,
+  onChange,
+}: {
+  icon: ReactNode
+  label: string
+  unit: string
+  value: number
+  min: number
+  max: number
+  onChange: (next: number) => void
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <span className="inline-flex items-center gap-1.5 text-sm text-ink-3">
+        {icon}
+        {label}
+      </span>
+      <div className="flex items-center gap-1">
+        <IconButton
+          size="xs"
+          variant="secondary"
+          aria-label={`${label}: one ${unit.replace(/s$/, '')} fewer`}
+          disabled={value <= min}
+          onClick={() => onChange(Math.max(min, value - 1))}
+        >
+          <Minus size={13} weight="bold" />
+        </IconButton>
+        <span className="num min-w-8 text-center text-lg text-ink">{value}</span>
+        <IconButton
+          size="xs"
+          variant="secondary"
+          aria-label={`${label}: one ${unit.replace(/s$/, '')} more`}
+          disabled={value >= max}
+          onClick={() => onChange(Math.min(max, value + 1))}
+        >
+          <Plus size={13} weight="bold" />
+        </IconButton>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * What to buy, for the batch you are actually cooking. The amounts are the
+ * source's own, rewritten by `scaleIngredient`; a line with no number in it
+ * ("Salt and pepper to taste") is left exactly as written. Ticking things off
+ * as you gather them is the point of a shopping list.
+ */
+function Ingredients({
+  items,
+  factor,
+  cooking,
+  maxCooking,
+  onCookingChange,
+}: {
+  items: string[]
+  factor: number
+  cooking: number | null
+  maxCooking: number
+  onCookingChange: (next: number) => void
+}) {
   const reduceMotion = useReducedMotion()
   const [got, setGot] = useState<string[]>([])
+  const lines = useMemo(() => items.map((item) => scaleIngredient(item, factor)), [items, factor])
+
   return (
     <section className="flex flex-col gap-3 lg:sticky lg:top-4">
       <h2 className="flex items-baseline justify-between gap-3 border-b border-line pb-2 text-lg text-ink">
         Ingredients
         <span className="num text-2xs text-ink-3">{items.length}</span>
       </h2>
+
+      {cooking !== null && (
+        <>
+          <Stepper
+            icon={<Users size={15} weight="bold" />}
+            label="Cooking for"
+            unit={cooking === 1 ? 'serving' : 'servings'}
+            value={cooking}
+            min={1}
+            max={maxCooking}
+            onChange={onCookingChange}
+          />
+          <p className="text-2xs text-ink-3">
+            {factor === 1
+              ? 'The amounts as the recipe is written.'
+              : 'Amounts rewritten for this batch; lines without a measurement are unchanged.'}
+          </p>
+        </>
+      )}
+
       <ul className="flex flex-col">
-        {items.map((item, i) => {
-          const checked = got.includes(item)
+        {lines.map((line, i) => {
+          const checked = got.includes(line)
           return (
             <motion.li
-              key={item}
+              key={items[i]}
               initial={reduceMotion ? false : { opacity: 0, x: -4 }}
               animate={{ opacity: 1, x: 0 }}
               transition={reduceMotion ? { duration: 0 } : { delay: Math.min(i * 0.03, 0.3) }}
@@ -244,14 +331,11 @@ function Ingredients({ items }: { items: string[] }) {
                 type="button"
                 aria-pressed={checked}
                 onClick={() =>
-                  setGot((prev) => (checked ? prev.filter((x) => x !== item) : [...prev, item]))
+                  setGot((prev) => (checked ? prev.filter((x) => x !== line) : [...prev, line]))
                 }
                 className="flex w-full items-start gap-2.5 border-b border-line/60 py-2 text-left"
               >
-                <span
-                  className={cnBox(checked)}
-                  aria-hidden
-                >
+                <span className={cnBox(checked)} aria-hidden>
                   {checked && <span className="size-1.5 rounded-full bg-surface" />}
                 </span>
                 <span
@@ -261,7 +345,7 @@ function Ingredients({ items }: { items: string[] }) {
                       : 'text-sm text-ink-2'
                   }
                 >
-                  {item}
+                  {line}
                 </span>
               </button>
             </motion.li>
