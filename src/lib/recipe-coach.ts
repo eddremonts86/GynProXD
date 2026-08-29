@@ -1,7 +1,7 @@
 import { aiCoachEnabled, extractJson } from './ai-plan'
 import { activeAuthHeader } from './sync'
 import { GOAL_LABELS } from './labels'
-import { rankSuggestions, type RecipeSuggestion } from './recipes'
+import { dishTotals, rankSuggestions, type RecipeSuggestion } from './recipes'
 import type { NutritionTarget } from './nutrition-target'
 import type { OnboardingInput } from './types'
 
@@ -21,10 +21,11 @@ export function buildNotesPrompt(
   input: OnboardingInput,
 ): string {
   const dishes = items
-    .map(
-      (r) =>
-        `${r.id} | ${r.title} | ${r.kcal ?? '?'} kcal | ${r.proteinG ?? '?'} g protein`,
-    )
+    .map((r) => {
+      const plate = dishTotals(r)
+      const serving = plate.portions > 1 ? ` | ${plate.portions} servings` : ''
+      return `${r.id} | ${r.title}${serving} | ${plate.kcal ?? '?'} kcal | ${plate.proteinG ?? '?'} g protein`
+    })
     .join('\n')
   const trajectory = input.targetWeightKg
     ? `${input.weightKg} kg heading to ${input.targetWeightKg} kg`

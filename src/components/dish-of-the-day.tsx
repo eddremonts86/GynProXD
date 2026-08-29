@@ -6,6 +6,7 @@ import { Tag } from '../ui/Tag'
 import { Section } from '../ui/PageHeader'
 import { RecipePreparation } from './recipe-preparation'
 import { RecipeAttribution } from './recipe-attribution'
+import { showsSourceLink } from '../lib/recipes'
 
 /**
  * One good plate a day, the same one on every device: the pick is seeded by
@@ -46,7 +47,7 @@ export function DishOfTheDay() {
               <p className="max-w-[52ch] text-sm text-ink-3">{daily.dish.coachNote}</p>
             )}
             <RecipePreparation dish={daily.dish} />
-            {daily.dish.sourceUrl && (
+            {daily.dish.sourceUrl && showsSourceLink(daily.dish.provider) && (
               <a
                 href={daily.dish.sourceUrl}
                 target="_blank"

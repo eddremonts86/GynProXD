@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { nutritionTargetFor } from './nutrition-target'
 import {
+  dishTotals,
   parseDish,
   parseDishList,
   rankSuggestions,
+  showsSourceLink,
   suggestionsQuery,
   type RecipeSuggestion,
 } from './recipes'
@@ -67,9 +69,54 @@ describe('parseDish', () => {
     expect(parsed!.directions).toEqual(['ok'])
   })
 
+  it('carries the recommended portions through', () => {
+    expect(parseDish({ ...dish, portions: 3 })!.portions).toBe(3)
+    expect(parseDish(dish)!.portions).toBeUndefined()
+    expect(parseDish({ ...dish, portions: 'three' })!.portions).toBeUndefined()
+  })
+
   it('treats a null readyInMinutes from the server as absent', () => {
     const parsed = parseDish({ ...dish, readyInMinutes: null })
     expect(parsed!.readyInMinutes).toBeUndefined()
+  })
+})
+
+describe('dishTotals', () => {
+  const base: RecipeSuggestion = {
+    id: 'x',
+    provider: 'pd',
+    title: 'x',
+    imageUrl: 'x.jpg',
+    kcal: 154,
+    proteinG: 17,
+  }
+
+  it('scales the plate by the recommended portions', () => {
+    expect(dishTotals({ ...base, portions: 3 })).toEqual({ portions: 3, kcal: 462, proteinG: 51 })
+  })
+
+  it('treats a missing or single portion as one serving', () => {
+    expect(dishTotals(base)).toEqual({ portions: 1, kcal: 154, proteinG: 17 })
+    expect(dishTotals({ ...base, portions: 1 })).toEqual({ portions: 1, kcal: 154, proteinG: 17 })
+  })
+
+  it('keeps unknown macros unknown instead of inventing zeroes', () => {
+    expect(dishTotals({ ...base, kcal: undefined, portions: 2 })).toEqual({
+      portions: 2,
+      kcal: undefined,
+      proteinG: 34,
+    })
+  })
+})
+
+describe('showsSourceLink', () => {
+  it('is false for our own public-domain rows: the whole recipe is in the app', () => {
+    expect(showsSourceLink('pd')).toBe(false)
+  })
+
+  it('is true where the source still holds something we do not, or requires it', () => {
+    expect(showsSourceLink('sample')).toBe(true)
+    expect(showsSourceLink('fatsecret')).toBe(true)
   })
 })
 
@@ -122,6 +169,14 @@ describe('rankSuggestions', () => {
     const target = nutritionTargetFor(input)
     const ranked = rankSuggestions([mk('a', 700, 30), mk('b', 400, 38)], target)
     expect(ranked[0].id).toBe('b')
+  })
+
+  it('ranks on the plate as served, not on one serving', () => {
+    const target = nutritionTargetFor(input)
+    // Three servings of the small dish beat one of the big one on density.
+    const small = { ...mk('small', 154, 17), portions: 3 }
+    const ranked = rankSuggestions([mk('big', 700, 40), small], target)
+    expect(ranked[0].id).toBe('small')
   })
 
   it('sends missing-macro dishes to the back', () => {

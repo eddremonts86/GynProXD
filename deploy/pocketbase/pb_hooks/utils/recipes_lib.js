@@ -17,6 +17,29 @@ function seedFrom(text) {
 /* The daily dish rotates over these normalized categories. */
 const DAILY_CATEGORIES = ['main', 'breakfast', 'salad', 'soup', 'side']
 
+/**
+ * How many servings of this dish land inside the meal window, or 0 when none
+ * do. The catalogue is USDA nutrition-education content: a serving is small
+ * (median 186 kcal, 8 g protein), so a single one rarely meets an athlete's
+ * protein floor while three often do. The arithmetic is honest — the numbers
+ * are measured per serving — and it is capped by how many servings the recipe
+ * actually makes, so the advice stays "eat 3 of the 4 this makes", never
+ * "eat more of it than exists".
+ */
+const MAX_PORTIONS = 3
+
+function portionsFor(kcal, proteinG, servings, window) {
+  if (!(kcal > 0) || !(proteinG >= 0)) return 0
+  const cap = servings > 0 ? Math.min(MAX_PORTIONS, Math.floor(servings)) : MAX_PORTIONS
+  for (let n = 1; n <= cap; n++) {
+    const k = kcal * n
+    const p = proteinG * n
+    if (k > window.maxKcal) break
+    if (p >= window.minProtein && (!window.minKcal || k >= window.minKcal)) return n
+  }
+  return 0
+}
+
 /** fatsecret rows older than this must not be served (their 24h rule). */
 function freshCutoff() {
   return new Date(Date.now() - 24 * 3600 * 1000).toISOString().replace('T', ' ')
@@ -136,6 +159,8 @@ function maintain(app) {
 
 module.exports = {
   seedFrom: seedFrom,
+  portionsFor: portionsFor,
+  MAX_PORTIONS: MAX_PORTIONS,
   DAILY_CATEGORIES: DAILY_CATEGORIES,
   freshCutoff: freshCutoff,
   dishFromRecord: dishFromRecord,

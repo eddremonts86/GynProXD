@@ -24,16 +24,45 @@ routerAdd('GET', '/api/enforma/recipes/suggestions', (e) => {
     return e.json(400, { message: 'Bad minProtein.' })
   }
 
+  const window = {
+    maxKcal: maxKcal,
+    minProtein: minProtein,
+    minKcal: Number.isFinite(minKcal) && minKcal > 0 ? minKcal : 0,
+  }
+
+  /* Coarse filter in SQL, exact selection in JS: a dish qualifies if some
+     number of its servings lands in the window, and n >= 1 means a single
+     serving can never exceed the ceiling, while n <= MAX_PORTIONS means the
+     per-serving protein can never be below a third of the floor. */
   const localQuery = () => {
-    let filter =
-      "category = 'main' && proteinG >= {:prot} && kcal > 0 && kcal <= {:max}" +
+    const filter =
+      "category = 'main' && kcal > 0 && kcal <= {:max} && proteinG >= {:minPer}" +
       " && (provider = 'pd' || fetchedAt >= {:cutoff})"
-    const params = { prot: minProtein, max: maxKcal, cutoff: lib.freshCutoff() }
-    if (Number.isFinite(minKcal) && minKcal > 0) {
-      filter += ' && kcal >= {:min}'
-      params.min = minKcal
+    const rows = $app.findRecordsByFilter(
+      'recipes',
+      filter,
+      '-proteinG,providerId',
+      200,
+      0,
+      {
+        max: maxKcal,
+        minPer: minProtein / lib.MAX_PORTIONS,
+        cutoff: lib.freshCutoff(),
+      },
+    )
+    const fitted = []
+    for (const r of rows) {
+      const portions = lib.portionsFor(
+        r.getFloat('kcal'),
+        r.getFloat('proteinG'),
+        r.getFloat('servings'),
+        window,
+      )
+      if (portions > 0) fitted.push({ record: r, portions: portions })
     }
-    return $app.findRecordsByFilter('recipes', filter, '-proteinG,providerId', 40, 0, params)
+    /* Most protein on the plate first, at the portions we are recommending. */
+    fitted.sort((a, b) => b.record.getFloat('proteinG') * b.portions - a.record.getFloat('proteinG') * a.portions)
+    return fitted
   }
 
   let rows = localQuery()
@@ -70,8 +99,14 @@ routerAdd('GET', '/api/enforma/recipes/suggestions', (e) => {
   /* A seeded 3-dish window rotates the shortlist day to day. */
   const offset = rows.length > 3 ? lib.seedFrom(date) % (rows.length - 2) : 0
   const picked = rows.slice(offset, offset + 3)
-  lib.touchUsed($app, picked)
-  return e.json(200, { items: picked.map(lib.dishFromRecord) })
+  lib.touchUsed($app, picked.map((f) => f.record))
+  return e.json(200, {
+    items: picked.map((f) => {
+      const dish = lib.dishFromRecord(f.record)
+      dish.portions = f.portions
+      return dish
+    }),
+  })
 })
 
 routerAdd('GET', '/api/enforma/daily-dish', (e) => {

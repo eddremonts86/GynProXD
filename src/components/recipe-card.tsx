@@ -2,10 +2,11 @@ import { ArrowUpRight } from '@phosphor-icons/react'
 import { Panel } from '../ui/Panel'
 import { Tag } from '../ui/Tag'
 import { RecipePreparation } from './recipe-preparation'
-import type { RecipeSuggestion } from '../lib/recipes'
+import { dishTotals, showsSourceLink, type RecipeSuggestion } from '../lib/recipes'
 
 /** One suggested plate: photo, the numbers that matter, the coach's sentence. */
 export function RecipeCard({ dish }: { dish: RecipeSuggestion }) {
+  const plate = dishTotals(dish)
   return (
     <Panel padding="none" className="flex flex-col overflow-hidden">
       <img
@@ -17,14 +18,19 @@ export function RecipeCard({ dish }: { dish: RecipeSuggestion }) {
       <div className="flex flex-1 flex-col gap-2 p-4">
         <h3 className="text-sm font-semibold text-ink">{dish.title}</h3>
         <div className="flex flex-wrap gap-1.5">
-          {dish.kcal !== undefined && (
-            <Tag>
-              <span className="num">{dish.kcal}</span>&nbsp;kcal
+          {plate.portions > 1 && (
+            <Tag tone="outline">
+              <span className="num">{plate.portions}</span>&nbsp;servings
             </Tag>
           )}
-          {dish.proteinG !== undefined && (
+          {plate.kcal !== undefined && (
+            <Tag>
+              <span className="num">{plate.kcal}</span>&nbsp;kcal
+            </Tag>
+          )}
+          {plate.proteinG !== undefined && (
             <Tag tone="brand">
-              <span className="num">{dish.proteinG}</span>&nbsp;g protein
+              <span className="num">{plate.proteinG}</span>&nbsp;g protein
             </Tag>
           )}
           {dish.readyInMinutes !== undefined && (
@@ -37,7 +43,7 @@ export function RecipeCard({ dish }: { dish: RecipeSuggestion }) {
           <p className="text-2xs leading-relaxed text-ink-3">{dish.coachNote}</p>
         )}
         <RecipePreparation dish={dish} />
-        {dish.sourceUrl && (
+        {dish.sourceUrl && showsSourceLink(dish.provider) && (
           <a
             href={dish.sourceUrl}
             target="_blank"

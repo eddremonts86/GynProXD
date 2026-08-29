@@ -26,6 +26,13 @@ export interface RecipeSuggestion {
   area?: string
   directions?: string[]
   ingredients?: string[]
+  /**
+   * Servings of this dish that hit the member's meal window, decided by the
+   * server. `kcal` and `proteinG` stay per serving — the source's own
+   * measurement — so anything that shows or ranks a plate goes through
+   * `dishTotals` rather than multiplying by hand.
+   */
+  portions?: number
   /** One sentence from the AI coach on why this dish fits. Optional. */
   coachNote?: string
 }
@@ -70,7 +77,34 @@ export function parseDish(raw: unknown): RecipeSuggestion | null {
     sourceUrl: asText(r?.sourceUrl),
     directions: asSteps(r?.directions),
     ingredients: asSteps(r?.ingredients),
+    portions: asNumber(r?.portions),
   }
+}
+
+/** The plate as recommended: per-serving numbers times the served portions. */
+export function dishTotals(dish: RecipeSuggestion): {
+  portions: number
+  kcal: number | undefined
+  proteinG: number | undefined
+} {
+  const portions = dish.portions !== undefined && dish.portions > 1 ? dish.portions : 1
+  return {
+    portions,
+    kcal: dish.kcal === undefined ? undefined : Math.round(dish.kcal * portions),
+    proteinG: dish.proteinG === undefined ? undefined : Math.round(dish.proteinG * portions),
+  }
+}
+
+/**
+ * Whether to offer a link out. Our public-domain rows carry the whole recipe —
+ * photo, ingredients, steps, nutrition — so a "view the full recipe" link
+ * would promise something more complete than what is already on screen, and
+ * it would point at an Internet Archive snapshot of a site the government
+ * retired in January 2026. The bundled samples have no steps in the app, and
+ * fatsecret's terms require the credit, so those keep theirs.
+ */
+export function showsSourceLink(provider: RecipeProvider): boolean {
+  return provider !== 'pd'
 }
 
 export function parseDishList(raw: unknown): RecipeSuggestion[] {
@@ -144,10 +178,11 @@ export function rankSuggestions(
   const meal = mealTargets(target)
   const mid = (meal.kcalMin + meal.kcalMax) / 2
   const score = (r: RecipeSuggestion): number => {
-    if (r.kcal === undefined || r.proteinG === undefined) return -1
-    if (target.direction === 'deficit') return r.proteinG / Math.max(r.kcal, 1)
-    if (target.direction === 'surplus') return r.kcal + r.proteinG
-    return -Math.abs(r.kcal - mid)
+    const { kcal, proteinG } = dishTotals(r)
+    if (kcal === undefined || proteinG === undefined) return -1
+    if (target.direction === 'deficit') return proteinG / Math.max(kcal, 1)
+    if (target.direction === 'surplus') return kcal + proteinG
+    return -Math.abs(kcal - mid)
   }
   return [...items].sort((a, b) => score(b) - score(a))
 }
