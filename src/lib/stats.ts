@@ -111,6 +111,24 @@ export function dailySetSeries(workouts: Workout[], weeks = 26, today = new Date
 }
 
 /**
+ * Consecutive days ending today (or yesterday, so a rest-so-far-today does not
+ * zero it) on which at least one session was logged. The home-screen habit
+ * figure. Counts each calendar day once regardless of how many sessions it held.
+ */
+export function trainingStreak(workouts: Workout[], today = new Date()): number {
+  const days = new Set(workouts.map((w) => w.date))
+  const cursor = new Date(today)
+  cursor.setHours(0, 0, 0, 0)
+  if (!days.has(toLocalIso(cursor))) cursor.setDate(cursor.getDate() - 1)
+  let streak = 0
+  while (days.has(toLocalIso(cursor))) {
+    streak += 1
+    cursor.setDate(cursor.getDate() - 1)
+  }
+  return streak
+}
+
+/**
  * Times each exercise was performed across all sessions. Feeds the strength
  * chart's exercise ordering, the library's done filter and done-count chips.
  */

@@ -4,6 +4,7 @@ import {
   dailySetSeries,
   rangeVolume,
   sessionCountsByExercise,
+  trainingStreak,
   weeklyVolumeSeries,
 } from './stats'
 import type { Workout } from './types'
@@ -51,6 +52,23 @@ describe('dailySetSeries', () => {
     const days = dailySetSeries([], 4, new Date(2026, 7, 25))
     expect(days).toHaveLength(28)
     expect(days.every((d) => d.sets === 0)).toBe(true)
+  })
+})
+
+describe('trainingStreak', () => {
+  it('counts consecutive trained days back from today', () => {
+    const today = new Date(2026, 7, 25) // Tue
+    const w = [workout('2026-08-25', 50, 5), workout('2026-08-24', 50, 5), workout('2026-08-23', 50, 5)]
+    expect(trainingStreak(w, today)).toBe(3)
+  })
+
+  it('holds on a rest-so-far-today by counting from yesterday, and breaks on a gap', () => {
+    const today = new Date(2026, 7, 25)
+    // trained yesterday and the day before, not yet today: streak survives at 2.
+    expect(trainingStreak([workout('2026-08-24', 50, 5), workout('2026-08-23', 50, 5)], today)).toBe(2)
+    // a missing day breaks it.
+    expect(trainingStreak([workout('2026-08-24', 50, 5), workout('2026-08-22', 50, 5)], today)).toBe(1)
+    expect(trainingStreak([], today)).toBe(0)
   })
 })
 

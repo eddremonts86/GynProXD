@@ -37,6 +37,9 @@ import { MealSuggestions } from '@/components/meal-suggestions'
 import { DishOfTheDay } from '@/components/dish-of-the-day'
 import { ChallengeToday } from '@/components/challenge-today'
 import { StoryToday } from '@/components/story-today'
+import { ConsistencyToday } from '@/components/consistency-today'
+import { LatestRecord } from '@/components/latest-record'
+import { FitnessLevel } from '@/components/fitness-level'
 import {
   Dialog,
   DialogContent,
@@ -351,6 +354,8 @@ function TodayOverview({
         </Panel>
       </div>
 
+      <ConsistencyToday />
+
       {primary ? (
         <Panel padding="none" className="overflow-hidden">
           <div className="flex flex-wrap items-start justify-between gap-3 border-b border-line p-5">
@@ -497,6 +502,10 @@ function TodayOverview({
       <MealSuggestions />
       <DishOfTheDay />
 
+      {/* Your standing: the last record and where the fitness test placed you,
+          then the session history. */}
+      <LatestRecord />
+      <FitnessLevel />
       <RecentSessions />
 
       <WeighInDialog

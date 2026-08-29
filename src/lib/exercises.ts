@@ -37,6 +37,55 @@ export function epley1rm(weight: number, reps: number): number {
   return weight * (1 + reps / 30)
 }
 
+export interface PersonalRecord {
+  exerciseId: string
+  e1rm: number
+  weight: number
+  reps: number
+  date: string
+}
+
+/**
+ * The most recent set that beat a movement's previous best estimated 1RM.
+ * A first-ever lift is not a record (there was nothing to beat), and bodyweight
+ * sets score zero, so only loaded progress surfaces. Returns null until a real
+ * PR exists — the widget that shows it simply is not there before then.
+ */
+export function latestPersonalRecord(workouts: Workout[]): PersonalRecord | null {
+  const sorted = [...workouts].sort((a, b) =>
+    (a.startedAt ?? a.date).localeCompare(b.startedAt ?? b.date),
+  )
+  const best = new Map<string, number>()
+  let latest: PersonalRecord | null = null
+  for (const w of sorted) {
+    for (const le of w.exercises) {
+      const prior = best.get(le.exerciseId) ?? 0
+      let topE = 0
+      let topSet: { weight: number; reps: number } | null = null
+      for (const s of le.sets) {
+        const e = epley1rm(s.weight, s.reps)
+        if (e > topE) {
+          topE = e
+          topSet = s
+        }
+      }
+      if (topSet && topE > prior) {
+        if (prior > 0) {
+          latest = {
+            exerciseId: le.exerciseId,
+            e1rm: Math.round(topE * 10) / 10,
+            weight: topSet.weight,
+            reps: topSet.reps,
+            date: w.date,
+          }
+        }
+        best.set(le.exerciseId, topE)
+      }
+    }
+  }
+  return latest
+}
+
 export function bestE1rm(workouts: Workout[], exerciseId: string): number {
   let best = 0
   for (const w of workouts) {
