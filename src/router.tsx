@@ -34,6 +34,9 @@ const NotFoundPage = React.lazy(() =>
 const ChallengesPage = React.lazy(() =>
   import('./routes/Challenges').then((m) => ({ default: m.ChallengesPage })),
 )
+const RecipePage = React.lazy(() =>
+  import('./routes/Recipe').then((m) => ({ default: m.RecipePage })),
+)
 const StoryPage = React.lazy(() =>
   import('./routes/Story').then((m) => ({ default: m.StoryPage })),
 )
@@ -63,6 +66,22 @@ function lazyRoute<const P extends string>(path: P, Component: React.ComponentTy
   })
 }
 
+/* The recipe page carries the portions a suggestion recommended, so opening a
+   plate from Today lands on the numbers the card promised. */
+const recipeRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/recipe/$id',
+  validateSearch: (search: Record<string, unknown>): { p?: number } => {
+    const raw = Number(search.p)
+    return Number.isFinite(raw) && raw >= 1 && raw <= 12 ? { p: Math.round(raw) } : {}
+  },
+  component: () => (
+    <React.Suspense fallback={<RouteFallback />}>
+      <RecipePage />
+    </React.Suspense>
+  ),
+})
+
 export const router = createRouter({
   /* A cross-fade between screens on navigation — the small thing that reads as
      "app", not "web page". The transition is defined in index.css and is a
@@ -84,6 +103,7 @@ export const router = createRouter({
     lazyRoute('/fitness-test', FitnessTestPage),
     lazyRoute('/onboarding', OnboardingPage),
     lazyRoute('/generated/$id', GeneratedPlanPage),
+    recipeRoute,
   ]),
 })
 

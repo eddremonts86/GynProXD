@@ -71,6 +71,7 @@ function dishFromRecord(record) {
     kcal: numField(record, 'kcal'),
     proteinG: numField(record, 'proteinG'),
     readyInMinutes: numField(record, 'readyInMinutes'),
+    servings: numField(record, 'servings'),
     category: record.getString('sourceCategory') || record.getString('category') || undefined,
     directions: jsonField(record, 'directions'),
     ingredients: jsonField(record, 'ingredients'),

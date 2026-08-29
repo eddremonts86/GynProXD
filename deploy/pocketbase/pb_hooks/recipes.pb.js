@@ -109,6 +109,31 @@ routerAdd('GET', '/api/enforma/recipes/suggestions', (e) => {
   })
 })
 
+/**
+ * One recipe by id, for the recipe page and its deep links. Public like the
+ * daily dish: the catalogue is not personal data. A fatsecret row past its
+ * 24 hours is treated as gone rather than served stale.
+ */
+routerAdd('GET', '/api/enforma/recipe/{id}', (e) => {
+  const lib = require(`${__hooks}/utils/recipes_lib.js`)
+  const id = e.request.pathValue('id')
+  if (!id) return e.json(400, { message: 'No recipe asked for.' })
+  let record
+  try {
+    record = $app.findRecordById('recipes', id)
+  } catch {
+    return e.json(404, { message: 'No such recipe.' })
+  }
+  if (record.getString('provider') === 'fatsecret') {
+    const fetchedAt = record.getString('fetchedAt').replace(' ', 'T')
+    if (!fetchedAt || fetchedAt < lib.freshCutoff().replace(' ', 'T')) {
+      return e.json(404, { message: 'No such recipe.' })
+    }
+  }
+  lib.touchUsed($app, [record])
+  return e.json(200, lib.dishFromRecord(record))
+})
+
 routerAdd('GET', '/api/enforma/daily-dish', (e) => {
   const fs = require(`${__hooks}/utils/fatsecret.js`)
   const lib = require(`${__hooks}/utils/recipes_lib.js`)

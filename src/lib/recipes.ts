@@ -22,6 +22,8 @@ export interface RecipeSuggestion {
   kcal?: number
   proteinG?: number
   readyInMinutes?: number
+  /** How many servings the recipe as written makes, when the source says. */
+  servings?: number
   category?: string
   area?: string
   directions?: string[]
@@ -73,6 +75,7 @@ export function parseDish(raw: unknown): RecipeSuggestion | null {
     kcal: asNumber(r?.kcal),
     proteinG: asNumber(r?.proteinG),
     readyInMinutes: asNumber(r?.readyInMinutes),
+    servings: asNumber(r?.servings),
     category: asText(r?.category),
     sourceUrl: asText(r?.sourceUrl),
     directions: asSteps(r?.directions),
@@ -141,6 +144,19 @@ export function suggestionsQuery(target: NutritionTarget, dateIso: string): stri
 export async function fetchDailyDish(dateIso: string): Promise<RecipeSuggestion | null> {
   try {
     const res = await fetch(`/pb/api/enforma/daily-dish?date=${encodeURIComponent(dateIso)}`, {
+      signal: AbortSignal.timeout(8000),
+    })
+    if (!res.ok) return null
+    return parseDish(await res.json())
+  } catch {
+    return null
+  }
+}
+
+/** One recipe by id, so the recipe page survives a refresh or a shared link. */
+export async function fetchRecipe(id: string): Promise<RecipeSuggestion | null> {
+  try {
+    const res = await fetch(`/pb/api/enforma/recipe/${encodeURIComponent(id)}`, {
       signal: AbortSignal.timeout(8000),
     })
     if (!res.ok) return null

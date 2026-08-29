@@ -1,8 +1,8 @@
-import { ArrowUpRight } from '@phosphor-icons/react'
+import { ArrowRight, ArrowUpRight } from '@phosphor-icons/react'
+import { Link } from '@tanstack/react-router'
 import { Panel } from '../ui/Panel'
 import { Tag } from '../ui/Tag'
-import { RecipePreparation } from './recipe-preparation'
-import { dishTotals, showsSourceLink, type RecipeSuggestion } from '../lib/recipes'
+import { dishTotals, type RecipeSuggestion } from '../lib/recipes'
 
 /** One suggested plate: photo, the numbers that matter, the coach's sentence. */
 export function RecipeCard({ dish }: { dish: RecipeSuggestion }) {
@@ -42,18 +42,35 @@ export function RecipeCard({ dish }: { dish: RecipeSuggestion }) {
         {dish.coachNote && (
           <p className="text-2xs leading-relaxed text-ink-3">{dish.coachNote}</p>
         )}
-        <RecipePreparation dish={dish} />
-        {dish.sourceUrl && showsSourceLink(dish.provider) && (
-          <a
-            href={dish.sourceUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-auto inline-flex items-center gap-1 pt-1 text-2xs font-medium text-brand"
-          >
-            View recipe
-            <ArrowUpRight size={12} weight="bold" />
-          </a>
-        )}
+        {/* Catalogue plates open in the app, where the method lives; the
+            bundled samples have no page of their own, so they still link out. */}
+        {dish.provider === 'sample'
+          ? dish.sourceUrl && (
+              <a
+                href={dish.sourceUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-auto inline-flex items-center gap-1 pt-1 text-2xs font-medium text-brand"
+              >
+                View recipe
+                <ArrowUpRight size={12} weight="bold" />
+              </a>
+            )
+          : (
+              <Link
+                to="/recipe/$id"
+                params={{ id: dish.id }}
+                search={plate.portions > 1 ? { p: plate.portions } : {}}
+                className="group mt-auto inline-flex items-center gap-1 pt-1 text-2xs font-medium text-brand"
+              >
+                How to make it
+                <ArrowRight
+                  size={12}
+                  weight="bold"
+                  className="transition-transform duration-150 group-hover:translate-x-0.5"
+                />
+              </Link>
+            )}
       </div>
     </Panel>
   )

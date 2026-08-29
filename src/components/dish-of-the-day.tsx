@@ -1,12 +1,12 @@
 import { useEffect } from 'react'
-import { ArrowUpRight } from '@phosphor-icons/react'
+import { ArrowRight } from '@phosphor-icons/react'
+import { Link } from '@tanstack/react-router'
 import { useRecipes } from '../store/useRecipes'
 import { Panel } from '../ui/Panel'
 import { Tag } from '../ui/Tag'
 import { Section } from '../ui/PageHeader'
-import { RecipePreparation } from './recipe-preparation'
 import { RecipeAttribution } from './recipe-attribution'
-import { showsSourceLink } from '../lib/recipes'
+
 
 /**
  * One good plate a day, the same one on every device: the pick is seeded by
@@ -46,18 +46,18 @@ export function DishOfTheDay() {
             {daily.dish.coachNote && (
               <p className="max-w-[52ch] text-sm text-ink-3">{daily.dish.coachNote}</p>
             )}
-            <RecipePreparation dish={daily.dish} />
-            {daily.dish.sourceUrl && showsSourceLink(daily.dish.provider) && (
-              <a
-                href={daily.dish.sourceUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-auto inline-flex items-center gap-1 pt-1 text-sm font-medium text-brand"
-              >
-                View the full recipe
-                <ArrowUpRight size={14} weight="bold" />
-              </a>
-            )}
+            <Link
+              to="/recipe/$id"
+              params={{ id: daily.dish.id }}
+              className="group mt-auto inline-flex items-center gap-1.5 pt-1 text-sm font-medium text-brand"
+            >
+              How to make it
+              <ArrowRight
+                size={14}
+                weight="bold"
+                className="transition-transform duration-150 group-hover:translate-x-0.5"
+              />
+            </Link>
           </div>
         </Panel>
       )}
