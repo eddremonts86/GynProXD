@@ -11,7 +11,8 @@ services:
       # Phase 7 shared fetches + the push public key served by /api/enforma/capabilities.
       MINIMAX_API_KEY: ${MINIMAX_API_KEY:-}
       MINIMAX_BASE_URL: ${MINIMAX_BASE_URL:-}
-      SPOONACULAR_API_KEY: ${SPOONACULAR_API_KEY:-}
+      FATSECRET_CLIENT_ID: ${FATSECRET_CLIENT_ID:-}
+      FATSECRET_CLIENT_SECRET: ${FATSECRET_CLIENT_SECRET:-}
       VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
       # Seeds the superuser on boot; the push service uses the same pair.
       PB_SUPERUSER_EMAIL: ${PB_SUPERUSER_EMAIL:-}

@@ -34,26 +34,6 @@ export default defineConfig(({ mode }) => {
     : undefined
 
   /**
-   * Same arrangement for meal suggestions: the Spoonacular key is injected as
-   * an x-api-key header on the server side of the proxy. TheMealDB needs no
-   * key and allows CORS, so the dish of the day calls it directly.
-   */
-  const recipeProxy: Record<string, ProxyOptions> | undefined = env.SPOONACULAR_API_KEY
-    ? {
-        '/api/recipes/spoonacular': {
-          target: 'https://api.spoonacular.com',
-          changeOrigin: true,
-          rewrite: (p) => p.replace(/^\/api\/recipes\/spoonacular/, ''),
-          configure: (proxy) => {
-            proxy.on('proxyReq', (proxyReq) => {
-              proxyReq.setHeader('x-api-key', env.SPOONACULAR_API_KEY)
-            })
-          },
-        },
-      }
-    : undefined
-
-  /**
    * The sync server (PocketBase). In dev the app talks to /pb and the proxy
    * forwards to a local instance (deploy/pocketbase/.local, or wherever
    * POCKETBASE_URL points); in production the server address is whatever the
@@ -73,23 +53,20 @@ export default defineConfig(({ mode }) => {
       changeOrigin: true,
       rewrite: (p) => p.replace(/^\/exercise-img/, '/gh/yuhonas/free-exercise-db@main/exercises'),
     },
-    /* Same-path shared fetches (phase 7). With a local key the direct proxies
-       above win; without one, dev behaves like production and asks the sync
-       server, which answers 503 honestly when it has no key either. */
+    /* Same-path shared fetches (phase 7). With a local key the direct proxy
+       above wins; without one, dev behaves like production and asks the sync
+       server, which answers 503 honestly when it has no key either. Recipes
+       always take this path: the catalogue lives on the sync server. */
     '/api/enforma': { target: pbTarget, changeOrigin: true },
     ...(env.MINIMAX_API_KEY ? {} : { '/api/minimax': { target: pbTarget, changeOrigin: true } }),
-    ...(env.SPOONACULAR_API_KEY
-      ? {}
-      : { '/api/recipes': { target: pbTarget, changeOrigin: true } }),
   }
 
-  const apiProxy = { ...pbProxy, ...(aiProxy ?? {}), ...(recipeProxy ?? {}) }
+  const apiProxy = { ...pbProxy, ...(aiProxy ?? {}) }
 
   return {
   define: {
     __AI_COACH__: JSON.stringify(Boolean(env.MINIMAX_API_KEY)),
     __AI_COACH_MODEL__: JSON.stringify(env.MINIMAX_MODEL || 'MiniMax-Text-01'),
-    __RECIPE_SEARCH__: JSON.stringify(Boolean(env.SPOONACULAR_API_KEY)),
   },
   server: {
     port: PORT,
