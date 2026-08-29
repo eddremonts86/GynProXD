@@ -12,6 +12,8 @@ import { ExerciseThumb } from '../ui/ExerciseThumb'
 import { PageHeader, Section } from '../ui/PageHeader'
 import { EmptyState } from '../ui/EmptyState'
 import { ExercisePicker } from '@/components/exercise-picker'
+import { DayPlate } from '@/components/day-plate'
+import { useDayPlates } from '../lib/use-day-plates'
 import {
   Dialog,
   DialogContent,
@@ -134,6 +136,10 @@ export function PlannerPage() {
     () => selectedPlan?.days.find((d) => d.day === selectedDay)?.ecNote,
     [selectedPlan, selectedDay],
   )
+
+  /* The plate this day carries, the same one the programme names for it. */
+  const platesByDate = useDayPlates(selectedDate ? [selectedDate] : [])
+  const dayPlate = selectedDate ? platesByDate[selectedDate] : undefined
 
   if (plans.length === 0 && generatedPlans.length === 0) {
     return (
@@ -350,6 +356,9 @@ export function PlannerPage() {
                     {selectedDate === todayIso() && <Tag tone="brand">Today</Tag>}
                   </span>
                   <p className="text-sm text-ink-3">{pluralize(dayExercises.length, 'movement')}</p>
+                  {dayPlate && (
+                    <DayPlate dish={dayPlate} tone="panel" className="mt-1 max-w-sm" />
+                  )}
                   {dayEcNote && (
                     <p className="flex items-start gap-1.5 text-2xs text-ink-3">
                       <Plus size={12} weight="bold" className="mt-0.5 shrink-0 text-brand" />

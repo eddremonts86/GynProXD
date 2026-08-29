@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import {
   ArrowRight,
@@ -16,15 +16,10 @@ import { useGym } from '../store/useGym'
 import { exerciseById } from '../lib/exercises'
 import { todayIso } from '../lib/dates'
 import { buildProgramme } from '../lib/ai-plan'
-import { nutritionTargetFor, mealTargets } from '../lib/nutrition-target'
-import {
-  MAX_PORTIONS,
-  dishTotals,
-  fetchCatalogue,
-  portionsForDish,
-  type RecipeSuggestion,
-} from '../lib/recipes'
-import { pickPerDay } from '../lib/day-plates'
+import { nutritionTargetFor } from '../lib/nutrition-target'
+import type { RecipeSuggestion } from '../lib/recipes'
+import { DayPlate } from '@/components/day-plate'
+import { useDayPlates } from '../lib/use-day-plates'
 import { writePlannerSelection } from '../lib/planner-selection'
 import { Button, IconButton } from '../ui/Button'
 import { Panel } from '../ui/Panel'
@@ -85,41 +80,7 @@ export function GeneratedPlanPage() {
      paces the training: the gym and the plate never disagree. */
   const nutrition = useMemo(() => (plan ? nutritionTargetFor(plan.input) : null), [plan])
 
-  /* One pool of plates that fit a main meal for this member, fetched once and
-     dealt out per day. Hooks run before the not-found guard below. */
-  const [pool, setPool] = useState<RecipeSuggestion[]>([])
-  useEffect(() => {
-    if (!nutrition) return undefined
-    const meal = mealTargets(nutrition)
-    let live = true
-    /* Ask wide, then decide here: a serving that misses the protein floor on
-       its own can still clear it two or three at a time, which is how the
-       suggestions on Today read this catalogue too. */
-    void fetchCatalogue({
-      minProtein: Math.max(1, Math.floor(meal.proteinMinG / MAX_PORTIONS)),
-      maxKcal: meal.kcalMax,
-      sort: 'protein',
-    }).then((result) => {
-      if (!live || !result) return
-      const fitted: RecipeSuggestion[] = []
-      for (const dish of result.items) {
-        const portions = portionsForDish(dish, {
-          maxKcal: meal.kcalMax,
-          minProtein: meal.proteinMinG,
-        })
-        if (portions > 0) fitted.push({ ...dish, portions })
-      }
-      setPool(fitted)
-    })
-    return () => {
-      live = false
-    }
-  }, [nutrition])
-
-  const plates = useMemo(
-    () => (week ? pickPerDay(pool, week.days.map((d) => d.date)) : {}),
-    [pool, week],
-  )
+  const plates = useDayPlates(week ? week.days.map((d) => d.date) : [])
 
   if (!plan || !week) {
     return (
@@ -437,15 +398,14 @@ function DayCard({
     .filter((m) => m.ex !== undefined)
 
   return (
-    <button
-      type="button"
-      onClick={onOpen}
+    <div
       className={cn(
         'group flex flex-col gap-4 rounded-xl bg-surface p-5 text-left',
         'shadow-[var(--shadow-panel)] transition-shadow duration-150 hover:shadow-[var(--shadow-tile)]',
         isToday && 'ring-2 ring-brand',
       )}
     >
+      <button type="button" onClick={onOpen} className="flex flex-col gap-4 text-left">
       <div className="flex w-full items-center justify-between gap-2">
         <span className="text-lg font-semibold text-ink">{DAY_FULL_LABELS[day.day]}</span>
         {isToday ? (
@@ -486,28 +446,12 @@ function DayCard({
         )}
       </ul>
 
+      </button>
+
       {plate && (
-        <span className="flex w-full items-center gap-2.5 border-t border-line pt-3">
-          <img
-            src={plate.imageUrl}
-            alt=""
-            loading="lazy"
-            className="size-10 shrink-0 rounded-lg bg-surface-2 object-cover"
-          />
-          <span className="flex min-w-0 flex-col gap-0.5">
-            <span className="truncate text-2xs font-medium text-ink-2">{plate.title}</span>
-            <span className="text-2xs text-ink-3">
-              {(() => {
-                const t = dishTotals(plate)
-                const parts: string[] = []
-                if (t.portions > 1) parts.push(`${t.portions} servings`)
-                if (t.kcal !== undefined) parts.push(`${t.kcal} kcal`)
-                if (t.proteinG !== undefined) parts.push(`${t.proteinG} g protein`)
-                return <span className="num">{parts.join(' · ')}</span>
-              })()}
-            </span>
-          </span>
-        </span>
+        <div className="border-t border-line pt-3">
+          <DayPlate dish={plate} />
+        </div>
       )}
 
       {day.ecNote && (
@@ -517,7 +461,9 @@ function DayCard({
         </span>
       )}
 
-      <span
+      <button
+        type="button"
+        onClick={onOpen}
         className={cn(
           'flex w-full items-center justify-between text-2xs font-medium text-ink-3',
           !day.ecNote && 'border-t border-line pt-3',
@@ -528,8 +474,8 @@ function DayCard({
           View day
           <CaretRight size={12} weight="bold" />
         </span>
-      </span>
-    </button>
+      </button>
+    </div>
   )
 }
 
