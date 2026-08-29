@@ -84,6 +84,33 @@ export function parseDish(raw: unknown): RecipeSuggestion | null {
   }
 }
 
+/**
+ * How many servings of a dish land inside a meal window, or 0 when none do.
+ * Mirrors `portionsFor` in pb_hooks/utils/recipes_lib.js — the JSVM and the
+ * bundle cannot share a module, so the rule is written twice on purpose, the
+ * same way `seedFrom` is. Capped by what the recipe actually makes, so the
+ * advice never asks for more of it than exists.
+ */
+export const MAX_PORTIONS = 3
+
+export function portionsForDish(
+  dish: RecipeSuggestion,
+  window: { maxKcal: number; minProtein: number; minKcal?: number },
+): number {
+  if (dish.kcal === undefined || dish.proteinG === undefined || dish.kcal <= 0) return 0
+  const cap =
+    dish.servings !== undefined && dish.servings >= 1
+      ? Math.min(MAX_PORTIONS, Math.floor(dish.servings))
+      : MAX_PORTIONS
+  for (let n = 1; n <= cap; n++) {
+    const kcal = dish.kcal * n
+    const protein = dish.proteinG * n
+    if (kcal > window.maxKcal) break
+    if (protein >= window.minProtein && (!window.minKcal || kcal >= window.minKcal)) return n
+  }
+  return 0
+}
+
 /** The plate as recommended: per-serving numbers times the served portions. */
 export function dishTotals(dish: RecipeSuggestion): {
   portions: number

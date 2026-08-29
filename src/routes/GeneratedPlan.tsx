@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import {
   ArrowRight,
@@ -16,6 +16,15 @@ import { useGym } from '../store/useGym'
 import { exerciseById } from '../lib/exercises'
 import { todayIso } from '../lib/dates'
 import { buildProgramme } from '../lib/ai-plan'
+import { nutritionTargetFor, mealTargets } from '../lib/nutrition-target'
+import {
+  MAX_PORTIONS,
+  dishTotals,
+  fetchCatalogue,
+  portionsForDish,
+  type RecipeSuggestion,
+} from '../lib/recipes'
+import { pickPerDay } from '../lib/day-plates'
 import { writePlannerSelection } from '../lib/planner-selection'
 import { Button, IconButton } from '../ui/Button'
 import { Panel } from '../ui/Panel'
@@ -71,6 +80,46 @@ export function GeneratedPlanPage() {
   const today = todayIso()
 
   const week = useMemo(() => plan?.weeks[activeWeek] ?? plan?.weeks[0], [plan, activeWeek])
+
+  /* The same numbers the kitchen uses elsewhere, from the same input that
+     paces the training: the gym and the plate never disagree. */
+  const nutrition = useMemo(() => (plan ? nutritionTargetFor(plan.input) : null), [plan])
+
+  /* One pool of plates that fit a main meal for this member, fetched once and
+     dealt out per day. Hooks run before the not-found guard below. */
+  const [pool, setPool] = useState<RecipeSuggestion[]>([])
+  useEffect(() => {
+    if (!nutrition) return undefined
+    const meal = mealTargets(nutrition)
+    let live = true
+    /* Ask wide, then decide here: a serving that misses the protein floor on
+       its own can still clear it two or three at a time, which is how the
+       suggestions on Today read this catalogue too. */
+    void fetchCatalogue({
+      minProtein: Math.max(1, Math.floor(meal.proteinMinG / MAX_PORTIONS)),
+      maxKcal: meal.kcalMax,
+      sort: 'protein',
+    }).then((result) => {
+      if (!live || !result) return
+      const fitted: RecipeSuggestion[] = []
+      for (const dish of result.items) {
+        const portions = portionsForDish(dish, {
+          maxKcal: meal.kcalMax,
+          minProtein: meal.proteinMinG,
+        })
+        if (portions > 0) fitted.push({ ...dish, portions })
+      }
+      setPool(fitted)
+    })
+    return () => {
+      live = false
+    }
+  }, [nutrition])
+
+  const plates = useMemo(
+    () => (week ? pickPerDay(pool, week.days.map((d) => d.date)) : {}),
+    [pool, week],
+  )
 
   if (!plan || !week) {
     return (
@@ -184,6 +233,12 @@ export function GeneratedPlanPage() {
               />
             </>
           )}
+          {nutrition && (
+            <>
+              <FactRow label="Daily energy" value={`${nutrition.kcalTarget} kcal`} />
+              <FactRow label="Daily protein" value={`${nutrition.proteinG} g`} />
+            </>
+          )}
           <FactRow
             label="Designed by"
             value={plan.source === 'coach' ? 'AI coach' : 'Standard template'}
@@ -268,6 +323,7 @@ export function GeneratedPlanPage() {
               key={d.date}
               day={d}
               isToday={d.date === today}
+              plate={plates[d.date]}
               onOpen={() => setOpenDay(d)}
             />
           ))}
@@ -367,10 +423,13 @@ function FactRow({ label, value }: { label: string; value: string }) {
 function DayCard({
   day,
   isToday,
+  plate,
   onOpen,
 }: {
   day: GeneratedDay
   isToday: boolean
+  /** The plate suggested for this day, once the catalogue has answered. */
+  plate: RecipeSuggestion | undefined
   onOpen: () => void
 }) {
   const movements = day.exercises
@@ -426,6 +485,30 @@ function DayCard({
           <li className="text-2xs text-ink-3">and {movements.length - 3} more</li>
         )}
       </ul>
+
+      {plate && (
+        <span className="flex w-full items-center gap-2.5 border-t border-line pt-3">
+          <img
+            src={plate.imageUrl}
+            alt=""
+            loading="lazy"
+            className="size-10 shrink-0 rounded-lg bg-surface-2 object-cover"
+          />
+          <span className="flex min-w-0 flex-col gap-0.5">
+            <span className="truncate text-2xs font-medium text-ink-2">{plate.title}</span>
+            <span className="text-2xs text-ink-3">
+              {(() => {
+                const t = dishTotals(plate)
+                const parts: string[] = []
+                if (t.portions > 1) parts.push(`${t.portions} servings`)
+                if (t.kcal !== undefined) parts.push(`${t.kcal} kcal`)
+                if (t.proteinG !== undefined) parts.push(`${t.proteinG} g protein`)
+                return <span className="num">{parts.join(' · ')}</span>
+              })()}
+            </span>
+          </span>
+        </span>
+      )}
 
       {day.ecNote && (
         <span className="flex w-full items-start gap-1.5 border-t border-line pt-3 text-2xs text-ink-3">

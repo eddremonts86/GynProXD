@@ -5,6 +5,7 @@ import {
   dishTotals,
   parseDish,
   parseDishList,
+  portionsForDish,
   rankSuggestions,
   showsSourceLink,
   suggestionsQuery,
@@ -204,5 +205,32 @@ describe('catalogueQuery', () => {
   it('drops zeroed macro filters rather than sending them', () => {
     expect(catalogueQuery({ minProtein: 0, maxKcal: 0 })).toBe('')
     expect(catalogueQuery({ minProtein: 25, maxKcal: 400 })).toBe('minProtein=25&maxKcal=400')
+  })
+})
+
+describe('portionsForDish', () => {
+  const dish = (kcal: number, proteinG: number, servings?: number): RecipeSuggestion => ({
+    id: 'x',
+    provider: 'pd',
+    title: 'x',
+    imageUrl: 'x.jpg',
+    kcal,
+    proteinG,
+    servings,
+  })
+  const window = { maxKcal: 780, minProtein: 43 }
+
+  it('finds the smallest number of servings that fits', () => {
+    expect(portionsForDish(dish(154, 17, 4), window)).toBe(3)
+    expect(portionsForDish(dish(400, 50, 4), window)).toBe(1)
+  })
+
+  it('never asks for more servings than the recipe makes', () => {
+    expect(portionsForDish(dish(154, 17, 2), window)).toBe(0)
+  })
+
+  it('is zero when nothing fits, and when macros are missing', () => {
+    expect(portionsForDish(dish(900, 60, 4), window)).toBe(0)
+    expect(portionsForDish({ id: 'y', provider: 'pd', title: 'y', imageUrl: 'y.jpg' }, window)).toBe(0)
   })
 })
