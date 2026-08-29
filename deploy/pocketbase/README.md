@@ -44,6 +44,26 @@ Generate VAPID keys once (`npx web-push generate-vapid-keys` or any P-256
 tool) and never rotate them casually: rotating invalidates every existing
 subscription.
 
+## Seeding the recipe catalogue
+
+The recipes are data, not code: a fresh server starts with an empty catalogue,
+and the app falls back to its bundled sample dishes until this is run. Import
+is a two-step, one-time job from a developer machine.
+
+```bash
+node scripts/import/myplate-crawl.mjs          # ~2-3 h, resumable, writes scripts/import/out/
+PB_URL=https://<sync-domain> PB_SUPERUSER_EMAIL=… PB_SUPERUSER_PASSWORD=… \
+  node scripts/import/myplate-seed.mjs         # idempotent: re-running updates, never duplicates
+```
+
+The crawl pulls the retired USDA MyPlate collection from the Internet Archive
+(public domain, see ATTRIBUTION.md); the seed uploads each recipe with its
+photo, so expect roughly a gigabyte over the wire and run it from a machine
+with a decent uplink. Both are safe to re-run.
+
+Gym-written recipes need no import: a platform admin adds them in the app under
+Admin -> Recipes, and they are stored with `provider: house`.
+
 ## Local development
 
 ```bash
