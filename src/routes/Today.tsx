@@ -58,7 +58,7 @@ import {
   pluralize,
 } from '../lib/labels'
 import { isoDaysAgo, todayIso } from '../lib/dates'
-import { bodyweightDelta, rangeVolume, setVolume, weeklyVolumeSeries, workoutTotals } from '../lib/stats'
+import { bmi, bodyweightDelta, rangeVolume, setVolume, weeklyVolumeSeries, workoutTotals } from '../lib/stats'
 import { summarizeSession } from '../lib/session-summary'
 import { testAgeDays, testIsStale } from '../lib/fitness-test'
 import { alternativesFor } from '../lib/alternatives'
@@ -247,6 +247,18 @@ function TodayOverview({
   })
   const losingIsGood =
     targetKg !== undefined && lastWeighIn ? targetKg < lastWeighIn.kg : undefined
+  /* Height comes from the profile; paired with the latest weigh-in it turns the
+     bodyweight tile into a live BMI without asking for anything twice. */
+  const heightCm = useGym((s) => s.profileDetails?.heightCm)
+  const bmiValue = lastWeighIn && heightCm ? bmi(lastWeighIn.kg, heightCm) : null
+  const weightSub = lastWeighIn
+    ? (targetKg !== undefined
+        ? `Target ${targetKg} kg`
+        : lastWeighIn.date === todayIso()
+          ? 'Logged today'
+          : `Logged ${formatLongDate(lastWeighIn.date)}`) +
+      (bmiValue !== null ? ` · BMI ${bmiValue}` : '')
+    : 'No weigh-ins yet. Your trend starts with the first one.'
   const primary = scheduled[0]
   const finished = finishedId ? (workouts.find((w) => w.id === finishedId) ?? null) : null
 
@@ -294,15 +306,7 @@ function TodayOverview({
           label="Bodyweight"
           value={lastWeighIn?.kg}
           unit={lastWeighIn ? 'kg' : undefined}
-          sub={
-            lastWeighIn
-              ? targetKg !== undefined
-                ? `Target ${targetKg} kg`
-                : lastWeighIn.date === todayIso()
-                  ? 'Logged today'
-                  : `Logged ${formatLongDate(lastWeighIn.date)}`
-              : 'No weigh-ins yet. Your trend starts with the first one.'
-          }
+          sub={weightSub}
           foot={
             <>
               {weightDelta !== null && weightDelta !== 0 && (

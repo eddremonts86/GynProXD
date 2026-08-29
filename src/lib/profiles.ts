@@ -20,6 +20,7 @@ import {
   type RecordCache,
 } from './record-store'
 import { withRecordIds } from './records'
+import type { ProfileDetails } from './types'
 import { EMPTY_SNAPSHOT, hydrateGym, snapshotGym, useGym, type GymSnapshot } from '../store/useGym'
 import { useSession } from '../store/useSession'
 
@@ -380,7 +381,7 @@ async function startSession(
 export async function createProfile(
   name: string,
   passphrase: string,
-  options?: { importLegacy?: boolean; gym?: string; role?: ProfileRole },
+  options?: { importLegacy?: boolean; gym?: string; role?: ProfileRole; details?: ProfileDetails },
 ): Promise<void> {
   const salt = randomBytes(16)
   const key = await deriveKey(passphrase, salt, KDF_ITERATIONS)
@@ -404,6 +405,9 @@ export async function createProfile(
     ...EMPTY_SNAPSHOT,
     ...imported,
     bodyweight: withRecordIds(imported.bodyweight ?? []),
+    /* Details given at the door seed the encrypted snapshot so the programme
+       designer and Today are prefilled from the very first unlock. */
+    ...(options?.details ? { profileDetails: options.details } : {}),
   }
   const cache = await writeAllRecords(meta.id, key, data)
 

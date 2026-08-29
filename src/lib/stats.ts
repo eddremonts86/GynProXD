@@ -139,6 +139,13 @@ export function sessionCountsByExercise(workouts: Workout[]): Map<string, number
   return counts
 }
 
+/** Body mass index from weight and height, to one decimal. Zero guards a bad height. */
+export function bmi(weightKg: number, heightCm: number): number {
+  const m = heightCm / 100
+  if (m <= 0) return 0
+  return Math.round((weightKg / (m * m)) * 10) / 10
+}
+
 /** Signed bodyweight change across the last `days`, or null without two points. */
 export function bodyweightDelta(entries: BodyweightEntry[], days: number, today = new Date()): number | null {
   if (entries.length < 2) return null

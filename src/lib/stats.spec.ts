@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  bmi,
   bodyweightDelta,
   dailySetSeries,
   rangeVolume,
@@ -69,6 +70,17 @@ describe('trainingStreak', () => {
     // a missing day breaks it.
     expect(trainingStreak([workout('2026-08-24', 50, 5), workout('2026-08-22', 50, 5)], today)).toBe(1)
     expect(trainingStreak([], today)).toBe(0)
+  })
+})
+
+describe('bmi', () => {
+  it('is weight over height-in-metres squared, to one decimal', () => {
+    expect(bmi(70, 175)).toBe(22.9)
+    expect(bmi(80, 178)).toBe(25.2)
+  })
+
+  it('guards a zero or missing height instead of returning Infinity', () => {
+    expect(bmi(80, 0)).toBe(0)
   })
 })
 

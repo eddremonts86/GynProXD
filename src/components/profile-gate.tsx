@@ -4,6 +4,7 @@ import { Wordmark } from '@/components/brand'
 import { Avatar } from '@/ui/Avatar'
 import { Button, IconButton } from '@/ui/Button'
 import { Combobox } from '@/ui/Combobox'
+import { FormSelect } from '@/ui/FormSelect'
 import { Input } from '@/ui/Input'
 import { Tag } from '@/ui/Tag'
 import {
@@ -16,7 +17,8 @@ import {
   type ProfileRole,
 } from '@/lib/profiles'
 import { requestPasswordReset, resetPasswordFromGate, signInFromGate } from '@/lib/sync'
-import { formatShortDate } from '@/lib/labels'
+import { SEX_LABELS, formatShortDate } from '@/lib/labels'
+import type { ProfileDetails } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
 /**
@@ -74,6 +76,9 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
   const [name, setName] = useState('')
   const [gym, setGym] = useState('')
   const [gyms] = useState(listGyms)
+  const [age, setAge] = useState('')
+  const [sex, setSex] = useState<'hombre' | 'mujer' | 'otro' | ''>('')
+  const [height, setHeight] = useState('')
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState<GateError | null>(null)
   const [showPass, setShowPass] = useState(false)
@@ -210,7 +215,19 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
     setBusy(true)
     setError(null)
     try {
-      await createProfile(trimmed, passphrase, { importLegacy: hasLegacy, gym })
+      /* Optional identity given at the door; seeds the encrypted snapshot so
+         the programme designer and Today start prefilled, not blank. */
+      const details: ProfileDetails = {}
+      const ageN = Math.round(Number(age))
+      if (age.trim() && Number.isFinite(ageN) && ageN > 0) details.age = ageN
+      if (sex) details.sex = sex
+      const heightN = Math.round(Number(height))
+      if (height.trim() && Number.isFinite(heightN) && heightN > 0) details.heightCm = heightN
+      await createProfile(trimmed, passphrase, {
+        importLegacy: hasLegacy,
+        gym,
+        details: Object.keys(details).length > 0 ? details : undefined,
+      })
       onUnlocked()
     } finally {
       setBusy(false)
@@ -576,6 +593,42 @@ export function ProfileGate({ onUnlocked }: { onUnlocked: () => void }) {
               error={errorFor('gym')}
               hint="Leave empty if you train on your own."
             />
+            <div className="grid grid-cols-3 gap-3">
+              <Input
+                label="Age"
+                value={age}
+                onChange={(e) => {
+                  setAge(e.target.value)
+                  setError(null)
+                }}
+                inputMode="numeric"
+                placeholder="—"
+              />
+              <FormSelect
+                label="Sex"
+                value={sex}
+                onValueChange={(v) => setSex(v as typeof sex)}
+                placeholder="—"
+                options={(['hombre', 'mujer', 'otro'] as const).map((v) => ({
+                  value: v,
+                  label: SEX_LABELS[v],
+                }))}
+              />
+              <Input
+                label="Height"
+                value={height}
+                onChange={(e) => {
+                  setHeight(e.target.value)
+                  setError(null)
+                }}
+                inputMode="numeric"
+                suffix="cm"
+                placeholder="—"
+              />
+            </div>
+            <p className="-mt-1 text-2xs text-ink-3">
+              Optional — prefills your programme and unlocks BMI on Today.
+            </p>
             <Input
               label="Passphrase"
               type={showPass ? 'text' : 'password'}

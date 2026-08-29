@@ -99,6 +99,12 @@ export function OnboardingPage() {
     try {
       const plan = await buildProgramme(input, duration)
       addGeneratedPlan(plan)
+      /* The designer is the fullest statement of who the person is, so persist
+         its identity back: Settings, Today's BMI and the next design run all
+         read the same source instead of drifting apart. */
+      useGym
+        .getState()
+        .setProfileDetails({ age: input.age, sex: input.sex, heightCm: input.heightCm })
       /* Only pull the user to the result if they are still here waiting.
          The coach can take minutes; someone who wandered off would otherwise
          never learn their programme landed, so tell them where it is. */
