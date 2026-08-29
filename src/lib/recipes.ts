@@ -1,26 +1,21 @@
 import { mealTargets, type NutritionTarget } from './nutrition-target'
-import { seedFrom } from './seed'
 import { serverCapabilities } from './capabilities'
 import { activeAuthHeader } from './sync'
 
 /**
- * Recipe suggestions from two free sources. TheMealDB is keyless and allows
- * CORS, so the browser calls it directly; Spoonacular's key stays server-side
- * behind the /api/recipes/spoonacular proxy, exactly like the MiniMax key.
- * Every suggestion carries a real photo URL from its source; nothing here is
- * ever invented, and anything malformed is dropped rather than repaired.
+ * Food recommendations come from the app's own sync server (phase 8): a
+ * local-first catalogue in PocketBase where public-domain rows (USDA MyPlate)
+ * live forever and FatSecret rows are a 24-hour rolling cache the server
+ * tops up on demand. The browser never talks to a recipe vendor directly.
+ * Every dish carries a real photo; anything malformed is dropped, never
+ * repaired. `parseDish` mirrors dishFromRecord in pb_hooks/utils/recipes_lib.
  */
 
-/** Dev-proxy key, or the sync server's — the latter needs a signed-in member. */
-export function recipeSearchEnabled(): boolean {
-  return __RECIPE_SEARCH__ || (serverCapabilities().recipes && activeAuthHeader() !== null)
-}
-
-export type RecipeSource = 'mealdb' | 'spoonacular' | 'sample'
+export type RecipeProvider = 'pd' | 'fatsecret' | 'sample'
 
 export interface RecipeSuggestion {
   id: string
-  source: RecipeSource
+  provider: RecipeProvider
   title: string
   imageUrl: string
   sourceUrl?: string
@@ -29,190 +24,112 @@ export interface RecipeSuggestion {
   readyInMinutes?: number
   category?: string
   area?: string
+  directions?: string[]
+  ingredients?: string[]
   /** One sentence from the AI coach on why this dish fits. Optional. */
   coachNote?: string
 }
 
-const MEALDB_BASE = 'https://www.themealdb.com/api/json/v1/1'
-
-/**
- * The categories the daily dish rotates through. Curated: TheMealDB also has
- * "Dessert" and "Side", which are not a plate recommendation for a gym, and
- * its "Vegan" category is seven entries of mostly sides and cake, so plant
- * dishes come from the far deeper "Vegetarian" instead.
- */
-export const DAILY_CATEGORIES = [
-  'Chicken',
-  'Seafood',
-  'Beef',
-  'Vegetarian',
-  'Pasta',
-  'Breakfast',
-  'Lamb',
-  'Pork',
-] as const
-
-export function dailyCategoryFor(dateIso: string): string {
-  return DAILY_CATEGORIES[seedFrom(dateIso) % DAILY_CATEGORIES.length]
-}
-
-/**
- * TheMealDB categories mix real plates with condiments and preserves ("Red
- * onion pickle" lives under Vegan). A recommendation must be a meal, so
- * anything titled like a jarred side is skipped, deterministically.
- */
-const NON_PLATE_WORDS =
-  /\b(pickle|pickled|sauce|dip|jam|chutney|relish|dressing|marinade|gravy|spread|syrup|cake|brownies?|cookies?|fudge|pudding|ice cream)\b/i
-
-export function isPlate(title: string): boolean {
-  return !NON_PLATE_WORDS.test(title)
-}
-
-interface MealDbListEntry {
-  id: string
-  title: string
-  imageUrl: string
+/** Suggestions need a signed-in member; the server owns every vendor key. */
+export function recipeSearchEnabled(): boolean {
+  return serverCapabilities().recipes && activeAuthHeader() !== null
 }
 
 function asText(value: unknown): string | undefined {
   return typeof value === 'string' && value.trim().length > 0 ? value.trim() : undefined
 }
 
-export function parseMealDbList(raw: unknown): MealDbListEntry[] {
-  const meals = (raw as { meals?: unknown })?.meals
-  if (!Array.isArray(meals)) return []
-  const entries: MealDbListEntry[] = []
-  for (const m of meals as Record<string, unknown>[]) {
-    const id = asText(m?.idMeal)
-    const title = asText(m?.strMeal)
-    const imageUrl = asText(m?.strMealThumb)
-    if (id && title && imageUrl) entries.push({ id, title, imageUrl })
-  }
-  return entries
+function asNumber(value: unknown): number | undefined {
+  return typeof value === 'number' && Number.isFinite(value) && value > 0
+    ? Math.round(value)
+    : undefined
 }
 
-export function parseMealDbDetail(raw: unknown): RecipeSuggestion | null {
-  const meal = (raw as { meals?: unknown[] })?.meals?.[0] as Record<string, unknown> | undefined
-  if (!meal) return null
-  const id = asText(meal.idMeal)
-  const title = asText(meal.strMeal)
-  const imageUrl = asText(meal.strMealThumb)
-  if (!id || !title || !imageUrl) return null
+function asSteps(value: unknown): string[] | undefined {
+  if (!Array.isArray(value)) return undefined
+  const steps = value.filter((s): s is string => typeof s === 'string' && s.trim().length > 0)
+  return steps.length > 0 ? steps : undefined
+}
+
+export function parseDish(raw: unknown): RecipeSuggestion | null {
+  const r = raw as Record<string, unknown> | null | undefined
+  const id = asText(r?.id)
+  const title = asText(r?.title)
+  const imageUrl = asText(r?.imageUrl)
+  const provider = r?.provider === 'pd' || r?.provider === 'fatsecret' ? r.provider : undefined
+  if (!id || !title || !imageUrl || !provider) return null
   return {
     id,
-    source: 'mealdb',
+    provider,
     title,
     imageUrl,
-    category: asText(meal.strCategory),
-    area: asText(meal.strArea) ?? asText(meal.strCountry),
-    sourceUrl:
-      asText(meal.strSource) ?? asText(meal.strYoutube) ?? `https://www.themealdb.com/meal/${id}`,
+    kcal: asNumber(r?.kcal),
+    proteinG: asNumber(r?.proteinG),
+    readyInMinutes: asNumber(r?.readyInMinutes),
+    category: asText(r?.category),
+    sourceUrl: asText(r?.sourceUrl),
+    directions: asSteps(r?.directions),
+    ingredients: asSteps(r?.ingredients),
   }
 }
 
-/**
- * The dish of the day: two keyless calls, both seeded by the date, so a whole
- * gym's worth of devices converges on the same plate without coordinating.
- */
-export async function fetchDailyDish(dateIso: string): Promise<RecipeSuggestion | null> {
-  /* The sync server computes and caches the same pick once for everyone
-     (phase 7); a device that cannot reach it converges on its own. */
-  try {
-    const res = await fetch(`/pb/api/enforma/daily-dish?date=${encodeURIComponent(dateIso)}`, {
-      signal: AbortSignal.timeout(4000),
-    })
-    if (res.ok) {
-      const dish = (await res.json()) as RecipeSuggestion
-      if (dish && dish.id && dish.title && dish.imageUrl) return { ...dish, source: 'mealdb' }
-    }
-  } catch {
-    /* Offline or no server: fall through to the direct calls. */
+export function parseDishList(raw: unknown): RecipeSuggestion[] {
+  const items = (raw as { items?: unknown })?.items
+  if (!Array.isArray(items)) return []
+  const dishes: RecipeSuggestion[] = []
+  for (const item of items) {
+    const dish = parseDish(item)
+    if (dish) dishes.push(dish)
   }
-
-  const category = dailyCategoryFor(dateIso)
-  const listRes = await fetch(`${MEALDB_BASE}/filter.php?c=${encodeURIComponent(category)}`)
-  if (!listRes.ok) return null
-  const all = parseMealDbList(await listRes.json())
-  const list = all.filter((m) => isPlate(m.title))
-  if (list.length === 0) return null
-
-  const pick = list[seedFrom(dateIso + category) % list.length]
-  const detailRes = await fetch(`${MEALDB_BASE}/lookup.php?i=${encodeURIComponent(pick.id)}`)
-  if (!detailRes.ok) return null
-  return parseMealDbDetail(await detailRes.json())
+  return dishes
 }
 
 /**
- * The daily suggestion query. Deterministic for a given date and target so the
- * cache is coherent and the free-tier points are spent once, not per visit.
+ * The daily suggestion query. Deterministic for a given date and target so
+ * the server cache is coherent and vendor calls happen once, not per visit.
  * Direction decides which side of the calorie band is enforced.
  */
-export function spoonacularQuery(target: NutritionTarget, dateIso: string): string {
+export function suggestionsQuery(target: NutritionTarget, dateIso: string): string {
   const meal = mealTargets(target)
   const params = new URLSearchParams()
-  params.set('number', '3')
-  params.set('type', 'main course')
-  params.set('instructionsRequired', 'true')
-  params.set('addRecipeNutrition', 'true')
-  params.set('sort', 'protein')
-  params.set('sortDirection', 'desc')
+  params.set('date', dateIso)
   params.set('minProtein', String(meal.proteinMinG))
   if (target.direction === 'surplus') {
-    params.set('minCalories', String(meal.kcalMin))
-    params.set('maxCalories', String(Math.round(meal.kcalMax * 1.25)))
+    params.set('minKcal', String(meal.kcalMin))
+    params.set('maxKcal', String(Math.round(meal.kcalMax * 1.25)))
   } else {
-    params.set('maxCalories', String(meal.kcalMax))
+    params.set('maxKcal', String(meal.kcalMax))
   }
-  // A small seeded offset rotates the shortlist day to day without randomness.
-  params.set('offset', String(seedFrom(dateIso) % 12))
   return params.toString()
 }
 
-interface SpoonacularNutrient {
-  name?: unknown
-  amount?: unknown
-}
-
-function nutrientAmount(nutrients: unknown, name: string): number | undefined {
-  if (!Array.isArray(nutrients)) return undefined
-  const hit = (nutrients as SpoonacularNutrient[]).find((n) => n?.name === name)
-  return typeof hit?.amount === 'number' ? Math.round(hit.amount) : undefined
-}
-
-export function parseSpoonacularResults(raw: unknown): RecipeSuggestion[] {
-  const results = (raw as { results?: unknown })?.results
-  if (!Array.isArray(results)) return []
-  const suggestions: RecipeSuggestion[] = []
-  for (const r of results as Record<string, unknown>[]) {
-    const id = typeof r?.id === 'number' ? String(r.id) : asText(r?.id)
-    const title = asText(r?.title)
-    const imageUrl = asText(r?.image)
-    if (!id || !title || !imageUrl) continue
-    const nutrients = (r.nutrition as { nutrients?: unknown } | undefined)?.nutrients
-    suggestions.push({
-      id,
-      source: 'spoonacular',
-      title,
-      imageUrl,
-      kcal: nutrientAmount(nutrients, 'Calories'),
-      proteinG: nutrientAmount(nutrients, 'Protein'),
-      readyInMinutes: typeof r.readyInMinutes === 'number' ? r.readyInMinutes : undefined,
-      sourceUrl: asText(r.sourceUrl) ?? `https://spoonacular.com/recipes/x-${id}`,
+/** The server computes and caches the same daily pick once for everyone. */
+export async function fetchDailyDish(dateIso: string): Promise<RecipeSuggestion | null> {
+  try {
+    const res = await fetch(`/pb/api/enforma/daily-dish?date=${encodeURIComponent(dateIso)}`, {
+      signal: AbortSignal.timeout(8000),
     })
+    if (!res.ok) return null
+    return parseDish(await res.json())
+  } catch {
+    return null
   }
-  return suggestions
 }
 
 export async function fetchSuggestions(
   target: NutritionTarget,
   dateIso: string,
 ): Promise<RecipeSuggestion[]> {
-  const res = await fetch(
-    `/api/recipes/spoonacular/recipes/complexSearch?${spoonacularQuery(target, dateIso)}`,
-    { headers: activeAuthHeader() ?? {} },
-  )
-  if (!res.ok) return []
-  return parseSpoonacularResults(await res.json())
+  try {
+    const res = await fetch(
+      `/pb/api/enforma/recipes/suggestions?${suggestionsQuery(target, dateIso)}`,
+      { headers: activeAuthHeader() ?? {}, signal: AbortSignal.timeout(20000) },
+    )
+    if (!res.ok) return []
+    return parseDishList(await res.json())
+  } catch {
+    return []
+  }
 }
 
 /**
