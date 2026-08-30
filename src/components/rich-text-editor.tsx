@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   ArrowUUpLeft,
   Link as LinkIcon,
@@ -6,20 +6,20 @@ import {
   ListNumbers,
   Quotes,
   TextB,
-  TextHOne,
   TextItalic,
   TextStrikethrough,
 } from '@phosphor-icons/react'
 import { isEmptyHtml, sanitizeHtml } from '@/lib/rich-text'
+import { FormSelect } from '@/ui/FormSelect'
 import { cn } from '@/lib/utils'
 
 /**
  * A small formatting surface, not an editor suite.
  *
- * A gym owner writing about a clip card needs bold, a list and a link. They do
- * not need headings, tables, colours or a font picker, and every one of those
- * is another shape the member's card has to survive. The toolbar is the
- * allowlist made visible: if it is not a button here, it cannot be in the body.
+ * A gym owner writing about a clip card needs bold, a list, a heading and a
+ * link. They do not need colours or a font picker, and every one of those is
+ * another shape the member's card has to survive. The toolbar is the allowlist
+ * made visible: if it is not here, it cannot be in the body.
  *
  * `contenteditable` is uncontrolled on purpose. Rewriting `innerHTML` from
  * React state on every keystroke destroys the selection and the composition
@@ -27,47 +27,42 @@ import { cn } from '@/lib/utils'
  * then only reads.
  */
 
-interface Command {
-  id: string
-  label: string
-  icon: React.ReactNode
-  run: (exec: (command: string, value?: string) => void) => void
-}
+/**
+ * Levels, named for what they look like rather than what they are.
+ *
+ * The tags start at `h4` because the card around this body already renders the
+ * message title as an `h3`; a body opening with `h1` would leave the page's
+ * outline out of order for anyone moving through it by headings. The operator
+ * never has to know that — they see three sizes and a way back to normal text,
+ * which is the whole of it.
+ */
+const BLOCKS = [
+  { value: 'p', label: 'Normal text' },
+  { value: 'h4', label: 'Heading' },
+  { value: 'h5', label: 'Subheading' },
+  { value: 'h6', label: 'Small heading' },
+  { value: 'blockquote', label: 'Quote' },
+] as const
 
-const COMMANDS: Command[] = [
-  { id: 'bold', label: 'Bold', icon: <TextB size={15} weight="bold" />, run: (x) => x('bold') },
-  { id: 'italic', label: 'Italic', icon: <TextItalic size={15} weight="bold" />, run: (x) => x('italic') },
+const INLINE = [
+  { command: 'bold', label: 'Bold', icon: <TextB size={15} weight="bold" /> },
+  { command: 'italic', label: 'Italic', icon: <TextItalic size={15} weight="bold" /> },
   {
-    id: 'strikeThrough',
+    command: 'strikeThrough',
     label: 'Strikethrough',
     icon: <TextStrikethrough size={15} weight="bold" />,
-    run: (x) => x('strikeThrough'),
   },
   {
-    id: 'formatBlock:h4',
-    label: 'Subheading',
-    icon: <TextHOne size={15} weight="bold" />,
-    run: (x) => x('formatBlock', 'h4'),
-  },
-  {
-    id: 'insertUnorderedList',
+    command: 'insertUnorderedList',
     label: 'Bulleted list',
     icon: <ListBullets size={15} weight="bold" />,
-    run: (x) => x('insertUnorderedList'),
   },
   {
-    id: 'insertOrderedList',
+    command: 'insertOrderedList',
     label: 'Numbered list',
     icon: <ListNumbers size={15} weight="bold" />,
-    run: (x) => x('insertOrderedList'),
   },
-  {
-    id: 'formatBlock:blockquote',
-    label: 'Quote',
-    icon: <Quotes size={15} weight="bold" />,
-    run: (x) => x('formatBlock', 'blockquote'),
-  },
-]
+] as const
 
 export function RichTextEditor({
   id,
@@ -84,6 +79,8 @@ export function RichTextEditor({
 }) {
   const box = useRef<HTMLDivElement>(null)
   const [empty, setEmpty] = useState(() => isEmptyHtml(value))
+  const [active, setActive] = useState<string[]>([])
+  const [block, setBlock] = useState('p')
 
   /* Seeded once, and again only when the value is replaced from outside —
      publishing clears the composer, and the editor has to follow. */
@@ -96,6 +93,42 @@ export function RichTextEditor({
     }
   }, [value])
 
+  /**
+   * What the caret is sitting in.
+   *
+   * Without this the toolbar is write-only: every button looks the same
+   * whether or not it is already on, and the heading control has no idea a
+   * line is already a heading — which is why pressing it twice used to leave
+   * the line stuck as one, with no way back to a paragraph.
+   */
+  const readSelection = useCallback(() => {
+    const el = box.current
+    if (!el || !el.contains(document.getSelection()?.anchorNode ?? null)) return
+    const on: string[] = []
+    for (const { command } of INLINE) {
+      try {
+        if (document.queryCommandState(command)) on.push(command)
+      } catch {
+        /* Some engines throw for an unsupported command; it simply reads off. */
+      }
+    }
+    setActive(on)
+    let current = ''
+    try {
+      current = document.queryCommandValue('formatBlock').toLowerCase()
+    } catch {
+      current = ''
+    }
+    /* Engines answer with `div`, an empty string or the tag; anything that is
+       not one of ours is a plain paragraph as far as this control goes. */
+    setBlock(BLOCKS.some((b) => b.value === current) ? current : 'p')
+  }, [])
+
+  useEffect(() => {
+    document.addEventListener('selectionchange', readSelection)
+    return () => document.removeEventListener('selectionchange', readSelection)
+  }, [readSelection])
+
   const read = () => {
     const el = box.current
     if (!el) return
@@ -105,6 +138,7 @@ export function RichTextEditor({
     const html = sanitizeHtml(el.innerHTML)
     setEmpty(isEmptyHtml(html))
     onChange(html)
+    readSelection()
   }
 
   const exec = (command: string, argument?: string) => {
@@ -116,6 +150,10 @@ export function RichTextEditor({
     read()
   }
 
+  /* Some engines only recognise the angle-bracket form. Passing it that way
+     works in all of them. */
+  const setBlockTo = (tag: string) => exec('formatBlock', `<${tag}>`)
+
   const addLink = () => {
     const url = window.prompt('Link to where?')
     if (!url) return
@@ -126,17 +164,36 @@ export function RichTextEditor({
 
   return (
     <div className="flex flex-col gap-1.5">
-      <div className="flex flex-wrap items-center gap-0.5 rounded-lg border border-line bg-surface-2 p-1">
-        {COMMANDS.map((command) => (
+      <div className="flex flex-wrap items-center gap-1 rounded-lg border border-line bg-surface-2 p-1">
+        {/* A control that shows the block it is in, rather than a button that
+            only ever pushes one way. Choosing "Normal text" is the way back. */}
+        <FormSelect
+          ariaLabel="Text style"
+          size="sm"
+          value={block}
+          onValueChange={setBlockTo}
+          options={BLOCKS.map((b) => ({ value: b.value, label: b.label }))}
+          className="h-7 w-[9.25rem] border-none bg-transparent text-2xs hover:bg-line"
+        />
+
+        <span className="mx-0.5 h-4 w-px bg-line" />
+
+        {INLINE.map(({ command, label, icon }) => (
           <ToolButton
-            key={command.id}
-            label={command.label}
-            onPress={() => command.run(exec)}
+            key={command}
+            label={label}
+            on={active.includes(command)}
+            onPress={() => exec(command)}
           >
-            {command.icon}
+            {icon}
           </ToolButton>
         ))}
-        <span className="mx-1 h-4 w-px bg-line" />
+
+        <span className="mx-0.5 h-4 w-px bg-line" />
+
+        <ToolButton label="Quote" on={block === 'blockquote'} onPress={() => setBlockTo('blockquote')}>
+          <Quotes size={15} weight="bold" />
+        </ToolButton>
         <ToolButton label="Add a link" onPress={addLink}>
           <LinkIcon size={15} weight="bold" />
         </ToolButton>
@@ -163,6 +220,8 @@ export function RichTextEditor({
           aria-multiline="true"
           onInput={read}
           onBlur={read}
+          onKeyUp={readSelection}
+          onMouseUp={readSelection}
           /* Paste arrives as whatever the source page was made of; taking the
              plain text is the only way to be sure the toolbar is the allowlist. */
           onPaste={(e) => {
@@ -184,10 +243,12 @@ export function RichTextEditor({
 
 function ToolButton({
   label,
+  on,
   onPress,
   children,
 }: {
   label: string
+  on?: boolean
   onPress: () => void
   children: React.ReactNode
 }) {
@@ -195,12 +256,16 @@ function ToolButton({
     <button
       type="button"
       aria-label={label}
+      aria-pressed={on}
       title={label}
       /* The mousedown is what would move the caret out of the text before the
          command ran; taking it here keeps the selection where the user left it. */
       onMouseDown={(e) => e.preventDefault()}
       onClick={onPress}
-      className="flex size-7 items-center justify-center rounded-md text-ink-2 transition-colors duration-150 hover:bg-line hover:text-ink active:scale-[0.94]"
+      className={cn(
+        'flex size-7 items-center justify-center rounded-md transition-colors duration-150 active:scale-[0.94]',
+        on ? 'bg-ink text-bg' : 'text-ink-2 hover:bg-line hover:text-ink',
+      )}
     >
       {children}
     </button>

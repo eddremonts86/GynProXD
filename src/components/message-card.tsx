@@ -53,7 +53,10 @@ export function MessageCard({
             <Tag tone={KIND_TONE[message.kind]}>{TEMPLATE_LABELS[message.kind]}</Tag>
             {unread && <Tag tone="brand">New</Tag>}
           </span>
-          <h3 className="text-base font-semibold text-ink">{message.title}</h3>
+          {/* One step above the body's largest heading. At `text-base` it was
+              14px against a 17px `h4` inside its own body: the message title
+              lost to a subheading of itself. */}
+          <h3 className="text-lg leading-snug font-semibold text-ink">{message.title}</h3>
         </div>
         <span className="num shrink-0 text-2xs text-ink-3">
           {formatShortDate(message.createdAt.slice(0, 10))}
