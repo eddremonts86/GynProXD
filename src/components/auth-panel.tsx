@@ -72,10 +72,23 @@ interface AuthPanelProps {
   onUnlocked: () => void
   /** Overrides the default (profiles on this device -> unlock, none -> create). */
   initialMode?: Mode
+  /**
+   * Carries the accent edge. Off by default because the landing mounts this
+   * twice and only one of them is ever alone on screen: the second sits a few
+   * hundred pixels under the comparison card, which already has the accent, and
+   * two of them in one viewport is one too many.
+   */
+  accent?: boolean
   className?: string
 }
 
-export function AuthPanel({ idPrefix, onUnlocked, initialMode, className }: AuthPanelProps) {
+export function AuthPanel({
+  idPrefix,
+  onUnlocked,
+  initialMode,
+  accent = false,
+  className,
+}: AuthPanelProps) {
   const [profiles] = useState(listProfiles)
   const [mode, setMode] = useState<Mode>(
     initialMode ?? (profiles.length > 0 ? 'unlock' : 'create'),
@@ -264,6 +277,8 @@ export function AuthPanel({ idPrefix, onUnlocked, initialMode, className }: Auth
     <div
       className={cn(
         'w-full rounded-xl bg-surface p-6 shadow-[var(--shadow-tile)] md:p-7',
+        /* Everything above it argues; this is where the member acts. */
+        accent && 'aurora-edge',
         className,
       )}
     >
@@ -297,15 +312,21 @@ export function AuthPanel({ idPrefix, onUnlocked, initialMode, className }: Auth
               >
                 <Avatar name={p.name} seed={p.id} />
                 <span className="min-w-0 flex-1">
-                  <span className="flex items-center gap-2">
-                    <span className="truncate text-sm font-semibold text-ink">{p.name}</span>
-                    {ROLE_TAGS[p.role] && <Tag tone="outline">{ROLE_TAGS[p.role]}</Tag>}
-                  </span>
+                  <span className="block truncate text-sm font-semibold text-ink">{p.name}</span>
                   <span className="block truncate text-2xs text-ink-3">
                     {p.gym ? `${p.gym} · ` : ''}
                     <span className="num">since {formatShortDate(p.createdAt.slice(0, 10))}</span>
                   </span>
                 </span>
+                {/* Pinned to the row's edge rather than trailing the name: as a
+                    sibling it stops competing with the name for width, so a
+                    long one truncates later and the space on the right is
+                    used instead of left blank. */}
+                {ROLE_TAGS[p.role] && (
+                  <Tag tone="outline" className="shrink-0">
+                    {ROLE_TAGS[p.role]}
+                  </Tag>
+                )}
               </button>
             ))}
           </div>
@@ -323,7 +344,13 @@ export function AuthPanel({ idPrefix, onUnlocked, initialMode, className }: Auth
             trailing={<RevealToggle shown={showPass} onToggle={() => setShowPass((v) => !v)} />}
           />
 
-          <Button type="submit" size="lg" disabled={busy || !passphrase} className="w-full">
+          <Button
+            variant="primary"
+            type="submit"
+            size="lg"
+            disabled={busy || !passphrase}
+            className="w-full"
+          >
             {busy ? (
               <CircleNotch size={18} weight="bold" className="animate-spin" />
             ) : (
@@ -396,7 +423,7 @@ export function AuthPanel({ idPrefix, onUnlocked, initialMode, className }: Auth
             trailing={<RevealToggle shown={showPass} onToggle={() => setShowPass((v) => !v)} />}
           />
 
-          <Button type="submit" size="lg" disabled={busy} className="w-full">
+          <Button variant="primary" type="submit" size="lg" disabled={busy} className="w-full">
             {busy ? (
               <CircleNotch size={18} weight="bold" className="animate-spin" />
             ) : (
@@ -460,7 +487,7 @@ export function AuthPanel({ idPrefix, onUnlocked, initialMode, className }: Auth
                 }}
                 error={errorFor('email')}
               />
-              <Button type="submit" size="lg" disabled={busy} className="w-full">
+              <Button variant="primary" type="submit" size="lg" disabled={busy} className="w-full">
                 {busy ? (
                   <CircleNotch size={18} weight="bold" className="animate-spin" />
                 ) : (
@@ -527,7 +554,7 @@ export function AuthPanel({ idPrefix, onUnlocked, initialMode, className }: Auth
                 error={errorFor('recovery')}
                 hint="The 25-character code shown when sync was turned on."
               />
-              <Button type="submit" size="lg" disabled={busy} className="w-full">
+              <Button variant="primary" type="submit" size="lg" disabled={busy} className="w-full">
                 {busy ? (
                   <CircleNotch size={18} weight="bold" className="animate-spin" />
                 ) : (
@@ -670,7 +697,7 @@ export function AuthPanel({ idPrefix, onUnlocked, initialMode, className }: Auth
             </p>
           )}
 
-          <Button type="submit" size="lg" disabled={busy} className="w-full">
+          <Button variant="primary" type="submit" size="lg" disabled={busy} className="w-full">
             {busy ? (
               <CircleNotch size={18} weight="bold" className="animate-spin" />
             ) : (

@@ -1,10 +1,26 @@
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { ArrowRight, Check, MapPin, Storefront, Tag as TagIcon, X } from '@phosphor-icons/react'
+import {
+  ArrowRight,
+  Check,
+  CloudSlash,
+  MapPin,
+  Storefront,
+  Tag as TagIcon,
+  WarningCircle,
+  X,
+} from '@phosphor-icons/react'
 import { useNavigate } from '@tanstack/react-router'
 import { useSession } from '../store/useSession'
 import { useMessages } from '../store/useMessages'
-import { dismissNotice, dismissedNotices, noticesForToday } from '../lib/gym-notices'
+import {
+  SNOOZE_DAYS,
+  dismissNotice,
+  noticesForToday,
+  promptIsSnoozed,
+  snoozePrompt,
+} from '../lib/gym-notices'
+import { readSyncLink } from '../lib/sync'
 import { formatShortDate } from '../lib/labels'
 import { todayIso } from '../lib/dates'
 import { Button } from '../ui/Button'
@@ -89,54 +105,93 @@ function NoticeCard({
 }
 
 /**
- * The sentinel id the setup prompt is dismissed under, so it can share the
- * per-profile dismissal list with real messages.
+ * The prompt ids, snoozed per profile so a wave-off is a pause and not a
+ * permanent silence.
  */
+const LOCAL_ONLY_PROMPT = 'prompt:local-only'
 const NO_GYM_PROMPT = 'prompt:no-gym'
 
+/** What a local-only profile is actually carrying. All three are facts. */
+const LOCAL_RISKS = [
+  {
+    icon: WarningCircle,
+    text: 'Forget the passphrase and this training is gone. A local profile has no reset and no recovery code.',
+  },
+  {
+    icon: CloudSlash,
+    text: 'It exists in this browser and nowhere else. Clearing site data, or losing the device, ends it.',
+  },
+  {
+    icon: Storefront,
+    text: 'No gym can reach you. Joining one needs an account, and with it come their events, offers and daily menu.',
+  },
+]
+
 /**
- * The same slot when there is no gym attached. A member who skipped the
- * optional gym field at sign-up was invisible to every gym forever and was
- * never asked again; this is the ask, once, where the gym's own content would
- * otherwise be. It costs no new space on the page and it goes away for good if
- * they wave it off.
+ * The same slot, for a member who has not finished setting up. Two states,
+ * because they are two different asks in order: a local profile cannot join a
+ * gym at all — membership is granted server-side — so sync comes first and the
+ * gym second.
+ *
+ * It leads with what the member stands to lose rather than what we stand to
+ * gain. That is not softness: the passphrase really is unrecoverable and the
+ * data really does live in one browser, and saying so plainly is both the
+ * honest case and the persuasive one.
  */
-function NoGymYet({ profileId }: { profileId: string }) {
+function SetupPrompt({ profileId, synced }: { profileId: string; synced: boolean }) {
   const navigate = useNavigate()
-  const [hidden, setHidden] = useState(() => dismissedNotices(profileId).includes(NO_GYM_PROMPT))
-  if (hidden) return null
+  const promptId = synced ? NO_GYM_PROMPT : LOCAL_ONLY_PROMPT
+  const [snoozed, setSnoozed] = useState(() => promptIsSnoozed(profileId, promptId, todayIso()))
+  if (snoozed) return null
+
+  const hide = () => {
+    snoozePrompt(profileId, promptId, todayIso())
+    setSnoozed(true)
+  }
 
   return (
-    <Section title="Your gym">
-      <Panel padding="lg" className="flex flex-col gap-4">
+    <Section title={synced ? 'Your gym' : 'This profile is local only'}>
+      <Panel padding="lg" className="aurora-edge flex flex-col gap-5">
         <div className="flex items-start justify-between gap-4">
-          <div className="flex items-start gap-4">
-            <Storefront size={22} weight="regular" className="mt-0.5 shrink-0 text-ink-3" />
-            <div className="flex flex-col gap-2">
+          {synced ? (
+            <div className="flex items-start gap-4">
+              <Storefront size={22} weight="regular" className="mt-0.5 shrink-0 text-ink-3" />
               <p className="max-w-[62ch] text-sm text-ink-2">
                 Add the gym you train at and its events, offers and daily menu arrive here instead
                 of nowhere. They see your name on their member list; your training stays encrypted
                 and never leaves this device.
               </p>
             </div>
-          </div>
+          ) : (
+            <ul className="flex flex-col gap-3">
+              {LOCAL_RISKS.map((risk) => (
+                <li key={risk.text} className="flex items-start gap-4">
+                  <risk.icon size={20} weight="regular" className="mt-0.5 shrink-0 text-ink-3" />
+                  <span className="max-w-[62ch] text-sm text-ink-2">{risk.text}</span>
+                </li>
+              ))}
+            </ul>
+          )}
           <button
             type="button"
-            aria-label="Hide this"
-            onClick={() => {
-              dismissNotice(profileId, NO_GYM_PROMPT)
-              setHidden(true)
-            }}
+            aria-label={`Remind me in ${SNOOZE_DAYS} days`}
+            title={`Remind me in ${SNOOZE_DAYS} days`}
+            onClick={hide}
             className="flex size-7 shrink-0 items-center justify-center rounded-full text-ink-3 transition-colors duration-150 hover:bg-surface-2 hover:text-ink"
           >
             <X size={14} weight="bold" />
           </button>
         </div>
-        <div>
-          <Button variant="secondary" onClick={() => navigate({ to: '/settings' })}>
-            Set your gym
+        <div className="flex flex-wrap items-center gap-3">
+          <Button variant="primary" onClick={() => navigate({ to: '/settings' })}>
+            {synced ? 'Find your gym' : 'Turn on sync'}
             <ArrowRight size={16} weight="bold" />
           </Button>
+          <span className="text-xs text-ink-3">
+            {synced
+              ? 'Takes a code from the desk, or a request they approve.'
+              : 'One password. The server only ever holds sealed rows.'}
+          </span>
         </div>
       </Panel>
     </Section>
@@ -155,7 +210,7 @@ export function FromYourGym() {
   const [hidden, setHidden] = useState<string[]>([])
 
   if (!profileId) return null
-  if (!gym) return <NoGymYet profileId={profileId} />
+  if (!gym) return <SetupPrompt profileId={profileId} synced={readSyncLink(profileId) !== null} />
 
   const picked = noticesForToday(messages, { id: profileId, gym }, todayIso())
   const event = picked.event && !hidden.includes(picked.event.id) ? picked.event : undefined
