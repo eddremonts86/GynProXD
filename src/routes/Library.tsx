@@ -1,6 +1,7 @@
-import { useDeferredValue, useMemo, useState } from 'react'
+import { useCallback, useDeferredValue, useMemo, useState } from 'react'
 import { CaretRight, MagnifyingGlass, Plus } from '@phosphor-icons/react'
 import { exerciseImageCandidates, exercisePhotoFrames } from '../lib/images'
+import { useInfiniteScroll } from '../lib/use-infinite-scroll'
 import { useGym } from '../store/useGym'
 import { exerciseLookup } from '../lib/exercises'
 import { sessionCountsByExercise } from '../lib/stats'
@@ -124,6 +125,9 @@ export function LibraryPage() {
 
   const shown = filtered.slice(0, visible)
   const resetPaging = () => setVisible(PAGE)
+
+  const showMore = useCallback(() => setVisible((v) => v + PAGE), [])
+  const sentinelRef = useInfiniteScroll(showMore, visible < filtered.length)
 
   return (
     <div className="flex flex-col gap-6">
@@ -283,13 +287,13 @@ export function LibraryPage() {
           </ul>
 
           {visible < filtered.length && (
-            <Button
-              variant="secondary"
-              onClick={() => setVisible((v) => v + PAGE)}
-              className="mx-auto"
-            >
-              Show {Math.min(PAGE, filtered.length - visible)} more
-            </Button>
+            /* Scrolling loads the next page; the button is how a keyboard gets
+               there, and the fallback where the observer is absent. */
+            <div ref={sentinelRef} className="flex justify-center">
+              <Button variant="secondary" onClick={showMore}>
+                Show {Math.min(PAGE, filtered.length - visible)} more
+              </Button>
+            </div>
           )}
         </>
       )}

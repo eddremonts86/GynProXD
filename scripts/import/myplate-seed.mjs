@@ -33,14 +33,26 @@ export function categoryFromTitle(title) {
 }
 
 async function main() {
-  const auth = await fetch(`${PB}/api/collections/_superusers/auth-with-password`, {
+  const authRes = await fetch(`${PB}/api/collections/_superusers/auth-with-password`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({
       identity: process.env.PB_SUPERUSER_EMAIL,
       password: process.env.PB_SUPERUSER_PASSWORD,
     }),
-  }).then((r) => r.json())
+  })
+  const authBody = await authRes.text()
+  let auth
+  try {
+    auth = JSON.parse(authBody)
+  } catch {
+    /* A restarting container answers with the proxy's HTML, not JSON. Say so
+       instead of dying on a parse error halfway down a stack trace. */
+    throw new Error(
+      `${PB} did not answer with JSON (HTTP ${authRes.status}). If it is mid-deploy,` +
+        ' wait for the container and run this again.\n' + authBody.slice(0, 200),
+    )
+  }
   if (!auth.token) {
     throw new Error(
       'Superuser auth failed against ' + PB + ': ' + JSON.stringify(auth) +

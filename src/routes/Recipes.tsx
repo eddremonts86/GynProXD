@@ -14,6 +14,7 @@ import { Panel } from '../ui/Panel'
 import { Tag } from '../ui/Tag'
 import { Button, IconButton } from '../ui/Button'
 import { EmptyState } from '../ui/EmptyState'
+import { useInfiniteScroll } from '../lib/use-infinite-scroll'
 import { cn } from '@/lib/utils'
 
 /**
@@ -140,6 +141,8 @@ export function RecipesPage() {
       })
       .finally(() => setLoadingMore(false))
   }, [key, query, result])
+
+  const sentinelRef = useInfiniteScroll(loadMore, hasMore && !loadingMore)
 
   const filtered = debounced !== '' || category !== '' || highProtein || light
   const clearAll = () => {
@@ -274,10 +277,16 @@ export function RecipesPage() {
             ))}
           </div>
           {hasMore && (
-            <div className="flex justify-center pt-1">
-              <Button variant="secondary" size="sm" onClick={loadMore} disabled={loadingMore}>
-                {loadingMore ? 'Loading…' : 'Show more'}
-              </Button>
+            <div ref={sentinelRef} className="flex justify-center pt-1">
+              {loadingMore ? (
+                <p className="text-2xs text-ink-3">Loading more…</p>
+              ) : (
+                /* Scrolling loads the next page; the button is how a keyboard
+                   gets there, and the fallback where the observer is absent. */
+                <Button variant="secondary" size="sm" onClick={loadMore}>
+                  Show more
+                </Button>
+              )}
             </div>
           )}
         </>

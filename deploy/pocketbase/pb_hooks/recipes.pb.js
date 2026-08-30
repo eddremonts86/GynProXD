@@ -209,7 +209,11 @@ routerAdd('GET', '/api/enforma/daily-dish', (e) => {
 
   const cacheKey = 'dish-' + date
   const cached = lib.cacheGet($app, cacheKey)
-  if (cached) return e.json(200, cached)
+  /* A dish cached by an older build has a different shape, and the client
+     drops anything it cannot recognise. Recompute rather than serve it. */
+  if (cached && cached.id && cached.title && cached.imageUrl && cached.provider) {
+    return e.json(200, cached)
+  }
 
   const poolFor = (category) =>
     $app.findRecordsByFilter(
