@@ -1,13 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   ArrowUUpLeft,
+  Highlighter,
   Link as LinkIcon,
+  LinkBreak,
   ListBullets,
   ListNumbers,
+  Minus,
   Quotes,
   TextB,
   TextItalic,
   TextStrikethrough,
+  TextSubscript,
+  TextSuperscript,
+  TextUnderline,
 } from '@phosphor-icons/react'
 import { isEmptyHtml, sanitizeHtml } from '@/lib/rich-text'
 import { FormSelect } from '@/ui/FormSelect'
@@ -44,14 +50,27 @@ const BLOCKS = [
   { value: 'blockquote', label: 'Quote' },
 ] as const
 
+/** Emphasis, in the order a hand reaches for it. */
 const INLINE = [
   { command: 'bold', label: 'Bold', icon: <TextB size={15} weight="bold" /> },
   { command: 'italic', label: 'Italic', icon: <TextItalic size={15} weight="bold" /> },
+  /* Underline reads as a link on the web, which is why it is not first — but a
+     gym asking for it and finding nothing is worse than the ambiguity. */
+  { command: 'underline', label: 'Underline', icon: <TextUnderline size={15} weight="bold" /> },
   {
     command: 'strikeThrough',
     label: 'Strikethrough',
     icon: <TextStrikethrough size={15} weight="bold" />,
   },
+  {
+    command: 'superscript',
+    label: 'Superscript',
+    icon: <TextSuperscript size={15} weight="bold" />,
+  },
+  { command: 'subscript', label: 'Subscript', icon: <TextSubscript size={15} weight="bold" /> },
+] as const
+
+const LISTS = [
   {
     command: 'insertUnorderedList',
     label: 'Bulleted list',
@@ -81,6 +100,7 @@ export function RichTextEditor({
   const [empty, setEmpty] = useState(() => isEmptyHtml(value))
   const [active, setActive] = useState<string[]>([])
   const [block, setBlock] = useState('p')
+  const [highlighted, setHighlighted] = useState(false)
 
   /* Seeded once, and again only when the value is replaced from outside —
      publishing clears the composer, and the editor has to follow. */
@@ -105,7 +125,7 @@ export function RichTextEditor({
     const el = box.current
     if (!el || !el.contains(document.getSelection()?.anchorNode ?? null)) return
     const on: string[] = []
-    for (const { command } of INLINE) {
+    for (const { command } of [...INLINE, ...LISTS]) {
       try {
         if (document.queryCommandState(command)) on.push(command)
       } catch {
@@ -122,6 +142,12 @@ export function RichTextEditor({
     /* Engines answer with `div`, an empty string or the tag; anything that is
        not one of ours is a plain paragraph as far as this control goes. */
     setBlock(BLOCKS.some((b) => b.value === current) ? current : 'p')
+
+    /* `queryCommandState` knows nothing about `mark`, so the caret's ancestry
+       is what answers it. */
+    const anchor = document.getSelection()?.anchorNode ?? null
+    const node = anchor?.nodeType === 1 ? (anchor as Element) : (anchor?.parentElement ?? null)
+    setHighlighted(!!node?.closest('mark') && el.contains(node))
   }, [])
 
   useEffect(() => {
@@ -153,6 +179,53 @@ export function RichTextEditor({
   /* Some engines only recognise the angle-bracket form. Passing it that way
      works in all of them. */
   const setBlockTo = (tag: string) => exec('formatBlock', `<${tag}>`)
+
+  /**
+   * Highlight has no `execCommand`, and the one that comes closest —
+   * `hiliteColor` — writes an inline style, which the sanitiser drops on the
+   * way out. So the tag is wrapped round the selection directly, and pressing
+   * it again inside an existing mark unwraps that mark: without the second
+   * half it would be paint that never comes off.
+   */
+  const toggleHighlight = () => {
+    const el = box.current
+    if (!el) return
+    el.focus()
+    const selection = document.getSelection()
+    if (!selection || selection.rangeCount === 0) return
+
+    const anchor = selection.anchorNode
+    const inside =
+      anchor instanceof Node
+        ? ((anchor.nodeType === 1 ? (anchor as Element) : anchor.parentElement)?.closest('mark') ??
+          null)
+        : null
+
+    if (inside && el.contains(inside)) {
+      const parent = inside.parentNode
+      if (parent) {
+        while (inside.firstChild) parent.insertBefore(inside.firstChild, inside)
+        parent.removeChild(inside)
+        parent.normalize()
+      }
+      read()
+      return
+    }
+
+    const range = selection.getRangeAt(0)
+    if (range.collapsed) return
+    const mark = document.createElement('mark')
+    try {
+      range.surroundContents(mark)
+    } catch {
+      /* The selection crossed an element boundary, which `surroundContents`
+         refuses; extracting and re-inserting handles it. */
+      mark.appendChild(range.extractContents())
+      range.insertNode(mark)
+    }
+    selection.removeAllRanges()
+    read()
+  }
 
   const addLink = () => {
     const url = window.prompt('Link to where?')
@@ -188,14 +261,40 @@ export function RichTextEditor({
             {icon}
           </ToolButton>
         ))}
+        <ToolButton label="Highlight" on={highlighted} onPress={toggleHighlight}>
+          <Highlighter size={15} weight="bold" />
+        </ToolButton>
 
         <span className="mx-0.5 h-4 w-px bg-line" />
 
-        <ToolButton label="Quote" on={block === 'blockquote'} onPress={() => setBlockTo('blockquote')}>
+        {LISTS.map(({ command, label, icon }) => (
+          <ToolButton
+            key={command}
+            label={label}
+            on={active.includes(command)}
+            onPress={() => exec(command)}
+          >
+            {icon}
+          </ToolButton>
+        ))}
+        <ToolButton
+          label="Quote"
+          on={block === 'blockquote'}
+          onPress={() => setBlockTo('blockquote')}
+        >
           <Quotes size={15} weight="bold" />
         </ToolButton>
+        <ToolButton label="Divider" onPress={() => exec('insertHorizontalRule')}>
+          <Minus size={15} weight="bold" />
+        </ToolButton>
+
+        <span className="mx-0.5 h-4 w-px bg-line" />
+
         <ToolButton label="Add a link" onPress={addLink}>
           <LinkIcon size={15} weight="bold" />
+        </ToolButton>
+        <ToolButton label="Remove link" onPress={() => exec('unlink')}>
+          <LinkBreak size={15} weight="bold" />
         </ToolButton>
         <ToolButton label="Clear formatting" onPress={() => exec('removeFormat')}>
           <ArrowUUpLeft size={15} weight="bold" />
