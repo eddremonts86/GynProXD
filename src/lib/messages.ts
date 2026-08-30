@@ -15,6 +15,7 @@ export type TemplateKind =
   | 'offer'
   | 'challenge'
   | 'collection'
+  | 'product'
 
 export interface MenuCourse {
   name: string
@@ -35,6 +36,13 @@ export interface GymMessage {
   event?: { date: string; time?: string; place?: string }
   menu?: { courses: MenuCourse[] }
   offer?: { discount: string; validUntil?: string; code: string }
+  /**
+   * Something the gym sells over the counter. There is no basket and no
+   * payment here: a member reserves one and picks it up, which is what a
+   * counter-service gym actually does. Interest is counted in `saved`, the
+   * same field an offer uses, so the panel tallies it without new plumbing.
+   */
+  product?: { name: string; price: string; note?: string }
   challenge?: Challenge
   collection?: Collection
   /** Also surface as a strip under the top bar, for this many minutes. */
@@ -56,6 +64,7 @@ export const TEMPLATE_LABELS: Record<TemplateKind, string> = {
   offer: 'Offer',
   challenge: 'Challenge',
   collection: 'Collection',
+  product: 'In the shop',
 }
 
 const sameGym = (a: string | undefined, b: string | undefined): boolean =>

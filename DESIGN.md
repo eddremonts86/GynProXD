@@ -68,7 +68,7 @@ every pairing is contrast-verified.
 
 **Key characteristics**
 
-- Warm chalk neutrals, light-first. Dark is a graphite complement, one tap away.
+- Warm chalk neutrals; graphite dark. The device picks until the member does.
 - Chrome is monochrome: charcoal pills for actions and selection. No blue, no
   purple, nothing decorative.
 - The aurora gradient (green to orange) appears only on hero data tiles.
@@ -95,8 +95,17 @@ Two themes, one structure. Every value is a custom property in
 | `--danger` | `#b93526` | `#ff8272` | Destructive actions, worsening trends |
 
 **The aurora rule.** The gradient material exists in two tones, green and
-orange, and appears only on `AuroraTile`. It never decorates a button, a
-background or a chart. White text on it is verified at 3:1 for the large
+orange, and carries exactly two things: a hero data tile (`AuroraTile`) and the
+gym's commercial notices on Today (`FromYourGym`). Both are cases of "this is
+the one thing that matters here" — the first for the member's own numbers, the
+second because the gym is the paying side of this product and what it sells has
+to be seen. It never decorates a button, a background or a chart, and it never
+follows the member into a session.
+
+A third, deliberate exception: a single hairline of the same material marks the
+seam between the rail and the content (`rail-edge`). One pixel of the brand's
+own colour drawing a boundary is not a tint on a control, so the
+monochrome-chrome rule below still holds. White text on it is verified at 3:1 for the large
 dot figures and 4.5:1 for supporting text against the saturated center in
 both themes.
 
@@ -176,8 +185,9 @@ tabular readout, hold to repeat.
 
 ## Layout
 
-Desktop: a 240px rail of pill items on the page ground plus a `76rem` content
-column. Below `lg`: a chalk top bar and a five-item bottom nav where the
+Desktop: a 240px rail of pill items on the page ground plus a `120rem` content
+column, padded `lg:px-10`. The public landing wears the same rail and the same
+measure, and pulls in to `82rem` for the sections you read rather than scan. Below `lg`: a chalk top bar and a five-item bottom nav where the
 active item is a charcoal pill. Sections stack with `gap-8`; metric grids use
 `gap-4` between floating tiles. Full-height surfaces use `min-h-[100dvh]`.
 
@@ -190,9 +200,34 @@ no scroll effects, no chart draw-ins.
 
 ## Theme
 
-Light-first: the language is built around chalk, so light is the default
-rather than the system preference. The toggle persists the choice and the
-dark theme keeps hierarchy, the aurora material and AA contrast intact.
+The device decides until the member does. With no stored choice the theme
+follows `prefers-color-scheme` and keeps following it, so a machine that turns
+dark at sunset takes the app with it. The toggle writes a choice and a written
+choice wins from then on. Both themes keep hierarchy, the aurora material and
+AA contrast intact.
+
+The resolution happens twice and the two must agree: an inline script in
+`index.html` settles it before first paint so nothing flashes, and
+`src/hooks/use-theme.ts` owns it from there.
+
+## What the gym pays for
+
+Members are given the training and the eating; gyms pay the bills. So anything
+a gym publishes outranks the equivalent thing the app generates, in the same
+slot rather than in a new one:
+
+- Today's food slot shows the gym's kitchen card, with prices, whenever there
+  is one. The public recipe of the day drops below it and is never removed.
+- `FromYourGym` sits directly under the day's training and carries at most two
+  cards: the soonest event still ahead, and one commercial card — the newest
+  live offer or fresh shop item, whichever came last.
+- With no gym attached, that same slot asks for one, once, and can be waved off
+  for good.
+
+The restraint is the point. Nothing interrupts, nothing blocks, everything is
+dismissible, and none of it enters a live session, where the screen has one
+job. An app that becomes a hoarding loses the audience the gym is paying to
+reach.
 
 ## Copy
 

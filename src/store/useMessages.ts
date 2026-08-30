@@ -37,6 +37,7 @@ export interface PublishInput {
   event?: { date: string; time?: string; place?: string }
   menu?: { courses: MenuCourse[] }
   offer?: { discount: string; validUntil?: string; code: string }
+  product?: { name: string; price: string; note?: string }
   challenge?: Challenge
   collection?: Collection
   banner?: { minutes: number }

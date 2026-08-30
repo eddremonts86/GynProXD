@@ -382,6 +382,27 @@
 }
 
 /**
+ * The seam between the rail and the content, on the landing and in the app
+ * alike. A hairline that fades up out of nothing, carries the aurora accent
+ * across the middle of the viewport and fades back out, so the boundary reads
+ * without a hard border cutting the page ground in two.
+ *
+ * This is the one place a hue touches chrome. It earns the exception by being
+ * a single pixel of the brand's own material rather than a tint on a control:
+ * the rule that matters — no coloured buttons, no coloured navigation — still
+ * holds.
+ */
+@utility rail-edge {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    var(--aurora-green-mid) 24%,
+    var(--aurora-orange-mid) 76%,
+    transparent 100%
+  );
+}
+
+/**
  * Cross-fade between screens on navigation (router defaultViewTransition). Fast
  * and quiet — the point is that a screen change reads as an app view swap, not
  * a page reload. The sticky chrome is excluded so the header and bottom nav

@@ -1025,6 +1025,7 @@ export async function publishToServer(
           event: input.event ?? null,
           menu: input.menu ?? null,
           offer: input.offer ?? null,
+          product: input.product ?? null,
           challenge: input.challenge ?? null,
           collection: input.collection ?? null,
           banner: input.banner ?? null,

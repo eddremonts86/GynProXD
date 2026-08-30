@@ -16,7 +16,25 @@ declare let self: ServiceWorkerGlobalScope
  * notification tap that lands on the right screen.
  */
 
-self.skipWaiting()
+/**
+ * A new worker waits instead of taking over the moment it installs.
+ *
+ * It used to call `skipWaiting()` here, which sounds helpful and is not: every
+ * route in this app is loaded on demand, so a worker that activates under a
+ * running page — and then runs `cleanupOutdatedCaches()` — deletes the very
+ * chunks that page is about to ask for. The next navigation 404s on a build
+ * that no longer exists. So it waits, the app offers the update, and the swap
+ * happens on a reload we control.
+ *
+ * It still activates on its own once every tab is closed, which is how a PWA
+ * picks up a release without anyone pressing anything.
+ */
+self.addEventListener('message', (event) => {
+  if ((event.data as { type?: string } | null)?.type === 'SKIP_WAITING') {
+    void self.skipWaiting()
+  }
+})
+
 clientsClaim()
 
 precacheAndRoute(self.__WB_MANIFEST)

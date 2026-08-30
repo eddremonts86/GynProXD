@@ -4,9 +4,10 @@ import { Link } from '@tanstack/react-router'
 import { useRecipes } from '../store/useRecipes'
 import { Panel } from '../ui/Panel'
 import { Tag } from '../ui/Tag'
-import { Section } from '../ui/PageHeader'
+import { SECTION_ACTION, Section } from '../ui/PageHeader'
 import type { RecipeSuggestion } from '../lib/recipes'
 import { RecipeAttribution } from './recipe-attribution'
+import { cn } from '@/lib/utils'
 
 
 /**
@@ -27,7 +28,15 @@ function shapeOf(dish: RecipeSuggestion): string {
   return parts.join(' · ')
 }
 
-export function DishOfTheDay() {
+/** `stacked` shares a row: picture over text, and the card stretches to match. */
+export function DishOfTheDay({
+  stacked = false,
+  showMenuLink = false,
+}: {
+  stacked?: boolean
+  /** Offered on Today; never on the menu page itself, which is the target. */
+  showMenuLink?: boolean
+}) {
   const daily = useRecipes((s) => s.daily)
   const loading = useRecipes((s) => s.loadingDaily)
   const ensureDaily = useRecipes((s) => s.ensureDaily)
@@ -39,21 +48,48 @@ export function DishOfTheDay() {
   if (!daily && !loading) return null
 
   return (
-    <Section title="Dish of the day" hint={daily?.dish.category}>
+    <Section
+      title="Dish of the day"
+      hint={daily?.dish.category}
+      className={stacked ? 'h-full self-stretch' : undefined}
+      /* The gym's kitchen card had no standing way in: it was reachable only
+         from a broadcast banner or a button buried in the inbox. Food lives
+         here, so the door goes here. */
+      action={
+        showMenuLink ? (
+          <Link to="/menu" className={SECTION_ACTION}>
+            Gym menu
+          </Link>
+        ) : undefined
+      }
+    >
       {!daily ? (
         <Panel padding="lg">
           <p className="text-sm text-ink-3">Picking today&apos;s plate…</p>
         </Panel>
       ) : (
-        <Panel padding="none" className="overflow-hidden sm:flex">
+        <Panel
+          padding="none"
+          className={cn('overflow-hidden', stacked ? 'flex flex-1 flex-col' : 'sm:flex')}
+        >
           <img
             src={daily.dish.imageUrl}
             alt={daily.dish.title}
-            className="aspect-[4/3] w-full bg-surface-2 object-cover sm:aspect-auto sm:w-72 sm:shrink-0 lg:w-80"
+            className={cn(
+              'aspect-[4/3] w-full bg-surface-2 object-cover',
+              !stacked && 'sm:aspect-auto sm:w-72 sm:shrink-0 lg:w-80',
+            )}
           />
           <div className="flex min-w-0 flex-1 flex-col gap-3 p-5 md:p-6">
             <div className="flex flex-col gap-2">
-              <h3 className="text-xl leading-tight text-ink md:text-2xl">{daily.dish.title}</h3>
+              <h3
+                className={cn(
+                  'text-xl leading-tight text-ink',
+                  !stacked && 'md:text-2xl',
+                )}
+              >
+                {daily.dish.title}
+              </h3>
               <div className="flex flex-wrap gap-1.5">
                 {daily.dish.category && <Tag>{daily.dish.category}</Tag>}
                 {daily.dish.area && <Tag tone="outline">{daily.dish.area}</Tag>}

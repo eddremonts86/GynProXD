@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { motion, useReducedMotion } from 'motion/react'
-import { CookingPot, MagnifyingGlass, WarningCircle, X } from '@phosphor-icons/react'
+import { CookingPot, ForkKnife, MagnifyingGlass, WarningCircle, X } from '@phosphor-icons/react'
 import {
   catalogueQuery,
   fetchCatalogue,
@@ -50,6 +50,7 @@ const HIGH_PROTEIN_G = 25
 const LIGHT_KCAL = 300
 
 export function RecipesPage() {
+  const navigate = useNavigate()
   const [term, setTerm] = useState('')
   const [debounced, setDebounced] = useState('')
   const [category, setCategory] = useState('')
@@ -157,6 +158,12 @@ export function RecipesPage() {
       <PageHeader
         title="Recipes"
         description="Every plate in the catalogue, with its method and the numbers that matter. Search by name, or narrow it down to what fits your day."
+        action={
+          <Button variant="secondary" size="sm" onClick={() => navigate({ to: '/menu' })}>
+            <ForkKnife size={14} />
+            Gym menu
+          </Button>
+        }
       />
 
       <div className="flex flex-col gap-3">

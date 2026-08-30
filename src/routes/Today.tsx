@@ -15,6 +15,9 @@ import {
   TrendUp,
   X,
 } from '@phosphor-icons/react'
+import { useSession } from '../store/useSession'
+import { useMenus } from '../store/useMenus'
+import { menuFor } from '../lib/menu'
 import { useGym } from '../store/useGym'
 import { bestE1rm, exerciseById, lastPerformance } from '../lib/exercises'
 import { isPersonalRecord, suggestNext } from '../lib/progression'
@@ -35,6 +38,8 @@ import { SetPlan } from '@/components/set-plan'
 import { SessionLogDialog } from '@/components/session-log-dialog'
 import { MealSuggestions } from '@/components/meal-suggestions'
 import { DishOfTheDay } from '@/components/dish-of-the-day'
+import { GymKitchenToday } from '@/components/gym-kitchen-today'
+import { FromYourGym } from '@/components/from-your-gym'
 import { ChallengeToday } from '@/components/challenge-today'
 import { StoryToday } from '@/components/story-today'
 import { ConsistencyToday } from '@/components/consistency-today'
@@ -187,6 +192,13 @@ function TodayOverview({
   onDismissSummary: () => void
 }) {
   const navigate = useNavigate()
+
+  /* The gym's kitchen card outranks the public recipe for the food slot: it is
+     the only block on this page that leads anywhere money changes hands. */
+  const gymName = useSession((s) => s.gym)
+  const menus = useMenus((s) => s.menus)
+  const gymMenu = menuFor(menus, gymName ?? undefined)
+
   const plans = useGym((s) => s.plans)
   const workouts = useGym((s) => s.workouts)
   const bodyweight = useGym((s) => s.bodyweight)
@@ -462,70 +474,102 @@ function TodayOverview({
             </div>
           )}
         </Panel>
-      ) : plans.length > 0 ? (
-        <Panel padding="lg" className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <h2 className="text-xl text-ink">Rest day</h2>
-            <p className="max-w-[52ch] text-sm text-ink-3">
-              Nothing is scheduled for {DAY_FULL_LABELS[day]}. Recovery is part of the plan, but you
-              can still train if you want to.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button variant="secondary" onClick={startWorkout}>
-              Start an empty session
-            </Button>
-            <Button variant="ghost" onClick={() => navigate({ to: '/planner' })}>
-              Open planner
-            </Button>
-          </div>
-        </Panel>
-      ) : (
-        <Panel padding="lg" className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <h2 className="text-xl text-ink">Start with a programme</h2>
-            <p className="max-w-[52ch] text-sm text-ink-3">
-              Tell enForma your goal, your weight and how much time you actually have. It works out a
-              realistic timeline and builds the weeks around it.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button size="lg" onClick={() => navigate({ to: '/onboarding' })}>
-              Design my programme
-              <ArrowRight size={18} weight="bold" />
-            </Button>
-            <Button size="lg" variant="secondary" onClick={startWorkout}>
-              Start an empty session
-            </Button>
-          </div>
-          {!fitnessTest && (
-            <p className="text-2xs text-ink-3">
-              Not sure where you stand?{' '}
-              <Link to="/fitness-test" className="text-brand underline underline-offset-2">
-                Take the 5-minute fitness test
-              </Link>{' '}
-              first and the designer starts from your real level.
-            </p>
-          )}
-        </Panel>
-      )}
+      ) : null}
+
+      {/*
+        What the gym is running or selling, above everything the app gives away.
+        It sits after the session panel, so the order settles itself: on a day
+        with training booked the session leads and the gym follows it; on a rest
+        day, where there is nothing to start, the gym leads. Two cards at most,
+        only while they can still be acted on, each dismissible for good.
+      */}
+      <FromYourGym />
 
       {/* The member's other daily commitments, each present only while it is
           running: the challenge to act on, the story chapter to read. */}
       <ChallengeToday />
       <StoryToday />
 
-      <ExerciseOfTheDay />
-
-      {/* Plan-aligned plates when a programme exists; the daily dish is always
-          here so food is never buried on a page the member has to go find. */}
+      {/* Plan-aligned plates when a programme exists. */}
       <MealSuggestions />
-      <DishOfTheDay />
+
+      {/*
+        The day's light cards share one row: none of them carries enough to
+        justify a band of its own on a wide screen. With a session scheduled
+        the call to action is gone from here — it sits above, at full width,
+        because a loaded session is the one thing on this page that does earn
+        the room — and the two spotlights split the row between them.
+      */}
+      {/*
+        Three columns that read left to right as what to do, what to move and
+        what to eat. Items sit to the top and take the height they need; the two
+        spotlights opt back into stretching so they match each other.
+      */}
+      <div className="grid items-start gap-4 lg:grid-cols-3 lg:gap-6">
+        {/* The member's own column: what to do next, and where they stand.
+            Together they fill a column that either one alone left half empty. */}
+        <div className="flex flex-col gap-6">
+          {!primary &&
+            (plans.length > 0 ? (
+            <Section title="Rest day">
+              <Panel padding="lg" className="flex flex-col gap-4">
+                <p className="text-sm text-ink-3">
+                  Nothing is scheduled for {DAY_FULL_LABELS[day]}. Recovery is part of the plan, but
+                  you can still train if you want to.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="secondary" onClick={startWorkout}>
+                    Start an empty session
+                  </Button>
+                  <Button variant="ghost" onClick={() => navigate({ to: '/planner' })}>
+                    Open planner
+                  </Button>
+                </div>
+              </Panel>
+            </Section>
+          ) : (
+            <Section title="Start with a programme">
+              <Panel padding="lg" className="flex flex-col gap-4">
+                <p className="text-sm text-ink-3">
+                  Tell enForma your goal, your weight and how much time you actually have. It works
+                  out a realistic timeline and builds the weeks around it.
+                </p>
+                <div className="flex flex-col gap-3">
+                  <div className="flex flex-wrap gap-2">
+                    <Button onClick={() => navigate({ to: '/onboarding' })}>
+                      Design my programme
+                      <ArrowRight size={18} weight="bold" />
+                    </Button>
+                    <Button variant="secondary" onClick={startWorkout}>
+                      Start an empty session
+                    </Button>
+                  </div>
+                  {!fitnessTest && (
+                    <p className="text-2xs text-ink-3">
+                      Not sure where you stand?{' '}
+                      <Link to="/fitness-test" className="text-brand underline underline-offset-2">
+                        Take the 5-minute fitness test
+                      </Link>{' '}
+                      first and the designer starts from your real level.
+                    </p>
+                  )}
+                </div>
+              </Panel>
+            </Section>
+          ))}
+          <FitnessLevel stacked />
+        </div>
+
+        <ExerciseOfTheDay stacked />
+        {gymMenu ? <GymKitchenToday stacked /> : <DishOfTheDay stacked showMenuLink />}
+      </div>
+
+      {/* Demoted, never dropped: the free plate is what brings people here. */}
+      {gymMenu && <DishOfTheDay />}
 
       {/* Your standing: the last record and where the fitness test placed you,
           then the session history. */}
       <LatestRecord />
-      <FitnessLevel />
       <RecentSessions />
 
       <WeighInDialog

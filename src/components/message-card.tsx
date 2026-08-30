@@ -17,6 +17,7 @@ const KIND_TONE = {
   offer: 'danger',
   challenge: 'brand',
   collection: 'good',
+  product: 'brand',
 } as const
 
 /**
@@ -161,6 +162,30 @@ export function MessageCard({
             )
           })}
         </ul>
+      )}
+
+      {message.kind === 'product' && message.product && (
+        <div className="flex flex-wrap items-end justify-between gap-4 border-t border-line pt-3">
+          <div className="flex min-w-0 flex-col gap-1">
+            <span className="text-lg font-semibold text-ink">{message.product.name}</span>
+            {message.product.note && (
+              <span className="max-w-[52ch] text-sm leading-relaxed text-ink-3">
+                {message.product.note}
+              </span>
+            )}
+          </div>
+          <div className="flex shrink-0 items-center gap-4">
+            <span className="num text-2xl leading-none font-semibold text-ink">
+              {message.product.price}
+              <span className="ml-1 text-sm font-normal text-ink-3">&euro;</span>
+            </span>
+            {viewer && onToggleSave && (
+              <Button size="sm" variant={savedByMe ? 'primary' : 'secondary'} onClick={onToggleSave}>
+                {savedByMe ? 'Reserved' : 'Reserve one'}
+              </Button>
+            )}
+          </div>
+        </div>
       )}
 
       {message.kind === 'offer' && message.offer && (

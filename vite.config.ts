@@ -109,7 +109,12 @@ export default defineConfig(({ mode }) => {
       strategies: 'injectManifest',
       srcDir: 'src',
       filename: 'sw.ts',
-      registerType: 'autoUpdate',
+      /* The app owns the update: `prompt` leaves the new worker waiting so
+         nothing swaps under a running page, and `injectRegister: null` stops
+         the plugin injecting its own bare registration — src/lib/pwa-update.ts
+         registers, polls for a new build and offers it. */
+      registerType: 'prompt',
+      injectRegister: null,
       includeAssets: ['favicon.svg', 'pwa-192x192.png', 'pwa-512x512.png', 'apple-touch-icon.png'],
       manifest: {
         id: '/',

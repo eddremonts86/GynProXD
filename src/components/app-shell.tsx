@@ -23,6 +23,7 @@ import { ThemeToggle } from '@/components/theme-toggle'
 import { SessionRailCard, SessionMobileBar } from '@/components/session-indicator'
 import { Landing } from '@/components/landing'
 import { GymBanner } from '@/components/gym-banner'
+import { UpdateBanner } from '@/components/update-banner'
 import { useSession } from '@/store/useSession'
 import { useMessages } from '@/store/useMessages'
 import { useGym } from '@/store/useGym'
@@ -149,6 +150,12 @@ function isActive(item: NavItem, pathname: string): boolean {
 function DesktopRail({ pathname }: { pathname: string }) {
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col lg:flex">
+      {/* Where the rail ends and the content begins. */}
+      <span
+        aria-hidden="true"
+        className="rail-edge pointer-events-none absolute inset-y-0 right-0 w-px opacity-70"
+      />
+
       <div className="px-5 py-5">
         <Link to="/" aria-label="enForma, go to today">
           <Wordmark />
@@ -345,21 +352,25 @@ export function AppShell() {
 
   if (status === 'locked') {
     return (
-      <Landing
-        onUnlocked={() => {
-          const meta = activeProfile()
-          if (meta) {
-            setUnlocked(meta)
-            landFor(meta.role)
-            syncQuietly(meta.id)
-          }
-        }}
-      />
+      <>
+        <UpdateBanner />
+        <Landing
+          onUnlocked={() => {
+            const meta = activeProfile()
+            if (meta) {
+              setUnlocked(meta)
+              landFor(meta.role)
+              syncQuietly(meta.id)
+            }
+          }}
+        />
+      </>
     )
   }
 
   return (
     <div className="min-h-[100dvh] bg-bg">
+      <UpdateBanner />
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-md focus:bg-brand focus:px-3 focus:py-2 focus:text-sm focus:text-brand-ink"

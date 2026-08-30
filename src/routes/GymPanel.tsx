@@ -46,6 +46,8 @@ import { Input } from '../ui/Input'
 import { Panel } from '../ui/Panel'
 import { PageHeader } from '../ui/PageHeader'
 import { Tag } from '../ui/Tag'
+import { Stat } from '../ui/Stat'
+import { REACH_WINDOW_DAYS, summariseReach, windowStart } from '../lib/gym-reach'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 
@@ -54,13 +56,16 @@ interface CourseDraft {
   dishes: string
 }
 
+/* Ordered by how much they earn the gym, not alphabetically: the two that
+   move money sit where the thumb lands first. */
 const KINDS: TemplateKind[] = [
-  'announcement',
+  'offer',
+  'product',
   'event',
   'menu',
-  'offer',
   'challenge',
   'collection',
+  'announcement',
 ]
 
 /** Movement names for the challenge form's suggestion list, resolved on publish. */
@@ -112,6 +117,9 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
   const [discount, setDiscount] = useState('')
   const [validUntil, setValidUntil] = useState('')
   const [code, setCode] = useState(makeOfferCode)
+  const [productName, setProductName] = useState('')
+  const [productPrice, setProductPrice] = useState('')
+  const [productNote, setProductNote] = useState('')
   const [chExerciseName, setChExerciseName] = useState('')
   const [chDays, setChDays] = useState('30')
   const [chStart, setChStart] = useState('20')
@@ -172,6 +180,18 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
         offer: { discount: discount.trim(), validUntil: validUntil || undefined, code },
       }
     }
+    if (kind === 'product') {
+      /* A price with no number in it is not a price. */
+      if (!productName.trim() || !/\d/.test(productPrice)) return null
+      return {
+        ...common,
+        product: {
+          name: productName.trim(),
+          price: productPrice.trim(),
+          note: productNote.trim() || undefined,
+        },
+      }
+    }
     if (kind === 'challenge') {
       const exerciseId = exerciseIdByName(chExerciseName)
       const days = Number(chDays)
@@ -207,7 +227,7 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
       }
     }
     return common
-  }, [gym, profileId, kind, title, body, eventDate, eventTime, eventPlace, courses, discount, validUntil, code, chExerciseName, chDays, chStart, chDelta, chUnit, collectionPicks])
+  }, [gym, profileId, kind, title, body, eventDate, eventTime, eventPlace, courses, discount, validUntil, code, productName, productPrice, productNote, chExerciseName, chDays, chStart, chDelta, chUnit, collectionPicks])
 
   const doPublish = () => {
     if (!draft) {
@@ -218,6 +238,8 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
             ? 'A menu needs a title and at least one course with dishes.'
             : kind === 'offer'
               ? 'An offer needs a title and the discount.'
+              : kind === 'product'
+                ? 'A shop item needs a title, a name and a price with a number in it.'
               : kind === 'challenge'
                 ? 'A challenge needs a title, a movement from the library, and sane numbers (7-120 days, positive start).'
                 : kind === 'collection'
@@ -240,6 +262,7 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
       event: draft.event,
       menu: draft.menu,
       offer: draft.offer,
+      product: draft.product,
       challenge: draft.challenge
         ? { ...draft.challenge, id: `chal-${gym.trim().toLowerCase()}-${Date.now()}` }
         : undefined,
@@ -271,6 +294,9 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
     setDiscount('')
     setValidUntil('')
     setCode(makeOfferCode())
+    setProductName('')
+    setProductPrice('')
+    setProductNote('')
     setChExerciseName('')
     setChDays('30')
     setChStart('20')
@@ -575,6 +601,35 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
                 </div>
               )}
 
+              {kind === 'product' && (
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <Input
+                    label="Item"
+                    value={productName}
+                    onChange={(e) => touch(setProductName)(e.target.value)}
+                    placeholder="Hangar training tee"
+                  />
+                  <Input
+                    label="Price"
+                    value={productPrice}
+                    onChange={(e) => touch(setProductPrice)(e.target.value)}
+                    inputMode="decimal"
+                    suffix="€"
+                    placeholder="24.00"
+                  />
+                  {/* Input hands className to the field itself, so the column
+                      span has to live on a wrapper. */}
+                  <div className="sm:col-span-2">
+                    <Input
+                      label="What it is"
+                      value={productNote}
+                      onChange={(e) => touch(setProductNote)(e.target.value)}
+                      hint="Optional. Members reserve one here and pay at the desk."
+                    />
+                  </div>
+                </div>
+              )}
+
               <div className="flex flex-col gap-2 border-t border-line pt-4">
                 <span className="text-2xs font-medium text-ink-3">Send to</span>
                 <div className="flex flex-wrap gap-1.5">
@@ -664,6 +719,35 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
         </TabPanel>
 
         <TabPanel value="sent">
+          {/* What the publishing actually bought. The per-message tallies below
+              were always here; nobody had ever added them up, which left the
+              paying side of this product with no way to see its own return. */}
+          {sent.length > 0 && (
+            <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-6">
+              {(() => {
+                const reach = summariseReach(messages, gym, windowStart(todayIso()))
+                return (
+                  [
+                    { label: 'Published', value: reach.published },
+                    { label: 'Members reached', value: reach.membersReached },
+                    { label: 'Going to events', value: reach.going },
+                    { label: 'Offers saved', value: reach.offersSaved },
+                    { label: 'Items reserved', value: reach.itemsReserved },
+                    { label: 'Challenges joined', value: reach.challengesJoined },
+                  ] as const
+                ).map((item) => (
+                  <Panel key={item.label} padding="md">
+                    <Stat
+                      label={item.label}
+                      value={item.value}
+                      hint={`Last ${REACH_WINDOW_DAYS} days`}
+                    />
+                  </Panel>
+                ))
+              })()}
+            </div>
+          )}
+
           {sent.length === 0 ? (
             <Panel padding="lg">
               <p className="text-sm text-ink-3">
@@ -695,6 +779,10 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
                             · read {m.readBy.length}
                             {m.kind === 'event' ? ` · going ${going} · declined ${declined}` : ''}
                             {m.kind === 'offer' ? ` · saved ${m.saved.length}` : ''}
+                            {m.kind === 'product' ? ` · reserved ${m.saved.length}` : ''}
+                            {m.kind === 'product' && m.product
+                              ? ` · ${m.product.price} €`
+                              : ''}
                             {m.kind === 'offer' && m.offer ? ` · code ${m.offer.code}` : ''}
                             {m.kind === 'challenge' ? ` · joined ${m.joined?.length ?? 0}` : ''}
                             {m.kind === 'collection' && m.collection

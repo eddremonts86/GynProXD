@@ -19,9 +19,14 @@
     <meta name="apple-mobile-web-app-title" content="enForma" />
     <script>
       // Resolve the theme before first paint so the app never flashes the
-      // wrong one. Light is the default; dark only when chosen.
+      // wrong one. A stored choice wins; with none, the operating system
+      // decides. Kept in sync with src/hooks/use-theme.ts.
       try {
-        if (localStorage.getItem('forma-theme') === 'dark') {
+        var choice = localStorage.getItem('forma-theme')
+        var dark =
+          choice === 'dark' ||
+          (choice !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        if (dark) {
           document.documentElement.classList.add('dark')
           document.querySelector('meta[name="theme-color"]').setAttribute('content', '#141412')
         }

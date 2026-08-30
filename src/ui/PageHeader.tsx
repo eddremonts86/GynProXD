@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { cn } from '@/lib/utils'
 
 interface PageHeaderProps {
   title: string
@@ -18,18 +19,28 @@ export function PageHeader({ title, description, action }: PageHeaderProps) {
   )
 }
 
+/**
+ * The quiet action that sits on a section's rule. Deliberately text-sized: a
+ * real button out-measures the heading, and in a row of sections that drops
+ * one card below its neighbours. Keep section actions to this.
+ */
+export const SECTION_ACTION =
+  'inline-flex items-center gap-1.5 text-2xs font-medium text-brand underline-offset-2 hover:underline'
+
 interface SectionProps {
   title: string
   hint?: string
   action?: ReactNode
   children: ReactNode
+  /** For a section sharing a grid row, where it has to stretch to match. */
+  className?: string
 }
 
 /** Section heading with a hairline rule. No eyebrows anywhere in this app. */
-export function Section({ title, hint, action, children }: SectionProps) {
+export function Section({ title, hint, action, children, className }: SectionProps) {
   return (
-    <section className="flex flex-col gap-3">
-      <div className="flex items-end justify-between gap-3 border-b border-line pb-2">
+    <section className={cn('flex flex-col gap-3', className)}>
+      <div className="flex min-h-[2.125rem] items-end justify-between gap-3 border-b border-line pb-2">
         <div className="flex min-w-0 items-baseline gap-2">
           <h2 className="truncate text-lg text-ink">{title}</h2>
           {hint && <span className="num shrink-0 text-2xs text-ink-3">{hint}</span>}
