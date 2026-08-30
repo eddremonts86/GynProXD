@@ -22,6 +22,8 @@ import {
 } from '../lib/gym-notices'
 import { readSyncLink } from '../lib/sync'
 import { formatShortDate } from '../lib/labels'
+import type { MessageImage } from '../lib/messages'
+import { htmlToPlain } from '../lib/rich-text'
 import { todayIso } from '../lib/dates'
 import { Button } from '../ui/Button'
 import { Panel } from '../ui/Panel'
@@ -68,6 +70,8 @@ function NoticeCard({
   eyebrowIcon,
   eyebrow,
   title,
+  lead,
+  blurb,
   onDismiss,
   dismissLabel,
   children,
@@ -76,6 +80,10 @@ function NoticeCard({
   eyebrowIcon: React.ReactNode
   eyebrow: string
   title: string
+  /** The gym's first picture, if it attached one. */
+  lead?: MessageImage
+  /** The opening line of the body — enough to want the rest. */
+  blurb?: string
   onDismiss: () => void
   dismissLabel: string
   children: React.ReactNode
@@ -95,13 +103,51 @@ function NoticeCard({
         <DismissButton label={dismissLabel} onDismiss={onDismiss} />
       </div>
 
+      {/* Inset rather than a background: the aurora is this surface's material
+          and the photograph is the gym's, so the card frames the picture
+          instead of being replaced by it. */}
+      {lead && (
+        <figure className="overflow-hidden rounded-lg bg-white/10 ring-1 ring-white/20">
+          <img
+            src={lead.url}
+            alt={lead.alt ?? ''}
+            loading="lazy"
+            className="aspect-[16/7] w-full object-cover"
+          />
+        </figure>
+      )}
+
       <h3 className={cn('max-w-[24ch] text-xl leading-snug font-semibold text-white', OVER_AURORA)}>
         {title}
       </h3>
 
+      {blurb && (
+        <p className={cn('-mt-1 max-w-[42ch] text-sm leading-relaxed text-white/85', OVER_AURORA)}>
+          {blurb}
+        </p>
+      )}
+
       <div className="mt-auto flex flex-col gap-3">{children}</div>
     </div>
   )
+}
+
+/**
+ * The first paragraph, trimmed to a card's worth.
+ *
+ * A card carrying a picture has little room left, so it gets a line or two. A
+ * card without one has the height anyway — the pair sits in a grid and matches
+ * heights — and filling that space with the gym's own sentences beats leaving
+ * a hole where a photograph would have been.
+ */
+function openingLine(body: string | undefined, hasImage: boolean): string | undefined {
+  if (!body) return undefined
+  /* The card has no room for formatting and no business rendering markup, so
+     it takes the words and leaves the tags behind. */
+  const first = htmlToPlain(body).split(/\n{2,}/)[0]?.trim()
+  if (!first) return undefined
+  const limit = hasImage ? 150 : 320
+  return first.length > limit ? `${first.slice(0, limit - 1).trimEnd()}…` : first
 }
 
 /**
@@ -241,6 +287,8 @@ export function FromYourGym() {
             eyebrowIcon={<Check size={16} weight="bold" />}
             eyebrow="Happening soon"
             title={event.title}
+            lead={event.images?.[0]}
+            blurb={openingLine(event.body, !!event.images?.[0])}
             dismissLabel={`Hide ${event.title}`}
             onDismiss={() => hide(event)}
           >
@@ -288,6 +336,8 @@ export function FromYourGym() {
             eyebrowIcon={<TagIcon size={16} weight="bold" />}
             eyebrow="Members' offer"
             title={deal.offer.discount}
+            lead={deal.images?.[0]}
+            blurb={openingLine(deal.body, !!deal.images?.[0])}
             dismissLabel={`Hide ${deal.title}`}
             onDismiss={() => hide(deal)}
           >
@@ -321,6 +371,8 @@ export function FromYourGym() {
             eyebrowIcon={<Storefront size={16} weight="bold" />}
             eyebrow="New in the shop"
             title={deal.product.name}
+            lead={deal.images?.[0]}
+            blurb={openingLine(deal.body, !!deal.images?.[0])}
             dismissLabel={`Hide ${deal.title}`}
             onDismiss={() => hide(deal)}
           >

@@ -22,6 +22,16 @@ export interface MenuCourse {
   dishes: string[]
 }
 
+/**
+ * A picture the gym attached. `url` points at the sync server's file endpoint;
+ * a message published on a device with no account carries none, because there
+ * is nowhere to put the bytes that is not the training history's own quota.
+ */
+export interface MessageImage {
+  url: string
+  alt?: string
+}
+
 export interface GymMessage {
   id: string
   /** Gym name as written in the directory; matched case-insensitively. */
@@ -51,6 +61,8 @@ export interface GymMessage {
   banner?: { minutes: number }
   /** Where the banner's View action goes; default is the inbox. */
   link?: 'menu'
+  /** Up to four, in the order the gym picked them; the first one leads. */
+  images?: MessageImage[]
   readBy: string[]
   rsvp: Record<string, 'yes' | 'no'>
   saved: string[]

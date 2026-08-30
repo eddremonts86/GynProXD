@@ -40,7 +40,8 @@ consistent with names and gyms being public on the device.
 GymMessage {
   id, gym, authorId, createdAt
   kind: 'announcement' | 'event' | 'menu' | 'offer'
-  title, body?
+  title, body?            // sanitised HTML; see "The body" below
+  images?: [{ url, alt }] // up to 4, uploaded to the sync server
   audience: 'all' | profileId[]
   event?: { date, time?, place? }
   menu?:  { courses: [{ name, dishes[] }] }
@@ -54,6 +55,41 @@ GymMessage {
 Zustand store (`useMessages`) hydrated from localStorage, persisted on every
 change, re-hydrated on the `storage` event so a gym tab and a member tab on
 the same machine stay live.
+
+### The body, and the pictures
+
+Every template carries a formatted body and up to four photographs — the same
+two fields whether it is an offer, a shop item, an event, the daily menu, a
+challenge, a collection or an announcement. A gym sells things; one line of
+grey text was never going to do it.
+
+The body is HTML, written through a small `contenteditable` with a fixed
+toolbar (bold, italic, strikethrough, subheading, two list kinds, quote, link,
+clear). The toolbar *is* the allowlist made visible: `src/lib/rich-text.ts`
+sanitises with DOMPurify to exactly those tags, forces `target="_blank"` and
+`rel="noopener noreferrer nofollow"` on links, and refuses any scheme but
+http(s), mailto, tel and `#`.
+
+Sanitising happens **on render, every time** — not once on the way in. A row
+can also arrive from the sync server, and the only thing that account
+guarantees is that it belongs to an operator. Bodies written before formatting
+existed are plain text with blank lines; `bodyHtml()` detects which era a body
+is from and converts, so old messages keep their paragraphs. `htmlToPlain()`
+is what the Today card's opening line uses, because a tile has no business
+rendering markup.
+
+Images are files on the `gym_messages` row, not data URLs: a couple of photos
+in localStorage would eat the quota the training history lives in. The client
+downscales to 1400px and re-encodes as JPEG before upload, so the server's
+`maxSize` is a backstop rather than the working limit. Alt text rides in
+`payload.alts`, aligned by upload order, because the operator writes it before
+PocketBase has named the files. A gym publishing without a sync account gets
+the picker disabled and told why — there is nowhere to put the bytes.
+
+Rendering adapts to how many there are: one photo takes the full measure,
+three take a 2fr lead with two stacked beside it, two and four go in a grid.
+On Today the picture is inset inside the aurora tile rather than replacing it,
+because the aurora is that surface's material and the photograph is the gym's.
 
 ### Answers travel (`gym_responses`)
 

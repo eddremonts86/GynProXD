@@ -440,6 +440,98 @@
   }
 }
 
+/**
+ * Formatted message bodies, in the composer and on the card.
+ *
+ * Tailwind's reset strips list markers and heading weight, which is right for
+ * an app and wrong for the one place a gym owner writes prose. These rules put
+ * back exactly what the toolbar can produce — nothing more, so an element that
+ * slipped past the sanitiser has no styling waiting for it either.
+ */
+@utility rich-text {
+  & p {
+    margin-block: 0;
+  }
+
+  & p + p,
+  & ul + p,
+  & ol + p,
+  & p + ul,
+  & p + ol,
+  & blockquote + p,
+  & h4 + p {
+    margin-top: 0.7em;
+  }
+
+  & h4 {
+    margin-top: 1.1em;
+    margin-bottom: 0.3em;
+    font-size: 0.95em;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  & h4:first-child {
+    margin-top: 0;
+  }
+
+  & strong,
+  & b {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  & em,
+  & i {
+    font-style: italic;
+  }
+
+  & s {
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+
+  & ul,
+  & ol {
+    margin-block: 0.6em;
+    padding-inline-start: 1.35em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25em;
+  }
+
+  & ul {
+    list-style: disc;
+  }
+
+  & ol {
+    list-style: decimal;
+  }
+
+  & li::marker {
+    color: var(--ink-3);
+  }
+
+  & blockquote {
+    margin-block: 0.7em;
+    padding-inline-start: 0.9em;
+    border-inline-start: 2px solid var(--line-strong);
+    color: var(--ink-3);
+  }
+
+  & a {
+    color: var(--brand);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}
+
+/* The editor writes the same shapes it will be read in, so what the gym sees
+   while typing is what its members get. */
+@utility rich-body {
+  @apply rich-text;
+}
+
 @utility rail-edge {
   background: linear-gradient(
     to bottom,

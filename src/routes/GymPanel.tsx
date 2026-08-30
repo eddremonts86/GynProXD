@@ -21,7 +21,7 @@ import {
   type TemplateKind,
 } from '../lib/messages'
 import { listProfiles } from '../lib/profiles'
-import { publishToServer } from '../lib/sync'
+import { publishToServer, readSyncLink } from '../lib/sync'
 import { GymJoinCode, GymRequests } from '@/components/gym-operator-tools'
 import { formatShortDate, pluralize } from '../lib/labels'
 import { todayIso } from '../lib/dates'
@@ -33,6 +33,10 @@ import { exerciseById } from '../lib/exercises'
 import { ExercisePicker } from '@/components/exercise-picker'
 import { ExerciseThumb } from '../ui/ExerciseThumb'
 import { MessageCard } from '@/components/message-card'
+import { ImagePicker } from '@/components/image-picker'
+import { RichTextEditor } from '@/components/rich-text-editor'
+import { htmlToPlain, isEmptyHtml } from '@/lib/rich-text'
+import type { PendingImage } from '@/lib/message-images'
 import { MenuEditor } from '@/components/menu-editor'
 import { Switch } from '@/components/ui/switch'
 import { Tabs, TabPanel } from '../ui/Tabs'
@@ -96,6 +100,28 @@ export function GymPanelPage() {
  * between a metric and a door list, and they only exist because the answers
  * now travel rather than sitting on each member's phone.
  */
+/**
+ * What to write, per template. A placeholder that says "Optional details" gets
+ * an empty field; one that shows the shape of a good answer gets a paragraph.
+ * Each of these is the kind of thing a gym actually needs to say to sell the
+ * thing above it.
+ */
+const BODY_PLACEHOLDER: Record<TemplateKind, string> = {
+  offer:
+    'Who it is for and what it saves them. Where to redeem it, and anything it does not cover.',
+  product:
+    'What it is made of, which sizes are on the shelf, and whether it can be tried before buying.',
+  event:
+    'What happens in the session, what to bring, and how much of it is hands-on.\n\nWho it suits — first timers, people coming back from a break, anyone chasing a number.',
+  menu: 'What the kitchen is cooking today and until when.\n\nAnything worth flagging: what is high protein, what is vegetarian, what tends to run out.',
+  challenge:
+    'Why this movement, how to scale it on a bad day, and what a good month looks like.',
+  collection:
+    'What these movements have in common and when to reach for them.',
+  announcement:
+    'The change, when it starts, and what members should do differently.',
+}
+
 function GuestList({ message }: { message: GymMessage }) {
   const names = guestList(message)
   const going = Object.values(message.rsvp).filter((r) => r === 'yes').length
@@ -163,6 +189,11 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
   const [error, setError] = useState<string | null>(null)
   const [published, setPublished] = useState<string | null>(null)
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
+  const [images, setImages] = useState<PendingImage[]>([])
+
+  /* Files need somewhere to live that is not this browser's storage quota, so
+     the picker is only offered to an operator whose account can reach one. */
+  const canUpload = !!readSyncLink(profileId)?.token
 
   const togglePicked = (id: string) => {
     setEveryone(false)
@@ -179,8 +210,10 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
       createdAt: new Date().toISOString(),
       kind,
       title: title.trim(),
-      body: body.trim() || undefined,
+      body: isEmptyHtml(body) ? undefined : body,
       audience: 'all' as const,
+      /* Local blob URLs stand in for the server's until it has them. */
+      images: images.map((i) => ({ url: i.preview, alt: i.alt.trim() || undefined })),
       readBy: [],
       rsvp: {},
       saved: [],
@@ -256,7 +289,7 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
       }
     }
     return common
-  }, [gym, profileId, kind, title, body, eventDate, eventTime, eventPlace, courses, discount, validUntil, code, productName, productPrice, productNote, chExerciseName, chDays, chStart, chDelta, chUnit, collectionPicks])
+  }, [gym, profileId, kind, title, body, images, eventDate, eventTime, eventPlace, courses, discount, validUntil, code, productName, productPrice, productNote, chExerciseName, chDays, chStart, chDelta, chUnit, collectionPicks])
 
   const doPublish = () => {
     if (!draft) {
@@ -301,17 +334,22 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
       banner: bannerOn ? { minutes: Number(bannerMinutes) } : undefined,
     }
     /* Server bus first when this operator account can reach it: the same id
-       on both sides keeps the later pull from duplicating the sent copy. */
-    void publishToServer(profileId, input).then((serverId) => {
-      publish(serverId ? { ...input, id: serverId } : input)
+       on both sides keeps the later pull from duplicating the sent copy, and
+       it is the upload that turns the picker's blobs into real URLs. */
+    const files = images.map((i) => ({ file: i.file, alt: i.alt }))
+    void publishToServer(profileId, input, files).then((sent) => {
+      publish(sent ? { ...input, id: sent.id, images: sent.images } : input)
       const reachCount = everyone ? members.length : picked.length
+      const withPictures = images.length > 0 ? ` ${pluralize(images.length, 'picture')} attached.` : ''
       setPublished(
-        serverId
-          ? `Published to ${gym} on every device. It is now under Sent.`
+        sent
+          ? `Published to ${gym} on every device.${withPictures} It is now under Sent.`
           : reachCount === 0
             ? 'Published. No members on this device yet — it sits under Sent and delivers as they join.'
             : `Published to ${pluralize(reachCount, 'member')} on this device. It is now under Sent.`,
       )
+      for (const image of images) URL.revokeObjectURL(image.preview)
+      setImages([])
     })
     setError(null)
     setTitle('')
@@ -401,21 +439,38 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
                 }
               />
 
-              {kind !== 'menu' && (
-                <div className="flex flex-col gap-1.5">
+              {/* Every template, the daily menu included: a kitchen card with
+                  no sentence about it is a price list. The old field was three
+                  rows labelled "Optional details", which is a caption, not a
+                  place to explain what you are selling. */}
+              <div className="flex flex-col gap-1.5">
+                <span className="flex flex-wrap items-baseline justify-between gap-2">
                   <label htmlFor="gym-body" className="text-2xs font-medium text-ink-3">
-                    Message
+                    Message body
                   </label>
-                  <Textarea
-                    id="gym-body"
-                    value={body}
-                    onChange={(e) => touch(setBody)(e.target.value)}
-                    rows={3}
-                    placeholder="Optional details."
-                    className="border-line bg-surface text-sm"
-                  />
-                </div>
-              )}
+                  {!isEmptyHtml(body) && (
+                    <span className="num text-2xs text-ink-3">
+                      {htmlToPlain(body).length} characters
+                    </span>
+                  )}
+                </span>
+                <RichTextEditor
+                  id="gym-body"
+                  value={body}
+                  onChange={touch(setBody)}
+                  placeholder={BODY_PLACEHOLDER[kind]}
+                />
+                <span className="text-2xs text-ink-3">
+                  Bold, lists and links. Say what it is, who it is for, and what to do next.
+                </span>
+              </div>
+
+              <ImagePicker
+                images={images}
+                onChange={setImages}
+                disabled={!canUpload}
+                disabledReason="Pictures travel with your sync account. Sign in under Settings → Data to attach them."
+              />
 
               {kind === 'event' && (
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">

@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { GymMessage, TemplateKind, MenuCourse } from '../lib/messages'
+import type { GymMessage, MessageImage, TemplateKind, MenuCourse } from '../lib/messages'
 import { applyResponses, markResponseDirty, type ResponseRow } from '../lib/gym-responses'
 import type { Challenge } from '../lib/challenge'
 import type { Collection } from '../lib/collection'
@@ -43,6 +43,8 @@ export interface PublishInput {
   collection?: Collection
   banner?: { minutes: number }
   link?: 'menu'
+  /** Already uploaded; the picker holds the files until the server names them. */
+  images?: MessageImage[]
 }
 
 interface MessagesState {
