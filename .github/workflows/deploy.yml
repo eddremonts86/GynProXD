@@ -133,17 +133,24 @@ jobs:
           base="${COOLIFY_API_URL%/}"
           auth="Authorization: Bearer $COOLIFY_API_TOKEN"
 
-          # `/api/v1/applications/<uuid>/start` and `/api/v1/deploy?uuid=` both
-          # exist in Coolify v4 — confirmed against `php artisan route:list`.
-          # This uses the per-application route because every other app here
-          # does, and one shape across the fleet is worth more than a preference.
+          # `/api/v1/deploy?uuid=` is what the rest of the fleet uses — all three
+          # ai-os workflows call it — and `/api/v1/applications/<uuid>/start`
+          # exists too. This one, for one shape across every repo. That claim was
+          # made backwards here once; it is a `grep` away and worth making.
           start() {
-            curl -fsS -X POST -H "$auth" -H 'Accept: application/json' \
-              --max-time 60 "$base/api/v1/applications/$1/start"
+            curl -sS -o /tmp/start.json -w '%{http_code}' -H "$auth" \
+              -H 'Accept: application/json' --max-time 60 \
+              "$base/api/v1/deploy?uuid=$1&force=false"
           }
 
           # A queued deploy is not a finished deploy. Without this the job goes
           # green while production breaks, which is the whole failure mode.
+          #
+          # The states are Coolify's own, from app/Enums/ApplicationDeploymentStatus:
+          # queued, in_progress, finished, failed, cancelled-by-user. Note the
+          # hyphen — an earlier version here waited on `cancelled`, `error` and
+          # `success`, none of which Coolify ever emits, so a cancelled deploy
+          # would have polled for ten minutes and then blamed a timeout.
           wait_for() {
             name="$1"
             id="$2"
@@ -153,8 +160,8 @@ jobs:
                 "$base/api/v1/deployments/$id" | jq -r '.status // "?"')
               echo "  poll $i: $status"
               case "$status" in
-                finished|success) echo "  $name is live"; return 0 ;;
-                failed|error|cancelled)
+                finished) echo "  $name is live"; return 0 ;;
+                failed|cancelled-by-user)
                   echo "::error::$name deployment $status — see the Coolify deployment log"
                   return 1 ;;
               esac
@@ -167,11 +174,26 @@ jobs:
             name="$1"
             uuid="$2"
             echo "→ $name"
-            resp=$(start "$uuid")
-            echo "$resp"
-            id=$(printf '%s' "$resp" | jq -r '.deployment_uuid // empty')
+            code=$(start "$uuid")
+            cat /tmp/start.json; echo
+
+            if [ "$code" = "429" ]; then
+              echo "::error::$name: Coolify is rate-limiting deploys — re-run this workflow in a minute"
+              return 1
+            fi
+            case "$code" in 2*) ;; *)
+              echo "::error::$name: Coolify answered HTTP $code"
+              return 1 ;;
+            esac
+
+            # The response is {"deployments":[{message, resource_uuid,
+            # deployment_uuid?}]} — and `deployment_uuid` is genuinely optional:
+            # DeployController pushes the entry without it when nothing was
+            # queued. No id means nothing to wait on, and a job that cannot see
+            # the result must not claim one.
+            id=$(jq -r '.deployments[0].deployment_uuid // empty' /tmp/start.json)
             if [ -z "$id" ]; then
-              echo "::error::$name: Coolify returned no deployment_uuid; nothing to wait on"
+              echo "::error::$name: Coolify queued no deployment — its message above says why"
               return 1
             fi
             wait_for "$name" "$id"
