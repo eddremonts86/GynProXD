@@ -42,6 +42,8 @@ export interface GymMessage {
    * counter-service gym actually does. Interest is counted in `saved`, the
    * same field an offer uses, so the panel tallies it without new plumbing.
    */
+  /** `price` is whatever the gym typed, currency and all: the app has no
+      currency field and must never staple a symbol onto it. */
   product?: { name: string; price: string; note?: string }
   challenge?: Challenge
   collection?: Collection

@@ -60,7 +60,7 @@ export function MenuPage() {
                       </span>
                       {item.price && (
                         <span className="num shrink-0 text-sm font-medium text-ink-2">
-                          {item.price} €
+                          {item.price}
                         </span>
                       )}
                     </li>

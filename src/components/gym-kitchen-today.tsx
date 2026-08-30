@@ -72,7 +72,6 @@ export function GymKitchenToday({ stacked = false }: { stacked?: boolean }) {
               {item.price && (
                 <span className="num shrink-0 text-lg leading-none font-semibold text-ink">
                   {item.price}
-                  <span className="ml-1 text-xs font-normal text-ink-3">&euro;</span>
                 </span>
               )}
             </li>

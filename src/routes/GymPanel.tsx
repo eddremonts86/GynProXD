@@ -609,13 +609,15 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
                     onChange={(e) => touch(setProductName)(e.target.value)}
                     placeholder="Hangar training tee"
                   />
+                  {/* Free text, and no decimal keypad: the currency is part
+                      of what you type, because the app has no idea which one
+                      this gym charges in. */}
                   <Input
                     label="Price"
                     value={productPrice}
                     onChange={(e) => touch(setProductPrice)(e.target.value)}
-                    inputMode="decimal"
-                    suffix="€"
-                    placeholder="24.00"
+                    placeholder="649 kr"
+                    hint="However your members read it, currency included."
                   />
                   {/* Input hands className to the field itself, so the column
                       span has to live on a wrapper. */}
@@ -781,7 +783,7 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
                             {m.kind === 'offer' ? ` · saved ${m.saved.length}` : ''}
                             {m.kind === 'product' ? ` · reserved ${m.saved.length}` : ''}
                             {m.kind === 'product' && m.product
-                              ? ` · ${m.product.price} €`
+                              ? ` · ${m.product.price}`
                               : ''}
                             {m.kind === 'offer' && m.offer ? ` · code ${m.offer.code}` : ''}
                             {m.kind === 'challenge' ? ` · joined ${m.joined?.length ?? 0}` : ''}

@@ -145,8 +145,7 @@ export function MenuEditor({ gym, profileId }: { gym: string; profileId: string 
                     aria-label={`Item ${ii + 1} price in ${section.name || `section ${si + 1}`}`}
                     value={item.price ?? ''}
                     onChange={(e) => patchItem(si, ii, 'price', e.target.value)}
-                    placeholder="0.00"
-                    suffix="€"
+                    placeholder="75 kr"
                     className="h-9 w-24"
                   />
                   <IconButton

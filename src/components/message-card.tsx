@@ -177,7 +177,6 @@ export function MessageCard({
           <div className="flex shrink-0 items-center gap-4">
             <span className="num text-2xl leading-none font-semibold text-ink">
               {message.product.price}
-              <span className="ml-1 text-sm font-normal text-ink-3">&euro;</span>
             </span>
             {viewer && onToggleSave && (
               <Button size="sm" variant={savedByMe ? 'primary' : 'secondary'} onClick={onToggleSave}>
