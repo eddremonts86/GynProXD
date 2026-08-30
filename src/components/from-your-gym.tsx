@@ -326,7 +326,6 @@ export function FromYourGym() {
           >
             <span className={cn('flex items-baseline gap-2 text-white', OVER_AURORA)}>
               <span className="num text-3xl leading-none font-semibold">{deal.product.price}</span>
-              <span className="text-sm text-white/85">&euro;</span>
               {deal.product.note && (
                 <span className="ml-1 max-w-[28ch] text-xs text-white/85">{deal.product.note}</span>
               )}

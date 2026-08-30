@@ -7,6 +7,7 @@
 export interface MenuItem {
   name: string
   desc?: string
+  /** As typed by the gym, currency included — see the note in messages.ts. */
   price?: string
 }
 
