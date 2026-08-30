@@ -234,6 +234,16 @@
   --shadow-overlay: var(--shadow-overlay);
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* One stop past 2xl. Declared here rather than written inline as
+     `min-[1840px]:` so Tailwind sorts it after the smaller breakpoints: an
+     arbitrary media variant is emitted out of order, and a later `sm:` rule
+     then wins at 1840px and quietly undoes it.
+
+     The number is where the rail stops hurting: it takes 240px, so a fourth
+     column only stops shrinking the cards it sits beside once the window is
+     this wide. */
+  --breakpoint-3xl: 115rem;
 }
 
 @layer base {

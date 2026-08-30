@@ -3,12 +3,19 @@ import { Link } from '@tanstack/react-router'
 import { Panel } from '../ui/Panel'
 import { Tag } from '../ui/Tag'
 import { dishTotals, type RecipeSuggestion } from '../lib/recipes'
+import { cn } from '@/lib/utils'
 
 /** One suggested plate: photo, the numbers that matter, the coach's sentence. */
-export function RecipeCard({ dish }: { dish: RecipeSuggestion }) {
+export function RecipeCard({
+  dish,
+  className,
+}: {
+  dish: RecipeSuggestion
+  className?: string
+}) {
   const plate = dishTotals(dish)
   return (
-    <Panel padding="none" className="flex flex-col overflow-hidden">
+    <Panel padding="none" className={cn('flex flex-col overflow-hidden', className)}>
       <img
         src={dish.imageUrl}
         alt={dish.title}

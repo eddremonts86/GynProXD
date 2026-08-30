@@ -6,6 +6,7 @@ import { Section } from '../ui/PageHeader'
 import { Panel } from '../ui/Panel'
 import { RecipeCard } from './recipe-card'
 import { RecipeAttribution } from './recipe-attribution'
+import { cn } from '@/lib/utils'
 import type { OnboardingInput } from '../lib/types'
 
 /**
@@ -48,6 +49,19 @@ function Suggestions({ input }: { input: OnboardingInput }) {
 
   const items = suggestions?.items ?? []
 
+  /* On a wide screen three cards stopped being cards: 568px each to carry a
+     title and two lines. A fourth column spends that width instead — but only
+     when a fourth plate actually came back, because an empty cell reads worse
+     than a wide card. The extra one hides below the threshold so a
+     three-column row never carries an orphan.
+
+     That threshold is the 3xl breakpoint (1840px), not 2xl: the rail takes 240 of
+     them, so at 1600 a fourth column made every card 308px — narrower than the
+     363px three columns gave at 1440. Widening the window has to make the
+     cards bigger, never smaller. */
+  const shown = items.slice(0, 4)
+  const fourAcross = shown.length >= 4
+
   return (
     <Section
       title="Eat for your plan"
@@ -60,9 +74,13 @@ function Suggestions({ input }: { input: OnboardingInput }) {
       </p>
 
       {items.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          {items.slice(0, 3).map((dish) => (
-            <RecipeCard key={`${dish.provider}-${dish.id}`} dish={dish} />
+        <div className={cn('grid grid-cols-1 gap-4 sm:grid-cols-3', fourAcross && '3xl:grid-cols-4')}>
+          {shown.map((dish, i) => (
+            <RecipeCard
+              key={`${dish.provider}-${dish.id}`}
+              dish={dish}
+              className={i === 3 ? 'hidden 3xl:flex' : undefined}
+            />
           ))}
         </div>
       ) : (
@@ -73,7 +91,7 @@ function Suggestions({ input }: { input: OnboardingInput }) {
         )
       )}
 
-      {items.length > 0 && <RecipeAttribution items={items} />}
+      {shown.length > 0 && <RecipeAttribution items={shown} />}
     </Section>
   )
 }
