@@ -2,9 +2,11 @@ import type { RecipeSuggestion } from '../lib/recipes'
 
 /**
  * Offline and no-key fallback dishes. Real TheMealDB entries with their CDN
- * photos; the macro numbers are editorial estimates for these three plates
+ * photos; the macro numbers are editorial estimates for these four plates
  * only (bundled content, like the sample menu's prices), never presented as
- * source data. Live suggestions always carry their provider's numbers.
+ * source data. Four rather than three so the wide layout on Today has a fourth
+ * plate to show even with no recipe server reachable. Live suggestions always
+ * carry their provider's numbers.
  */
 export const SAMPLE_SUGGESTIONS: RecipeSuggestion[] = [
   {
@@ -28,6 +30,17 @@ export const SAMPLE_SUGGESTIONS: RecipeSuggestion[] = [
     area: 'Japanese',
     kcal: 520,
     proteinG: 40,
+  },
+  {
+    id: '53133',
+    provider: 'sample',
+    title: 'Asado',
+    imageUrl: 'https://www.themealdb.com/images/media/meals/kgfh3q1763075438.jpg',
+    sourceUrl: 'https://www.themealdb.com/meal/53133',
+    category: 'Beef',
+    area: 'Argentinian',
+    kcal: 700,
+    proteinG: 52,
   },
   {
     id: '52807',

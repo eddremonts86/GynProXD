@@ -24,6 +24,8 @@ import { SessionRailCard, SessionMobileBar } from '@/components/session-indicato
 import { Landing } from '@/components/landing'
 import { GymBanner } from '@/components/gym-banner'
 import { UpdateBanner } from '@/components/update-banner'
+import { RailToggle } from '@/components/rail-toggle'
+import { useRailHidden } from '@/hooks/use-rail'
 import { useSession } from '@/store/useSession'
 import { useMessages } from '@/store/useMessages'
 import { useGym } from '@/store/useGym'
@@ -148,6 +150,7 @@ function isActive(item: NavItem, pathname: string): boolean {
 }
 
 function DesktopRail({ pathname }: { pathname: string }) {
+  if (useRailHidden()) return null
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col lg:flex">
       {/* Where the rail ends and the content begins. */}
@@ -156,10 +159,11 @@ function DesktopRail({ pathname }: { pathname: string }) {
         className="rail-edge pointer-events-none absolute inset-y-0 right-0 w-px opacity-70"
       />
 
-      <div className="px-5 py-5">
+      <div className="flex items-center justify-between gap-2 px-5 py-5">
         <Link to="/" aria-label="enForma, go to today">
           <Wordmark />
         </Link>
+        <RailToggle />
       </div>
 
       <nav aria-label="Main" className="flex flex-1 flex-col gap-0.5 px-3">
@@ -282,6 +286,7 @@ function syncQuietly(profileId: string): void {
 
 export function AppShell() {
   const pathname = useRouterState({ select: (s) => s.location.pathname })
+  const railHidden = useRailHidden()
   const status = useSession((s) => s.status)
   const setUnlocked = useSession((s) => s.setUnlocked)
   const setLocked = useSession((s) => s.setLocked)
@@ -378,13 +383,14 @@ export function AppShell() {
         Skip to content
       </a>
       <DesktopRail pathname={pathname} />
+      <RailToggle floating />
       <MobileChrome pathname={pathname} />
-      <main id="main" className="lg:pl-60 print:pl-0">
+      <main id="main" className={cn(!railHidden && 'lg:pl-60', 'print:pl-0')}>
         {/* The cap exists to stop an ultrawide monitor stretching the grids,
             not to gutter an ordinary large screen: 1216px left a 1920px
             display with 232px dead on each side. Prose sets its own measure
             in ch, so widening here costs nothing in readability. */}
-        <div className="mx-auto w-full max-w-[120rem] px-4 py-6 pb-32 md:px-8 md:py-10 lg:px-10 lg:pb-12">
+        <div className="mx-auto w-full max-w-[120rem] px-4 py-5 pb-32 sm:px-6 sm:py-6 md:px-8 md:py-10 lg:px-10 lg:pb-12">
           {/* Pulled up out of the content padding so it sits level with the
               rail's wordmark, reading as the top bar's right side. */}
           <div className="-mt-[1.375rem] mb-4 hidden justify-end lg:flex">
