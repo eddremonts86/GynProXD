@@ -21,7 +21,7 @@ import type { Icon } from '@phosphor-icons/react'
 import { Wordmark, Mark } from '@/components/brand'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { SessionRailCard, SessionMobileBar } from '@/components/session-indicator'
-import { ProfileGate } from '@/components/profile-gate'
+import { Landing } from '@/components/landing'
 import { GymBanner } from '@/components/gym-banner'
 import { useSession } from '@/store/useSession'
 import { useMessages } from '@/store/useMessages'
@@ -345,7 +345,7 @@ export function AppShell() {
 
   if (status === 'locked') {
     return (
-      <ProfileGate
+      <Landing
         onUnlocked={() => {
           const meta = activeProfile()
           if (meta) {
@@ -369,7 +369,11 @@ export function AppShell() {
       <DesktopRail pathname={pathname} />
       <MobileChrome pathname={pathname} />
       <main id="main" className="lg:pl-60 print:pl-0">
-        <div className="mx-auto w-full max-w-[76rem] px-4 py-6 pb-32 md:px-8 md:py-10 lg:pb-12">
+        {/* The cap exists to stop an ultrawide monitor stretching the grids,
+            not to gutter an ordinary large screen: 1216px left a 1920px
+            display with 232px dead on each side. Prose sets its own measure
+            in ch, so widening here costs nothing in readability. */}
+        <div className="mx-auto w-full max-w-[120rem] px-4 py-6 pb-32 md:px-8 md:py-10 lg:px-10 lg:pb-12">
           {/* Pulled up out of the content padding so it sits level with the
               rail's wordmark, reading as the top bar's right side. */}
           <div className="-mt-[1.375rem] mb-4 hidden justify-end lg:flex">

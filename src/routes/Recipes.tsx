@@ -271,7 +271,7 @@ export function RecipesPage() {
         )
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4 2xl:grid-cols-5">
             {items.map((dish, i) => (
               <CatalogueCard key={dish.id} dish={dish} index={i} />
             ))}
@@ -370,7 +370,7 @@ function CatalogueCard({ dish, index }: { dish: RecipeSuggestion; index: number 
 
 function SkeletonGrid() {
   return (
-    <div className="grid animate-pulse grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4">
+    <div className="grid animate-pulse grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4 2xl:grid-cols-5">
       {Array.from({ length: 8 }, (_, i) => (
         <div key={i} className="flex flex-col gap-2">
           <div className="aspect-[4/3] w-full rounded-xl bg-surface-2" />

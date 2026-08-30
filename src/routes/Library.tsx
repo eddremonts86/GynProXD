@@ -274,7 +274,7 @@ export function LibraryPage() {
               : `${filtered.length} of ${exercises.length} movements`}
           </p>
 
-          <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
+          <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
             {shown.map((e) => (
               <li key={e.id}>
                 <MovementCard
