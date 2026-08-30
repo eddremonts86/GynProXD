@@ -63,12 +63,26 @@ two fields whether it is an offer, a shop item, an event, the daily menu, a
 challenge, a collection or an announcement. A gym sells things; one line of
 grey text was never going to do it.
 
-The body is HTML, written through a small `contenteditable` with a fixed
-toolbar (bold, italic, strikethrough, subheading, two list kinds, quote, link,
-clear). The toolbar *is* the allowlist made visible: `src/lib/rich-text.ts`
-sanitises with DOMPurify to exactly those tags, forces `target="_blank"` and
-`rel="noopener noreferrer nofollow"` on links, and refuses any scheme but
-http(s), mailto, tel and `#`.
+The body is HTML, written through a small `contenteditable`. The toolbar *is*
+the allowlist made visible, and the list is closed on both sides: paste is
+reduced to plain text, so nothing enters except through a button, and a tag
+with no button could never appear anyway.
+
+What it can produce: three heading levels (`h4`–`h6`, named Heading /
+Subheading / Small heading), paragraphs, quotes, bulleted and numbered lists,
+dividers, bold, italic, underline, strikethrough, highlight, superscript,
+subscript, and links.
+
+Deliberately absent: `img` and `figure` (pictures are uploaded to the row, not
+written into text), `table` (a price table is what the menu and shop templates
+already are, and on a phone it is a horizontal scrollbar), `pre`/`code`,
+`div`/`span` (no meaning of their own — useful only as attribute carriers), and
+`details`/`summary` (the card already decides what to fold on Today). Headings
+start at `h4` because the card renders the message title as an `h3`.
+
+`src/lib/rich-text.ts` sanitises with DOMPurify to exactly those tags, forces
+`target="_blank"` and `rel="noopener noreferrer nofollow"` on links, and
+refuses any scheme but http(s), mailto, tel and `#`.
 
 Sanitising happens **on render, every time** — not once on the way in. A row
 can also arrive from the sync server, and the only thing that account

@@ -17,31 +17,50 @@ import DOMPurify from 'dompurify'
  */
 
 /**
- * What a gym owner needs to describe what they sell, and nothing else. No
- * images (they are a separate, uploaded thing) and no tables.
+ * Everything a gym owner has a use for, and deliberately nothing else.
+ *
+ * The list is closed on both sides: paste is reduced to plain text, so the
+ * toolbar is the only way markup gets in, and a tag with no button here can
+ * never appear anyway. Adding one to this list without a way to produce it
+ * would only widen what has to be trusted.
  *
  * Headings start at `h4` because the body is not the top of anything: the card
  * around it already renders the message title as an `h3`, and a body opening
  * with `h1` would put the page's outline in the wrong order for anyone
- * navigating it by headings. Three levels is what the toolbar offers, so three
- * levels is what may appear.
+ * navigating it by headings.
+ *
+ * What is missing, on purpose:
+ * - `img`, `figure` — pictures are uploaded to the row, not written into text.
+ * - `table` — a price table is what the menu and shop templates already are,
+ *   with their own fields, and a table on a phone is a horizontal scrollbar.
+ * - `pre`, `code` — nobody publishes source code to a gym.
+ * - `div`, `span` — no meaning of their own; useful only as attribute carriers.
+ * - `details`, `summary` — the card already decides what to fold on Today.
  */
 const ALLOWED_TAGS = [
+  /* Structure */
   'p',
   'br',
+  'hr',
+  'h4',
+  'h5',
+  'h6',
+  'blockquote',
+  'ul',
+  'ol',
+  'li',
+  /* Emphasis */
   'strong',
   'b',
   'em',
   'i',
   'u',
   's',
-  'ul',
-  'ol',
-  'li',
-  'h4',
-  'h5',
-  'h6',
-  'blockquote',
+  'mark',
+  /* Units and ordinals: 24 m², the 1st of the month */
+  'sup',
+  'sub',
+  /* Links */
   'a',
 ]
 
@@ -80,7 +99,7 @@ export function sanitizeHtml(dirty: string): string {
 
 /** Markup at all, or a body typed before formatting existed? */
 export function looksLikeHtml(body: string): boolean {
-  return /<\/?(?:p|br|ul|ol|li|strong|b|em|i|u|s|h[456]|blockquote|a)\b[^>]*>/i.test(body)
+  return /<\/?(?:p|br|hr|ul|ol|li|strong|b|em|i|u|s|mark|sup|sub|h[456]|blockquote|a)\b[^>]*>/i.test(body)
 }
 
 /**
@@ -97,6 +116,7 @@ export function htmlToPlain(html: string): string {
   const spaced = clean
     .replace(/<\/(p|li|h[456]|blockquote|ul|ol)>/gi, '\n\n')
     .replace(/<(p|li|h[456]|blockquote|ul|ol)\b[^>]*>/gi, '\n\n')
+    .replace(/<hr\s*\/?>/gi, '\n\n')
     .replace(/<br\s*\/?>/gi, '\n')
   const doc = new DOMParser().parseFromString(spaced, 'text/html')
   return (doc.body.textContent ?? '')

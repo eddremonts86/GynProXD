@@ -559,6 +559,43 @@
     text-decoration: underline;
     text-underline-offset: 2px;
   }
+
+  & u {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+
+  /* Grey, not yellow. The aurora is spoken for — two sanctioned surfaces and
+     the rail seam — and a highlighter colour would be a third accent loose in
+     the app. `--line-strong` is the darkest neutral that still takes ink on
+     top, so the marked words read as raised rather than painted. */
+  & mark {
+    background: var(--line-strong);
+    box-shadow: 0 0 0 0.15em var(--line-strong);
+    border-radius: 0.15em;
+    color: var(--ink);
+  }
+
+  & sup,
+  & sub {
+    font-size: 0.75em;
+    line-height: 0;
+  }
+
+  & sup {
+    vertical-align: super;
+  }
+
+  & sub {
+    vertical-align: sub;
+  }
+
+  & hr {
+    margin-block: 1.1em;
+    border: 0;
+    border-top: 1px solid var(--line);
+  }
 }
 
 /* The editor writes the same shapes it will be read in, so what the gym sees

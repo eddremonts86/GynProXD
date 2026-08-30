@@ -461,7 +461,8 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
                   placeholder={BODY_PLACEHOLDER[kind]}
                 />
                 <span className="text-2xs text-ink-3">
-                  Bold, lists and links. Say what it is, who it is for, and what to do next.
+                  Headings, lists, emphasis and links. Say what it is, who it is for, and what
+                  to do next.
                 </span>
               </div>
 

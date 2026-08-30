@@ -77,6 +77,32 @@ describe('what it is allowed to carry', () => {
     expect(out).toContain('Medium')
   })
 
+  it('keeps the emphasis a gym reaches for', () => {
+    const out = sanitizeHtml(
+      '<p><u>Saturday</u>, <mark>twelve places</mark>, 24 m<sup>2</sup>, H<sub>2</sub>O</p>',
+    )
+    expect(out).toContain('<u>Saturday</u>')
+    expect(out).toContain('<mark>twelve places</mark>')
+    expect(out).toContain('<sup>2</sup>')
+    expect(out).toContain('<sub>2</sub>')
+  })
+
+  it('keeps a divider between sections', () => {
+    expect(sanitizeHtml('<p>One</p><hr><p>Two</p>')).toContain('<hr>')
+  })
+
+  it('refuses a table: the menu and shop templates already are one', () => {
+    const out = sanitizeHtml('<table><tr><td>Beef</td><td>89 kr</td></tr></table>')
+    expect(out).not.toContain('<table')
+    expect(out).toContain('Beef')
+  })
+
+  it('refuses div and span, which exist only to carry attributes', () => {
+    const out = sanitizeHtml('<div data-x="1"><span class="y">Text</span></div>')
+    expect(out).not.toMatch(/<(div|span)/)
+    expect(out).toContain('Text')
+  })
+
   it('keeps an https link and hardens it', () => {
     const out = sanitizeHtml('<a href="https://nordhavn.test/book">Book</a>')
     expect(out).toContain('href="https://nordhavn.test/book"')
@@ -128,6 +154,10 @@ describe('the words without the markup', () => {
 
   it('breaks a heading away from the paragraph under it', () => {
     expect(htmlToPlain('<h4>What you get</h4><p>Six weeks.</p>')).toBe('What you get\n\nSix weeks.')
+  })
+
+  it('treats a divider as a break between sections', () => {
+    expect(htmlToPlain('<p>One</p><hr><p>Two</p>')).toBe('One\n\nTwo')
   })
 
   it('leaves plain text alone', () => {
