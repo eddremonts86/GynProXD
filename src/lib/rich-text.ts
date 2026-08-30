@@ -18,8 +18,13 @@ import DOMPurify from 'dompurify'
 
 /**
  * What a gym owner needs to describe what they sell, and nothing else. No
- * images (they are a separate, uploaded thing), no tables, no headings above
- * h4 — the card already owns the title.
+ * images (they are a separate, uploaded thing) and no tables.
+ *
+ * Headings start at `h4` because the body is not the top of anything: the card
+ * around it already renders the message title as an `h3`, and a body opening
+ * with `h1` would put the page's outline in the wrong order for anyone
+ * navigating it by headings. Three levels is what the toolbar offers, so three
+ * levels is what may appear.
  */
 const ALLOWED_TAGS = [
   'p',
@@ -34,6 +39,8 @@ const ALLOWED_TAGS = [
   'ol',
   'li',
   'h4',
+  'h5',
+  'h6',
   'blockquote',
   'a',
 ]
@@ -73,7 +80,7 @@ export function sanitizeHtml(dirty: string): string {
 
 /** Markup at all, or a body typed before formatting existed? */
 export function looksLikeHtml(body: string): boolean {
-  return /<\/?(?:p|br|ul|ol|li|strong|b|em|i|u|s|h4|blockquote|a)\b[^>]*>/i.test(body)
+  return /<\/?(?:p|br|ul|ol|li|strong|b|em|i|u|s|h[456]|blockquote|a)\b[^>]*>/i.test(body)
 }
 
 /**
@@ -88,8 +95,8 @@ export function htmlToPlain(html: string): string {
      text node, so a list that follows it has no `</p>` in front of it and the
      two would run together — "paid monthly.A movement screen". */
   const spaced = clean
-    .replace(/<\/(p|li|h4|blockquote|ul|ol)>/gi, '\n\n')
-    .replace(/<(p|li|h4|blockquote|ul|ol)\b[^>]*>/gi, '\n\n')
+    .replace(/<\/(p|li|h[456]|blockquote|ul|ol)>/gi, '\n\n')
+    .replace(/<(p|li|h[456]|blockquote|ul|ol)\b[^>]*>/gi, '\n\n')
     .replace(/<br\s*\/?>/gi, '\n')
   const doc = new DOMParser().parseFromString(spaced, 'text/html')
   return (doc.body.textContent ?? '')

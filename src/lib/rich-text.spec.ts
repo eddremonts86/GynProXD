@@ -64,6 +64,19 @@ describe('what it is allowed to carry', () => {
     expect(out).toContain('<li>89 kr</li>')
   })
 
+  it('keeps all three heading levels', () => {
+    const out = sanitizeHtml('<h4>One</h4><h5>Two</h5><h6>Three</h6>')
+    expect(out).toBe('<h4>One</h4><h5>Two</h5><h6>Three</h6>')
+  })
+
+  it('refuses h1 through h3, which belong to the page around the card', () => {
+    const out = sanitizeHtml('<h1>Huge</h1><h2>Big</h2><h3>Medium</h3>')
+    expect(out).not.toMatch(/<h[123]/)
+    /* The words survive; only the level is taken away. */
+    expect(out).toContain('Huge')
+    expect(out).toContain('Medium')
+  })
+
   it('keeps an https link and hardens it', () => {
     const out = sanitizeHtml('<a href="https://nordhavn.test/book">Book</a>')
     expect(out).toContain('href="https://nordhavn.test/book"')
@@ -111,6 +124,10 @@ describe('the words without the markup', () => {
     expect(htmlToPlain('Paid monthly.<ul><li>A screen on day one</li></ul>')).toBe(
       'Paid monthly.\n\nA screen on day one',
     )
+  })
+
+  it('breaks a heading away from the paragraph under it', () => {
+    expect(htmlToPlain('<h4>What you get</h4><p>Six weeks.</p>')).toBe('What you get\n\nSix weeks.')
   })
 
   it('leaves plain text alone', () => {

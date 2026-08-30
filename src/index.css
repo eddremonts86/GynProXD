@@ -458,20 +458,55 @@
   & ol + p,
   & p + ul,
   & p + ol,
-  & blockquote + p,
-  & h4 + p {
+  & blockquote + p {
     margin-top: 0.7em;
   }
 
-  & h4 {
-    margin-top: 1.1em;
-    margin-bottom: 0.3em;
-    font-size: 0.95em;
+  /* Three levels that read as three levels. The old single rule sat at 0.95em
+     and semibold — a heading you had to be told about. Sizes step by a fifth
+     each time, which is the smallest gap the eye reads as deliberate. */
+  & h4,
+  & h5,
+  & h6 {
+    margin-top: 1.15em;
+    margin-bottom: 0.35em;
     font-weight: 600;
+    line-height: 1.3;
     color: var(--ink);
   }
 
-  & h4:first-child {
+  /* Sized against the card title above them, not in isolation: that title is
+     16px and this body is 13px, so the three levels have to fit inside a 3px
+     gap and still read as three. Weight and colour carry what size cannot. */
+  & h4 {
+    font-size: 1.2em;
+    letter-spacing: -0.011em;
+  }
+
+  & h5 {
+    font-size: 1.08em;
+  }
+
+  & h6 {
+    font-size: 1em;
+    color: var(--ink-2);
+  }
+
+  & h4:first-child,
+  & h5:first-child,
+  & h6:first-child {
+    margin-top: 0;
+  }
+
+  & h4 + p,
+  & h5 + p,
+  & h6 + p,
+  & h4 + ul,
+  & h5 + ul,
+  & h6 + ul,
+  & h4 + ol,
+  & h5 + ol,
+  & h6 + ol {
     margin-top: 0;
   }
 
