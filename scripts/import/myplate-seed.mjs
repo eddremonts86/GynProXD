@@ -41,8 +41,24 @@ async function main() {
       password: process.env.PB_SUPERUSER_PASSWORD,
     }),
   }).then((r) => r.json())
-  if (!auth.token) throw new Error('superuser auth failed: ' + JSON.stringify(auth))
+  if (!auth.token) {
+    throw new Error(
+      'Superuser auth failed against ' + PB + ': ' + JSON.stringify(auth) +
+        '\nPB_URL must point at PocketBase itself. In production the app proxies it,' +
+        '\nso the URL ends in /pb (e.g. https://your-domain/pb), not the bare domain.',
+    )
+  }
   const headers = { authorization: auth.token }
+
+  /* The collection arrives with the migrations, which run when the server
+     boots the new code. Seeding an old server would 404 halfway through. */
+  const probe = await fetch(`${PB}/api/collections/recipes/records?perPage=1`, { headers })
+  if (probe.status === 404) {
+    throw new Error(
+      'This server has no `recipes` collection yet, so it is still running an older build.' +
+        '\nDeploy first: the migrations create the collection on boot, then run this again.',
+    )
+  }
 
   const recipes = JSON.parse(readFileSync(path.join(OUT, 'myplate.json'), 'utf8'))
   let created = 0
