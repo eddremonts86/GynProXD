@@ -22,6 +22,26 @@ export interface GymMenu {
   sections: MenuSection[]
 }
 
+/**
+ * What actually counts as a card: named sections holding named items, trimmed.
+ * Shared so the copy saved on the device and the copy sent to the gym's
+ * members are the same bytes rather than two hopeful approximations.
+ */
+export function cleanSections(sections: MenuSection[]): MenuSection[] {
+  return sections
+    .map((s) => ({
+      name: s.name.trim(),
+      items: s.items
+        .map((i) => ({
+          name: i.name.trim(),
+          desc: i.desc?.trim() || undefined,
+          price: i.price?.trim() || undefined,
+        }))
+        .filter((i) => i.name),
+    }))
+    .filter((s) => s.name && s.items.length > 0)
+}
+
 export function menuFor(menus: GymMenu[], gym: string | undefined): GymMenu | null {
   if (!gym) return null
   const key = gym.trim().toLowerCase()

@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { GymMenu, MenuSection } from '../lib/menu'
+import { cleanSections, type GymMenu, type MenuSection } from '../lib/menu'
 
 /** Device store for standing gym menus; same trust level as the message bus. */
 
@@ -23,6 +23,13 @@ function persist(menus: GymMenu[]): void {
 interface MenusState {
   menus: GymMenu[]
   setMenu: (gym: string, sections: MenuSection[]) => void
+  /**
+   * The gym's card as the server holds it. Separate from `setMenu` so a pull
+   * keeps the gym's own save time rather than stamping the moment this device
+   * happened to sync — a member reading "Updated today" about last week's
+   * kitchen is worse than no date at all.
+   */
+  adoptMenu: (gym: string, sections: MenuSection[], updatedAt: string) => void
   removeMenu: (gym: string) => void
   renameGym: (from: string, to: string) => void
   rehydrate: () => void
@@ -34,19 +41,15 @@ export const useMenus = create<MenusState>()((set, get) => ({
   menus: typeof localStorage === 'undefined' ? [] : load(),
 
   setMenu: (gym, sections) => {
-    const cleaned = sections
-      .map((s) => ({
-        name: s.name.trim(),
-        items: s.items
-          .map((i) => ({
-            name: i.name.trim(),
-            desc: i.desc?.trim() || undefined,
-            price: i.price?.trim() || undefined,
-          }))
-          .filter((i) => i.name),
-      }))
-      .filter((s) => s.name && s.items.length > 0)
+    const cleaned = cleanSections(sections)
     const entry: GymMenu = { gym: gym.trim(), updatedAt: new Date().toISOString(), sections: cleaned }
+    const menus = [...get().menus.filter((m) => keyOf(m.gym) !== keyOf(gym)), entry]
+    persist(menus)
+    set({ menus })
+  },
+
+  adoptMenu: (gym, sections, updatedAt) => {
+    const entry: GymMenu = { gym: gym.trim(), updatedAt, sections }
     const menus = [...get().menus.filter((m) => keyOf(m.gym) !== keyOf(gym)), entry]
     persist(menus)
     set({ menus })
