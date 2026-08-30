@@ -371,7 +371,7 @@ function RecipeForm({
               <Button variant="secondary" onClick={onClose}>
                 Cancel
               </Button>
-              <Button onClick={() => void save()} disabled={saving}>
+              <Button variant="primary" onClick={() => void save()} disabled={saving}>
                 {saving ? 'Saving…' : form.id ? 'Save changes' : 'Add recipe'}
               </Button>
             </div>

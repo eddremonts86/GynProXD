@@ -66,7 +66,7 @@ function StoryIntro({ onStart }: { onStart: () => void }) {
             <Tag tone="outline">No rest days</Tag>
           </div>
           <div>
-            <Button size="lg" onClick={onStart}>
+            <Button variant="primary" size="lg" onClick={onStart}>
               Start the climb
               <ArrowRight size={18} weight="bold" />
             </Button>
@@ -266,7 +266,7 @@ function DayCard({
       )}
 
       <div className="flex flex-wrap items-center gap-2 border-t border-line bg-surface-2 px-5 py-3">
-        <Button onClick={() => onStart(movements.map((m) => m.exerciseId))}>
+        <Button variant="primary" onClick={() => onStart(movements.map((m) => m.exerciseId))}>
           Start this day
           <ArrowRight size={16} weight="bold" />
         </Button>

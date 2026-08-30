@@ -697,7 +697,7 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
               </div>
 
               <div className="flex flex-wrap items-center gap-3">
-                <Button onClick={doPublish}>
+                <Button variant="primary" onClick={doPublish}>
                   <PaperPlaneTilt size={16} />
                   Publish
                 </Button>

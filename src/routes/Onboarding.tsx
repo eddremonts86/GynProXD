@@ -434,7 +434,13 @@ export function OnboardingPage() {
               </div>
             )}
 
-            <Button size="lg" onClick={generate} disabled={designing} className="w-full">
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={generate}
+              disabled={designing}
+              className="w-full"
+            >
               {designing ? (
                 <>
                   <CircleNotch size={18} weight="bold" className="animate-spin" />

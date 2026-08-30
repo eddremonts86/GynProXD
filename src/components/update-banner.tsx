@@ -30,6 +30,7 @@ export function UpdateBanner() {
           <span className="block text-2xs opacity-75">Your training is saved. This takes a second.</span>
         </span>
         <Button
+          variant="primary"
           size="sm"
           aria-label="Update to the new version and reload"
           onClick={applyUpdate}

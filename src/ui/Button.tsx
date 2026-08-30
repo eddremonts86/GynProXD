@@ -11,12 +11,28 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children?: ReactNode
 }
 
+/**
+ * Three rungs, and the gap between them has to be visible or the ladder does
+ * no work.
+ *
+ * `secondary` used to sit on `--surface`, which in the dark theme is #1e1e1b
+ * against a #141412 page: technically a step, visually none. It moves to
+ * `--surface-2` with the stronger hairline, so it reads as a control in both
+ * themes rather than only in the light one.
+ *
+ * `ghost` moves up from `--ink-3` to `--ink-2`. It is the quiet rung, not the
+ * unreadable one; a tertiary action still has to be findable.
+ */
 const variantMap: Record<Variant, string> = {
-  primary: 'bg-brand text-brand-ink hover:bg-brand-hover disabled:bg-line disabled:text-ink-3',
+  primary:
+    'bg-brand text-brand-ink shadow-[var(--shadow-panel)] hover:bg-brand-hover ' +
+    'disabled:bg-line disabled:text-ink-3 disabled:shadow-none',
   secondary:
-    'border border-line bg-surface text-ink shadow-[var(--shadow-panel)] hover:border-line-strong hover:bg-surface-2 disabled:opacity-45 disabled:shadow-none',
-  ghost: 'text-ink-3 hover:bg-surface-2 hover:text-ink disabled:opacity-45',
-  danger: 'bg-danger text-danger-ink hover:opacity-90 disabled:opacity-45',
+    'border border-line-strong bg-surface-2 text-ink hover:border-ink-3 hover:bg-line ' +
+    'disabled:opacity-45',
+  ghost: 'text-ink-2 hover:bg-surface-2 hover:text-ink disabled:opacity-45',
+  danger:
+    'bg-danger text-danger-ink shadow-[var(--shadow-panel)] hover:opacity-90 disabled:opacity-45 disabled:shadow-none',
   dangerQuiet: 'border border-danger/40 text-danger hover:bg-danger-soft disabled:opacity-45',
 }
 
@@ -27,8 +43,18 @@ const sizeMap: Record<Size, string> = {
   lg: 'h-[3.25rem] gap-2 px-6 text-lg',
 }
 
+/**
+ * The default is deliberately the quiet one.
+ *
+ * It used to be `primary`, so the loudest treatment landed on any button
+ * nobody had thought about — 45 of them across the app, more than a third of
+ * every button here. A screen with six solid buttons has no primary action at
+ * all. Now the solid treatment has to be asked for, which makes it a decision
+ * instead of an accident: one per surface, on the control that finishes the
+ * job the member came to do.
+ */
 export function Button({
-  variant = 'primary',
+  variant = 'secondary',
   size = 'md',
   className,
   children,

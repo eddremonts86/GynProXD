@@ -184,6 +184,7 @@ export function SetPlan({
           )}
 
           <Button
+            variant="primary"
             size="lg"
             onClick={onLog}
             disabled={!canLog}

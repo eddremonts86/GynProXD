@@ -153,7 +153,7 @@ export function PlannerPage() {
           description="Generate a periodised plan from your goal and the time you actually have, or start an empty week and fill it in yourself."
           action={
             <div className="flex flex-wrap items-center justify-center gap-2">
-              <Button onClick={() => navigate({ to: '/onboarding' })}>
+              <Button variant="primary" onClick={() => navigate({ to: '/onboarding' })}>
                 Design my programme
                 <ArrowRight size={16} weight="bold" />
               </Button>
@@ -374,6 +374,7 @@ export function PlannerPage() {
                     Add movement
                   </Button>
                   <Button
+                    variant="primary"
                     disabled={dayExercises.length === 0}
                     onClick={() => {
                       startWorkoutFromPlan(selectedPlan.id, selectedDay)
@@ -490,7 +491,7 @@ export function PlannerPage() {
                     <Button variant="ghost" onClick={() => setRenameValue(null)}>
                       Cancel
                     </Button>
-                    <Button type="submit" disabled={!renameValue?.trim()}>
+                    <Button variant="primary" type="submit" disabled={!renameValue?.trim()}>
                       Save
                     </Button>
                   </div>
@@ -571,7 +572,7 @@ export function PlannerPage() {
                   <Button variant="ghost" onClick={() => setCreating(null)}>
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={!newPlanName.trim()}>
+                  <Button variant="primary" type="submit" disabled={!newPlanName.trim()}>
                     Create
                   </Button>
                 </div>
@@ -858,7 +859,7 @@ function ExerciseConfigDialog({
               </p>
 
               <div className="flex justify-end">
-                <Button onClick={onClose}>Done</Button>
+                <Button variant="primary" onClick={onClose}>Done</Button>
               </div>
             </div>
           </>

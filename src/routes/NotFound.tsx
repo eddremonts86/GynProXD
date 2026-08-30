@@ -21,7 +21,7 @@ export function NotFoundPage() {
         description="The link may be stale, or the page may have moved. Your training data is untouched."
         action={
           <div className="flex flex-wrap justify-center gap-2">
-            <Button onClick={() => navigate({ to: '/' })}>Go to Today</Button>
+            <Button variant="primary" onClick={() => navigate({ to: '/' })}>Go to Today</Button>
             <Button variant="secondary" onClick={() => navigate({ to: '/planner' })}>
               Open planner
             </Button>
