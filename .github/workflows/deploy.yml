@@ -1,20 +1,23 @@
-# Tell Coolify that `main` moved.
+# Tell Coolify that `main` moved, and wait to hear whether it worked.
 #
-# Coolify's "Public repository" source has no webhook and never deploys on its
-# own — five merges sat undeployed for two hours before anyone noticed. This
-# closes that gap from the repository side, where the trigger is versioned and
-# visible, instead of from a setting only the server can show you.
+# Coolify's "public repository" source installs no webhook and never deploys on
+# its own — five merges once sat undeployed for two hours behind that. The
+# trigger therefore lives here, where it is versioned and reviewable.
 #
-# Four secrets, all added under Settings → Secrets and variables → Actions:
+# Secret names follow the house convention (`coolify-deploy`), which is also
+# what the values are called in `ai-os/dev-env/env-config/.env`:
 #
-#   COOLIFY_URL        the Coolify instance, e.g. https://coolify.example.com
-#   COOLIFY_TOKEN      Keys & Tokens → API tokens, with deploy permission
-#   COOLIFY_APP_UUID   the web app resource's UUID (it is in the resource URL)
-#   COOLIFY_SYNC_UUID  the PocketBase resource's UUID — optional; leave it
-#                      unset and this workflow never touches the sync server
+#   COOLIFY_API_URL    the Coolify instance
+#   COOLIFY_API_TOKEN  Keys & Tokens → API tokens, with deploy permission
+#   COOLIFY_APP_UUID   the web resource's UUID — resolve it by NAME from
+#                      GET /api/v1/applications, never from a stored value:
+#                      one server hosts many apps and a stale UUID deploys to
+#                      somebody else's production without complaining
+#   COOLIFY_SYNC_UUID  the PocketBase resource's UUID — optional; unset means
+#                      this workflow never touches the sync server
 #
-# Until they exist the job fails on purpose and says which one is missing. A
-# green tick that deployed nothing is the failure mode this is here to end.
+# Caveat worth knowing: if COOLIFY_API_URL is http:// rather than https://, the
+# bearer token travels unencrypted from GitHub's runners.
 name: Deploy
 
 on:
@@ -27,36 +30,38 @@ on:
         type: boolean
         default: false
 
-# One deploy at a time, and never cancel one that is already running: Coolify
-# is mid-build on the far side and a cancelled job would leave it there.
+permissions:
+  contents: read
+
+# One deploy at a time, and never cancel one in flight: Coolify is mid-build on
+# the far side and a cancelled job would leave it there.
 concurrency:
-  group: deploy-main
+  group: coolify-deploy-main
   cancel-in-progress: false
 
 jobs:
   deploy:
     name: Deploy to Coolify
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 25
 
     steps:
       - uses: actions/checkout@v4
         with:
           # The whole history, because a rebase-merge lands several commits in
           # one push and the migration may be in the first of them, not the
-          # last. 73 MB is nothing on a runner; getting this wrong means the
-          # sync server silently misses a migration.
+          # last. Getting this wrong means the sync server silently misses one.
           fetch-depth: 0
 
       - name: Check the secrets are set
         env:
-          COOLIFY_URL: ${{ secrets.COOLIFY_URL }}
-          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+          COOLIFY_API_URL: ${{ secrets.COOLIFY_API_URL }}
+          COOLIFY_API_TOKEN: ${{ secrets.COOLIFY_API_TOKEN }}
           COOLIFY_APP_UUID: ${{ secrets.COOLIFY_APP_UUID }}
         run: |
           missing=""
-          [ -n "$COOLIFY_URL" ] || missing="$missing COOLIFY_URL"
-          [ -n "$COOLIFY_TOKEN" ] || missing="$missing COOLIFY_TOKEN"
+          [ -n "$COOLIFY_API_URL" ] || missing="$missing COOLIFY_API_URL"
+          [ -n "$COOLIFY_API_TOKEN" ] || missing="$missing COOLIFY_API_TOKEN"
           [ -n "$COOLIFY_APP_UUID" ] || missing="$missing COOLIFY_APP_UUID"
           if [ -n "$missing" ]; then
             echo "::error::Missing repository secrets:$missing — add them under Settings → Secrets and variables → Actions."
@@ -70,9 +75,9 @@ jobs:
           FORCE_SYNC: ${{ github.event_name == 'workflow_dispatch' && inputs.sync_server }}
           BEFORE: ${{ github.event.before }}
         run: |
-          # The sync server is a separate resource and redeploying it restarts
-          # PocketBase, so it only goes when something it actually runs changed
-          # — a migration, a hook, its Dockerfile or its compose file.
+          # Redeploying the sync server restarts PocketBase under whoever is
+          # mid-sync, so it only goes when something it actually runs changed:
+          # a migration, a hook, its Dockerfile or its compose file.
           sync=false
           if [ -z "$SYNC_UUID" ]; then
             echo "COOLIFY_SYNC_UUID is not set; the sync server is never deployed from here."
@@ -86,13 +91,9 @@ jobs:
             exit 0
           fi
 
-          # The whole push, not just its last commit: `before` is where main
-          # was, and a rebase-merge can put the migration in any of the commits
-          # between there and here.
-          # Written as an `if`, not `a && b`: GitHub runs these steps under
-          # `bash -e`, where a trailing `&&` that short-circuits is a non-zero
-          # exit and kills the step. Force-pushed history is exactly when that
-          # would have fired.
+          # Written as an `if`, not `a && b`: these steps run under `bash -e`,
+          # where a trailing `&&` that short-circuits is a non-zero exit and
+          # kills the step. A force push is exactly when that would fire.
           from=""
           case "$BEFORE" in
             ''|0000000000000000000000000000000000000000) ;;
@@ -120,42 +121,63 @@ jobs:
           fi
           echo "sync=$sync" >> "$GITHUB_OUTPUT"
 
-      - name: Deploy
+      - name: Deploy, and wait for the result
         env:
-          COOLIFY_URL: ${{ secrets.COOLIFY_URL }}
-          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+          COOLIFY_API_URL: ${{ secrets.COOLIFY_API_URL }}
+          COOLIFY_API_TOKEN: ${{ secrets.COOLIFY_API_TOKEN }}
           APP_UUID: ${{ secrets.COOLIFY_APP_UUID }}
           SYNC_UUID: ${{ secrets.COOLIFY_SYNC_UUID }}
           DEPLOY_SYNC: ${{ steps.what.outputs.sync }}
         run: |
           set -euo pipefail
-          base="${COOLIFY_URL%/}"
+          base="${COOLIFY_API_URL%/}"
+          auth="Authorization: Bearer $COOLIFY_API_TOKEN"
+
+          # `/api/v1/applications/<uuid>/start` and `/api/v1/deploy?uuid=` both
+          # exist in Coolify v4 — confirmed against `php artisan route:list`.
+          # This uses the per-application route because every other app here
+          # does, and one shape across the fleet is worth more than a preference.
+          start() {
+            curl -fsS -X POST -H "$auth" -H 'Accept: application/json' \
+              --max-time 60 "$base/api/v1/applications/$1/start"
+          }
+
+          # A queued deploy is not a finished deploy. Without this the job goes
+          # green while production breaks, which is the whole failure mode.
+          wait_for() {
+            name="$1"
+            id="$2"
+            for i in $(seq 1 60); do
+              sleep 10
+              status=$(curl -fsS -H "$auth" --max-time 30 \
+                "$base/api/v1/deployments/$id" | jq -r '.status // "?"')
+              echo "  poll $i: $status"
+              case "$status" in
+                finished|success) echo "  $name is live"; return 0 ;;
+                failed|error|cancelled)
+                  echo "::error::$name deployment $status — see the Coolify deployment log"
+                  return 1 ;;
+              esac
+            done
+            echo "::error::$name deployment did not finish within 10 minutes"
+            return 1
+          }
 
           deploy() {
             name="$1"
             uuid="$2"
-            echo "→ $name ($uuid)"
-            # One call per resource rather than a comma-separated list: the
-            # status then belongs to one resource and a failure names it.
-            code=$(curl -sS -o /tmp/deploy.json -w '%{http_code}' \
-              --max-time 60 \
-              -H "Authorization: Bearer $COOLIFY_TOKEN" \
-              "$base/api/v1/deploy?uuid=$uuid&force=false")
-            cat /tmp/deploy.json
-            echo
-            if [ "$code" != "200" ] && [ "$code" != "201" ]; then
-              echo "::error::$name refused the deploy: HTTP $code"
+            echo "→ $name"
+            resp=$(start "$uuid")
+            echo "$resp"
+            id=$(printf '%s' "$resp" | jq -r '.deployment_uuid // empty')
+            if [ -z "$id" ]; then
+              echo "::error::$name: Coolify returned no deployment_uuid; nothing to wait on"
               return 1
             fi
-            echo "  queued"
+            wait_for "$name" "$id"
           }
 
           deploy "web app" "$APP_UUID"
           if [ "$DEPLOY_SYNC" = "true" ]; then
             deploy "sync server" "$SYNC_UUID"
           fi
-
-          # Coolify answers as soon as the build is queued, not when it is
-          # live. A green tick here means "asked", and the deployment log on
-          # the server is what says "done".
-          echo "::notice::Deploy queued. Coolify builds asynchronously — watch the resource's deployment log for the result."
