@@ -1,0 +1,152 @@
+# The guardian. Nothing reaches `dev` or `main` without passing through here.
+#
+# Two jobs, and the second is the one that matters. Coolify does not run
+# `pnpm build` on a Mac — it builds the Dockerfile, which runs
+# `pnpm install --frozen-lockfile` inside a clean `node:26-alpine`. A lockfile
+# that drifted, a dependency added without committing the lock, a native module
+# the host tolerated and Alpine does not: none of those show up in a host build
+# and every one of them fails the deploy. An afternoon of green local builds
+# once proved nothing at all about the image that actually ships.
+#
+# Both jobs always run and always report. A job that is conditionally skipped
+# cannot be a required status check — GitHub leaves the check pending forever
+# and the branch never becomes mergeable — so the one conditional piece here
+# (the sync-server image) is a step inside a job that always runs, not a job of
+# its own.
+name: CI
+
+on:
+  pull_request:
+    branches: [main, dev]
+  push:
+    branches: [main, dev]
+
+permissions:
+  contents: read
+
+# Unlike the deploy, a superseded run is worth cancelling: nobody cares about
+# the checks for a commit that has already been replaced.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Lint, test, typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          # Matches the Dockerfile. Node 25 stopped bundling corepack, which is
+          # why pnpm is installed outright there and pinned here.
+          version: 11
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: pnpm
+
+      # The same flag the image build uses, so lockfile drift fails here in
+      # thirty seconds instead of four minutes into a Docker build.
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm test
+
+      # `pnpm build` is `tsc -b && vite build`. The `-b` matters: this repo uses
+      # project references, and `tsc --noEmit` at the root checks nothing at all
+      # and exits 0 — which hid type errors here for a whole session.
+      - name: Typecheck and build
+        run: pnpm build
+
+  images:
+    name: Build the images Coolify ships
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Enough history to see what a pull request changed against its base.
+          fetch-depth: 0
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build the web image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          # amd64 is the runner's own architecture and the app inside is
+          # JavaScript, so the arch it is assembled on does not change what
+          # ships. The sync server below is a different story.
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,mode=max,scope=web
+
+      - name: Did the sync server change?
+        id: sync
+        env:
+          BASE: ${{ github.event.pull_request.base.ref }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          # Written as `if`, never `a && b`: these steps run under `bash -e`,
+          # where a short-circuited `&&` is a non-zero exit that kills the step.
+          from=""
+          if [ -n "$BASE" ]; then
+            git fetch --quiet origin "$BASE"
+            from="origin/$BASE"
+          else
+            case "$BEFORE" in
+              ''|0000000000000000000000000000000000000000) ;;
+              *)
+                if git rev-parse --verify "$BEFORE^{commit}" >/dev/null 2>&1; then
+                  from="$BEFORE"
+                fi
+                ;;
+            esac
+            if [ -z "$from" ] && git rev-parse --verify HEAD~1 >/dev/null 2>&1; then
+              from="HEAD~1"
+            fi
+          fi
+
+          changed=false
+          if [ -z "$from" ]; then
+            changed=true
+            echo "No base to compare against; building the sync image to be sure."
+          elif git diff --name-only "$from" HEAD | grep -q '^deploy/pocketbase/'; then
+            changed=true
+            echo "deploy/pocketbase/ changed since $from:"
+            git diff --name-only "$from" HEAD | grep '^deploy/pocketbase/' | sed 's/^/  /'
+          else
+            echo "Nothing under deploy/pocketbase/ changed since $from; skipping its image."
+          fi
+          echo "changed=$changed" >> "$GITHUB_OUTPUT"
+
+      # Only when it changed, because it needs emulation and that is not free.
+      - uses: docker/setup-qemu-action@v3
+        if: steps.sync.outputs.changed == 'true'
+        with:
+          platforms: arm64
+
+      - name: Build the sync-server image
+        if: steps.sync.outputs.changed == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: deploy/pocketbase
+          push: false
+          # arm64 on purpose. That Dockerfile downloads a PocketBase binary for
+          # $TARGETARCH, the real box is arm64, and an amd64 binary only appears
+          # to work locally because Docker Desktop emulates it. Building the
+          # architecture that ships is the only way a bad version bump shows up
+          # here rather than in production.
+          platforms: linux/arm64
+          cache-from: type=gha,scope=sync
+          cache-to: type=gha,mode=max,scope=sync
