@@ -37,7 +37,7 @@ import {
   type ResponseRow,
 } from './gym-responses'
 import type { MenuSection } from './menu'
-import type { GymMessage, TemplateKind } from './messages'
+import type { GymMessage, MessageImage, TemplateKind } from './messages'
 
 /**
  * Cross-device sync against a PocketBase instance (deploy/pocketbase).
@@ -200,17 +200,23 @@ class SyncError extends Error {
 async function request<T>(
   server: string,
   path: string,
-  options: { method?: string; token?: string; body?: unknown } = {},
+  options: { method?: string; token?: string; body?: unknown; form?: FormData } = {},
 ): Promise<T> {
   let response: Response
   try {
     response = await fetch(server + path, {
       method: options.method ?? 'GET',
       headers: {
-        'content-type': 'application/json',
+        /* A multipart body carries its own content-type, boundary and all;
+           setting one here would truncate every upload at the first part. */
+        ...(options.form ? {} : { 'content-type': 'application/json' }),
         ...(options.token ? { authorization: options.token } : {}),
       },
-      ...(options.body !== undefined ? { body: JSON.stringify(options.body) } : {}),
+      ...(options.form
+        ? { body: options.form }
+        : options.body !== undefined
+          ? { body: JSON.stringify(options.body) }
+          : {}),
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     })
   } catch {
@@ -858,9 +864,16 @@ interface WireMessage {
   kind: string
   title: string
   body: string
-  payload: Partial<GymMessage> | null
+  payload: (Partial<GymMessage> & { alts?: string[] }) | null
+  /** File names on the row; the URL is built from the collection and id. */
+  images?: string[]
   created: string
   updated: string
+}
+
+/** Where the sync server serves an uploaded file from. */
+export function fileUrl(server: string, messageId: string, name: string): string {
+  return `${server}/api/files/gym_messages/${messageId}/${encodeURIComponent(name)}`
 }
 
 const sameName = (a: string | undefined, b: string | undefined): boolean =>
@@ -875,11 +888,18 @@ async function fetchGyms(link: SyncLink): Promise<GymRow[]> {
   return list.items
 }
 
-function messageFromWire(wire: WireMessage, gymName: string): GymMessage {
+function messageFromWire(wire: WireMessage, gymName: string, server: string): GymMessage {
   /* The wire stores absent optionals as null; the local shape wants them gone. */
+  const { alts, ...rest } = wire.payload ?? {}
   const payload = Object.fromEntries(
-    Object.entries(wire.payload ?? {}).filter(([, value]) => value !== null),
+    Object.entries(rest).filter(([, value]) => value !== null),
   ) as Partial<GymMessage>
+  /* Alt text was written before PocketBase had named the files, so the two
+     lists are joined by upload order — the only thing both sides can agree on. */
+  const images = (wire.images ?? []).map((name, i) => ({
+    url: fileUrl(server, wire.id, name),
+    ...(alts?.[i] ? { alt: alts[i] } : {}),
+  }))
   return {
     audience: 'all',
     ...payload,
@@ -890,6 +910,7 @@ function messageFromWire(wire: WireMessage, gymName: string): GymMessage {
     kind: wire.kind as TemplateKind,
     title: wire.title,
     ...(wire.body ? { body: wire.body } : {}),
+    ...(images.length > 0 ? { images } : {}),
     readBy: [],
     rsvp: {},
     saved: [],
@@ -1126,7 +1147,7 @@ async function syncGymBus(profileId: string, link: SyncLink): Promise<void> {
       { token: link.token },
     )
     for (const wire of list.items) {
-      incoming.push(messageFromWire(wire, nameOf(wire.gym)))
+      incoming.push(messageFromWire(wire, nameOf(wire.gym), link.server))
       if (wire.updated > newCursor) newCursor = wire.updated
     }
     if (list.page >= list.totalPages || list.items.length === 0) break
@@ -1152,10 +1173,18 @@ async function syncGymBus(profileId: string, link: SyncLink): Promise<void> {
  * (not linked, offline, or not an operator of that gym) — the caller then
  * publishes device-only, which is the honest fallback.
  */
+export interface PublishedToServer {
+  /** Bus id for the local copy, so the later pull does not duplicate it. */
+  id: string
+  /** Where the uploaded pictures ended up, ready for the device's own copy. */
+  images: MessageImage[]
+}
+
 export async function publishToServer(
   profileId: string,
   input: PublishInput,
-): Promise<string | null> {
+  images: { file: File; alt: string }[] = [],
+): Promise<PublishedToServer | null> {
   const link = readSyncLink(profileId)
   if (!link?.token) return null
   try {
@@ -1164,29 +1193,41 @@ export async function publishToServer(
       (g) => g.operators?.includes(link.userId) && sameName(g.name, input.gym),
     )
     if (!gym) return null
-    const row = await request<{ id: string }>(link.server, '/api/collections/gym_messages/records', {
-      method: 'POST',
-      token: link.token,
-      body: {
-        gym: gym.id,
-        author: link.userId,
-        kind: input.kind,
-        title: input.title,
-        body: input.body ?? '',
-        payload: {
-          audience: input.audience,
-          event: input.event ?? null,
-          menu: input.menu ?? null,
-          offer: input.offer ?? null,
-          product: input.product ?? null,
-          challenge: input.challenge ?? null,
-          collection: input.collection ?? null,
-          banner: input.banner ?? null,
-          link: input.link ?? null,
-        },
-      },
-    })
-    return `srv-${row.id}`
+    const payload = {
+      audience: input.audience,
+      event: input.event ?? null,
+      menu: input.menu ?? null,
+      offer: input.offer ?? null,
+      product: input.product ?? null,
+      challenge: input.challenge ?? null,
+      collection: input.collection ?? null,
+      banner: input.banner ?? null,
+      link: input.link ?? null,
+      /* Index-aligned with the files below, which is the only ordering both
+         ends can agree on before the server has named them. */
+      alts: images.map((i) => i.alt.trim()),
+    }
+    const form = new FormData()
+    form.set('gym', gym.id)
+    form.set('author', link.userId)
+    form.set('kind', input.kind)
+    form.set('title', input.title)
+    form.set('body', input.body ?? '')
+    form.set('payload', JSON.stringify(payload))
+    for (const { file } of images) form.append('images', file)
+
+    const row = await request<{ id: string; images?: string[] }>(
+      link.server,
+      '/api/collections/gym_messages/records',
+      { method: 'POST', token: link.token, form },
+    )
+    return {
+      id: `srv-${row.id}`,
+      images: (row.images ?? []).map((name, i) => ({
+        url: fileUrl(link.server, row.id, name),
+        ...(payload.alts[i] ? { alt: payload.alts[i] } : {}),
+      })),
+    }
   } catch {
     return null
   }

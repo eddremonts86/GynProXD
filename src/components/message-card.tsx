@@ -8,6 +8,7 @@ import { Panel } from '@/ui/Panel'
 import { Tag } from '@/ui/Tag'
 import { Button } from '@/ui/Button'
 import { QrCode } from '@/ui/QrCode'
+import { MessageBody, MessageGallery } from '@/components/message-body'
 import { cn } from '@/lib/utils'
 
 const KIND_TONE = {
@@ -59,7 +60,15 @@ export function MessageCard({
         </span>
       </div>
 
-      {message.body && <p className="max-w-[60ch] text-sm leading-relaxed text-ink-2">{message.body}</p>}
+      {/* Picture first, then the words: the card is selling something, and the
+          photograph is the part that does the selling. */}
+      {message.images && message.images.length > 0 && (
+        /* Held to the same measure as the body: a picture running wider than
+           the sentences under it reads as two components, not one card. */
+        <MessageGallery images={message.images} className="max-w-[68ch]" />
+      )}
+
+      {message.body && <MessageBody body={message.body} />}
 
       {message.kind === 'event' && message.event && (
         <div className="flex flex-col gap-3">
