@@ -402,12 +402,57 @@
  * the rule that matters — no coloured buttons, no coloured navigation — still
  * holds.
  */
+/**
+ * The rail seam's material, drawn around a surface instead of down one: the
+ * same green-to-orange fade, masked so only the hairline edge shows rather
+ * than the whole card turning into a gradient.
+ *
+ * Reserved for the one surface on a screen that is asking for something — the
+ * account column on the landing, the local-only notice on Today. If everything
+ * gets it, it marks nothing.
+ */
+@utility aurora-edge {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(
+      160deg,
+      transparent 0%,
+      var(--aurora-green-mid) 26%,
+      var(--aurora-orange-mid) 74%,
+      transparent 100%
+    );
+    /* Punch the middle out so the gradient survives only in the padding ring. */
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+  }
+}
+
 @utility rail-edge {
   background: linear-gradient(
     to bottom,
+    /* A real transparent run at each end, not just the instant a ramp starts:
+       15% top and 15% bottom, so 30% of the seam is genuinely absent and the
+       line reads as emerging from the page rather than being cut off by it.
+       The ramps either side are 20% each, leaving the colour at full strength
+       across the middle 30%. */
     transparent 0%,
-    var(--aurora-green-mid) 24%,
-    var(--aurora-orange-mid) 76%,
+    transparent 15%,
+    var(--aurora-green-mid) 35%,
+    var(--aurora-orange-mid) 65%,
+    transparent 85%,
     transparent 100%
   );
 }

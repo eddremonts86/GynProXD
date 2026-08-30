@@ -45,9 +45,13 @@ export function GymKitchenToday({ stacked = false }: { stacked?: boolean }) {
         </Link>
       }
     >
+      {/* The one surface on Today that leads anywhere money changes hands, so
+          it takes the accent. It cannot collide with the local-only notice
+          that also carries it: that one shows only when there is no gym, and
+          this one only when there is. */}
       <Panel
         padding="none"
-        className={cn('overflow-hidden', stacked ? 'flex flex-1 flex-col' : undefined)}
+        className={cn('aurora-edge overflow-hidden', stacked ? 'flex flex-1 flex-col' : undefined)}
       >
         <div className="flex items-center gap-2.5 border-b border-line px-5 py-3.5">
           <Storefront size={18} weight="regular" className="shrink-0 text-ink-3" />

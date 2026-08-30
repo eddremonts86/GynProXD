@@ -6,7 +6,6 @@ import {
   Barbell,
   CalendarBlank,
   ChartLineUp,
-  CloudSlash,
   ForkKnife,
   Gauge,
   ListMagnifyingGlass,
@@ -21,6 +20,8 @@ import { AuthPanel } from '@/components/auth-panel'
 import { AuroraTile } from '@/ui/AuroraTile'
 import { Mark, Wordmark } from '@/components/brand'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { RailToggle } from '@/components/rail-toggle'
+import { useRailHidden } from '@/hooks/use-rail'
 import { Button } from '@/ui/Button'
 import { Tag } from '@/ui/Tag'
 import { cn } from '@/lib/utils'
@@ -45,13 +46,21 @@ import { cn } from '@/lib/utils'
  * beside them.
  */
 
-/* Two measures, not one. `SHELL` is the app shell's own, kept identical so the
-   product and its front door line up. `READ` pulls in on very wide screens for
-   the sections you read rather than scan — the rail already frames the page, so
-   the content need not touch both edges every time. Below roughly 1500px they
-   resolve to the same thing and the difference simply does not arise. */
-const SHELL = 'mx-auto w-full max-w-[120rem] px-4 md:px-8 lg:px-10'
-const READ = 'mx-auto w-full max-w-[82rem] px-4 md:px-8 lg:px-10'
+/* Two measures, and neither is the app shell's.
+   
+   The shell caps at 120rem because a dashboard has dense grids that eat the
+   width. This page has a headline and a form: at 2056px the hero was 1816px
+   wide, the estimate pair stretched to 1224px, and the headline died 600px
+   short of its own column. Copying the product's cap made the front door look
+   abandoned rather than spacious.
+   
+   So the landing takes a measure of its own. `SHELL` is what a marketing page
+   can hold; `READ` pulls in further for the sections you read rather than
+   scan. Below roughly 1500px they resolve to the same thing and the difference
+   never arises. */
+const GUTTER = 'px-4 sm:px-6 md:px-8 lg:px-10'
+const SHELL = `mx-auto w-full max-w-[90rem] ${GUTTER}`
+const READ = `mx-auto w-full max-w-[82rem] ${GUTTER}`
 
 const SECTIONS: { id: string; label: string; icon: Icon }[] = [
   { id: 'top', label: 'Overview', icon: Gauge },
@@ -59,7 +68,7 @@ const SECTIONS: { id: string; label: string; icon: Icon }[] = [
   { id: 'inside', label: "What's inside", icon: ListMagnifyingGlass },
   { id: 'library', label: 'Movements', icon: Barbell },
   { id: 'session', label: 'In the gym', icon: Timer },
-  { id: 'privacy', label: 'Privacy', icon: LockKey },
+  { id: 'privacy', label: 'Local or synced', icon: LockKey },
 ]
 
 /** A section that rises into place once, and not at all under reduced motion. */
@@ -297,6 +306,7 @@ function MilestoneLadder({ className }: { className?: string }) {
  * left edge of the content sits exactly where it sits once you are signed in.
  */
 function LandingRail({ active, onJump }: { active: string; onJump: (id: string) => void }) {
+  if (useRailHidden()) return null
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col lg:flex">
       {/* Where the rail ends and the content begins. */}
@@ -310,6 +320,7 @@ function LandingRail({ active, onJump }: { active: string; onJump: (id: string) 
           <Wordmark />
         </button>
         <Tag tone="outline">Beta</Tag>
+        <RailToggle />
       </div>
 
       <nav aria-label="Page sections" className="flex flex-1 flex-col gap-0.5 px-3">
@@ -337,7 +348,10 @@ function LandingRail({ active, onJump }: { active: string; onJump: (id: string) 
       </nav>
 
       <div className="flex flex-col gap-3 p-3">
-        <Button onClick={() => onJump('join')} className="w-full">
+        {/* Also a jump, not a conversion: on a desktop the panel it scrolls to
+            is already on screen. The one solid button on this page is that
+            panel's own submit. */}
+        <Button variant="secondary" onClick={() => onJump('join')} className="w-full">
           Open my training
           <ArrowRight size={16} weight="bold" />
         </Button>
@@ -360,7 +374,7 @@ function MobileBar({ onJump }: { onJump: (id: string) => void }) {
         </span>
         <span className="flex items-center gap-1">
           <ThemeToggle />
-          <Button size="sm" onClick={() => onJump('join')}>
+          <Button variant="primary" size="sm" onClick={() => onJump('join')}>
             Open my training
           </Button>
         </span>
@@ -371,6 +385,7 @@ function MobileBar({ onJump }: { onJump: (id: string) => void }) {
 
 export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
   const reduceMotion = useReducedMotion()
+  const railHidden = useRailHidden()
   const [active, setActive] = useState('top')
 
   /* Which section the rail should light up. An observer rather than a scroll
@@ -418,9 +433,10 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
   return (
     <div className="select-text min-h-[100dvh] bg-bg">
       <LandingRail active={active} onJump={jump} />
+      <RailToggle floating />
       <MobileBar onJump={jump} />
 
-      <main className="lg:pl-60">
+      <main className={railHidden ? undefined : 'lg:pl-60'}>
         {/* -------------------------------------------------------------- Hero */}
         <section id="top" className="relative overflow-hidden scroll-mt-4">
           <ScaleGround className="top-32 -right-[14%] hidden w-[40vw] 2xl:flex" />
@@ -428,7 +444,7 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
           <div
             className={cn(
               SHELL,
-              'relative grid gap-12 pt-10 pb-16 md:pt-16 md:pb-20',
+              'relative grid gap-12 pt-8 pb-12 sm:pt-10 sm:pb-16 md:pt-16 md:pb-20',
               'xl:grid-cols-[minmax(0,1fr)_minmax(23rem,27rem)] xl:items-start xl:gap-14 2xl:gap-20',
             )}
           >
@@ -446,12 +462,16 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
                 </Lead>
               </div>
 
+            {/* Neither of these completes anything — one scrolls to the form
+                that is already on screen, the other further down the page. The
+                solid treatment belongs to the panel's own submit, so both step
+                down a rung and the eye lands where the work happens. */}
               <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
-                <Button size="lg" onClick={() => jump('join')}>
+                <Button variant="secondary" size="lg" onClick={() => jump('join')}>
                   Start on this device
                   <ArrowRight size={18} weight="bold" />
                 </Button>
-                <Button variant="secondary" size="lg" onClick={() => jump('estimate')}>
+                <Button variant="ghost" size="lg" onClick={() => jump('estimate')}>
                   See how it plans
                   <ArrowDown size={18} weight="bold" />
                 </Button>
@@ -466,7 +486,7 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
               aria-label="Open your training"
               className="scroll-mt-24 xl:sticky xl:top-6"
             >
-              <AuthPanel idPrefix="hero" onUnlocked={onUnlocked} />
+              <AuthPanel idPrefix="hero" onUnlocked={onUnlocked} accent />
               <p className="mt-4 text-center text-xs leading-relaxed text-ink-3">
                 Local first: nothing leaves this device unless you turn on sync in Settings. A
                 forgotten passphrase cannot be recovered.
@@ -478,18 +498,18 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
         {/* ------------------------------------------------------------- Facts */}
         <Reveal>
           <div className={cn(SHELL, 'py-4')}>
-            <dl className="grid grid-cols-2 gap-x-8 gap-y-10 border-y border-line py-10 md:grid-cols-4 md:py-12">
+            <dl className="grid grid-cols-2 gap-x-6 gap-y-8 border-y border-line py-8 sm:gap-x-8 sm:gap-y-10 sm:py-10 md:grid-cols-4 md:py-12">
               {FACTS.map((fact) => (
-                <div key={fact.label} className="flex flex-col gap-2">
+                <div key={fact.label} className="flex flex-col items-center gap-2 text-center">
                   <dt className="sr-only">{fact.label}</dt>
-                  <dd className="flex flex-col gap-2">
+                  <dd className="flex flex-col items-center gap-2">
                     <span className="flex items-baseline gap-2">
                       <span className="num text-4xl leading-none font-semibold text-ink md:text-5xl">
                         {fact.figure}
                       </span>
                       {fact.unit && <span className="text-base text-ink-3">{fact.unit}</span>}
                     </span>
-                    <span className="max-w-[24ch] text-base leading-snug text-ink-3">
+                    <span className="max-w-[24ch] text-base leading-snug text-balance text-ink-3">
                       {fact.label}
                     </span>
                   </dd>
@@ -504,7 +524,7 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
           <div
             className={cn(
               READ,
-              'grid gap-12 py-20 md:py-28',
+              'grid gap-10 sm:gap-12 py-14 sm:py-20 md:py-28',
               'lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center lg:gap-20',
             )}
           >
@@ -564,7 +584,7 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
 
         {/* ------------------------------------------------------------ Inside */}
         <section id="inside" className="scroll-mt-4">
-          <div className={cn(SHELL, 'flex flex-col gap-12 py-20 md:py-28')}>
+          <div className={cn(SHELL, 'flex flex-col gap-10 sm:gap-12 py-14 sm:py-20 md:py-28')}>
             <Reveal className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between md:gap-20">
               <SectionHeading className="md:max-w-[24ch]">
                 Nine screens, and none of them sell you anything.
@@ -599,7 +619,7 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
           <div
             className={cn(
               SHELL,
-              'grid gap-12 py-20 md:py-28',
+              'grid gap-10 sm:gap-12 py-14 sm:py-20 md:py-28',
               'lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-center lg:gap-20',
             )}
           >
@@ -650,7 +670,7 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
           <div
             className={cn(
               READ,
-              'grid gap-12 py-20 md:py-28',
+              'grid gap-10 sm:gap-12 py-14 sm:py-20 md:py-28',
               'lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-20',
             )}
           >
@@ -701,51 +721,72 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
 
         {/* ----------------------------------------------------------- Privacy */}
         <section id="privacy" className="scroll-mt-4 bg-surface">
-          <div
-            className={cn(
-              READ,
-              'grid gap-12 py-20 md:py-28',
-              'lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-20',
-            )}
-          >
-            <Reveal className="flex flex-col gap-6">
-              <SectionHeading>Your training does not need a server.</SectionHeading>
-              <Lead>
-                Every profile on this device is encrypted at rest under its own passphrase. Sync is
-                off until you turn it on, and when you do the server receives rows it cannot read —
-                the key never leaves your device, which is also why a forgotten passphrase is final.
+          <div className={cn(READ, 'flex flex-col gap-10 py-14 sm:gap-12 sm:py-20 md:py-28')}>
+            <Reveal className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between md:gap-20">
+              <SectionHeading>Local is the floor, not the ceiling.</SectionHeading>
+              <Lead className="md:max-w-[40ch] md:text-right">
+                Training with no account is a finished product, not a trial. It also has real
+                edges. Both halves, plainly.
               </Lead>
             </Reveal>
 
-            <Reveal delay={0.08} className="grid gap-4 sm:grid-cols-2">
+            {/*
+              A comparison rather than a pitch. The page has spent itself arguing
+              that this app does not lie to you, so the moment it wants something
+              it has to keep doing that: the left column is what you already have
+              and keep, the right is what an account adds, and the cost of staying
+              left is stated rather than skipped.
+            */}
+            <Reveal delay={0.08} className="grid gap-4 lg:grid-cols-2">
               {[
                 {
-                  icon: LockKey,
-                  title: 'AES-GCM at rest',
-                  body: 'The passphrase derives the key. There is no reset and no back door.',
+                  eyebrow: 'On this device',
+                  title: 'Yours, and only yours',
+                  loud: false,
+                  rows: [
+                    ['Encrypted at rest', 'The passphrase derives the key. No back door.'],
+                    ['Works with the signal off', 'Installable. A basement changes nothing.'],
+                    ['The library, the planner, the session', 'Free, and it stays free.'],
+                    ['Forget the passphrase and it is gone', 'No reset exists. Nobody can open it, us included.'],
+                    ['One browser, one device', 'Clear the site data and the training goes with it.'],
+                    ['No gym can reach you', 'Membership is granted server-side, so it needs an account.'],
+                  ],
                 },
                 {
-                  icon: CloudSlash,
-                  title: 'Offline by default',
-                  body: 'Installable as an app. A dead signal in the basement changes nothing.',
+                  eyebrow: 'With an account',
+                  title: 'The same training, with a way back',
+                  loud: true,
+                  rows: [
+                    ['A recovery code', 'The one thing that can re-open your training after a forgotten password.'],
+                    ['Every device you sign into', 'The phone in the gym and the laptop at home, same plan.'],
+                    ['Your gym reaches you', "Events to answer, offers to redeem, today's kitchen card with prices."],
+                    ['Their challenges and notices', 'The thirty-day boards your gym runs, and what they publish.'],
+                    ['Still sealed', 'The server stores rows it cannot read. The key never leaves your device.'],
+                    ['Still free', 'Gyms pay for their side. Members never do.'],
+                  ],
                 },
-                {
-                  icon: Megaphone,
-                  title: 'Sync when you ask',
-                  body: 'Turn it on and your training follows you onto the next device. Leave it off and nothing ever moves.',
-                  wide: true,
-                },
-              ].map((item) => (
+              ].map((col) => (
                 <div
-                  key={item.title}
+                  key={col.eyebrow}
                   className={cn(
-                    'flex flex-col gap-2.5 rounded-xl bg-bg p-6 shadow-[var(--shadow-panel)]',
-                    item.wide && 'sm:col-span-2',
+                    'flex flex-col gap-5 rounded-xl bg-bg p-6 md:p-8',
+                    col.loud
+                      ? 'aurora-edge shadow-[var(--shadow-tile)]'
+                      : 'shadow-[var(--shadow-panel)]',
                   )}
                 >
-                  <item.icon size={22} weight="regular" className="text-ink-3" />
-                  <span className="text-lg font-semibold text-ink">{item.title}</span>
-                  <Body className={item.wide ? 'max-w-[60ch]' : undefined}>{item.body}</Body>
+                  <div className="flex flex-col gap-1.5">
+                    <Label>{col.eyebrow}</Label>
+                    <span className="text-xl font-semibold text-ink">{col.title}</span>
+                  </div>
+                  <dl className="flex flex-col divide-y divide-line">
+                    {col.rows.map(([term, detail]) => (
+                      <div key={term} className="flex flex-col gap-1 py-3 first:pt-0 last:pb-0">
+                        <dt className="text-base font-medium text-ink">{term}</dt>
+                        <dd className="max-w-[46ch] text-sm leading-relaxed text-ink-3">{detail}</dd>
+                      </div>
+                    ))}
+                  </dl>
                 </div>
               ))}
             </Reveal>
@@ -759,7 +800,7 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
           <div
             className={cn(
               SHELL,
-              'relative grid gap-12 py-20 md:py-28',
+              'relative grid gap-10 sm:gap-12 py-14 sm:py-20 md:py-28',
               'xl:grid-cols-[minmax(0,1fr)_minmax(23rem,27rem)] xl:items-center xl:gap-20',
             )}
           >
@@ -800,7 +841,7 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
           <div
             className={cn(
               SHELL,
-              'flex flex-col gap-6 py-10 md:flex-row md:items-center md:justify-between',
+              'flex flex-col gap-6 py-8 sm:py-10 md:flex-row md:items-center md:justify-between',
             )}
           >
             <span className="flex items-center gap-3">

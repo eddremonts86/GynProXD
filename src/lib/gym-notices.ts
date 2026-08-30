@@ -32,6 +32,62 @@ export function dismissedNotices(profileId: string): string[] {
   return readDismissed()[profileId] ?? []
 }
 
+/**
+ * Prompts are snoozed, not dismissed.
+ *
+ * A gym broadcast is a one-off: wave it off and it is gone, which is right. A
+ * standing prompt — "your training only lives in this browser" — is a fact
+ * about the account that stays true until it is fixed, and a single tap used
+ * to silence it for good. That is not restraint, it is losing the thread:
+ * the member keeps the risk and we stop mentioning it.
+ *
+ * So it comes back, on a cadence slow enough not to nag.
+ */
+const SNOOZE_KEY = 'forma-prompt-snoozed'
+export const SNOOZE_DAYS = 21
+
+type SnoozeMap = Record<string, Record<string, string>>
+
+function readSnoozed(): SnoozeMap {
+  try {
+    const raw = localStorage.getItem(SNOOZE_KEY)
+    if (!raw) return {}
+    const parsed = JSON.parse(raw) as unknown
+    return parsed && typeof parsed === 'object' ? (parsed as SnoozeMap) : {}
+  } catch {
+    return {}
+  }
+}
+
+function daysBetween(fromIso: string, toIso: string): number {
+  const from = Date.parse(`${fromIso}T00:00:00.000Z`)
+  const to = Date.parse(`${toIso}T00:00:00.000Z`)
+  if (Number.isNaN(from) || Number.isNaN(to)) return Number.POSITIVE_INFINITY
+  return Math.floor((to - from) / 86_400_000)
+}
+
+export function snoozePrompt(profileId: string, promptId: string, todayIso: string): void {
+  try {
+    const all = readSnoozed()
+    const mine = { ...(all[profileId] ?? {}), [promptId]: todayIso }
+    localStorage.setItem(SNOOZE_KEY, JSON.stringify({ ...all, [profileId]: mine }))
+  } catch {
+    // Private mode: the prompt simply returns on the next load.
+  }
+}
+
+/** True while the snooze still holds. A clock moved backwards un-snoozes. */
+export function promptIsSnoozed(
+  profileId: string,
+  promptId: string,
+  todayIso: string,
+): boolean {
+  const since = readSnoozed()[profileId]?.[promptId]
+  if (!since) return false
+  const age = daysBetween(since, todayIso)
+  return age >= 0 && age < SNOOZE_DAYS
+}
+
 export function dismissNotice(profileId: string, messageId: string): void {
   try {
     const all = readDismissed()

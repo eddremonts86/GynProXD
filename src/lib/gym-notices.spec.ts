@@ -1,5 +1,13 @@
-import { describe, expect, it } from 'vitest'
-import { eventIsUpcoming, noticesForToday, offerIsLive, productIsFresh } from './gym-notices'
+import { beforeEach, describe, expect, it } from 'vitest'
+import {
+  SNOOZE_DAYS,
+  eventIsUpcoming,
+  noticesForToday,
+  offerIsLive,
+  productIsFresh,
+  promptIsSnoozed,
+  snoozePrompt,
+} from './gym-notices'
 import type { GymMessage } from './messages'
 
 const TODAY = '2026-08-30'
@@ -125,5 +133,57 @@ describe('picking at most one of each', () => {
 
   it('ignores an announcement, which has nothing to act on', () => {
     expect(noticesForToday([msg({ kind: 'announcement' })], member, TODAY)).toEqual({})
+  })
+})
+
+
+/**
+ * The suite runs on plain Node, which has no localStorage; the module under
+ * test swallows that in a try/catch, so without a stand-in these assertions
+ * would quietly pass against a no-op. An in-memory double keeps them honest.
+ */
+function useMemoryStorage(): void {
+  const store = new Map<string, string>()
+  Object.defineProperty(globalThis, 'localStorage', {
+    configurable: true,
+    value: {
+      getItem: (k: string) => store.get(k) ?? null,
+      setItem: (k: string, v: string) => void store.set(k, String(v)),
+      removeItem: (k: string) => void store.delete(k),
+      clear: () => store.clear(),
+    },
+  })
+}
+
+describe('a standing prompt comes back', () => {
+  const ME = 'p1'
+  const PROMPT = 'prompt:no-gym'
+
+  beforeEach(useMemoryStorage)
+
+  it('is not snoozed until it is waved off', () => {
+    expect(promptIsSnoozed(ME, PROMPT, TODAY)).toBe(false)
+  })
+
+  it('stays quiet the day it is waved off', () => {
+    snoozePrompt(ME, PROMPT, TODAY)
+    expect(promptIsSnoozed(ME, PROMPT, TODAY)).toBe(true)
+  })
+
+  it('stays quiet the day before the snooze runs out', () => {
+    snoozePrompt(ME, PROMPT, '2026-08-01')
+    const lastQuietDay = '2026-08-21' // 20 days on, with SNOOZE_DAYS at 21
+    expect(SNOOZE_DAYS).toBe(21)
+    expect(promptIsSnoozed(ME, PROMPT, lastQuietDay)).toBe(true)
+  })
+
+  it('returns once the snooze is over', () => {
+    snoozePrompt(ME, PROMPT, '2026-08-01')
+    expect(promptIsSnoozed(ME, PROMPT, '2026-08-22')).toBe(false)
+  })
+
+  it('is snoozed per profile, not per device', () => {
+    snoozePrompt(ME, PROMPT, TODAY)
+    expect(promptIsSnoozed('p2', PROMPT, TODAY)).toBe(false)
   })
 })
