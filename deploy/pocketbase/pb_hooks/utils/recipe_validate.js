@@ -46,14 +46,22 @@ function validateRecipe(e) {
   const hasUrl = (record.getString('imageUrl') || '').trim() !== ''
   if (!hasStored && !hasPending && !hasUrl) fail('A recipe needs a photo.')
 
-  const positive = (field, label, max) => {
+  const imported = record.getString('provider') === 'pd'
+
+  const bounded = (field, label, max, mustExceedZero) => {
     const value = record.getFloat(field)
-    if (!(value > 0)) fail(label + ' must be a number above zero.')
+    if (mustExceedZero && !(value > 0)) fail(label + ' must be a number above zero.')
+    if (value < 0) fail(label + ' cannot be negative.')
     if (value > max) fail(label + ' looks wrong: ' + value + '.')
   }
-  positive('kcal', 'Energy per serving', 5000)
-  positive('proteinG', 'Protein per serving', 500)
-  positive('servings', 'Servings', 100)
+  bounded('kcal', 'Energy per serving', 5000, true)
+  /* Protein may honestly be zero: a salsa, a dressing, a fruit slush. Only the
+     energy has to be a real number for the plan maths to mean anything. */
+  bounded('proteinG', 'Protein per serving', 500, false)
+  /* The archive does not always state a yield. Our own recipes must, because
+     whoever writes one knows it; an import is taken as it was published, and
+     the portion maths already caps at three servings when it is unknown. */
+  bounded('servings', 'Servings', 100, !imported)
 
   const list = (field, label, min) => {
     let parsed

@@ -66,6 +66,23 @@ function decode(s) {
     .trim()
 }
 
+/**
+ * Every list item inside one Drupal field block. Recipes with sub-components
+ * ("Pancakes", then "Sauce") split their items across several lists, and the
+ * first of those lists is sometimes empty, so taking a single <ul> loses them.
+ * The block runs from the field marker to wherever the next field begins.
+ */
+function fieldItems(html, name) {
+  const start = html.search(new RegExp(`field--name-field-(?:mp-)?${name}`))
+  if (start === -1) return []
+  const rest = html.slice(start + 1)
+  const next = rest.search(/field--name-field-/)
+  const block = next === -1 ? rest : rest.slice(0, next)
+  return [...block.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)]
+    .map((m) => decode(m[1]))
+    .filter(Boolean)
+}
+
 /** JSON-LD Recipe first; the Drupal field markup as fallback. */
 function parsePage(html, sourceUrl) {
   let ld = null
@@ -91,16 +108,8 @@ function parsePage(html, sourceUrl) {
 
   let directions = ld ? listFrom(ld.recipeInstructions) : []
   let ingredients = ld ? listFrom(ld.recipeIngredient) : []
-  if (directions.length === 0) {
-    const block = (html.match(/field--name-field-instructions[\s\S]*?<ol[^>]*>([\s\S]*?)<\/ol>/) ||
-      [])[1]
-    if (block) directions = [...block.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)].map((m) => decode(m[1]))
-  }
-  if (ingredients.length === 0) {
-    const block = (html.match(/field--name-field-ingredients[\s\S]*?<ul[^>]*>([\s\S]*?)<\/ul>/) ||
-      [])[1]
-    if (block) ingredients = [...block.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)].map((m) => decode(m[1]))
-  }
+  if (directions.length === 0) directions = fieldItems(html, 'instructions')
+  if (ingredients.length === 0) ingredients = fieldItems(html, 'ingredients')
   if (directions.length === 0) return null
 
   const nutriNum = (label) => {
