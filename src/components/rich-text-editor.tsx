@@ -102,15 +102,23 @@ export function RichTextEditor({
   const [block, setBlock] = useState('p')
   const [highlighted, setHighlighted] = useState(false)
 
-  /* Seeded once, and again only when the value is replaced from outside —
-     publishing clears the composer, and the editor has to follow. */
+  /**
+   * Seeded once, and again whenever the value is replaced from outside —
+   * publishing clears the composer, and the editor has to follow.
+   *
+   * "From outside" is decided by comparing against what this editor last
+   * emitted, not by whether it has focus. Guarding on focus looks equivalent
+   * and is not: a reset that lands while the caret is still in the box is
+   * exactly the case that matters, and it was being skipped, leaving the
+   * published text sitting in a composer that believed it was empty.
+   */
+  const lastEmitted = useRef(value)
   useEffect(() => {
     const el = box.current
-    if (!el) return
-    if (el.innerHTML !== value && document.activeElement !== el) {
-      el.innerHTML = value
-      setEmpty(isEmptyHtml(value))
-    }
+    if (!el || value === lastEmitted.current) return
+    el.innerHTML = value
+    lastEmitted.current = value
+    setEmpty(isEmptyHtml(value))
   }, [value])
 
   /**
@@ -163,6 +171,7 @@ export function RichTextEditor({
        script tag if a future renderer ever forgets. */
     const html = sanitizeHtml(el.innerHTML)
     setEmpty(isEmptyHtml(html))
+    lastEmitted.current = html
     onChange(html)
     readSelection()
   }
