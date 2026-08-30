@@ -158,7 +158,7 @@ export function SyncSection() {
                   hint="The session expired; signing in resumes sync. Nothing about your data changed."
                 />
               </div>
-              <Button type="submit" disabled={busy || !reauthPassword}>
+              <Button variant="primary" type="submit" disabled={busy || !reauthPassword}>
                 Sign in
               </Button>
             </form>
@@ -166,7 +166,9 @@ export function SyncSection() {
         </div>
       ) : (
         <div className="flex flex-wrap gap-2">
-          <Button onClick={() => setDialog('create')}>Create sync account</Button>
+          <Button variant="primary" onClick={() => setDialog('create')}>
+            Create sync account
+          </Button>
           <Button variant="secondary" onClick={() => setDialog('link')}>
             I already have one
           </Button>
@@ -306,7 +308,7 @@ function CreateAccountDialog({
               />
             </div>
           </Collapse>
-          <Button type="submit" disabled={busy || !email || !password}>
+          <Button variant="primary" type="submit" disabled={busy || !email || !password}>
             {busy ? 'Creating…' : 'Create and upload'}
           </Button>
         </form>
@@ -394,7 +396,7 @@ function LinkAccountDialog({
               />
             </div>
           </Collapse>
-          <Button type="submit" disabled={busy || !email || !password}>
+          <Button variant="primary" type="submit" disabled={busy || !email || !password}>
             {busy ? 'Linking…' : 'Link and merge'}
           </Button>
         </form>

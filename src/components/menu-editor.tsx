@@ -188,7 +188,7 @@ export function MenuEditor({ gym, profileId }: { gym: string; profileId: string 
           </Button>
 
           <div className="flex flex-wrap items-center gap-3 border-t border-line pt-4">
-            <Button onClick={save} disabled={!hasContent}>
+            <Button variant="primary" onClick={save} disabled={!hasContent}>
               Save menu
             </Button>
             {saved && (

@@ -514,7 +514,7 @@ function AddExerciseDialog({
             <Button variant="ghost" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={!name.trim()}>
+            <Button variant="primary" type="submit" disabled={!name.trim()}>
               Add movement
             </Button>
           </div>

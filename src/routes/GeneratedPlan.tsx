@@ -89,7 +89,11 @@ export function GeneratedPlanPage() {
         <EmptyState
           title="This programme no longer exists"
           description="It was deleted, or the link points at a programme from a different browser."
-          action={<Button onClick={() => navigate({ to: '/onboarding' })}>Design my programme</Button>}
+          action={
+            <Button variant="primary" onClick={() => navigate({ to: '/onboarding' })}>
+              Design my programme
+            </Button>
+          }
         />
       </div>
     )
@@ -150,7 +154,7 @@ export function GeneratedPlanPage() {
                 <Trash size={18} />
               </IconButton>
             )}
-            <Button onClick={save}>
+            <Button variant="primary" onClick={save}>
               Copy to planner
               <ArrowRight size={16} weight="bold" />
             </Button>
@@ -338,6 +342,7 @@ export function GeneratedPlanPage() {
                   Cancel
                 </Button>
                 <Button
+                  variant="primary"
                   disabled={designing}
                   onClick={() => {
                     if (designing) return

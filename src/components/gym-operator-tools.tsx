@@ -55,7 +55,12 @@ export function GymRequests() {
                 </span>
                 <span className="block truncate text-2xs text-ink-3">{r.memberEmail}</span>
               </span>
-              <Button size="sm" onClick={() => void decide(r.id, true)} disabled={busy === r.id}>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => void decide(r.id, true)}
+                disabled={busy === r.id}
+              >
                 <Check size={15} weight="bold" />
                 Approve
               </Button>
@@ -132,7 +137,7 @@ export function GymJoinCode() {
             error={error ?? undefined}
           />
         </div>
-        <Button onClick={() => void save()} disabled={busy}>
+        <Button variant="primary" onClick={() => void save()} disabled={busy}>
           {saved && saved === code.trim() ? 'Saved' : 'Set code'}
         </Button>
       </div>

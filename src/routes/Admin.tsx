@@ -177,7 +177,7 @@ function AdminDesk({ selfId }: { selfId: string }) {
                       />
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button type="submit" size="sm" disabled={!editName.trim()}>
+                      <Button variant="primary" type="submit" size="sm" disabled={!editName.trim()}>
                         Save
                       </Button>
                       <Button variant="ghost" size="sm" onClick={() => setEditingId(null)}>
@@ -293,7 +293,7 @@ function AdminDesk({ selfId }: { selfId: string }) {
                         autoFocus
                         className="h-9"
                       />
-                      <Button type="submit" size="sm" disabled={!renameTo.trim()}>
+                      <Button variant="primary" type="submit" size="sm" disabled={!renameTo.trim()}>
                         Rename
                       </Button>
                       <Button variant="ghost" size="sm" onClick={() => setRenaming(null)}>

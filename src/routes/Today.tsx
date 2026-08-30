@@ -410,6 +410,7 @@ function TodayOverview({
               </IconButton>
               <IntensityPicker value={intensity} onChange={setIntensity} />
               <Button
+                variant="primary"
                 size="lg"
                 onClick={() => startWorkoutFromPlan(primary.planId, day, intensity)}
                 className="w-full sm:w-auto"
@@ -505,7 +506,7 @@ function TodayOverview({
         what to eat. Items sit to the top and take the height they need; the two
         spotlights opt back into stretching so they match each other.
       */}
-      <div className="grid items-start gap-4 lg:grid-cols-3 lg:gap-6">
+      <div className="grid items-start gap-4 lg:grid-cols-3 lg:gap-6 2xl:gap-8">
         {/* The member's own column: what to do next, and where they stand.
             Together they fill a column that either one alone left half empty. */}
         <div className="flex flex-col gap-6">
@@ -536,7 +537,7 @@ function TodayOverview({
                 </p>
                 <div className="flex flex-col gap-3">
                   <div className="flex flex-wrap gap-2">
-                    <Button onClick={() => navigate({ to: '/onboarding' })}>
+                    <Button variant="primary" onClick={() => navigate({ to: '/onboarding' })}>
                       Design my programme
                       <ArrowRight size={18} weight="bold" />
                     </Button>
@@ -636,7 +637,7 @@ function WeighInDialog({
             <Button variant="ghost" onClick={() => close(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={!(value > 0)}>
+            <Button variant="primary" type="submit" disabled={!(value > 0)}>
               Save
             </Button>
           </div>
@@ -996,7 +997,7 @@ function ActiveSession({
           title="Empty session"
           description="Add the first movement and start logging."
           action={
-            <Button onClick={() => setPickerOpen(true)}>
+            <Button variant="primary" onClick={() => setPickerOpen(true)}>
               <Plus size={16} weight="bold" />
               Add movement
             </Button>

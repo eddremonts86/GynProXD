@@ -439,7 +439,7 @@ function ProfileIdentityPanel() {
       </div>
 
       <div className="flex items-center gap-3">
-        <Button onClick={save} disabled={!name.trim()}>
+        <Button variant="primary" onClick={save} disabled={!name.trim()}>
           Save details
         </Button>
         {saved && (

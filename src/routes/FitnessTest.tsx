@@ -137,7 +137,7 @@ export function FitnessTestPage() {
       </Section>
 
       <div className="flex flex-wrap items-center gap-3">
-        <Button disabled={!complete} onClick={save}>
+        <Button variant="primary" disabled={!complete} onClick={save}>
           Score my test
         </Button>
         {!complete && (

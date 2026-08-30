@@ -184,7 +184,11 @@ export function GymMembership() {
                     hint="If your gym gave you one, it joins you instantly."
                   />
                 </div>
-                <Button onClick={() => void doJoinCode()} disabled={busy || !code.trim()}>
+                <Button
+                  variant="primary"
+                  onClick={() => void doJoinCode()}
+                  disabled={busy || !code.trim()}
+                >
                   Join
                 </Button>
               </div>
