@@ -1,0 +1,161 @@
+# Tell Coolify that `main` moved.
+#
+# Coolify's "Public repository" source has no webhook and never deploys on its
+# own — five merges sat undeployed for two hours before anyone noticed. This
+# closes that gap from the repository side, where the trigger is versioned and
+# visible, instead of from a setting only the server can show you.
+#
+# Four secrets, all added under Settings → Secrets and variables → Actions:
+#
+#   COOLIFY_URL        the Coolify instance, e.g. https://coolify.example.com
+#   COOLIFY_TOKEN      Keys & Tokens → API tokens, with deploy permission
+#   COOLIFY_APP_UUID   the web app resource's UUID (it is in the resource URL)
+#   COOLIFY_SYNC_UUID  the PocketBase resource's UUID — optional; leave it
+#                      unset and this workflow never touches the sync server
+#
+# Until they exist the job fails on purpose and says which one is missing. A
+# green tick that deployed nothing is the failure mode this is here to end.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      sync_server:
+        description: 'Also redeploy the sync server (PocketBase)'
+        type: boolean
+        default: false
+
+# One deploy at a time, and never cancel one that is already running: Coolify
+# is mid-build on the far side and a cancelled job would leave it there.
+concurrency:
+  group: deploy-main
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to Coolify
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The whole history, because a rebase-merge lands several commits in
+          # one push and the migration may be in the first of them, not the
+          # last. 73 MB is nothing on a runner; getting this wrong means the
+          # sync server silently misses a migration.
+          fetch-depth: 0
+
+      - name: Check the secrets are set
+        env:
+          COOLIFY_URL: ${{ secrets.COOLIFY_URL }}
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+          COOLIFY_APP_UUID: ${{ secrets.COOLIFY_APP_UUID }}
+        run: |
+          missing=""
+          [ -n "$COOLIFY_URL" ] || missing="$missing COOLIFY_URL"
+          [ -n "$COOLIFY_TOKEN" ] || missing="$missing COOLIFY_TOKEN"
+          [ -n "$COOLIFY_APP_UUID" ] || missing="$missing COOLIFY_APP_UUID"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository secrets:$missing — add them under Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
+      - name: Work out what needs deploying
+        id: what
+        env:
+          SYNC_UUID: ${{ secrets.COOLIFY_SYNC_UUID }}
+          FORCE_SYNC: ${{ github.event_name == 'workflow_dispatch' && inputs.sync_server }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          # The sync server is a separate resource and redeploying it restarts
+          # PocketBase, so it only goes when something it actually runs changed
+          # — a migration, a hook, its Dockerfile or its compose file.
+          sync=false
+          if [ -z "$SYNC_UUID" ]; then
+            echo "COOLIFY_SYNC_UUID is not set; the sync server is never deployed from here."
+            echo "sync=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ "$FORCE_SYNC" = "true" ]; then
+            echo "Sync server requested by hand."
+            echo "sync=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # The whole push, not just its last commit: `before` is where main
+          # was, and a rebase-merge can put the migration in any of the commits
+          # between there and here.
+          # Written as an `if`, not `a && b`: GitHub runs these steps under
+          # `bash -e`, where a trailing `&&` that short-circuits is a non-zero
+          # exit and kills the step. Force-pushed history is exactly when that
+          # would have fired.
+          from=""
+          case "$BEFORE" in
+            ''|0000000000000000000000000000000000000000) ;;
+            *)
+              if git rev-parse --verify "$BEFORE^{commit}" >/dev/null 2>&1; then
+                from="$BEFORE"
+              fi
+              ;;
+          esac
+          if [ -z "$from" ] && git rev-parse --verify HEAD~1 >/dev/null 2>&1; then
+            from="HEAD~1"
+          fi
+
+          if [ -z "$from" ]; then
+            # Nothing to compare against: deploying is the safe side of a guess
+            # whose other side is a member hitting a collection that is not there.
+            sync=true
+            echo "No earlier commit to compare against; deploying the sync server too."
+          elif git diff --name-only "$from" HEAD | grep -q '^deploy/pocketbase/'; then
+            sync=true
+            echo "deploy/pocketbase/ changed between $from and HEAD:"
+            git diff --name-only "$from" HEAD | grep '^deploy/pocketbase/' | sed 's/^/  /'
+          else
+            echo "Nothing under deploy/pocketbase/ changed since $from; leaving the sync server alone."
+          fi
+          echo "sync=$sync" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy
+        env:
+          COOLIFY_URL: ${{ secrets.COOLIFY_URL }}
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+          APP_UUID: ${{ secrets.COOLIFY_APP_UUID }}
+          SYNC_UUID: ${{ secrets.COOLIFY_SYNC_UUID }}
+          DEPLOY_SYNC: ${{ steps.what.outputs.sync }}
+        run: |
+          set -euo pipefail
+          base="${COOLIFY_URL%/}"
+
+          deploy() {
+            name="$1"
+            uuid="$2"
+            echo "→ $name ($uuid)"
+            # One call per resource rather than a comma-separated list: the
+            # status then belongs to one resource and a failure names it.
+            code=$(curl -sS -o /tmp/deploy.json -w '%{http_code}' \
+              --max-time 60 \
+              -H "Authorization: Bearer $COOLIFY_TOKEN" \
+              "$base/api/v1/deploy?uuid=$uuid&force=false")
+            cat /tmp/deploy.json
+            echo
+            if [ "$code" != "200" ] && [ "$code" != "201" ]; then
+              echo "::error::$name refused the deploy: HTTP $code"
+              return 1
+            fi
+            echo "  queued"
+          }
+
+          deploy "web app" "$APP_UUID"
+          if [ "$DEPLOY_SYNC" = "true" ]; then
+            deploy "sync server" "$SYNC_UUID"
+          fi
+
+          # Coolify answers as soon as the build is queued, not when it is
+          # live. A green tick here means "asked", and the deployment log on
+          # the server is what says "done".
+          echo "::notice::Deploy queued. Coolify builds asynchronously — watch the resource's deployment log for the result."
