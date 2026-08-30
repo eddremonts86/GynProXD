@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import type { GymMessage, TemplateKind, MenuCourse } from '../lib/messages'
+import { applyResponses, markResponseDirty, type ResponseRow } from '../lib/gym-responses'
 import type { Challenge } from '../lib/challenge'
 import type { Collection } from '../lib/collection'
 
@@ -50,6 +51,13 @@ interface MessagesState {
   publish: (input: PublishInput & { id?: string }) => GymMessage
   /** Upserts rows pulled from the server bus, keeping local read/RSVP state. */
   merge: (incoming: GymMessage[]) => number
+  /** Folds the gym's members' answers, pulled from the server, into the bus. */
+  applyRemoteResponses: (
+    rows: ResponseRow[],
+    selfUserId: string,
+    selfProfileId: string,
+    keepMine?: Set<string>,
+  ) => void
   remove: (id: string) => void
   removeByGym: (gym: string) => void
   renameGym: (from: string, to: string) => void
@@ -95,6 +103,7 @@ export const useMessages = create<MessagesState>()((set, get) => ({
           rsvp: existing.rsvp,
           saved: existing.saved,
           joined: existing.joined,
+          respondents: existing.respondents,
           bannerDismissedBy: existing.bannerDismissedBy,
         })
       } else {
@@ -140,6 +149,7 @@ export const useMessages = create<MessagesState>()((set, get) => ({
       return { ...m, readBy: [...m.readBy, profileId] }
     })
     if (!changed) return
+    markResponseDirty(profileId, ids)
     persist(messages)
     set({ messages })
   },
@@ -158,6 +168,7 @@ export const useMessages = create<MessagesState>()((set, get) => ({
     const messages = get().messages.map((m) =>
       m.id === id ? { ...m, rsvp: { ...m.rsvp, [profileId]: answer } } : m,
     )
+    markResponseDirty(profileId, [id])
     persist(messages)
     set({ messages })
   },
@@ -170,6 +181,7 @@ export const useMessages = create<MessagesState>()((set, get) => ({
         : [...m.saved, profileId]
       return { ...m, saved }
     })
+    markResponseDirty(profileId, [id])
     persist(messages)
     set({ messages })
   },
@@ -182,6 +194,13 @@ export const useMessages = create<MessagesState>()((set, get) => ({
         : [...(m.joined ?? []), profileId]
       return { ...m, joined }
     })
+    markResponseDirty(profileId, [id])
+    persist(messages)
+    set({ messages })
+  },
+
+  applyRemoteResponses: (rows, selfUserId, selfProfileId, keepMine) => {
+    const messages = applyResponses(get().messages, rows, selfUserId, selfProfileId, keepMine)
     persist(messages)
     set({ messages })
   },

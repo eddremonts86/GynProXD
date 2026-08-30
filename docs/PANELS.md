@@ -55,6 +55,20 @@ Zustand store (`useMessages`) hydrated from localStorage, persisted on every
 change, re-hydrated on the `storage` event so a gym tab and a member tab on
 the same machine stay live.
 
+### Answers travel (`gym_responses`)
+
+`readBy`, `rsvp` and `saved` are keyed by *profile* id, which is device-local
+and meaningless anywhere else. For a synced member each answer is also a row
+on the server — one per member per message, upserted, carrying the member's
+name — and the gym pulls every row against its own messages, folding them back
+in under `srv-<userId>`. That is what makes the reach panel count members
+rather than the operator's own clicks; before it existed those tallies were
+structural zeroes on any machine but the one that answered.
+
+A dirty set (`forma-response-dirty`) records what was answered here and not yet
+sent, so a pull cannot undo a tap made a second ago and a device that never
+answered cannot push its emptiness over an answer made elsewhere.
+
 ## Interactive templates
 
 Each kind is a structured form in the gym composer and an interactive card
@@ -86,11 +100,14 @@ exclusion). The strip lives in the app shell above the route outlet.
 
 ## Standing menus
 
-Each gym keeps a permanent kitchen card (`forma-gym-menus`, one per gym)
-separate from the one-off "Daily menu" broadcast. The gym panel's Menu
-section edits it in place — sections of items with descriptions and
-prices, seedable from `SAMPLE_MENU` — and members browse it at `/menu`
-(linked from the inbox header and from menu banners). "Promote as banner"
+Each gym keeps a permanent kitchen card (`forma-gym-menus` on the device, one
+`gym_menus` row per gym on the server) separate from the one-off "Daily menu"
+broadcast. Saving pushes it and every member's sync pulls it, which is what
+puts the priced card on their Today; until that existed the card lived only in
+the operator's own browser and members saw the free public recipe instead. The
+gym panel's Menu section edits it in place — sections of items with
+descriptions and prices, seedable from `SAMPLE_MENU` — and members browse it
+at `/menu` (linked from the inbox header and from menu banners). "Promote as banner"
 publishes an announcement whose banner links straight to `/menu`, which is
 how the kitchen reaches members who never open the inbox. Admin gym
 renames and deletes propagate to menus like they do to messages.
@@ -120,7 +137,9 @@ would need to change shape.
 - **Composer**: template picker, structured fields per kind, audience
   selector (everyone or chosen members), live preview, publish.
 - **Sent**: reverse-chronological history with read counts, RSVP tallies,
-  offer save counts, and delete.
+  offer save counts, and delete. An event also lists who is coming by name —
+  "going 12" tells a gym how many chairs to put out and nothing about who to
+  expect at the door.
 
 ## Admin panel (`/admin`, role: admin)
 

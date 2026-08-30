@@ -56,6 +56,11 @@ export interface GymMessage {
   saved: string[]
   /** Members who joined a challenge; the definition copy in their profile is theirs. */
   joined?: string[]
+  /**
+   * Display names for the ids above, filled in when the gym pulls its members'
+   * answers off the server. A guest list of user ids is not a guest list.
+   */
+  respondents?: Record<string, string>
   bannerDismissedBy?: string[]
 }
 

@@ -48,6 +48,7 @@ import { PageHeader } from '../ui/PageHeader'
 import { Tag } from '../ui/Tag'
 import { Stat } from '../ui/Stat'
 import { REACH_WINDOW_DAYS, summariseReach, windowStart } from '../lib/gym-reach'
+import { guestList } from '../lib/gym-responses'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 
@@ -87,6 +88,34 @@ export function GymPanelPage() {
     return <Navigate to={role === 'admin' ? '/admin' : '/'} />
   }
   return <GymDesk gym={gym} profileId={profileId} />
+}
+
+/**
+ * Who is actually coming. "going 12" tells a gym how many chairs to put out
+ * and nothing about who to expect at the door; the names are the difference
+ * between a metric and a door list, and they only exist because the answers
+ * now travel rather than sitting on each member's phone.
+ */
+function GuestList({ message }: { message: GymMessage }) {
+  const names = guestList(message)
+  const going = Object.values(message.rsvp).filter((r) => r === 'yes').length
+  if (going === 0) {
+    return <p className="text-2xs text-ink-3">Nobody has answered yet.</p>
+  }
+  return (
+    <div className="flex flex-col gap-1.5 border-t border-line pt-3">
+      <span className="text-2xs font-medium tracking-wide text-ink-3 uppercase">
+        {pluralize(going, 'place')} taken
+      </span>
+      {names.length > 0 ? (
+        <p className="text-sm leading-relaxed text-ink-2">{names.join(' · ')}</p>
+      ) : (
+        /* Answered before this device last synced, or by a profile with no
+           account: the count is real, the names simply are not here. */
+        <p className="text-2xs text-ink-3">Names arrive with the next sync.</p>
+      )}
+    </div>
+  )
 }
 
 function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
@@ -842,7 +871,10 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
                         </>
                       }
                     >
-                      <MessageCard message={m} />
+                      <div className="flex flex-col gap-3">
+                        <MessageCard message={m} />
+                        {m.kind === 'event' && <GuestList message={m} />}
+                      </div>
                     </Collapse>
                   </Panel>
                 )

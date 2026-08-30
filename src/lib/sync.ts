@@ -25,6 +25,18 @@ import {
   setActiveGymName,
 } from './profiles'
 import { useMessages, type PublishInput } from '../store/useMessages'
+import { useMenus } from '../store/useMenus'
+import {
+  clearResponseDirty,
+  dirtyResponses,
+  isEmptyResponse,
+  myResponse,
+  sameResponse,
+  serverMessageId,
+  type MyResponse,
+  type ResponseRow,
+} from './gym-responses'
+import type { MenuSection } from './menu'
 import type { GymMessage, TemplateKind } from './messages'
 
 /**
@@ -886,6 +898,139 @@ function messageFromWire(wire: WireMessage, gymName: string): GymMessage {
 
 const BUS_CURSOR_PREFIX = 'forma-sync-bus-'
 
+interface MenuRow {
+  id: string
+  gym: string
+  sections: MenuSection[] | null
+  updated: string
+}
+
+/**
+ * The gym's standing kitchen card, down to a member's device.
+ *
+ * It used to live only in the operator's browser, which meant the priced card
+ * on Today — the one surface here that leads anywhere money changes hands —
+ * was invisible to every member of the gym. The public recipe took the slot
+ * instead, and the free thing outranked the thing being sold.
+ */
+async function pullGymMenu(link: SyncLink, gymId: string, gymName: string): Promise<void> {
+  const list = await request<ListPayload<MenuRow>>(
+    link.server,
+    `/api/collections/gym_menus/records?perPage=1&filter=${encodeURIComponent(`gym = "${gymId}"`)}`,
+    { token: link.token },
+  ).catch(() => null)
+  const row = list?.items?.[0]
+  if (!row) return
+  const sections = Array.isArray(row.sections) ? row.sections : []
+  if (sections.length === 0) return
+  useMenus.getState().adoptMenu(gymName, sections, new Date(row.updated.replace(' ', 'T')).toISOString())
+}
+
+/**
+ * The operator's save, up. Best-effort like every other bus write: a menu that
+ * did not reach the server is still on the screen it was typed on, and the
+ * next save carries it.
+ */
+export async function pushMenuToServer(
+  profileId: string,
+  gymName: string,
+  sections: MenuSection[],
+): Promise<boolean> {
+  const link = readSyncLink(profileId)
+  if (!link?.token) return false
+  try {
+    const gyms = await fetchGyms(link)
+    const gym = gyms.find((g) => g.operators?.includes(link.userId) && sameName(g.name, gymName))
+    if (!gym) return false
+    const existing = await request<ListPayload<MenuRow>>(
+      link.server,
+      `/api/collections/gym_menus/records?perPage=1&filter=${encodeURIComponent(`gym = "${gym.id}"`)}`,
+      { token: link.token },
+    )
+    const target = existing.items[0]
+    await request(
+      link.server,
+      target
+        ? `/api/collections/gym_menus/records/${target.id}`
+        : '/api/collections/gym_menus/records',
+      {
+        method: target ? 'PATCH' : 'POST',
+        token: link.token,
+        body: { gym: gym.id, sections },
+      },
+    )
+    return true
+  } catch {
+    return false
+  }
+}
+
+/**
+ * The answer back to the gym, both ways.
+ *
+ * Pull first, so a device that has never answered recovers what its owner said
+ * elsewhere and the gym's own copy fills with its members' replies. Then push
+ * only what was touched here since the last round — tracked as a dirty set,
+ * because a blind push would send a fresh device's emptiness over a real
+ * answer, and a blind pull would undo the tap made a second ago.
+ */
+async function syncGymResponses(profileId: string, link: SyncLink, memberName: string): Promise<void> {
+  const keepMine = new Set(dirtyResponses(profileId))
+
+  const rows: ResponseRow[] = []
+  for (let page = 1; ; page++) {
+    const list = await request<ListPayload<ResponseRow & { id: string }>>(
+      link.server,
+      `/api/collections/gym_responses/records?perPage=200&page=${page}`,
+      { token: link.token },
+    )
+    rows.push(...list.items)
+    if (list.page >= list.totalPages || list.items.length === 0) break
+  }
+  useMessages.getState().applyRemoteResponses(rows, link.userId, profileId, keepMine)
+
+  if (keepMine.size === 0) return
+  const own = new Map<string, ResponseRow & { id?: string }>()
+  for (const row of rows) {
+    if (row.owner === link.userId) own.set(row.message, row)
+  }
+
+  const messages = useMessages.getState().messages
+  const sent: string[] = []
+  for (const message of messages) {
+    if (!keepMine.has(message.id)) continue
+    const serverId = serverMessageId(message.id)
+    if (!serverId) continue
+    const mine = myResponse(message, profileId)
+    const existing = own.get(serverId)
+    const before: MyResponse = existing
+      ? { answer: existing.answer, saved: existing.saved, joined: existing.joined, opened: existing.opened }
+      : { answer: '', saved: false, joined: false, opened: false }
+    if (existing && sameResponse(mine, before)) {
+      sent.push(message.id)
+      continue
+    }
+    /* Nothing to say and nothing on record: no row is the honest state, and
+       it keeps the gym's table to the members who actually answered. */
+    if (!existing && isEmptyResponse(mine)) {
+      sent.push(message.id)
+      continue
+    }
+    const body = { message: serverId, owner: link.userId, ...mine, member_name: memberName }
+    const ok = await request(
+      link.server,
+      existing?.id
+        ? `/api/collections/gym_responses/records/${existing.id}`
+        : '/api/collections/gym_responses/records',
+      { method: existing?.id ? 'PATCH' : 'POST', token: link.token, body },
+    )
+      .then(() => true)
+      .catch(() => false)
+    if (ok) sent.push(message.id)
+  }
+  clearResponseDirty(profileId, sent)
+}
+
 /**
  * The server side of the gym bus, ridden after every training sync:
  * a) an account that operates a gym carries the operator role onto this
@@ -958,6 +1103,10 @@ async function syncGymBus(profileId: string, link: SyncLink): Promise<void> {
   }
   if (!memberGym) return
 
+  /* The kitchen card is not a message and has no cursor: one row per gym,
+     replaced wholesale, so every sync simply takes the current one. */
+  await pullGymMenu(link, memberGym.id, memberGym.name).catch(() => {})
+
   const cursorKey = BUS_CURSOR_PREFIX + profileId
   let cursor = ''
   try {
@@ -991,6 +1140,10 @@ async function syncGymBus(profileId: string, link: SyncLink): Promise<void> {
       /* Same trade as above. */
     }
   }
+
+  /* After the merge, never before: a response is meaningless until the message
+     it answers is on this device. */
+  await syncGymResponses(profileId, link, mine?.name ?? '').catch(() => {})
 }
 
 /**

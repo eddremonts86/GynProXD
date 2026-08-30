@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { ForkKnife, Megaphone, Plus, Trash } from '@phosphor-icons/react'
 import { useMenus } from '@/store/useMenus'
 import { useMessages } from '@/store/useMessages'
-import { menuFor, countItems } from '@/lib/menu'
+import { menuFor, countItems, cleanSections } from '@/lib/menu'
+import { pushMenuToServer } from '@/lib/sync'
 import type { MenuSection } from '@/lib/menu'
 import { BANNER_DURATIONS } from '@/lib/messages'
 import { SAMPLE_MENU } from '@/data/sample-menu'
@@ -45,7 +46,17 @@ export function MenuEditor({ gym, profileId }: { gym: string; profileId: string 
 
   const save = () => {
     setMenu(gym, sections)
-    setFeedback('Menu saved.')
+    setFeedback('Menu saved on this device…')
+    /* The card is worth nothing on the operator's own laptop: until it reaches
+       the server no member of this gym can see a single price. Best-effort,
+       and the wording says which of the two actually happened. */
+    void pushMenuToServer(profileId, gym, cleanSections(sections)).then((sent) =>
+      setFeedback(
+        sent
+          ? 'Menu saved and sent to your members.'
+          : 'Menu saved on this device. It has not reached your members — try again once you are online.',
+      ),
+    )
   }
 
   const promote = () => {
