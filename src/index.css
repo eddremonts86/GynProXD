@@ -591,10 +591,14 @@
     vertical-align: sub;
   }
 
+  /* `--line` is drawn for borders sitting on `--bg`; inside a card, on
+     `--surface`, it comes out 20/255 from its own background and the divider
+     stops being one. `--line-strong` is the token that survives the lighter
+     ground. */
   & hr {
-    margin-block: 1.1em;
+    margin-block: 1.25em;
     border: 0;
-    border-top: 1px solid var(--line);
+    border-top: 1px solid var(--line-strong);
   }
 }
 
