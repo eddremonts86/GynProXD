@@ -82,6 +82,22 @@ export async function deriveBitsBase64(
   return toBase64(new Uint8Array(bits))
 }
 
+/**
+ * The server-facing credential: what a device sends to sign in, which is never
+ * the password itself.
+ *
+ * It lives here rather than in `sync.ts` because it is pure PBKDF2 with no
+ * browser or store around it, and because `sync.ts` cannot be imported outside
+ * the app — it reaches for `localStorage` on the way in. Anything that has to
+ * produce this value from the outside, such as seeding the default accounts on
+ * a fresh server, needs to derive it *identically* or it writes a credential
+ * the app can never present. One definition is the only way that stays true.
+ */
+export async function authPassOf(email: string, password: string): Promise<string> {
+  const salt = new TextEncoder().encode(`enforma-auth:${email.trim().toLowerCase()}`)
+  return deriveBitsBase64(password, salt, KDF_ITERATIONS)
+}
+
 export async function encryptJson(key: CryptoKey, value: unknown): Promise<CipherBlob> {
   const iv = randomBytes(12)
   const plaintext = new TextEncoder().encode(JSON.stringify(value))

@@ -1,7 +1,7 @@
 import {
   KDF_ITERATIONS,
+  authPassOf,
   decryptJson,
-  deriveBitsBase64,
   deriveKey,
   encryptJson,
   exportKeyBase64,
@@ -238,16 +238,17 @@ interface AuthPayload {
 }
 
 /**
- * The server-facing credential. One password does both jobs — signs devices
- * in and decrypts the data — without the server ever being able to do the
- * second: what travels is a derivation salted by the email, the data key is
- * the same password under the account's random salt, and neither yields the
- * other or the password itself.
+ * One password does both jobs — signs devices in and decrypts the data —
+ * without the server ever being able to do the second: what travels is a
+ * derivation salted by the email, the data key is the same password under the
+ * account's random salt, and neither yields the other or the password itself.
+ *
+ * The derivation itself is `authPassOf` in `./crypto`, re-exported here because
+ * this is where it reads as part of the protocol. It moved so that code which
+ * cannot import this module — a seeding script on a server, for one — still
+ * derives the credential from the same eleven lines.
  */
-export async function authPassOf(email: string, password: string): Promise<string> {
-  const salt = new TextEncoder().encode(`enforma-auth:${email.trim().toLowerCase()}`)
-  return deriveBitsBase64(password, salt, KDF_ITERATIONS)
-}
+export { authPassOf }
 
 async function authenticate(server: string, email: string, password: string): Promise<AuthPayload> {
   return request<AuthPayload>(server, '/api/collections/users/auth-with-password', {
