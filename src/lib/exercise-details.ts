@@ -1,16 +1,19 @@
 /**
- * The teaching layer for the 601 movements RepDB covers: Spanish text, coaching
- * tips, MET values, difficulty and mechanics.
+ * The teaching layer over the catalogue: step-by-step instructions in ten
+ * languages, coaching tips, MET values, difficulty and mechanics.
  *
  * It lives outside `exercises-generated.ts` on purpose. The catalogue is
  * imported eagerly by the generator, the swap list and the search box, so
  * everything in it is downloaded before the first screen paints; this file is
- * nearly a megabyte and nothing needs it to render a plan. Hence the dynamic
- * import — Vite emits it as its own chunk, fetched the first time something
- * actually asks for a movement's detail, and cached for the rest of the session.
+ * megabytes and nothing needs it to render a plan. Hence the dynamic import —
+ * Vite emits it as its own chunk, fetched the first time something asks for a
+ * movement's detail and cached for the rest of the session. It is also kept out
+ * of the service worker's precache, so installing the app does not cost a
+ * viewer a translation set they may never open.
  *
- * Coverage is partial by nature: free-exercise-db movements RepDB does not
- * cover return null, and callers must render without them rather than wait.
+ * Coverage is partial in two different ways, and callers must survive both:
+ * roughly half the catalogue has a record at all, and a record may carry only
+ * some of the languages.
  */
 
 export type ExerciseDifficulty = 'beginner' | 'intermediate' | 'advanced'
@@ -25,29 +28,47 @@ export type ExerciseGoal =
   | 'rehabilitation'
   | 'core'
 
+/**
+ * `es` comes from RepDB where it exists — written against the illustration we
+ * ship — and from the translated set otherwise. The rest are the translated
+ * set's alone.
+ */
+export type InstructionLanguage =
+  | 'en'
+  | 'es'
+  | 'fr'
+  | 'it'
+  | 'pl'
+  | 'tr'
+  | 'ru'
+  | 'zh'
+  | 'hi'
+  | 'ko'
+
 export interface ExerciseDetail {
-  source: 'repdb'
-  /** The upstream id, which is also the illustration filename stem. */
-  repdbId: string
-  nameEs: string
-  descriptionEn: string
-  descriptionEs: string
-  instructionsEs: string[]
-  tipsEn: string[]
-  tipsEs: string[]
+  /** Which upstreams contributed. A record may hold translations and nothing else. */
+  sources: ('repdb' | 'exercises-dataset')[]
+  instructions: Partial<Record<InstructionLanguage, string[]>>
+  /** Present only on the 601 movements RepDB covers. */
+  repdbId?: string
+  nameEs?: string
+  descriptionEn?: string
+  descriptionEs?: string
+  tipsEn?: string[]
+  tipsEs?: string[]
   /**
    * Metabolic equivalent of task, 1.3 to 11.8 across the set. Energy cost is
    * roughly `met × bodyweightKg × hours`, which is the honest way to put a
    * calorie figure on a session instead of guessing one.
    */
-  met: number
-  difficulty: ExerciseDifficulty
-  mechanic: ExerciseMechanic
-  force: ExerciseForce
-  goals: ExerciseGoal[]
+  met?: number
+  difficulty?: ExerciseDifficulty
+  mechanic?: ExerciseMechanic
+  force?: ExerciseForce
+  goals?: ExerciseGoal[]
   /** RepDB's own anatomical vocabulary (`gluteus_medius`), not the app's muscle groups. */
-  secondaryMuscles: string[]
-  unilateral: boolean
+  secondaryMuscles?: string[]
+  unilateral?: boolean
 }
 
 let details: Record<string, ExerciseDetail> | null = null
@@ -63,7 +84,7 @@ export function loadExerciseDetails(): Promise<Record<string, ExerciseDetail>> {
   return pending
 }
 
-/** Null for movements RepDB does not cover — roughly half the catalogue. */
+/** Null for movements no upstream covers — roughly half the catalogue. */
 export async function exerciseDetail(id: string): Promise<ExerciseDetail | null> {
   return (await loadExerciseDetails())[id] ?? null
 }
@@ -75,4 +96,20 @@ export async function exerciseDetail(id: string): Promise<ExerciseDetail | null>
  */
 export function exerciseDetailSync(id: string): ExerciseDetail | null {
   return details?.[id] ?? null
+}
+
+/**
+ * Instructions in the requested language, falling back to English and then to
+ * whatever the record actually has. Returns null rather than an empty array so
+ * a caller can tell "nothing to show" from "a movement with no steps".
+ */
+export function instructionsIn(
+  detail: ExerciseDetail | null,
+  language: InstructionLanguage,
+): string[] | null {
+  if (!detail) return null
+  const steps = detail.instructions[language] ?? detail.instructions.en
+  if (steps?.length) return steps
+  const any = Object.values(detail.instructions).find((s) => s.length > 0)
+  return any ?? null
 }

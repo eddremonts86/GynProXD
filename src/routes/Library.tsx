@@ -10,6 +10,7 @@ import { useMessages } from '../store/useMessages'
 import { useSession } from '../store/useSession'
 import { SAMPLE_COLLECTIONS } from '../data/sample-collections'
 import { MovementFrames } from '@/components/movement-frames'
+import { MovementVideo } from '@/components/movement-video'
 import { Button } from '../ui/Button'
 import { Tag } from '../ui/Tag'
 import { Input } from '../ui/Input'
@@ -424,6 +425,7 @@ function ExerciseDetailDialog({
 
             <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
               <MovementFrames exercise={exercise} />
+              <MovementVideo key={exercise.id} exercise={exercise} />
 
               {exercise.instructions && exercise.instructions.length > 0 ? (
                 <ol className="flex flex-col gap-2.5">

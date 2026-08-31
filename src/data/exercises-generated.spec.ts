@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { generatedExercises } from './exercises-generated'
 import details from './exercise-details-generated.json'
 import illustrations from './images-generated.json'
+import videos from './exercise-videos.json'
 import { exercisePhotoFrames } from '../lib/images'
 
 /** What is actually on disk, resolved by Vite rather than by reading the filesystem. */
@@ -64,12 +65,26 @@ describe('generated exercise catalogue', () => {
     expect(orphans).toEqual([])
   })
 
-  it('gives every detailed movement Spanish text and a usable MET', () => {
-    for (const [id, detail] of Object.entries(details as Record<string, { nameEs: string; instructionsEs: string[]; met: number }>)) {
+  it('gives every detail record at least one language, and RepDB rows a usable MET', () => {
+    type Record_ = { sources: string[]; instructions: Record<string, string[]>; met?: number; nameEs?: string }
+    for (const [id, detail] of Object.entries(details as Record<string, Record_>)) {
+      expect(detail.sources.length, id).toBeGreaterThan(0)
+      const languages = Object.values(detail.instructions).filter((steps) => steps.length > 0)
+      expect(languages.length, id).toBeGreaterThan(0)
+      if (!detail.sources.includes('repdb')) continue
       expect(detail.nameEs, id).toBeTruthy()
-      expect(detail.instructionsEs.length, id).toBeGreaterThan(0)
       expect(detail.met, id).toBeGreaterThan(1)
       expect(detail.met, id).toBeLessThan(20)
+    }
+  })
+
+  it('points every video at a movement in the catalogue', () => {
+    const ids = new Set(generatedExercises.map((e) => e.id))
+    for (const [exerciseId, videoId] of Object.entries(videos as Record<string, string>)) {
+      expect(ids, exerciseId).toContain(exerciseId)
+      /* A YouTube id is exactly eleven URL-safe characters. Anything else is a
+         pasted full URL, which the player would silently fail to load. */
+      expect(videoId, exerciseId).toMatch(/^[A-Za-z0-9_-]{11}$/)
     }
   })
 })

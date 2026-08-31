@@ -1,24 +1,32 @@
 #!/usr/bin/env node
 /**
- * Builds the bundled movement catalogue from the two upstream datasets.
+ * Builds the bundled movement catalogue from the upstream datasets.
  *
- *   free-exercise-db  Unlicense (public domain). 873 movements, photographs
+ *   free-exercise-db  Unlicense (public domain). 876 movements, photographs
  *                     hot-loaded from jsDelivr. The historical source: its ids
  *                     are written into every logged workout, so they are frozen.
  *   RepDB free tier   attribution required, in-app use only. 601 movements with
  *                     flat WebP illustrations, MET values, difficulty and full
  *                     Spanish text.
+ *   exercises-dataset MIT text (hasaneyldrm). Contributes no movements and no
+ *                     media — its GIFs are Gym visual's and we have no licence
+ *                     to them — only step-by-step instructions in ten languages
+ *                     for movements the catalogue already has.
+ *   exercemus / wger  a short list of YouTube ids for movements they had a
+ *                     demonstration video for. Ids only; see the video section.
  *
  * This script owns `src/data/exercises-generated.ts` — it replaces the old
  * import-free-exercise-db.mjs, which knew nothing about RepDB and would have
  * silently dropped it on the next run.
  *
- * Two files come out, split by weight rather than by source:
- *   src/data/exercises-generated.ts        the catalogue the app imports eagerly
- *   src/data/exercise-details-generated.json  Spanish text, MET, tips, goals —
- *                                          loaded on demand, never bundled
+ * Four files come out, split by weight rather than by source:
+ *   src/data/exercises-generated.ts           the catalogue the app imports eagerly
+ *   src/data/exercise-details-generated.json  translations, MET, tips, goals —
+ *                                             loaded on demand, never bundled
+ *   src/data/exercise-videos.json             movement id -> YouTube id
+ *   src/data/catalogue-stats.ts               three numbers the landing page prints
  *
- * Run: node scripts/import-exercises.mjs [--no-media]
+ * Run: node scripts/import-exercises.mjs [--no-media] [--no-video-check] [--youtube]
  */
 
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
@@ -31,8 +39,15 @@ const FED_IMG_BASE = 'https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/
 const REPDB_SOURCE = 'https://exercise-dataset.com/exercises.json'
 const REPDB_IMG_BASE = 'https://exercise-dataset.com/'
 const REPDB_DIR = path.join(ROOT, 'public/repdb')
+const TRANSLATIONS_SOURCE =
+  'https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/data/exercises.json'
+const EXERCEMUS_SOURCE =
+  'https://raw.githubusercontent.com/exercemus/exercises/minified/minified-exercises.json'
+const WGER_TRANSLATIONS = 'https://wger.de/api/v2/exercise-translation/?format=json&limit=500'
 
 const skipMedia = process.argv.includes('--no-media')
+const skipVideoCheck = process.argv.includes('--no-video-check')
+const searchYouTube = process.argv.includes('--youtube')
 
 /* ---------------------------------------------------------------- vocabulary */
 
@@ -310,11 +325,14 @@ async function loadRepDb() {
       /* `start`/`peak` is a two-frame movement, `main` a single hold or stretch. */
       files: [flat.start, flat.peak, flat.main].filter(Boolean).map((p) => path.basename(p)),
       details: {
-        source: 'repdb',
+        sources: ['repdb'],
         nameEs: x.name_es,
         descriptionEn: x.description_en,
         descriptionEs: x.description_es,
-        instructionsEs: x.instructions_es ?? [],
+        /* One map for every language, whichever source supplied it. RepDB's
+           Spanish is written against its own illustrations, so it wins over
+           the translated set when both cover a movement. */
+        instructions: { es: x.instructions_es ?? [] },
         tipsEn: x.tips_en ?? [],
         tipsEs: x.tips_es ?? [],
         met: x.met,
@@ -329,9 +347,144 @@ async function loadRepDb() {
   })
 }
 
+/**
+ * Step-by-step instructions in ten languages, from hasaneyldrm/exercises-dataset.
+ *
+ * Text only. That repository's LICENSE puts the code, structure and translations
+ * under MIT but carves the `images/` and `videos/` directories out entirely —
+ * they are Gym visual's, and cloning the repo grants no licence to them. So this
+ * adds no movement and no artwork: it attaches language to movements the
+ * catalogue already has, which is the half we are allowed to use.
+ */
+async function loadTranslations() {
+  const raw = await fetchJson(TRANSLATIONS_SOURCE)
+  return raw
+    .filter((x) => x.instruction_steps)
+    .map((x) => ({ name: x.name, steps: x.instruction_steps }))
+}
+
+/**
+ * Demonstration videos, as YouTube ids and nothing else.
+ *
+ * exercemus curated a handful against the same free-exercise-db movements we
+ * use, and a few wger descriptions carry an embedded link. Both are small —
+ * there is no free dataset that covers a catalogue this size — so the map is
+ * meant to be extended by hand, and `--youtube` proposes candidates for review.
+ *
+ * Only the id is ever stored. YouTube's developer policy caps storage of
+ * unauthorised metadata (titles, channel names) at 30 days, and the embedded
+ * player renders both anyway.
+ */
+async function loadSeedVideos(byName) {
+  const found = new Map()
+  const id = (url) => url?.match(/(?:v=|youtu\.be\/|embed\/)([A-Za-z0-9_-]{11})/)?.[1]
+
+  /* Six upstream names our catalogue spells differently. Worth the hand-entry:
+     dips, skull crushers and preacher curls are staples, not long-tail. */
+  const VIDEO_ALIASES = {
+    'Machine Crunch': 'Ab_Crunch_Machine',
+    'Band Skullcrusher': 'Band_Skull_Crusher',
+    'Dumbbell Skullcrusher': 'db-skull-crusher',
+    'Dips (Chest Focus)': 'Dips_-_Chest_Version',
+    'Dips (Triceps Focus)': 'Dips_-_Triceps_Version',
+    'Dumbbell Preacher Curl': 'Two-Arm_Dumbbell_Preacher_Curl',
+  }
+
+  const exercemus = await fetchJson(EXERCEMUS_SOURCE)
+  for (const x of exercemus.exercises) {
+    const target = VIDEO_ALIASES[x.name] ?? byName.get(normalise(x.name))
+    const video = id(x.video)
+    if (target && video) found.set(target, video)
+  }
+
+  for (let url = WGER_TRANSLATIONS; url; ) {
+    const page = await fetchJson(url)
+    for (const row of page.results) {
+      const target = byName.get(normalise(row.name))
+      const video = id(row.description ?? '')
+      if (target && video && !found.has(target)) found.set(target, video)
+    }
+    url = page.next
+  }
+  return found
+}
+
+/**
+ * A video is only useful if it still exists and still allows embedding, and
+ * both change without warning. oEmbed answers exactly that question, needs no
+ * key, and returns metadata we deliberately throw away.
+ */
+async function isPlayable(videoId) {
+  const target = encodeURIComponent(`https://www.youtube.com/watch?v=${videoId}`)
+  try {
+    const res = await fetch(`https://www.youtube.com/oembed?url=${target}&format=json`)
+    return res.ok
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Channels whose form demonstrations are worth putting in front of somebody
+ * about to load a barbell. Drawn from what exercemus already curated by hand.
+ * A search result from anywhere else is not proposed: an exercise app pointing
+ * at the wrong movement is worse than an exercise app pointing at nothing.
+ */
+const VIDEO_CHANNELS = [
+  'ScottHermanFitness',
+  'Howcast',
+  'My PT Hub',
+  'Starting Strength',
+  'National Academy of Sports Medicine (NASM)',
+  'Trifocus Fitness Academy',
+  "Runner's World",
+  'LIVESTRONG.COM',
+]
+
+/**
+ * Proposes a video for movements that have none, using the YouTube Data API
+ * with the caller's own key. Deliberately writes to a review file rather than
+ * to the shipped map: search picks the wrong lift often enough that a human has
+ * to look. Costs 100 quota units per movement, so the free 10,000/day allowance
+ * is about 100 movements — the run is resumable and simply stops when asked.
+ */
+async function proposeVideos(catalogue, videos, limit) {
+  const key = process.env.YOUTUBE_API_KEY
+  if (!key) throw new Error('--youtube needs YOUTUBE_API_KEY in the environment')
+  const pending = [...catalogue.values()].filter((e) => !videos.has(e.id)).slice(0, limit)
+  const proposals = []
+  for (const exercise of pending) {
+    const query = encodeURIComponent(`${exercise.name} exercise proper form`)
+    const url =
+      `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=10` +
+      `&videoEmbeddable=true&videoSyndicated=true&videoDuration=short&q=${query}&key=${key}`
+    const res = await fetch(url)
+    if (!res.ok) {
+      console.warn(`  youtube search stopped at ${exercise.id}: ${res.status}`)
+      break
+    }
+    const { items = [] } = await res.json()
+    const hit = items.find((i) => VIDEO_CHANNELS.includes(i.snippet?.channelTitle))
+    if (hit) {
+      proposals.push({
+        exerciseId: exercise.id,
+        name: exercise.name,
+        videoId: hit.id.videoId,
+        channel: hit.snippet.channelTitle,
+        title: hit.snippet.title,
+      })
+    }
+  }
+  return proposals
+}
+
 /* -------------------------------------------------------------------- merge */
 
-const [fed, repdb] = await Promise.all([loadFreeExerciseDb(), loadRepDb()])
+const [fed, repdb, translations] = await Promise.all([
+  loadFreeExerciseDb(),
+  loadRepDb(),
+  loadTranslations(),
+])
 
 const catalogue = new Map(fed.map((e) => [e.id, e]))
 const details = {}
@@ -411,6 +564,74 @@ for (const ex of repdb) {
   if (reordered) collisions.push(`${ex.id} — "${ex.name}" is "${reordered}" reworded; add an alias`)
 }
 
+/* ------------------------------------------------------- language + video */
+
+/* Both indexes now span the WHOLE catalogue, RepDB's movements included: a
+   translation is worth having wherever the movement came from. `byTokens`
+   catches the same words in another order — "barbell bent over row" against
+   "Bent Over Barbell Row" — which is safe here because it cannot invent a
+   match, only reorder one. */
+const nameIndex = new Map()
+const tokenIndex = new Map()
+{
+  const nameDupes = new Set()
+  const tokenDupes = new Set()
+  for (const e of catalogue.values()) {
+    const name = normalise(e.name)
+    if (nameIndex.has(name)) nameDupes.add(name)
+    nameIndex.set(name, e.id)
+    const tokens = [...new Set(name.split(' '))].sort().join(' ')
+    if (tokenIndex.has(tokens)) tokenDupes.add(tokens)
+    tokenIndex.set(tokens, e.id)
+  }
+  for (const k of nameDupes) nameIndex.delete(k)
+  for (const k of tokenDupes) tokenIndex.delete(k)
+}
+
+let translated = 0
+for (const entry of translations) {
+  const name = normalise(entry.name)
+  const target = nameIndex.get(name) ?? tokenIndex.get([...new Set(name.split(' '))].sort().join(' '))
+  if (!target) continue
+  const detail = (details[target] ??= { sources: [], instructions: {} })
+  if (!detail.sources.includes('exercises-dataset')) detail.sources.push('exercises-dataset')
+  for (const [lang, steps] of Object.entries(entry.steps)) {
+    /* RepDB's own Spanish is written against the illustration we ship, so it
+       stays; every other language is a gain rather than a replacement. */
+    if (detail.instructions[lang]?.length) continue
+    if (Array.isArray(steps) && steps.length > 0) detail.instructions[lang] = steps
+  }
+  translated += 1
+}
+
+/* Curation survives re-imports: whatever a human put in the file stays, and is
+   only dropped if the video itself has gone or stopped allowing embeds. */
+const videoPath = path.join(ROOT, 'src/data/exercise-videos.json')
+const videos = new Map(
+  Object.entries(existsSync(videoPath) ? JSON.parse(await readFile(videoPath, 'utf8')) : {}),
+)
+const seedVideos = await loadSeedVideos(nameIndex)
+for (const [id, video] of seedVideos) if (!videos.has(id)) videos.set(id, video)
+
+let dropped = 0
+if (!skipVideoCheck) {
+  for (const [id, video] of [...videos]) {
+    if (await isPlayable(video)) continue
+    videos.delete(id)
+    dropped += 1
+    console.warn(`  video gone or not embeddable, dropped: ${id} (${video})`)
+  }
+}
+
+if (searchYouTube) {
+  const proposals = await proposeVideos(catalogue, videos, 100)
+  const out = path.join(ROOT, 'scripts/out/video-candidates.json')
+  await mkdir(path.dirname(out), { recursive: true })
+  await writeFile(out, `${JSON.stringify(proposals, null, 2)}\n`)
+  console.log(`\n${proposals.length} video candidates written to ${path.relative(ROOT, out)}`)
+  console.log('  review them, then copy the good ones into src/data/exercise-videos.json')
+}
+
 /* -------------------------------------------------------------------- media */
 
 let downloaded = 0
@@ -459,6 +680,9 @@ await writeFile(
 const sortedImages = Object.fromEntries(Object.entries(repdbImages).sort(([a], [b]) => a.localeCompare(b)))
 await writeFile(path.join(ROOT, 'src/data/repdb-images.json'), `${JSON.stringify(sortedImages, null, 2)}\n`)
 
+const sortedVideos = Object.fromEntries([...videos].sort(([a], [b]) => a.localeCompare(b)))
+await writeFile(videoPath, `${JSON.stringify(sortedVideos, null, 2)}\n`)
+
 /* The landing page states the size of the library. It said 873 for long enough
    to be wrong in six places, so it reads the number from here instead — a few
    bytes, rather than importing a megabyte of catalogue into the signed-out page. */
@@ -469,13 +693,16 @@ await writeFile(
 export const CATALOGUE_SIZE = ${exercises.length}
 export const CATALOGUE_PUBLIC_DOMAIN = ${fed.length}
 export const CATALOGUE_TRANSLATED = ${Object.keys(sortedDetails).length}
+export const CATALOGUE_WITH_VIDEO = ${videos.size}
 `,
 )
 
 console.log(`\n${exercises.length} movements in the catalogue`)
 console.log(`  ${fed.length} from free-exercise-db`)
 console.log(`  ${stats.added} added by RepDB, ${stats.enriched} existing ones enriched (${stats.aliased} via alias)`)
-console.log(`  ${Object.keys(sortedDetails).length} with Spanish text and MET`)
+console.log(`  ${Object.keys(sortedDetails).length} with a detail record`)
+console.log(`  ${translated} given instructions in ten languages`)
+console.log(`  ${videos.size} with a demonstration video${dropped ? `, ${dropped} dropped as unplayable` : ''}`)
 if (!skipMedia) console.log(`  ${downloaded} illustrations downloaded${unavailable ? `, ${unavailable} unavailable` : ''}`)
 console.log('\nnext: node scripts/build-image-map.mjs')
 if (collisions.length > 0) {

@@ -2,4 +2,5 @@
 
 export const CATALOGUE_SIZE = 1322
 export const CATALOGUE_PUBLIC_DOMAIN = 876
-export const CATALOGUE_TRANSLATED = 601
+export const CATALOGUE_TRANSLATED = 756
+export const CATALOGUE_WITH_VIDEO = 26
