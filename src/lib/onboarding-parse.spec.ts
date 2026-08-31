@@ -68,3 +68,86 @@ describe('parseOnboarding', () => {
     expect(merged.goal).toBe('general')
   })
 })
+
+/**
+ * The cases that made this file worth changing.
+ *
+ * Every one of them is a sentence a member actually wrote, or the placeholder the
+ * app itself puts in the box, and every one of them used to be read wrong or not
+ * read at all.
+ */
+describe('what the box used to lose', () => {
+  it('carries the whole prose so the coach can read what no field holds', () => {
+    const text = 'un mes en casa moderado y luego al gym a tope'
+    expect(parseOnboarding(text).partial.constraints).toBe(text)
+    // Not the residue, the lot: the sequence is in the shape of the sentence,
+    // not in the words the patterns failed to eat.
+    expect(mergeWithDefaults(parseOnboarding(text).partial).constraints).toBe(text)
+  })
+
+  it('reads kilos, not only kg', () => {
+    // "peso 92 kilos" yielded nothing, so the plan paced from the 75 kg default.
+    expect(parseOnboarding('peso 92 kilos').partial.weightKg).toBe(92)
+  })
+
+  it('reads "ponerme fuerte" as the goal it is', () => {
+    const r = parseOnboarding('quiero ponerme fuerte')
+    expect(r.partial.goal).toBe('fuerza')
+    // And not as an intensity. `fuerte` is strong, not hard.
+    expect(r.partial.effort).toBeUndefined()
+  })
+
+  it('does not lose half a sentence to one mistyped letter', () => {
+    // `gyn` for `gym` used to match nothing, taking the gym half of the plan with it.
+    expect(parseOnboarding('voy al gyn 4 dias').partial.equipment).toBe('barbell')
+  })
+
+  it('believes the equipment someone says they own over the room they are in', () => {
+    // "en casa, tengo mancuernas" answered bodyweight — the opposite of the words.
+    expect(parseOnboarding('entreno en casa, tengo mancuernas').partial.equipment).toBe('dumbbell')
+  })
+
+  it('reads two places as both places, not as whichever pattern sits higher', () => {
+    expect(parseOnboarding('1 mes en casa y luego al gyn').partial.equipment).toBe('hibrido')
+  })
+
+  it('takes the effort the programme starts at, not the loudest one in the sentence', () => {
+    // "moderada ... y ya luego a darle con todo" starts moderate. The climb is a
+    // sequence and belongs to the coach.
+    expect(parseOnboarding('de manera moderada y ya luego a darle con todo').partial.effort).toBe(3)
+  })
+
+  it('reads effort from idiom, since nobody types "esfuerzo: 4"', () => {
+    expect(parseOnboarding('quiero darle a tope').partial.effort).toBe(5)
+    expect(parseOnboarding('prefiero ir suave').partial.effort).toBe(2)
+  })
+
+  it('says out loud that a sentence describes a plan which changes', () => {
+    const r = parseOnboarding('un mes en casa y luego al gimnasio')
+    expect(r.warnings.some((w) => /changes over time/i.test(w))).toBe(true)
+  })
+})
+
+describe('confidence stops claiming certainty it does not have', () => {
+  it('does not return 1.0 for a sentence it half guessed', () => {
+    // The app's own placeholder. This returned exactly 1.0 while reading two
+    // hours as per-session and a barbell pool out of the word "gym".
+    const r = parseOnboarding('40 years old, 140kg, want to get down to 80kg, gym 3 times a week for 2 hours')
+    expect(r.confidence).toBeLessThan(1)
+    expect(r.provenance.minsPerSession).toBe('inferred')
+    expect(r.provenance.equipment).toBe('inferred')
+    expect(r.provenance.age).toBe('quoted')
+  })
+
+  it('flags the hours reading rather than filing it as something they said', () => {
+    const r = parseOnboarding('gym 3 times a week for 2 hours')
+    expect(r.warnings.some((w) => /per session/i.test(w))).toBe(true)
+  })
+
+  it('scores an inference at half a quote', () => {
+    // One quoted field of six, nothing else.
+    expect(parseOnboarding('tengo 30 años').confidence).toBeCloseTo(1 / 6, 2)
+    // One inferred field of six.
+    expect(parseOnboarding('entreno en el gimnasio').confidence).toBeCloseTo(0.5 / 6, 2)
+  })
+})

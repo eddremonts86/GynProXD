@@ -187,6 +187,18 @@ Athlete:
 - Goal: ${GOAL_LABELS[input.goal]}. Experience: ${LEVEL_LABELS[input.level]}.
 - Trains ${input.daysPerWeek} days a week, ${input.minsPerSession} minutes per session. Training at: ${place}.
 ${rate > 0 ? `- Weight pace is fixed at ${rate} kg/week by a separate calculation. Do not mention or change it.` : ''}
+${
+  input.constraints
+    ? `
+In their own words, between the markers. Read it for everything the fields above cannot hold, and let it win where it plainly disagrees with them:
+--- BEGIN
+${input.constraints}
+--- END
+- Injuries, pain and movements to avoid live here and nowhere else. Honour them by leaving the movement out, not by working around it half way.
+- If those words describe a plan that CHANGES OVER TIME, build the change into the blocks. A block is four weeks. "The first month at home and then the gym" means block 1 uses only what a home has and later blocks use the rest. "Start moderate then go hard" means difficulty and volume climb between blocks instead of staying level.
+- Typos and loose phrasing are theirs to make and yours to read past.`
+    : ''
+}
 
 Requirements:
 - Design exactly ${blockCount} four-week training block(s). Blocks repeat in rotation. Each block after the first MUST swap at least half of the movements on every day for different ids from the list; changing only reps does not count.
