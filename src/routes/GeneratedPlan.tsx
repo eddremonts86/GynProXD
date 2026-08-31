@@ -65,6 +65,16 @@ function isDeloadWeek(weekIndex: number): boolean {
   return (weekIndex + 1) % 4 === 0
 }
 
+/**
+ * The two ways to ask for another programme, in one piece of state.
+ *
+ * Both end in the same place — `buildProgramme` and a new plan — and differ only
+ * in which half is held still: `length` keeps the answers and changes the
+ * calendar, `numbers` keeps the calendar and changes the answers. One dialog
+ * that names which is which beats two that drift apart.
+ */
+type Pending = { kind: 'length'; duration: DurationKey } | { kind: 'numbers' } | null
+
 export function GeneratedPlanPage() {
   const navigate = useNavigate()
   const params = useParams({ strict: false }) as { id?: string }
@@ -74,13 +84,70 @@ export function GeneratedPlanPage() {
   const saveGeneratedAsPlan = useGym((s) => s.saveGeneratedAsPlan)
   const deleteGeneratedPlan = useGym((s) => s.deleteGeneratedPlan)
   const addGeneratedPlan = useGym((s) => s.addGeneratedPlan)
+  const bodyweight = useGym((s) => s.bodyweight)
+  const profileDetails = useGym((s) => s.profileDetails)
 
   const [activeWeek, setActiveWeek] = useState(0)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [openDay, setOpenDay] = useState<GeneratedDay | null>(null)
-  const [pendingDuration, setPendingDuration] = useState<DurationKey | null>(null)
+  const [pending, setPending] = useState<Pending>(null)
   const [designing, setDesigning] = useState(false)
   const today = todayIso()
+
+  /**
+   * The same answers, with anything the profile now knows better.
+   *
+   * A programme is arithmetic over the numbers it was given, and those numbers
+   * age: weigh in for two months and the plan is still pacing from the weight
+   * you started at. Nothing here reads a field the member has not filled — an
+   * absent detail leaves the original answer alone rather than overwriting it
+   * with a guess.
+   */
+  const currentInput = useMemo(
+    () =>
+      plan
+        ? {
+            ...plan.input,
+            ...(bodyweight[0] ? { weightKg: bodyweight[0].kg } : {}),
+            ...(profileDetails?.age ? { age: profileDetails.age } : {}),
+            ...(profileDetails?.sex ? { sex: profileDetails.sex } : {}),
+            ...(profileDetails?.heightCm ? { heightCm: profileDetails.heightCm } : {}),
+          }
+        : null,
+    [plan, bodyweight, profileDetails],
+  )
+
+  /**
+   * What actually moved, so the offer to redesign can name it.
+   *
+   * Empty means the section does not render at all. An always-present "redesign
+   * with your current numbers" on a programme whose numbers are unchanged is an
+   * invitation to spend two minutes of the coach's time reproducing what is
+   * already on the screen.
+   */
+  const numberChanges = useMemo(() => {
+    if (!plan || !currentInput) return []
+    const out: Array<{ label: string; from: string; to: string }> = []
+    // Half a kilo: a programme is paced in kg per week, and a scale that reads
+    // 0.2 lighter after breakfast has not changed anything worth rebuilding for.
+    if (Math.abs(currentInput.weightKg - plan.input.weightKg) >= 0.5) {
+      out.push({ label: 'Weight', from: `${plan.input.weightKg} kg`, to: `${currentInput.weightKg} kg` })
+    }
+    if (currentInput.age !== plan.input.age) {
+      out.push({ label: 'Age', from: `${plan.input.age}`, to: `${currentInput.age}` })
+    }
+    if (currentInput.sex !== plan.input.sex) {
+      out.push({ label: 'Sex', from: plan.input.sex, to: currentInput.sex })
+    }
+    if (currentInput.heightCm !== plan.input.heightCm) {
+      out.push({
+        label: 'Height',
+        from: plan.input.heightCm ? `${plan.input.heightCm} cm` : 'not given',
+        to: `${currentInput.heightCm} cm`,
+      })
+    }
+    return out
+  }, [plan, currentInput])
 
   const week = useMemo(() => plan?.weeks[activeWeek] ?? plan?.weeks[0], [plan, activeWeek])
 
@@ -144,11 +211,20 @@ export function GeneratedPlanPage() {
 
   return (
     <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-2">
       <PageHeader
         title={plan.weeklyTemplate.name}
-        description={`${GOAL_LABELS[plan.input.goal]} over ${plan.weeks.length} weeks. Tap a day for movement detail. Programmes are read-only: copy one to the planner and edit the copy.`}
+        description={`${GOAL_LABELS[plan.input.goal]} over ${plan.weeks.length} weeks. Tap a day for movement detail.`}
         action={
           <>
+            {/* The only labelled action, and the answer to "how do I change this",
+                so it leads. It used to sit last, behind two unlabelled icons —
+                which is how a screen with three things you can do reads as a
+                screen with two. */}
+            <Button variant="primary" onClick={save}>
+              Edit a copy
+              <ArrowRight size={16} weight="bold" />
+            </Button>
             <IconButton size="md" onClick={exportJson} aria-label="Export this programme as JSON">
               <DownloadSimple size={18} />
             </IconButton>
@@ -176,13 +252,19 @@ export function GeneratedPlanPage() {
                 <Trash size={18} />
               </IconButton>
             )}
-            <Button variant="primary" onClick={save}>
-              Copy to planner
-              <ArrowRight size={16} weight="bold" />
-            </Button>
           </>
         }
       />
+      {/* Out of the header paragraph, where it was the fourth sentence and read
+          as trivia. A member who wants to change a programme is looking for a
+          verb, not for the end of a description. */}
+      <p className="max-w-[62ch] text-2xs text-ink-3">
+        A programme is fixed once it is designed — its weeks and weight
+        checkpoints are arithmetic over the answers you gave. To change the
+        training itself, edit a copy in the planner. To change the answers,
+        redesign it further down.
+      </p>
+      </div>
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <AuroraTile
@@ -346,10 +428,39 @@ export function GeneratedPlanPage() {
         </Section>
       )}
 
+      {numberChanges.length > 0 && (
+        <Section title="Your numbers have moved">
+          <div className="flex flex-wrap gap-2">
+            {numberChanges.map((c) => (
+              <span
+                key={c.label}
+                className="num inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1.5 text-2xs text-ink-2 shadow-[var(--shadow-panel)]"
+              >
+                <span className="text-ink-3">{c.label}</span>
+                <span className="text-ink-3 line-through">{c.from}</span>
+                <ArrowRight size={11} weight="bold" className="text-ink-3" />
+                <span className="font-medium text-ink">{c.to}</span>
+              </span>
+            ))}
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="secondary" onClick={() => setPending({ kind: 'numbers' })}>
+              Redesign with these
+            </Button>
+          </div>
+          <p className="text-2xs text-ink-3">
+            This programme still paces from the numbers it was designed with, which
+            is why its dates and checkpoints have not moved either. A redesign keeps
+            the same {DURATION_LABELS[plan.approvedDuration].toLowerCase()} length and
+            the same goal, and recalculates everything after that.
+          </p>
+        </Section>
+      )}
+
       <Section title="Try a different length">
         <div className="flex flex-wrap gap-2">
           {DURATION_KEYS.filter((d) => d !== plan.approvedDuration).map((d) => (
-            <Button key={d} variant="secondary" onClick={() => setPendingDuration(d)}>
+            <Button key={d} variant="secondary" onClick={() => setPending({ kind: 'length', duration: d })}>
               {DURATION_LABELS[d]}
             </Button>
           ))}
@@ -361,20 +472,24 @@ export function GeneratedPlanPage() {
 
       <DayDetailDialog day={openDay} onClose={() => setOpenDay(null)} />
 
-      <Dialog open={!!pendingDuration} onOpenChange={(open) => !open && setPendingDuration(null)}>
+      <Dialog open={!!pending} onOpenChange={(open) => !open && setPending(null)}>
         <DialogContent className="sm:max-w-sm">
-          {pendingDuration && (
+          {pending && (
             <>
               <DialogHeader>
-                <DialogTitle>Build a {DURATION_LABELS[pendingDuration]} programme?</DialogTitle>
+                <DialogTitle>
+                  {pending.kind === 'length'
+                    ? `Build a ${DURATION_LABELS[pending.duration]} programme?`
+                    : 'Redesign with your current numbers?'}
+                </DialogTitle>
                 <DialogDescription>
-                  A new programme is generated from the same details, with its own calendar and
-                  movement rotation. This one is kept, and anything you copied to the planner stays
-                  as it is. The coach usually takes a minute or two.
+                  {pending.kind === 'length'
+                    ? 'A new programme is generated from the same details, with its own calendar and movement rotation. This one is kept, and anything you copied to the planner stays as it is. The coach usually takes a minute or two.'
+                    : `A new programme is generated from ${numberChanges.map((c) => `${c.label.toLowerCase()} ${c.to}`).join(', ')}, over the same length and goal. This one is kept, and anything you copied to the planner stays as it is. The coach usually takes a minute or two.`}
                 </DialogDescription>
               </DialogHeader>
               <div className="flex justify-end gap-2">
-                <Button variant="ghost" disabled={designing} onClick={() => setPendingDuration(null)}>
+                <Button variant="ghost" disabled={designing} onClick={() => setPending(null)}>
                   Cancel
                 </Button>
                 <Button
@@ -383,13 +498,32 @@ export function GeneratedPlanPage() {
                   onClick={() => {
                     if (designing) return
                     setDesigning(true)
-                    void buildProgramme(plan.input, pendingDuration)
+                    /* Which half is held still is the whole difference between the
+                       two: a length change keeps the answers, a redesign keeps the
+                       length. Neither edits this programme — both leave it where
+                       it is, because a copy already in the planner refers to it. */
+                    const input = pending.kind === 'numbers' ? (currentInput ?? plan.input) : plan.input
+                    const duration = pending.kind === 'length' ? pending.duration : plan.approvedDuration
+                    void buildProgramme(input, duration)
                       .then((next) => {
                         addGeneratedPlan(next)
-                        setPendingDuration(null)
+                        setPending(null)
                         setActiveWeek(0)
                         if (window.location.pathname.startsWith('/generated/')) {
-                          void navigate({ to: '/generated/$id', params: { id: next.id } })
+                          /* No cross-fade on this one hop. The router turns view
+                             transitions on globally, and `startViewTransition`
+                             throws `InvalidStateError` on a hidden document — which
+                             this navigation is unusually likely to meet, because it
+                             lands a minute or two after the click, and a minute is
+                             long enough to go and look at something else. The
+                             transition failing takes the navigation with it, so the
+                             member comes back to the programme they asked to
+                             replace, with nothing to say it worked. */
+                          void navigate({
+                            to: '/generated/$id',
+                            params: { id: next.id },
+                            viewTransition: false,
+                          })
                         }
                       })
                       .finally(() => setDesigning(false))
