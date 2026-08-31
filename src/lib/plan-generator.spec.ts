@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { generatePlan } from './plan-generator'
+import { assemblePlan, generatePlan } from './plan-generator'
 import type { OnboardingInput } from './types'
 
 const base: OnboardingInput = {
@@ -62,5 +62,69 @@ describe('generatePlan', () => {
     const plan = generatePlan({ ...base, weightKg: 70, targetWeightKg: 75, goal: 'musculo' }, 'trimestral')
     expect(plan.weeklyTemplate.id).toMatch(/plan-gen-/)
     expect(plan.weeklyTemplate.days.length).toBe(7)
+  })
+})
+
+/**
+ * A programme whose blocks differ, assembled.
+ *
+ * This is the shape "1 mes en casa y luego al gym" has to survive into, and the
+ * live coach is the wrong place to prove it: it answers on some runs and not on
+ * others, and when it declines the deterministic designer takes over, which does
+ * not phase by design. So the structure is handed in directly and the assembly
+ * is what gets checked.
+ */
+describe('assemblePlan with blocks that differ', () => {
+  const day = (d: 'mon' | 'thu', ids: string[]) => ({
+    day: d,
+    exercises: ids.map((exerciseId) => ({ exerciseId, progression: 'linear' as const })),
+  })
+  const structure = {
+    source: 'coach' as const,
+    name: 'Home then gym',
+    blocks: [
+      {
+        days: [day('mon', ['Pushups', 'Bodyweight_Squat', 'Plank'])],
+        label: 'Month 1, home',
+        place: 'bodyweight' as const,
+        intensity: 'II' as const,
+      },
+      {
+        days: [day('mon', ['Barbell_Full_Squat', 'Dumbbell_Shoulder_Press', 'Dumbbell_Squat'])],
+        label: 'Gym, heavier',
+        place: 'barbell' as const,
+        intensity: 'III' as const,
+      },
+    ],
+  }
+
+  const plan = assemblePlan(base, 'trimestral', structure, new Date('2026-09-07T00:00:00'))
+
+  it('keeps one metadata entry per block, and no second copy of the days', () => {
+    expect(plan.blocks).toHaveLength(2)
+    expect(plan.blocks![0]).toEqual({ label: 'Month 1, home', place: 'bodyweight', intensity: 'II' })
+    expect(plan.blocks![1]).toEqual({ label: 'Gym, heavier', place: 'barbell', intensity: 'III' })
+    expect(plan.blocks![0]).not.toHaveProperty('days')
+  })
+
+  it('tells every week which block it belongs to', () => {
+    // Four weeks to a block, cycling. Week 5 is the second block, week 9 the first again.
+    expect(plan.weeks[0].blockIndex).toBe(0)
+    expect(plan.weeks[3].blockIndex).toBe(0)
+    expect(plan.weeks[4].blockIndex).toBe(1)
+    expect(plan.weeks[8].blockIndex).toBe(0)
+  })
+
+  it('puts different movements in the first month and the ones after it', () => {
+    const idsOf = (weekIndex: number) =>
+      plan.weeks[weekIndex].days.flatMap((d) => d.exercises.map((e) => e.exerciseId))
+    const firstMonth = idsOf(0)
+    const secondMonth = idsOf(4)
+    expect(firstMonth.length).toBeGreaterThan(0)
+    expect(secondMonth.length).toBeGreaterThan(0)
+    // The whole point of the change: a home month and a gym month share nothing.
+    expect(firstMonth.some((id) => secondMonth.includes(id))).toBe(false)
+    expect(firstMonth).toContain('Pushups')
+    expect(secondMonth).toContain('Barbell_Full_Squat')
   })
 })

@@ -121,6 +121,35 @@ export interface OnboardingInput {
   constraints?: string
 }
 
+/**
+ * A four-week training block, which until now was only a week of days.
+ *
+ * A programme is `blocks[floor(week / 4) % blocks.length]`, so a block is
+ * already a month — the unit somebody means when they say "the first month at
+ * home and then the gym". It just had no way to say so: `place` and `intensity`
+ * are what let one block differ from the next in more than which movements were
+ * drawn, and what let a block header name itself on screen.
+ */
+export interface BlockPlan {
+  days: PlannedDay[]
+  /** Short name for the block header. At most a few words. */
+  label?: string
+  /**
+   * Where this block trains, which narrows the movements it may draw on.
+   *
+   * It can only ever NARROW the programme's own pool, never widen it: a member
+   * who said "home" does not get barbells because the coach felt like it. The
+   * widening happens once, upstream, when the intake reads two places in one
+   * sentence and answers `hibrido`.
+   */
+  place?: OnboardingInput['equipment']
+  /** Session volume for this block, which the day's session starts from. */
+  intensity?: Intensity
+}
+
+/** The half of a block that outlives assembly, kept so a week can name its block. */
+export type BlockMeta = Omit<BlockPlan, 'days'>
+
 export interface GeneratedDay {
   date: string
   day: DayOfWeek
@@ -141,7 +170,10 @@ export interface GeneratedPlan {
   rateKgPerWeek: number
   requestedDuration: DurationKey
   approvedDuration: DurationKey
-  weeks: { weekIndex: number; days: GeneratedDay[] }[]
+  /** `blockIndex` is absent on plans generated before blocks could differ. */
+  weeks: { weekIndex: number; blockIndex?: number; days: GeneratedDay[] }[]
+  /** One entry per block, in block order. Absent on plans from before this existed. */
+  blocks?: BlockMeta[]
   weeklyTemplate: WeeklyPlan
   milestones: { week: number; weight?: number; note: string }[]
   warnings: string[]

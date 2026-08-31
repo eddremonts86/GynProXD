@@ -2,7 +2,7 @@ import { generatedExercises } from '../data/exercises-generated'
 import { estimatePlan, DURATION_WEEKS } from './plan-estimate'
 import { toLocalIso } from './dates'
 import { DURATION_LABELS } from './labels'
-import type { DurationKey, GeneratedDay, GeneratedPlan, OnboardingInput, WeeklyPlan, PlannedDay, DayOfWeek } from './types'
+import type { BlockPlan, DurationKey, GeneratedDay, GeneratedPlan, OnboardingInput, WeeklyPlan, PlannedDay, DayOfWeek } from './types'
 
 /** Plan names are shown in the UI, so they use the English vocabulary. */
 const GOAL_PLAN_NAMES: Record<OnboardingInput['goal'], string> = {
@@ -186,8 +186,8 @@ export interface ProgrammeStructure {
   source: 'coach' | 'standard'
   name?: string
   coachNotes?: string
-  /** One weekly layout per training block, cycled across the calendar. */
-  blocks: PlannedDay[][]
+  /** One block per four weeks, cycled across the calendar. */
+  blocks: BlockPlan[]
 }
 
 /** Turns a designed structure into a dated calendar with deloads applied. */
@@ -198,8 +198,8 @@ export function assemblePlan(
   startDate = new Date(),
 ): GeneratedPlan {
   const { estimate, approvedDuration, weeks: actualWeeks } = resolveDuration(input, requested)
-  const blocks = structure.blocks.length > 0 ? structure.blocks : [[]]
-  const weeklyDays = blocks[0]
+  const blocks = structure.blocks.length > 0 ? structure.blocks : [{ days: [] }]
+  const weeklyDays = blocks[0].days
 
   const weeklyTemplate: WeeklyPlan = {
     id: `plan-gen-${crypto.randomUUID()}`,
@@ -216,8 +216,8 @@ export function assemblePlan(
 
   for (let w = 0; w < actualWeeks; w++) {
     const isDeload = (w + 1) % 4 === 0
-    const blockDays = blocks[Math.floor(w / 4) % blocks.length]
-    const days: GeneratedDay[] = blockDays
+    const blockIndex = Math.floor(w / 4) % blocks.length
+    const days: GeneratedDay[] = blocks[blockIndex].days
       .filter((d) => d.exercises.length > 0)
       .map((d) => {
         let exercises = d.exercises
@@ -233,7 +233,7 @@ export function assemblePlan(
           ecNote: isDeload ? undefined : d.ecNote,
         }
       })
-    weeks.push({ weekIndex: w, days })
+    weeks.push({ weekIndex: w, blockIndex, days })
   }
 
   return {
@@ -248,6 +248,9 @@ export function assemblePlan(
     requestedDuration: requested,
     approvedDuration,
     weeks,
+    /* Metadata only. The days live in `weeks`, already expanded onto dates, and
+       a second copy of them here would be a second thing to keep in step. */
+    blocks: blocks.map(({ days: _days, ...meta }) => meta),
     weeklyTemplate,
     milestones: estimate.milestones,
     warnings: estimate.warnings,
@@ -277,7 +280,11 @@ export function generatePlan(input: OnboardingInput, requested: DurationKey, sta
     })
     return days
   }
-  const blocks = Array.from({ length: blockCount }, (_, b) => buildWeek(b))
+  /* The deterministic designer does not phase: it varies movements per block
+     and nothing else, so every block inherits the programme's own place. It is
+     the fallback for a coach that did not answer, and inventing a periodisation
+     it was never asked for would be the wrong kind of initiative. */
+  const blocks = Array.from({ length: blockCount }, (_, b) => ({ days: buildWeek(b) }))
 
   return assemblePlan(input, requested, { source: 'standard', blocks }, startDate)
 }

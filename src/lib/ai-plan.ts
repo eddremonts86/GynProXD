@@ -10,11 +10,12 @@ import { GOAL_LABELS, LEVEL_LABELS, SEX_LABELS, TRAINING_PLACE_OPTIONS } from '.
 import { serverCapabilities } from './capabilities'
 import { activeAuthHeader } from './sync'
 import type {
+  BlockPlan,
   DayOfWeek,
   DurationKey,
   GeneratedPlan,
+  Intensity,
   OnboardingInput,
-  PlannedDay,
   PlannedExercise,
   ProgressionRule,
 } from './types'
@@ -46,6 +47,9 @@ export function aiCoachEnabled(): boolean {
 const REQUEST_TIMEOUT_MS = 180_000
 const DAY_VALUES: DayOfWeek[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
 const PROGRESSIONS: ProgressionRule[] = ['none', 'linear', 'double']
+/* The three the intake offers. A block may name one of these and no other, so a
+   hallucinated place cannot conjure a pool the programme never authorised. */
+const PLACE_VALUES: OnboardingInput['equipment'][] = ['hibrido', 'barbell', 'bodyweight']
 
 interface RawExercise {
   exerciseId?: unknown
@@ -115,13 +119,38 @@ export function validateBlocks(
   raw: unknown,
   input: OnboardingInput,
   maxBlocks: number,
-): PlannedDay[][] | null {
+): BlockPlan[] | null {
   const response = raw as RawResponse
   if (!response || !Array.isArray(response.blocks) || response.blocks.length === 0) return null
-  const allowed = allowedExerciseIds(input.equipment)
+  /**
+   * The programme's own pool, and the ceiling for every block.
+   *
+   * A block may say it trains somewhere narrower — that is the point of letting
+   * one differ from the next — but it may never reach past this. Intersecting
+   * rather than replacing is what stops a coach handing barbells to a member who
+   * said they train in a living room. Widening happens once, upstream: the intake
+   * reads two places in one sentence and answers `hibrido`, whose pool holds both.
+   */
+  const programmePool = allowedExerciseIds(input.equipment)
 
-  const blocks: PlannedDay[][] = []
+  const blocks: BlockPlan[] = []
   for (const rawBlock of response.blocks.slice(0, maxBlocks)) {
+    const rawPlace = (rawBlock as { place?: unknown })?.place
+    const place =
+      typeof rawPlace === 'string' && PLACE_VALUES.includes(rawPlace as OnboardingInput['equipment'])
+        ? (rawPlace as OnboardingInput['equipment'])
+        : undefined
+    const allowed = place
+      ? new Set([...allowedExerciseIds(place)].filter((id) => programmePool.has(id)))
+      : programmePool
+
+    const rawIntensity = (rawBlock as { intensity?: unknown })?.intensity
+    const intensity =
+      typeof rawIntensity === 'string' && ['I', 'II', 'III'].includes(rawIntensity)
+        ? (rawIntensity as Intensity)
+        : undefined
+    const label = cleanText((rawBlock as { label?: unknown })?.label, 28)
+
     const rawDays = (rawBlock as { days?: unknown })?.days
     if (!Array.isArray(rawDays) || rawDays.length !== Math.min(input.daysPerWeek, 7)) return null
 
@@ -160,13 +189,16 @@ export function validateBlocks(
       if (note) notesByDay.set(day, note)
     }
 
-    blocks.push(
-      DAY_VALUES.map((d) => ({
+    blocks.push({
+      days: DAY_VALUES.map((d) => ({
         day: d,
         exercises: byDay.get(d) ?? [],
         ecNote: notesByDay.get(d),
       })),
-    )
+      label: label || undefined,
+      place,
+      intensity,
+    })
   }
   return blocks.length > 0 ? blocks : null
 }
@@ -202,8 +234,11 @@ ${input.constraints}
 
 Requirements:
 - Design exactly ${blockCount} four-week training block(s). Blocks repeat in rotation. Each block after the first MUST swap at least half of the movements on every day for different ids from the list; changing only reps does not count.
+- Give every block a "label" of at most 28 characters naming what it is for, e.g. "Home base" or "Gym, heavier".
+- Give every block a "place": "bodyweight" for a room and a floor, "barbell" for a full gym, "hibrido" for both. It may only be NARROWER than the athlete's own setting above, never wider — a block cannot reach equipment they do not have. When their words describe moving from one place to another, that move belongs here.
+- Give every block an "intensity": "I" fewer sets, "II" normal, "III" more. Use it to make the blocks differ in volume as well as in movements, and follow their words about how hard they mean to go.
 - Each block is one training week: exactly ${input.daysPerWeek} days, values from mon,tue,wed,thu,fri,sat,sun, sensibly spaced, no duplicates.
-- ${perDay} movements per day, compounds first.
+- About ${perDay} movements per day, compounds first. Vary it with the block's intensity: a "I" block runs one fewer, a "III" block one more. Never fewer than three.
 - Use ONLY these movement ids, spelled verbatim:
 ${catalogue}
 - progression per movement: "linear" (add 2.5 kg each session), "double" (build reps to the top of the range, then add weight), or "none" (stretches, easy accessories). Beginners: mostly linear on compounds.
@@ -212,7 +247,7 @@ ${catalogue}
 - ecNote per day: ONE short optional line for anyone who finishes the day with something left, at most 120 characters. Concrete and additive, e.g. "Add a fourth set on the first movement" or "Finish with a 90 second plank". Never required, never medical advice.
 
 Reply with ONE minified JSON object on a single line, nothing else, exactly this shape:
-{"planName":"...","coachNotes":"...","blocks":[{"days":[{"day":"mon","ecNote":"...","exercises":[{"exerciseId":"...","progression":"linear","supersetGroup":null,"timed":false,"unilateral":false}]}]}]}
+{"planName":"...","coachNotes":"...","blocks":[{"label":"...","place":"hibrido","intensity":"II","days":[{"day":"mon","ecNote":"...","exercises":[{"exerciseId":"...","progression":"linear","supersetGroup":null,"timed":false,"unilateral":false}]}]}]}
 planName: at most 40 characters, no dates. coachNotes: 2 or 3 plain sentences on how the programme is built and why the blocks differ. No medical claims, no hyphens used as dashes.`
 }
 

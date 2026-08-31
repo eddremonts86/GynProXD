@@ -50,8 +50,16 @@ import {
   formatShortDate,
   pluralize,
 } from '../lib/labels'
+import { INTENSITY_SETS } from '../lib/intensity'
 import { cn } from '@/lib/utils'
 import type { DurationKey, GeneratedDay, ProgressionRule } from '../lib/types'
+
+/** Three words at most: this sits in a hint beside four other things. */
+const PLACE_SHORT: Record<string, string> = {
+  bodyweight: 'at home',
+  barbell: 'full gym',
+  hibrido: 'gym and home',
+}
 
 function isDeloadWeek(weekIndex: number): boolean {
   return (weekIndex + 1) % 4 === 0
@@ -75,6 +83,20 @@ export function GeneratedPlanPage() {
   const today = todayIso()
 
   const week = useMemo(() => plan?.weeks[activeWeek] ?? plan?.weeks[0], [plan, activeWeek])
+
+  /**
+   * Which block this week belongs to, when the programme has blocks that differ.
+   *
+   * Absent on everything designed before a block could say where it trains, and
+   * absent on any programme the coach did not phase — in both cases the header
+   * simply does not appear, rather than showing "Block 1 of 1" to say nothing.
+   */
+  const block = useMemo(() => {
+    if (!plan?.blocks || plan.blocks.length < 2 || week?.blockIndex === undefined) return null
+    const meta = plan.blocks[week.blockIndex]
+    if (!meta || (!meta.label && !meta.place && !meta.intensity)) return null
+    return { index: week.blockIndex, total: plan.blocks.length, ...meta }
+  }, [plan, week])
 
   /* The same numbers the kitchen uses elsewhere, from the same input that
      paces the training: the gym and the plate never disagree. */
@@ -233,7 +255,21 @@ export function GeneratedPlanPage() {
 
       <Section
         title={`Week ${week.weekIndex + 1}`}
-        hint={isDeloadWeek(week.weekIndex) ? 'Deload week, lighter on purpose' : undefined}
+        /* The block, when there is more than one and they differ. It belongs on
+           the week header rather than in a panel of its own: the question it
+           answers — "why do these movements look nothing like last month's" —
+           is asked while looking at the days. */
+        hint={
+          [
+            block ? `Block ${block.index + 1} of ${block.total}` : null,
+            block?.label,
+            block?.place ? PLACE_SHORT[block.place] : null,
+            block?.intensity ? `${INTENSITY_SETS[block.intensity]} sets` : null,
+            isDeloadWeek(week.weekIndex) ? 'Deload week, lighter on purpose' : null,
+          ]
+            .filter(Boolean)
+            .join(' · ') || undefined
+        }
         action={
           <>
             <IconButton
