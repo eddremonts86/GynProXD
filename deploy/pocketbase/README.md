@@ -31,6 +31,45 @@ Point a compose service at this directory (`docker-compose.yml`). First boot:
 Members never see this server: the app proxies `/pb` on its own origin
 (`SYNC_PROXY_TARGET` / `SYNC_UPSTREAM_HOST` env vars on the app service).
 
+## The default accounts, for testing
+
+Every app in this fleet seeds an admin and an ordinary member from
+`DEFAULT_ADMIN_*` / `DEFAULT_USER_*` so there is always something to sign in as.
+Here that is:
+
+```bash
+pnpm seed:accounts --server http://127.0.0.1:8095
+```
+
+Idempotent, and it refuses any server that is not a local address unless you
+pass `--force` — these are default credentials plus a platform-admin grant, and
+putting that pair on a reachable host hands the admin account to anyone who can
+read a repository.
+
+**An account is half an identity here, and the half a script can reach.** The
+other half is the local profile, whose key is derived from a passphrase inside
+the browser and written to `localStorage`; nothing outside that browser can make
+one. So the seeded admin is not "log in and you are admin" the way it is in the
+apps backed by Postgres. It is:
+
+1. create a local profile in the app — a name and a passphrase
+2. Sign in to sync with `DEFAULT_ADMIN_EMAIL` / `DEFAULT_ADMIN_PASSWORD`
+3. the next sync reads `platform_admins` and adopts `role: 'admin'`
+   (`syncGymBus` in `src/lib/sync.ts`)
+
+**The password on the wire is not the password.** Every sign-in sends
+`authPassOf(email, password)` — PBKDF2-SHA256, 310k iterations, salted by the
+address — because that same password also unwraps the account's data key and the
+server must never be able to do the second job. An account created with the raw
+password therefore exists, shows up in the superuser panel, takes a platform
+admin grant, and refuses every sign-in from the app with nothing to explain why.
+The seed imports the app's own `authPassOf` rather than restating it, which is
+the only version of this that stays true when the derivation changes.
+
+Existing accounts are left alone rather than having their passwords reset: a
+password here wraps the data key, so rewriting one from outside the app strands
+every encrypted row behind a key nobody holds.
+
 Environment for the compose (set as Coolify env vars on this service):
 
 | var | feeds | purpose |
