@@ -1,6 +1,7 @@
 import {
   KDF_ITERATIONS,
   authPassOf,
+  generateRecoveryCode,
   decryptJson,
   deriveKey,
   encryptJson,
@@ -141,16 +142,6 @@ export function planPush(
 }
 
 /** 25 characters, 5 bits each, no confusable letters. Shown exactly once. */
-export function generateRecoveryCode(): string {
-  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-  const bytes = randomBytes(25)
-  let code = ''
-  for (let i = 0; i < bytes.length; i++) {
-    if (i > 0 && i % 5 === 0) code += '-'
-    code += alphabet[bytes[i] & 31]
-  }
-  return code
-}
 
 interface WireRecord {
   id: string
@@ -248,7 +239,7 @@ interface AuthPayload {
  * cannot import this module — a seeding script on a server, for one — still
  * derives the credential from the same eleven lines.
  */
-export { authPassOf }
+export { authPassOf, generateRecoveryCode }
 
 async function authenticate(server: string, email: string, password: string): Promise<AuthPayload> {
   return request<AuthPayload>(server, '/api/collections/users/auth-with-password', {

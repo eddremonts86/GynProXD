@@ -34,7 +34,17 @@
  * to `grant-admin.mjs`: an admin account that is not marked is an ordinary
  * member, and the surfaces you seeded it to reach stay invisible.
  */
-import { authPassOf } from '../../src/lib/crypto.ts'
+import {
+  KDF_ITERATIONS,
+  authPassOf,
+  deriveKey,
+  encryptJson,
+  exportKeyBase64,
+  generateRecoveryCode,
+  importKeyBase64,
+  randomBytes,
+  toBase64,
+} from '../../src/lib/crypto.ts'
 
 interface Args {
   server?: string
@@ -137,6 +147,9 @@ interface ListPayload<T> {
   items: T[]
 }
 
+/** Printed once at the end: the only moment these exist outside a wrapped blob. */
+const recoveryCodes: string[] = []
+
 const su = await call<{ token: string }>('/api/collections/_superusers/auth-with-password', {
   method: 'POST',
   body: { identity: SU_EMAIL, password: SU_PASSWORD },
@@ -172,7 +185,54 @@ for (const account of ACCOUNTS) {
       token,
       body: { email, password: authPass, passwordConfirm: authPass, emailVisibility: false },
     })
-    console.log(`  ${account.label.padEnd(6)} ${email} — created`)
+
+    /**
+     * The account is not usable yet, and this is the half that is easy to miss.
+     *
+     * A `users` row authenticates. It does not make an enForma account: the app
+     * refuses to link one that has no `sync_state`, with "That account holds no
+     * training data yet" — correctly, because linking is a *pull*, and there is
+     * nothing on the far side to pull. Both entry points refuse it, so an
+     * account seeded without this is one nobody can sign into from the product
+     * even though every server-side check passes.
+     *
+     * So the same ceremony `createSyncAccount` performs: a random data key,
+     * wrapped twice — once under the password so the account opens with it, once
+     * under a one-time recovery code so a forgotten password is survivable — plus
+     * a sentinel the app decrypts to prove a secret is the right one. The server
+     * receives only wrapped blobs and can open none of them.
+     */
+    const auth = await call<{ token: string; record: { id: string } }>(
+      '/api/collections/users/auth-with-password',
+      { method: 'POST', body: { identity: email, password: authPass } },
+    )
+    const dataKey = await importKeyBase64(toBase64(randomBytes(32)))
+    const check = await encryptJson(dataKey, 'forma')
+
+    const encSalt = randomBytes(16)
+    const kek = await deriveKey(password, encSalt, KDF_ITERATIONS)
+    const wrappedDk = await encryptJson(kek, await exportKeyBase64(dataKey))
+
+    const recoveryCode = generateRecoveryCode()
+    const recoverySalt = randomBytes(16)
+    const wrapKey = await deriveKey(recoveryCode, recoverySalt)
+    const wrapped = await encryptJson(wrapKey, await exportKeyBase64(dataKey))
+
+    await call('/api/collections/sync_state/records', {
+      method: 'POST',
+      token: auth.token,
+      body: {
+        owner: auth.record.id,
+        salt: toBase64(encSalt),
+        iterations: KDF_ITERATIONS,
+        check,
+        wrapped_key: wrapped,
+        wrapped_dk: wrappedDk,
+        recovery_salt: toBase64(recoverySalt),
+      },
+    })
+    recoveryCodes.push(`${account.label}\t${email}\t${recoveryCode}`)
+    console.log(`  ${account.label.padEnd(6)} ${email} — created, with key material`)
   }
 
   if (!account.platformAdmin) continue
@@ -193,8 +253,17 @@ for (const account of ACCOUNTS) {
   }
 }
 
+if (recoveryCodes.length > 0) {
+  console.log(
+    '\n  Recovery codes — shown once, never recoverable, and the only way back into an\n'
+      + '  account whose password is lost. The server holds them wrapped and cannot read them.\n',
+  )
+  for (const line of recoveryCodes) console.log(`    ${line}`)
+}
+
 console.log(
   '\n  Server half done. These accounts have no local profile — nothing outside a\n'
-    + '  browser can make one. In the app: create a profile, then Sign in to sync with\n'
-    + '  the admin address above. The role arrives on the next sync.\n',
+    + '  browser can make one. In the app: create a profile, then Settings → Data →\n'
+    + '  "I already have one", and sign in with the admin address above. The role\n'
+    + '  arrives on the next sync.\n',
 )
