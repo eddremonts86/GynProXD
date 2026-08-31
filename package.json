@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "test": "vitest run",
+    "seed:accounts": "node --env-file-if-exists=.env.local --env-file-if-exists=.env scripts/admin/seed-default-accounts.ts",
     "preview": "vite preview"
   },
   "dependencies": {
