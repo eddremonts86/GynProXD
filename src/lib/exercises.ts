@@ -1,6 +1,6 @@
 import { generatedExercises } from '../data/exercises-generated'
 import { wgerExercises } from '../data/exercises-wger-generated'
-import { hasArtwork } from './images'
+import { artworkRank } from './images'
 import type { Exercise, LoggedExercise, SetEntry, Workout } from './types'
 
 const byIdCache = new Map<string, Exercise>()
@@ -24,24 +24,27 @@ export function exerciseLookup(custom: Exercise[]): Map<string, Exercise> {
 }
 
 /**
- * Browse order for the library: everything with a picture first, alphabetical
- * within each half.
+ * Browse order for the library: our own artwork, then wger's, then the
+ * movements with none. Alphabetical inside each band.
  *
- * A grid of typographic tiles reads as a broken page rather than a catalogue,
- * and 529 of the movements have no artwork — almost all of them wger's, which
- * ships text for far more movements than it illustrates. They are still there,
- * still searchable, still usable; they just stop interrupting the movements
- * somebody can recognise at a glance.
+ * A grid where every third card is a typographic tile reads as a broken page
+ * rather than a catalogue, and 529 of the 2,076 movements have no picture at
+ * all. Sinking those was the first half of the fix. The second is that wger's
+ * images are contributor uploads of uneven kind — mostly clean line drawings,
+ * but also logos and captioned composites — so they sit below the 1,547
+ * movements that share one visual language rather than interleaved with them.
  *
- * Sorted by a decorated copy: `hasArtwork` is cheap but a comparator would ask
+ * Nothing is hidden: everything stays searchable, filterable and usable, and
+ * the bands hold inside every filter because the order is applied before the
+ * list is filtered rather than after.
+ *
+ * Ranked into a map first: `artworkRank` is cheap, but a comparator would ask
  * it O(n log n) times over two thousand movements.
  */
 export function libraryOrder(exercises: Exercise[]): Exercise[] {
-  const illustrated = new Set(exercises.filter(hasArtwork).map((e) => e.id))
+  const rank = new Map(exercises.map((e) => [e.id, artworkRank(e)]))
   return [...exercises].sort(
-    (a, b) =>
-      Number(illustrated.has(b.id)) - Number(illustrated.has(a.id)) ||
-      a.name.localeCompare(b.name),
+    (a, b) => (rank.get(a.id) ?? 2) - (rank.get(b.id) ?? 2) || a.name.localeCompare(b.name),
   )
 }
 

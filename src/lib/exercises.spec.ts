@@ -117,23 +117,39 @@ describe('e1rmSeries', () => {
 })
 
 describe('libraryOrder', () => {
-  const withPhoto: Exercise = { ...ex, id: 'z-photo', name: 'Zercher Squat', image: 'https://cdn/z.jpg' }
-  const withoutArt: Exercise = { ...ex, id: 'a-bare', name: 'Ab Wheel', image: null }
-  const alsoWithout: Exercise = { ...ex, id: 'b-bare', name: 'Back Lever' }
-  const alsoWithPhoto: Exercise = { ...ex, id: 'y-photo', name: 'Yates Row', image: '/repdb/y.webp' }
+  const photo: Exercise = {
+    ...ex,
+    id: 'z-photo',
+    name: 'Zercher Squat',
+    image: 'https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Z/0.jpg',
+  }
+  const illustration: Exercise = { ...ex, id: 'y-repdb', name: 'Yates Row', image: '/repdb/y-peak.webp' }
+  const fromWger: Exercise = {
+    ...ex,
+    id: 'wger-1',
+    name: 'Ab Wheel',
+    image: 'https://wger.de/media/exercise-images/1/a.png',
+  }
+  const bare: Exercise = { ...ex, id: 'a-bare', name: 'Ab Roller', image: null }
+  const alsoBare: Exercise = { ...ex, id: 'b-bare', name: 'Back Lever' }
 
-  it('sinks movements with no artwork below every movement that has some', () => {
-    const order = libraryOrder([withoutArt, withPhoto, alsoWithout, alsoWithPhoto])
-    expect(order.map((e) => e.id)).toEqual(['y-photo', 'z-photo', 'a-bare', 'b-bare'])
+  it('ranks our own artwork, then wger, then nothing at all', () => {
+    const order = libraryOrder([bare, fromWger, photo, alsoBare, illustration])
+    expect(order.map((e) => e.id)).toEqual(['y-repdb', 'z-photo', 'wger-1', 'a-bare', 'b-bare'])
   })
 
-  it('keeps each half alphabetical', () => {
-    const order = libraryOrder([alsoWithPhoto, withPhoto])
+  it('keeps each band alphabetical', () => {
+    const order = libraryOrder([photo, illustration])
     expect(order.map((e) => e.name)).toEqual(['Yates Row', 'Zercher Squat'])
   })
 
+  it('sorts a wger image above no image even when the name says otherwise', () => {
+    /* "Ab Wheel" precedes "Ab Roller" only because it has something to show. */
+    expect(libraryOrder([bare, fromWger]).map((e) => e.id)).toEqual(['wger-1', 'a-bare'])
+  })
+
   it('does not mutate what it was given', () => {
-    const input = [withoutArt, withPhoto]
+    const input = [bare, photo]
     libraryOrder(input)
     expect(input.map((e) => e.id)).toEqual(['a-bare', 'z-photo'])
   })

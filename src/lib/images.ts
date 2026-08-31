@@ -12,6 +12,7 @@ const illustrations = repdbMap as Record<string, string>
  */
 const JSDELIVR_PREFIX = 'https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/'
 const SAME_ORIGIN_PREFIX = '/exercise-img/'
+const REPDB_PREFIX = '/repdb/'
 
 export function sameOriginImage(url: string): string {
   return url.startsWith(JSDELIVR_PREFIX)
@@ -64,11 +65,27 @@ export function exerciseIllustration(exerciseId: string): string | null {
 }
 
 /**
- * Whether anything but a typographic tile will render for this movement.
+ * How well a movement will render, on the three-way scale the library browses in.
  *
- * Cheaper than `exerciseImageCandidates`, which allocates: this answers the
- * yes/no a sort or a filter needs without building the cascade.
+ * `0` — our own material: a free-exercise-db photograph or a RepDB
+ *   illustration. One visual language across 1,547 movements, which is what
+ *   makes a grid of them read as a catalogue.
+ * `1` — a picture from wger, uploaded by whoever wrote the movement. Most are
+ *   clean line drawings; a minority are logos, video stills or two-panel
+ *   composites with their own captions burnt in. Good enough to show, not
+ *   consistent enough to lead with.
+ * `2` — nothing, and a typographic muscle tile renders instead.
+ *
+ * Cheaper than `exerciseImageCandidates`, which allocates: this answers what a
+ * sort needs without building the cascade.
  */
-export function hasArtwork(exercise: Pick<Exercise, 'id' | 'image'>): boolean {
-  return !!exercise.image || !!illustrations[exercise.id]
+export function artworkRank(exercise: Pick<Exercise, 'id' | 'image'>): 0 | 1 | 2 {
+  if (illustrations[exercise.id]) return 0
+  const source = exercise.image
+  if (!source) return 2
+  const ours =
+    source.startsWith(JSDELIVR_PREFIX) ||
+    source.startsWith(SAME_ORIGIN_PREFIX) ||
+    source.startsWith(REPDB_PREFIX)
+  return ours ? 0 : 1
 }
