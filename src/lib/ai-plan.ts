@@ -218,6 +218,9 @@ Athlete:
 - ${input.age} years old, ${SEX_LABELS[input.sex].toLowerCase()}, ${input.weightKg} kg${input.targetWeightKg ? `, target ${input.targetWeightKg} kg` : ''}${input.heightCm ? `, ${input.heightCm} cm` : ''}
 - Goal: ${GOAL_LABELS[input.goal]}. Experience: ${LEVEL_LABELS[input.level]}.
 - Trains ${input.daysPerWeek} days a week, ${input.minsPerSession} minutes per session. Training at: ${place}.
+${input.trainingDays?.length ? `- The days are fixed: ${input.trainingDays.join(', ')}. Use exactly these and space the work to suit them — two in a row is a different programme from every other day.` : ''}
+${input.limitations ? `- TRAIN AROUND THIS, in their words: "${input.limitations}". Leave out anything that loads it. Do not substitute a lighter version of the same movement, and do not mention it back to them as advice.` : ''}
+${input.avoid ? `- They do not want: ${input.avoid}. Honour it even where a replacement is worse on paper; a programme nobody follows trains nobody.` : ''}
 ${rate > 0 ? `- Weight pace is fixed at ${rate} kg/week by a separate calculation. Do not mention or change it.` : ''}
 ${
   input.constraints

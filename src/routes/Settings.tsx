@@ -304,16 +304,17 @@ export function SettingsPage() {
             >
               free-exercise-db
             </a>{' '}
-            (public domain). Offline fallback illustrations from{' '}
+            (public domain). Exercise data by{' '}
             <a
-              href="https://repdb.co/free-exercise-dataset"
+              href="https://repdb.co"
               target="_blank"
               rel="noreferrer"
               className="text-brand underline underline-offset-2"
             >
-              RepDB
+              RepDB (repdb.co)
             </a>{' '}
-            under its free-tier attribution licence.
+            — 446 further movements, their illustrations, MET values and Spanish text, under its
+            free-tier attribution licence.
           </p>
           <p className="max-w-[62ch] text-2xs">
             Recipes, their photos, preparation steps and nutrition numbers come from USDA MyPlate

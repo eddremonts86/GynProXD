@@ -11,9 +11,9 @@ progress with zero accounts and zero servers in v1.
   copied. Features/ideas are not copyrightable; the implementation here is original.
 - **Exercise media:** none bundled in v1. The openGym pipeline's GIFs are © Gym Visual
   (commercial stock) — never copy them without a license.
-- **Exercise dataset:** seed data written by hand (~22 exercises). Optional import from
-  `yuhonas/free-exercise-db` via `scripts/import-free-exercise-db.mjs` (Unlicense / public
-  domain).
+- **Exercise dataset:** seed data written by hand (~22 exercises). The bundled catalogue is
+  built by `scripts/import-exercises.mjs` from `yuhonas/free-exercise-db` (Unlicense / public
+  domain) and the RepDB free tier (attribution required, in-app use only).
 - **Name:** GynProXD (no relation to "openGym" branding).
 
 ## Stack

@@ -6,6 +6,7 @@ export const generatedExercises: Exercise[] = [
     "name": "3/4 Sit-Up",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/3_4_Sit-Up/0.jpg",
     "instructions": [
       "Lie down on the floor and secure your feet. Your legs should be bent at the knees.",
@@ -20,6 +21,7 @@ export const generatedExercises: Exercise[] = [
     "name": "90/90 Hamstring",
     "muscle": "hamstrings",
     "equipment": "bodyweight",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/90_90_Hamstring/0.jpg",
     "instructions": [
       "Lie on your back, with one leg extended straight out.",
@@ -33,6 +35,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Ab Crunch Machine",
     "muscle": "core",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Ab_Crunch_Machine/0.jpg",
     "instructions": [
       "Select a light resistance and sit down on the ab machine placing your feet under the pads provided and grabbing the top handles. Your arms should be bent at a 90 degree angle as you rest the triceps on the pads provided. This will be your starting position.",
@@ -46,6 +49,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Ab Roller",
     "muscle": "core",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Ab_Roller/0.jpg",
     "instructions": [
       "Hold the Ab Roller with both hands and kneel on the floor.",
@@ -55,10 +59,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "ab-wheel-rollout",
+    "name": "Ab Wheel Rollout",
+    "muscle": "core",
+    "equipment": "other",
+    "category": "strength",
+    "image": "/repdb/ab-wheel-rollout-start.webp",
+    "instructions": [
+      "Kneel on the floor and grip the ab wheel handles shoulder-width.",
+      "Brace the core hard so the lower back stays neutral.",
+      "Roll the wheel slowly forward, extending the body as far as you can control.",
+      "Stop before the hips sag or the back arches.",
+      "Pull the wheel back to the knees by contracting the abs."
+    ]
+  },
+  {
     "id": "Adductor",
     "name": "Adductor",
     "muscle": "glutes",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Adductor/0.jpg",
     "instructions": [
       "Lie face down with one leg on a foam roll.",
@@ -71,6 +91,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Adductor/Groin",
     "muscle": "glutes",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Adductor_Groin/0.jpg",
     "instructions": [
       "Lie on your back with your feet raised towards the ceiling.",
@@ -84,6 +105,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Advanced Kettlebell Windmill",
     "muscle": "core",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Advanced_Kettlebell_Windmill/0.jpg",
     "instructions": [
       "Clean and press a kettlebell overhead with one arm.",
@@ -97,6 +119,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Air Bike",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Air_Bike/0.jpg",
     "instructions": [
       "Lie flat on the floor with your lower back pressed to the ground. For this exercise, you will need to put your hands beside your head. Be careful however to not strain with the neck as you perform it. Now lift your shoulders into the crunch position.",
@@ -112,6 +135,7 @@ export const generatedExercises: Exercise[] = [
     "name": "All Fours Quad Stretch",
     "muscle": "quads",
     "equipment": "bodyweight",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/All_Fours_Quad_Stretch/0.jpg",
     "instructions": [
       "Start off on your hands and knees, then lift your leg off the floor and hold the foot with your hand.",
@@ -124,6 +148,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Alternate Hammer Curl",
     "muscle": "biceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Alternate_Hammer_Curl/0.jpg",
     "instructions": [
       "Stand up with your torso upright and a dumbbell in each hand being held at arms length. The elbows should be close to the torso.",
@@ -139,6 +164,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Alternate Heel Touchers",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Alternate_Heel_Touchers/0.jpg",
     "instructions": [
       "Lie on the floor with the knees bent and the feet on the floor around 18-24 inches apart. Your arms should be extended by your side. This will be your starting position.",
@@ -153,6 +179,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Alternate Incline Dumbbell Curl",
     "muscle": "biceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Alternate_Incline_Dumbbell_Curl/0.jpg",
     "instructions": [
       "Sit down on an incline bench with a dumbbell in each hand being held at arms length. Tip: Keep the elbows close to the torso.This will be your starting position.",
@@ -167,6 +194,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Alternate Leg Diagonal Bound",
     "muscle": "quads",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Alternate_Leg_Diagonal_Bound/0.jpg",
     "instructions": [
       "Assume a comfortable stance with one foot slightly in front of the other.",
@@ -180,6 +208,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Alternating Cable Shoulder Press",
     "muscle": "shoulders",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Alternating_Cable_Shoulder_Press/0.jpg",
     "instructions": [
       "Move the cables to the bottom of the tower and select an appropriate weight.",
@@ -193,6 +222,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Alternating Deltoid Raise",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Alternating_Deltoid_Raise/0.jpg",
     "instructions": [
       "In a standing position, hold a pair of dumbbells at your side.",
@@ -207,6 +237,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Alternating Floor Press",
     "muscle": "chest",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Alternating_Floor_Press/0.jpg",
     "instructions": [
       "Lie on the floor with two kettlebells next to your shoulders.",
@@ -220,6 +251,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Alternating Hang Clean",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Alternating_Hang_Clean/0.jpg",
     "instructions": [
       "Place two kettlebells between your feet. To get in the starting position, push your butt back and look straight ahead.",
@@ -232,6 +264,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Alternating Kettlebell Press",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Alternating_Kettlebell_Press/0.jpg",
     "instructions": [
       "Clean two kettlebells to your shoulders. Clean the kettlebells to your shoulders by extending through the legs and hips as you pull the kettlebells towards your shoulders. Rotate your wrists as you do so.",
@@ -244,6 +277,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Alternating Kettlebell Row",
     "muscle": "back",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Alternating_Kettlebell_Row/0.jpg",
     "instructions": [
       "Place two kettlebells in front of your feet. Bend your knees slightly and push your butt out as much as possible. As you bend over to get into the starting position grab both kettlebells by the handles.",
@@ -256,6 +290,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Alternating Renegade Row",
     "muscle": "back",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Alternating_Renegade_Row/0.jpg",
     "instructions": [
       "Place two kettlebells on the floor about shoulder width apart. Position yourself on your toes and your hands as though you were doing a pushup, with the body straight and extended. Use the handles of the kettlebells to support your upper body. You may need to position your feet wide for support.",
@@ -268,6 +303,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Ankle Circles",
     "muscle": "calves",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Ankle_Circles/0.jpg",
     "instructions": [
       "Use a sturdy object like a squat rack to hold yourself.",
@@ -280,6 +316,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Ankle On The Knee",
     "muscle": "glutes",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Ankle_On_The_Knee/0.jpg",
     "instructions": [
       "From a lying position, bend your knees and keep your feet on the floor.",
@@ -292,6 +329,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Anterior Tibialis-SMR",
     "muscle": "calves",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Anterior_Tibialis-SMR/0.jpg",
     "instructions": [
       "Begin seated on the ground with your legs bent and your feet on the floor.",
@@ -303,6 +341,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Anti-Gravity Press",
     "muscle": "shoulders",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Anti-Gravity_Press/0.jpg",
     "instructions": [
       "Place a bar on the ground behind the head of an incline bench.",
@@ -312,10 +351,41 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "archer-pull-ups",
+    "name": "Archer Pull Ups",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/archer-pull-ups-start.webp",
+    "instructions": [
+      "Grip the bar wider than shoulder width with palms facing away.",
+      "Pull yourself up while shifting your body toward one hand.",
+      "Keep the opposite arm straight as a support.",
+      "Lower yourself under control back to the hang.",
+      "Alternate sides each rep or complete reps on one side first."
+    ]
+  },
+  {
+    "id": "archer-push-ups",
+    "name": "Archer Push Ups",
+    "muscle": "chest",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/archer-push-ups-start.webp",
+    "instructions": [
+      "Set up in a wide push-up position with arms straight.",
+      "Lower yourself toward one hand while keeping the other arm straight.",
+      "Keep your core tight and body in a straight line.",
+      "Press back up to the start position.",
+      "Alternate sides each rep for the desired number of reps."
+    ]
+  },
+  {
     "id": "Arm_Circles",
     "name": "Arm Circles",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Arm_Circles/0.jpg",
     "instructions": [
       "Stand up and extend your arms straight out by the sides. The arms should be parallel to the floor and perpendicular (90-degree angle) to your torso. This will be your starting position.",
@@ -328,6 +398,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Arnold Dumbbell Press",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Arnold_Dumbbell_Press/0.jpg",
     "instructions": [
       "Sit on an exercise bench with back support and hold two dumbbells in front of you at about upper chest level with your palms facing your body and your elbows bent. Tip: Your arms should be next to your torso. The starting position should look like the contracted portion of a dumbbell curl.",
@@ -338,10 +409,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "arnold-press",
+    "name": "Arnold Press",
+    "muscle": "shoulders",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/arnold-press-start.webp",
+    "instructions": [
+      "Hold a pair of dumbbells at shoulder height with palms facing you.",
+      "Press the dumbbells overhead while rotating your palms to face forward.",
+      "Fully extend your arms at the top without locking the elbows.",
+      "Reverse the motion and rotate back to the start.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
     "id": "Around_The_Worlds",
     "name": "Around The Worlds",
     "muscle": "chest",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Around_The_Worlds/0.jpg",
     "instructions": [
       "Lay down on a flat bench holding a dumbbell in each hand with the palms of the hands facing towards the ceiling. Tip: Your arms should be parallel to the floor and next to your thighs. To avoid injury, make sure that you keep your elbows slightly bent. This will be your starting position.",
@@ -350,10 +437,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "assisted-pull-ups",
+    "name": "Assisted Pull Ups",
+    "muscle": "back",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/assisted-pull-ups-start.webp",
+    "instructions": [
+      "Place your knees on the assisted pull-up machine pad.",
+      "Grip the bar with palms facing away, slightly wider than shoulders.",
+      "Pull your chest toward the bar by driving your elbows down.",
+      "Lower yourself under control to a full hang.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
     "id": "Atlas_Stone_Trainer",
     "name": "Atlas Stone Trainer",
     "muscle": "back",
     "equipment": "other",
+    "category": "strongman",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Atlas_Stone_Trainer/0.jpg",
     "instructions": [
       "This trainer is effective for developing Atlas Stone strength for those who don't have access to stones, and are typically made from bar ends or heavy pipe.",
@@ -367,6 +470,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Atlas Stones",
     "muscle": "back",
     "equipment": "other",
+    "category": "strongman",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Atlas_Stones/0.jpg",
     "instructions": [
       "Begin with the atlas stone between your feet. Bend at the hips to wrap your arms vertically around the Atlas Stone, attempting to get your fingers underneath the stone. Many stones will have a small flat portion on the bottom, which will make the stone easier to hold.",
@@ -380,6 +484,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Axle Deadlift",
     "muscle": "back",
     "equipment": "other",
+    "category": "strongman",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Axle_Deadlift/0.jpg",
     "instructions": [
       "Approach the bar so that it is centered over your feet. You feet should be about hip width apart. Bend at the hip to grip the bar at shoulder width, allowing your shoulder blades to protract. Typically, you would use an over/under grip.",
@@ -389,10 +494,25 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "back-extension",
+    "name": "Back Extension",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/back-extension-start.webp",
+    "instructions": [
+      "Lie face down on a hyperextension bench with hips at the pad edge.",
+      "Lower your upper body toward the floor.",
+      "Raise your torso back up until your body is straight.",
+      "Repeat."
+    ]
+  },
+  {
     "id": "Back_Flyes_-_With_Bands",
     "name": "Back Flyes - With Bands",
     "muscle": "shoulders",
     "equipment": "band",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Back_Flyes_-_With_Bands/0.jpg",
     "instructions": [
       "Run a band around a stationary post like that of a squat rack.",
@@ -404,10 +524,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "back-lever",
+    "name": "Back Lever",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/back-lever-main.webp",
+    "instructions": [
+      "Hang from a bar with an overhand grip and rotate backward through the arms until inverted.",
+      "Lower the body forward and down until it is horizontal, facing the floor.",
+      "Keep the arms straight and the whole body in one rigid line from head to heels.",
+      "Brace the core and squeeze the glutes so the hips and shoulders do not sag.",
+      "Hold for time, then rotate back up under control."
+    ]
+  },
+  {
     "id": "Backward_Drag",
     "name": "Backward Drag",
     "muscle": "quads",
     "equipment": "other",
+    "category": "strongman",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Backward_Drag/0.jpg",
     "instructions": [
       "Load a sled with the desired weight, attaching a rope or straps to the sled that you can hold onto.",
@@ -419,6 +555,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Backward Medicine Ball Throw",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Backward_Medicine_Ball_Throw/0.jpg",
     "instructions": [
       "This exercise is best done with a partner. If you lack a partner, the ball can be thrown and retrieved or thrown against a wall.",
@@ -432,6 +569,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Balance Board",
     "muscle": "calves",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Balance_Board/0.jpg",
     "instructions": [
       "Place a balance board in front of you.",
@@ -444,6 +582,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Ball Leg Curl",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Ball_Leg_Curl/0.jpg",
     "instructions": [
       "Begin on the floor laying on your back with your feet on top of the ball.",
@@ -454,10 +593,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "ball-pike",
+    "name": "Ball Pike",
+    "muscle": "core",
+    "equipment": "other",
+    "category": "strength",
+    "image": "/repdb/ball-pike-start.webp",
+    "instructions": [
+      "Place the shins on a stability ball and hands on the floor in a high plank.",
+      "Brace the core and keep the legs straight.",
+      "Pike the hips up, rolling the ball toward the chest as the body forms an inverted V.",
+      "Pause briefly at the top.",
+      "Roll the ball back out to the starting plank."
+    ]
+  },
+  {
     "id": "Band_Assisted_Pull-Up",
     "name": "Band Assisted Pull-Up",
     "muscle": "back",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Band_Assisted_Pull-Up/0.jpg",
     "instructions": [
       "Choke the band around the center of the pullup bar. You can use different bands to provide varying levels of assistance.",
@@ -471,6 +626,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Band Good Morning",
     "muscle": "hamstrings",
     "equipment": "band",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Band_Good_Morning/0.jpg",
     "instructions": [
       "Using a 41 inch band, stand on one end, spreading your feet a small amount. Bend at the hips to loop the end of the band behind your neck. This will be your starting position.",
@@ -483,6 +639,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Band Good Morning (Pull Through)",
     "muscle": "hamstrings",
     "equipment": "band",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Band_Good_Morning_Pull_Through/0.jpg",
     "instructions": [
       "Loop the band around a post. Standing a little ways away, loop the opposite end around the neck. Your hands can help hold the band in position.",
@@ -495,6 +652,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Band Hip Adductions",
     "muscle": "glutes",
     "equipment": "band",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Band_Hip_Adductions/0.jpg",
     "instructions": [
       "Anchor a band around a solid post or other object.",
@@ -510,6 +668,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Band Pull Apart",
     "muscle": "shoulders",
     "equipment": "band",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Band_Pull_Apart/0.jpg",
     "instructions": [
       "Begin with your arms extended straight out in front of you, holding the band with both hands.",
@@ -523,6 +682,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Band Skull Crusher",
     "muscle": "triceps",
     "equipment": "band",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Band_Skull_Crusher/0.jpg",
     "instructions": [
       "Secure a band to the base of a rack or the bench. Lay on the bench so that the band is lined up with your head.",
@@ -531,10 +691,387 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "banded-adductor-stretch",
+    "name": "Banded Adductor Stretch",
+    "muscle": "glutes",
+    "equipment": "band",
+    "category": "stretching",
+    "image": "/repdb/banded-adductor-stretch-main.webp",
+    "instructions": [
+      "Lie on your back with a band looped around one foot.",
+      "Raise that leg and let it open out to the side.",
+      "Hold the band to control how far the leg lowers.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
+    "id": "banded-ankle-stretch",
+    "name": "Banded Ankle Stretch",
+    "muscle": "calves",
+    "equipment": "band",
+    "category": "stretching",
+    "image": "/repdb/banded-ankle-stretch-main.webp",
+    "instructions": [
+      "Sit with one leg extended and a band around the forefoot.",
+      "Hold the band in both hands.",
+      "Pull so the toes draw back toward your shin.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
+    "id": "banded-calf-stretch",
+    "name": "Banded Calf Stretch",
+    "muscle": "calves",
+    "equipment": "band",
+    "category": "stretching",
+    "image": "/repdb/banded-calf-stretch-main.webp",
+    "instructions": [
+      "Lie on your back and loop a band around the ball of one foot.",
+      "Raise the leg and keep it fairly straight.",
+      "Pull the band so your toes draw back toward your shin.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
+    "id": "banded-chest-stretch",
+    "name": "Banded Chest Stretch",
+    "muscle": "chest",
+    "equipment": "band",
+    "category": "stretching",
+    "image": "/repdb/banded-chest-stretch-main.webp",
+    "instructions": [
+      "Hold a band behind your back with both hands.",
+      "Straighten your arms and draw them apart.",
+      "Lift your chest and squeeze your shoulder blades.",
+      "Hold for 20 to 30 seconds, breathing steadily."
+    ]
+  },
+  {
+    "id": "banded-clamshell",
+    "name": "Banded Clamshell",
+    "muscle": "glutes",
+    "equipment": "band",
+    "category": "strength",
+    "image": "/repdb/banded-clamshell-start.webp",
+    "instructions": [
+      "Lie on your side with hips and knees bent to roughly 45 degrees, feet stacked.",
+      "Place a loop band around both legs above the knees.",
+      "Keep the feet pressed together and the pelvis stable — do not roll back as you move.",
+      "Open the top knee upward against the band, like a clamshell opening, until you feel the glute fire.",
+      "Pause briefly at the top, then lower under control to the start.",
+      "Complete all reps on one side, then switch."
+    ]
+  },
+  {
+    "id": "banded-figure-4-stretch",
+    "name": "Banded Figure-4 Stretch",
+    "muscle": "glutes",
+    "equipment": "band",
+    "category": "stretching",
+    "image": "/repdb/banded-figure-4-stretch-main.webp",
+    "instructions": [
+      "Lie on your back and cross one ankle over the opposite thigh.",
+      "Loop a band around the supporting thigh.",
+      "Pull both legs toward your chest with the band.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
+    "id": "banded-fire-hydrant",
+    "name": "Banded Fire Hydrant",
+    "muscle": "glutes",
+    "equipment": "band",
+    "category": "strength",
+    "image": "/repdb/banded-fire-hydrant-start.webp",
+    "instructions": [
+      "Place a loop band just above your knees and assume a quadruped position with hands under shoulders and knees under hips.",
+      "Keep your core engaged and back flat, maintaining a neutral spine throughout the movement.",
+      "Slowly lift one knee out to the side, keeping the knee bent at 90 degrees, until your thigh is parallel to the floor.",
+      "Hold briefly at the top, squeezing your glute, then slowly lower your leg back to the starting position with control.",
+      "Complete all repetitions on one side before switching to the other side."
+    ]
+  },
+  {
+    "id": "banded-glute-bridge",
+    "name": "Banded Glute Bridge",
+    "muscle": "glutes",
+    "equipment": "band",
+    "category": "strength",
+    "image": "/repdb/banded-glute-bridge-start.webp",
+    "instructions": [
+      "Lie on your back with the knees bent and feet flat on the floor, shoulder-width apart.",
+      "Place a loop band around both legs just above the knees.",
+      "Press the lower back into the floor and brace the core.",
+      "Drive through the heels and squeeze the glutes to lift the hips into a bridge — keep the band tension by pushing the knees outward.",
+      "At the top, the body forms a straight line from shoulders to knees. Pause briefly.",
+      "Lower under control to the start and repeat for the recommended number of repetitions."
+    ]
+  },
+  {
+    "id": "banded-hamstring-stretch",
+    "name": "Banded Hamstring Stretch",
+    "muscle": "hamstrings",
+    "equipment": "band",
+    "category": "stretching",
+    "image": "/repdb/banded-hamstring-stretch-main.webp",
+    "instructions": [
+      "Lie on your back and loop a band around one foot.",
+      "Raise that leg straight up, holding the band in both hands.",
+      "Gently pull the band to draw the leg toward you.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
+    "id": "banded-hip-thrust",
+    "name": "Banded Hip Thrust",
+    "muscle": "glutes",
+    "equipment": "band",
+    "category": "strength",
+    "image": "/repdb/banded-hip-thrust-start.webp",
+    "instructions": [
+      "Place a loop band just above your knees and sit on the floor with your upper back against a bench.",
+      "Bend your knees, plant your feet hip-width apart, and position the band to create tension.",
+      "Drive through your heels, extend your hips, and lift your glutes off the floor until your body forms a straight line from shoulders to knees.",
+      "Squeeze your glutes forcefully at the top, ensuring your knees are pushed out against the band.",
+      "Slowly lower your hips back to the starting position with control."
+    ]
+  },
+  {
+    "id": "banded-it-band-stretch",
+    "name": "Banded IT-Band Stretch",
+    "muscle": "glutes",
+    "equipment": "band",
+    "category": "stretching",
+    "image": "/repdb/banded-it-band-stretch-main.webp",
+    "instructions": [
+      "Lie on your back with a band around one raised foot.",
+      "Hold the band with the opposite hand.",
+      "Draw the straight leg across your body toward the floor.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
+    "id": "banded-kneeling-hip-thrust",
+    "name": "Banded Kneeling Hip Thrust",
+    "muscle": "glutes",
+    "equipment": "band",
+    "category": "strength",
+    "image": "/repdb/banded-kneeling-hip-thrust-start.webp",
+    "instructions": [
+      "Place a loop band just above your knees. Kneel on the floor with your torso upright and knees hip-width apart.",
+      "Lean slightly forward from your hips, keeping your back straight and core braced.",
+      "Initiate the movement by squeezing your glutes, driving your hips forward until your torso is upright.",
+      "Squeeze your glutes hard at the top, maintaining tension on the band.",
+      "Slowly reverse the movement, controlling the band's resistance as you return to the starting position."
+    ]
+  },
+  {
+    "id": "banded-lat-stretch",
+    "name": "Banded Lat Stretch",
+    "muscle": "back",
+    "equipment": "band",
+    "category": "stretching",
+    "image": "/repdb/banded-lat-stretch-main.webp",
+    "instructions": [
+      "Hold a band overhead with both hands under light tension.",
+      "Hinge forward at the hips with your arms reaching ahead.",
+      "Let your chest sink to lengthen the sides of your back.",
+      "Hold for 20 to 30 seconds, breathing steadily."
+    ]
+  },
+  {
+    "id": "banded-lateral-walk",
+    "name": "Banded Lateral Walk",
+    "muscle": "glutes",
+    "equipment": "band",
+    "category": "strength",
+    "image": "/repdb/banded-lateral-walk-start.webp",
+    "instructions": [
+      "Place a loop band around the legs above the knees (or around the ankles for a harder version).",
+      "Stand in a quarter-squat: feet shoulder-width, hips back, chest up, knees tracking over the toes.",
+      "Step one foot directly out to the side against the band tension.",
+      "Bring the trailing foot in toward the lead — keep tension on the band the entire time, do not let the feet snap together.",
+      "Continue side-stepping in one direction for the prescribed reps or distance, then reverse.",
+      "Stay low throughout; do not pop up between steps."
+    ]
+  },
+  {
+    "id": "banded-rear-delt-stretch",
+    "name": "Banded Rear Delt Stretch",
+    "muscle": "shoulders",
+    "equipment": "band",
+    "category": "stretching",
+    "image": "/repdb/banded-rear-delt-stretch-main.webp",
+    "instructions": [
+      "Loop a band around one arm and hold the other end.",
+      "Draw that arm horizontally across your chest.",
+      "Use the band to deepen the pull gently.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
+    "id": "banded-romanian-deadlift",
+    "name": "Banded Romanian Deadlift",
+    "muscle": "glutes",
+    "equipment": "band",
+    "category": "strength",
+    "image": "/repdb/banded-romanian-deadlift-start.webp",
+    "instructions": [
+      "Stand on a loop band with both feet and grip the top of the band.",
+      "Set feet hip-width with a soft bend in the knees.",
+      "Hinge at the hips, sliding the hands down the legs.",
+      "Lower until you feel a stretch in the hamstrings.",
+      "Drive the hips forward to return to standing."
+    ]
+  },
+  {
+    "id": "banded-seated-hip-abduction",
+    "name": "Banded Seated Hip Abduction",
+    "muscle": "glutes",
+    "equipment": "band",
+    "category": "strength",
+    "image": "/repdb/banded-seated-hip-abduction-start.webp",
+    "instructions": [
+      "Sit on a bench or chair with a loop band around your knees.",
+      "Keep your feet flat on the floor, hip-width apart, and maintain an upright posture.",
+      "Push your knees outwards against the band, engaging your glutes.",
+      "Hold the peak contraction briefly, then slowly return your knees to the starting position.",
+      "Control the movement throughout the entire range of motion."
+    ]
+  },
+  {
+    "id": "banded-shoulder-stretch",
+    "name": "Banded Shoulder Stretch",
+    "muscle": "shoulders",
+    "equipment": "band",
+    "category": "stretching",
+    "image": "/repdb/banded-shoulder-stretch-main.webp",
+    "instructions": [
+      "Hold a band behind your back, one hand high and one low.",
+      "Keep light tension in the band.",
+      "Open your chest and draw your shoulders gently back.",
+      "Hold for 20 to 30 seconds, breathing steadily."
+    ]
+  },
+  {
+    "id": "banded-squat",
+    "name": "Banded Squat",
+    "muscle": "glutes",
+    "equipment": "band",
+    "category": "strength",
+    "image": "/repdb/banded-squat-start.webp",
+    "instructions": [
+      "Place a loop band just above the knees.",
+      "Stand with feet shoulder-width apart, toes slightly out.",
+      "Push the knees out against the band as you squat down.",
+      "Descend until thighs are parallel or below.",
+      "Drive through the heels to stand back up."
+    ]
+  },
+  {
+    "id": "banded-standing-hip-abduction",
+    "name": "Banded Standing Hip Abduction",
+    "muscle": "glutes",
+    "equipment": "band",
+    "category": "strength",
+    "image": "/repdb/banded-standing-hip-abduction-start.webp",
+    "instructions": [
+      "Place a loop band around your ankles or just above your knees.",
+      "Stand tall with a slight bend in your knees and brace your core.",
+      "Shift your weight onto one leg, maintaining a stable torso.",
+      "Slowly abduct the free leg out to the side, feeling the glute contract.",
+      "Control the movement as you return the leg to the starting position.",
+      "Complete all reps per side before switching."
+    ]
+  },
+  {
+    "id": "banded-standing-hip-adduction",
+    "name": "Banded Standing Hip Adduction",
+    "muscle": "glutes",
+    "equipment": "band",
+    "category": "strength",
+    "image": "/repdb/banded-standing-hip-adduction-start.webp",
+    "instructions": [
+      "Anchor a loop band to a sturdy upright at ankle height.",
+      "Step into the loop with the working leg facing the anchor side.",
+      "Stand a few feet away so the band has tension.",
+      "Sweep the working leg across the body toward the standing leg.",
+      "Return slowly to the start. Complete reps per side, then switch."
+    ]
+  },
+  {
+    "id": "banded-standing-curl",
+    "name": "Banded Standing Leg Curl",
+    "muscle": "hamstrings",
+    "equipment": "band",
+    "category": "strength",
+    "image": "/repdb/banded-standing-curl-start.webp",
+    "instructions": [
+      "Loop a resistance band around one ankle and anchor the other end under your standing foot or a fixed point in front of you.",
+      "Stand tall, holding onto something for balance if needed, with a slight bend in the standing knee.",
+      "Curl the banded heel up and back toward your glute, keeping the thigh still.",
+      "Squeeze the hamstring at the top, then lower under control to a full stretch.",
+      "Complete all reps on one side, then switch legs."
+    ]
+  },
+  {
+    "id": "banded-sumo-walk",
+    "name": "Banded Sumo Walk",
+    "muscle": "glutes",
+    "equipment": "band",
+    "category": "strength",
+    "image": "/repdb/banded-sumo-walk-start.webp",
+    "instructions": [
+      "Place a loop band just above the knees.",
+      "Drop into a quarter squat with feet wider than shoulder-width.",
+      "Step forward in a wide stance, keeping tension on the band.",
+      "Continue stepping forward, alternating feet, for the prescribed distance.",
+      "Stay low throughout — do not stand up between steps."
+    ]
+  },
+  {
+    "id": "banded-terminal-knee-extension",
+    "name": "Banded Terminal Knee Extension",
+    "muscle": "quads",
+    "equipment": "band",
+    "category": "strength",
+    "image": "/repdb/banded-terminal-knee-extension-start.webp",
+    "instructions": [
+      "Anchor a loop band to a sturdy upright at knee height.",
+      "Step into the loop so the band sits behind one knee.",
+      "Step back so the band pulls the knee into a slight bend.",
+      "Extend the knee fully against the band, contracting the quad.",
+      "Return slowly. Complete reps per side, then switch."
+    ]
+  },
+  {
+    "id": "banded-triceps-stretch",
+    "name": "Banded Triceps Stretch",
+    "muscle": "triceps",
+    "equipment": "band",
+    "category": "stretching",
+    "image": "/repdb/banded-triceps-stretch-main.webp",
+    "instructions": [
+      "Hold a band that runs down your back, top hand behind your head.",
+      "Anchor the lower hand at your lower back.",
+      "Reach the top hand down to feel the triceps lengthen.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
     "id": "Barbell_Ab_Rollout",
     "name": "Barbell Ab Rollout",
     "muscle": "core",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Ab_Rollout/0.jpg",
     "instructions": [
       "For this exercise you will need to get into a pushup position, but instead of having your hands of the floor, you will be grabbing on to an Olympic barbell (loaded with 5-10 lbs on each side) instead. This will be your starting position.",
@@ -548,6 +1085,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Barbell Ab Rollout - On Knees",
     "muscle": "core",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Ab_Rollout_-_On_Knees/0.jpg",
     "instructions": [
       "Hold an Olympic barbell loaded with 5-10lbs on each side and kneel on the floor.",
@@ -561,6 +1099,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Barbell Bench Press - Medium Grip",
     "muscle": "chest",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Bench_Press_-_Medium_Grip/0.jpg",
     "instructions": [
       "Lie back on a flat bench. Using a medium width grip (a grip that creates a 90-degree angle in the middle of the movement between the forearms and the upper arms), lift the bar from the rack and hold it straight over you with your arms locked. This will be your starting position.",
@@ -571,10 +1110,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "barbell-calf-raise",
+    "name": "Barbell Calf Raise",
+    "muscle": "calves",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/barbell-calf-raise-start.webp",
+    "instructions": [
+      "Place a barbell across your upper back as in a squat.",
+      "Stand with the balls of your feet on a raised platform.",
+      "Push up onto your toes as high as possible.",
+      "Pause and squeeze your calves at the top.",
+      "Lower your heels below the platform and repeat."
+    ]
+  },
+  {
     "id": "Barbell_Curl",
     "name": "Barbell Curl",
     "muscle": "biceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Curl/0.jpg",
     "instructions": [
       "Stand up with your torso upright while holding a barbell at a shoulder-width grip. The palm of your hands should be facing forward and the elbows should be close to the torso. This will be your starting position.",
@@ -589,6 +1144,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Barbell Curls Lying Against An Incline",
     "muscle": "biceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Curls_Lying_Against_An_Incline/0.jpg",
     "instructions": [
       "Lie against an incline bench, with your arms holding a barbell and hanging down in a horizontal line. This will be your starting position.",
@@ -602,6 +1158,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Barbell Deadlift",
     "muscle": "back",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Deadlift/0.jpg",
     "instructions": [
       "Stand in front of a loaded barbell.",
@@ -612,10 +1169,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "barbell-front-raise",
+    "name": "Barbell Front Raise",
+    "muscle": "shoulders",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/barbell-front-raise-start.webp",
+    "instructions": [
+      "Stand holding a barbell with an overhand grip at thigh level.",
+      "Keep your arms straight and core braced.",
+      "Raise the barbell in front of you to shoulder height.",
+      "Pause briefly at the top.",
+      "Lower under control and repeat."
+    ]
+  },
+  {
     "id": "Barbell_Full_Squat",
     "name": "Barbell Full Squat",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Full_Squat/0.jpg",
     "instructions": [
       "This exercise is best performed inside a squat rack for safety purposes. To begin, first set the bar on a rack just above shoulder level. Once the correct height is chosen and the bar is loaded, step under the bar and place the back of your shoulders (slightly below the neck) across it.",
@@ -631,6 +1204,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Barbell Glute Bridge",
     "muscle": "glutes",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Glute_Bridge/0.jpg",
     "instructions": [
       "Begin seated on the ground with a loaded barbell over your legs. Using a fat bar or having a pad on the bar can greatly reduce the discomfort caused by this exercise. Roll the bar so that it is directly above your hips, and lay down flat on the floor.",
@@ -643,6 +1217,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Barbell Guillotine Bench Press",
     "muscle": "chest",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Guillotine_Bench_Press/0.jpg",
     "instructions": [
       "Using a medium width grip (a grip that creates a 90-degree angle in the middle of the movement between the forearms and the upper arms), lift the bar from the rack and hold it straight over your neck with your arms locked. This will be your starting position.",
@@ -657,6 +1232,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Barbell Hack Squat",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Hack_Squat/0.jpg",
     "instructions": [
       "Stand up straight while holding a barbell behind you at arms length and your feet at shoulder width. Tip: A shoulder width grip is best with the palms of your hands facing back. You can use wrist wraps for this exercise for a better grip. This will be your starting position.",
@@ -670,6 +1246,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Barbell Hip Thrust",
     "muscle": "glutes",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Hip_Thrust/0.jpg",
     "instructions": [
       "Begin seated on the ground with a bench directly behind you. Have a loaded barbell over your legs. Using a fat bar or having a pad on the bar can greatly reduce the discomfort caused by this exercise.",
@@ -682,6 +1259,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Barbell Incline Bench Press - Medium Grip",
     "muscle": "chest",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Incline_Bench_Press_-_Medium_Grip/0.jpg",
     "instructions": [
       "Lie back on an incline bench. Using a medium-width grip (a grip that creates a 90-degree angle in the middle of the movement between the forearms and the upper arms), lift the bar from the rack and hold it straight over you with your arms locked. This will be your starting position.",
@@ -696,6 +1274,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Barbell Incline Shoulder Raise",
     "muscle": "shoulders",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Incline_Shoulder_Raise/0.jpg",
     "instructions": [
       "Lie back on an Incline Bench. Using a medium width grip (a grip that is slightly wider than shoulder width), lift the bar from the rack and hold it straight over you with your arms straight. This will be your starting position.",
@@ -709,6 +1288,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Barbell Lunge",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Lunge/0.jpg",
     "instructions": [
       "This exercise is best performed inside a squat rack for safety purposes. To begin, first set the bar on a rack just below shoulder level. Once the correct height is chosen and the bar is loaded, step under the bar and place the back of your shoulders (slightly below the neck) across it.",
@@ -719,10 +1299,71 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "barbell-overhead-extension",
+    "name": "Barbell Overhead Extension",
+    "muscle": "triceps",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/barbell-overhead-extension-start.webp",
+    "instructions": [
+      "Load a barbell with an appropriate weight and stand or sit with a neutral spine.",
+      "Grip the barbell with an overhand, shoulder-width grip, and press it overhead.",
+      "Slowly lower the barbell behind your head by flexing your elbows, keeping your upper arms stable.",
+      "Extend your elbows to press the barbell back to the starting overhead position, squeezing your triceps.",
+      "Maintain control throughout the movement, avoiding momentum."
+    ]
+  },
+  {
+    "id": "ohp",
+    "name": "Barbell Overhead Press",
+    "muscle": "shoulders",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/ohp-start.webp",
+    "instructions": [
+      "Stand with feet shoulder-width apart, bar at collarbone level.",
+      "Brace your core and press the bar overhead.",
+      "Lock out at the top with the bar over your mid-foot.",
+      "Lower the bar back to collarbone height.",
+      "Repeat."
+    ]
+  },
+  {
+    "id": "barbell-preacher-curl",
+    "name": "Barbell Preacher Curl",
+    "muscle": "biceps",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/barbell-preacher-curl-start.webp",
+    "instructions": [
+      "Sit on a preacher bench with your chest against the pad, gripping a barbell with an underhand, shoulder-width grip.",
+      "Position your upper arms firmly against the pad, ensuring your elbows are slightly bent at the start.",
+      "Curl the barbell upwards by contracting your biceps, keeping your upper arms stationary on the pad.",
+      "Squeeze your biceps at the top of the movement, focusing on peak contraction.",
+      "Slowly lower the barbell back to the starting position, controlling the eccentric phase.",
+      "Fully extend your arms at the bottom to achieve a complete stretch in the biceps."
+    ]
+  },
+  {
+    "id": "barbell-pullover",
+    "name": "Barbell Pullover",
+    "muscle": "back",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/barbell-pullover-start.webp",
+    "instructions": [
+      "Lie across a bench with a barbell held over your chest.",
+      "Lower the bar back over your head in an arc.",
+      "Pull it back to the start over your chest.",
+      "Repeat."
+    ]
+  },
+  {
     "id": "Barbell_Rear_Delt_Row",
     "name": "Barbell Rear Delt Row",
     "muscle": "shoulders",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Rear_Delt_Row/0.jpg",
     "instructions": [
       "Stand up straight while holding a barbell using a wide (higher than shoulder width) and overhand (palms facing your body) grip.",
@@ -733,10 +1374,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "barbell-reverse-lunge",
+    "name": "Barbell Reverse Lunge",
+    "muscle": "glutes",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/barbell-reverse-lunge-start.webp",
+    "instructions": [
+      "Place a barbell across your upper back and stand tall.",
+      "Step one foot backward into a long stride.",
+      "Lower your back knee toward the ground under control.",
+      "Drive through your front heel to return to standing.",
+      "Complete reps on one side, then switch."
+    ]
+  },
+  {
     "id": "Barbell_Rollout_from_Bench",
     "name": "Barbell Rollout from Bench",
     "muscle": "core",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Rollout_from_Bench/0.jpg",
     "instructions": [
       "Place a loaded barbell on the ground, near the end of a bench. Kneel with both legs on the bench, and take a medium to narrow grip on the barbell. This will be your starting position.",
@@ -749,6 +1406,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Barbell Seated Calf Raise",
     "muscle": "calves",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Seated_Calf_Raise/0.jpg",
     "instructions": [
       "Place a block about 12 inches in front of a flat bench.",
@@ -764,6 +1422,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Barbell Shoulder Press",
     "muscle": "shoulders",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Shoulder_Press/0.jpg",
     "instructions": [
       "Sit on a bench with back support in a squat rack. Position a barbell at a height that is just above your head. Grab the barbell with a pronated grip (palms facing forward).",
@@ -778,6 +1437,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Barbell Shrug",
     "muscle": "back",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Shrug/0.jpg",
     "instructions": [
       "Stand up straight with your feet at shoulder width as you hold a barbell with both hands in front of you using a pronated grip (palms facing the thighs). Tip: Your hands should be a little wider than shoulder width apart. You can use wrist wraps for this exercise for a better grip. This will be your starting position.",
@@ -791,6 +1451,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Barbell Shrug Behind The Back",
     "muscle": "back",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Shrug_Behind_The_Back/0.jpg",
     "instructions": [
       "Stand up straight with your feet at shoulder width as you hold a barbell with both hands behind your back using a pronated grip (palms facing back). Tip: Your hands should be a little wider than shoulder width apart. You can use wrist wraps for this exercise for better grip. This will be your starting position.",
@@ -804,6 +1465,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Barbell Side Bend",
     "muscle": "core",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Side_Bend/0.jpg",
     "instructions": [
       "Stand up straight while holding a barbell placed on the back of your shoulders (slightly below the neck). Your feet should be shoulder width apart. This will be your starting position.",
@@ -817,6 +1479,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Barbell Side Split Squat",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Side_Split_Squat/0.jpg",
     "instructions": [
       "Stand up straight while holding a barbell placed on the back of your shoulders (slightly below the neck). Your feet should be placed wide apart with the foot of the lead leg angled out to the side. This will be your starting position.",
@@ -830,6 +1493,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Barbell Squat",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Squat/0.jpg",
     "instructions": [
       "This exercise is best performed inside a squat rack for safety purposes. To begin, first set the bar on a rack to just below shoulder level. Once the correct height is chosen and the bar is loaded, step under the bar and place the back of your shoulders (slightly below the neck) across it.",
@@ -845,6 +1509,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Barbell Squat To A Bench",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Squat_To_A_Bench/0.jpg",
     "instructions": [
       "This exercise is best performed inside a squat rack for safety purposes. To begin, first place a flat bench or a box behind you. The flat bench is used to teach you to set your hips back and to hit depth.",
@@ -862,6 +1527,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Barbell Step Ups",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Step_Ups/0.jpg",
     "instructions": [
       "Stand up straight while holding a barbell placed on the back of your shoulders (slightly below the neck) and stand upright behind an elevated platform (such as the one used for spotting behind a flat bench). This is your starting position.",
@@ -875,6 +1541,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Barbell Walking Lunge",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Barbell_Walking_Lunge/0.jpg",
     "instructions": [
       "Begin standing with your feet shoulder width apart and a barbell across your upper back.",
@@ -884,10 +1551,42 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "barbell-wrist-curl",
+    "name": "Barbell Wrist Curl",
+    "muscle": "other",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/barbell-wrist-curl-start.webp",
+    "instructions": [
+      "Sit on a bench with forearms resting on the thighs, palms up.",
+      "Hold a barbell with hands shoulder-width, wrists hanging off the knees.",
+      "Let the bar roll down to the fingertips at the bottom.",
+      "Curl the bar up by flexing the wrists.",
+      "Lower under control."
+    ]
+  },
+  {
+    "id": "battle-rope-double-slam",
+    "name": "Battle Rope Double Slam",
+    "muscle": "shoulders",
+    "equipment": "other",
+    "category": "cardio",
+    "image": "/repdb/battle-rope-double-slam-start.webp",
+    "instructions": [
+      "Take one rope end in each hand and face the anchor, standing far enough back that the ropes have a slight slack.",
+      "Set your feet slightly wider than your hips and sit into a quarter squat with your chest up.",
+      "Swing both arms up together, letting the ropes rise in front of you as you extend through the hips.",
+      "Slam both ends down to the floor at the same time, hinging at the hips and driving through your lats.",
+      "Ride the rebound straight back into the next slam, keeping both arms moving in unison rather than alternating.",
+      "Keep slamming for the desired time or number of reps."
+    ]
+  },
+  {
     "id": "Battling_Ropes",
     "name": "Battling Ropes",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Battling_Ropes/0.jpg",
     "instructions": [
       "For this exercise you will need a heavy rope anchored at its center 15-20 feet away. Standing in front of the rope, take an end in each hand with your arms extended at your side. This will be your starting position.",
@@ -897,10 +1596,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "bear-crawl",
+    "name": "Bear Crawl",
+    "muscle": "shoulders",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/bear-crawl-start.webp",
+    "instructions": [
+      "Start on all fours with your hands under your shoulders and knees under your hips.",
+      "Tuck your toes and lift your knees a few centimeters off the floor.",
+      "Keeping your back flat and hips low, step your right hand and left foot forward together.",
+      "Then move your left hand and right foot, crawling forward in a controlled rhythm.",
+      "Keep your core braced and your hips from swaying side to side."
+    ]
+  },
+  {
     "id": "Bear_Crawl_Sled_Drags",
     "name": "Bear Crawl Sled Drags",
     "muscle": "quads",
     "equipment": "other",
+    "category": "strongman",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bear_Crawl_Sled_Drags/0.jpg",
     "instructions": [
       "Wearing either a harness or a loose weight belt, attach the chain to the back so that you will be facing away from the sled. Bend down so that your hands are on the ground. Your back should be flat and knees bent. This is your starting position.",
@@ -912,6 +1627,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Behind Head Chest Stretch",
     "muscle": "chest",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Behind_Head_Chest_Stretch/0.jpg",
     "instructions": [
       "Sit upright on the floor with your partner behind you.",
@@ -921,10 +1637,160 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "behind-the-neck-press",
+    "name": "Behind the Neck Press",
+    "muscle": "shoulders",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/behind-the-neck-press-start.webp",
+    "instructions": [
+      "Sit or stand with a barbell resting on your upper traps behind your neck.",
+      "Grip the bar wider than shoulder width.",
+      "Press the bar straight up overhead until your arms are extended.",
+      "Lower the bar back to the starting position under control.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "behind-the-neck-lat-pulldown",
+    "name": "Behind-the-Neck Lat Pulldown",
+    "muscle": "back",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/behind-the-neck-lat-pulldown-start.webp",
+    "instructions": [
+      "Sit at a lat pulldown station with thighs secured under the pad.",
+      "Grip the bar with a wide, overhand grip — wider than shoulder-width.",
+      "Keep the torso upright and tuck the chin slightly forward.",
+      "Pull the bar down behind the head until it touches the base of the neck.",
+      "Return under control to the full overhead stretch.",
+      "Repeat for the recommended number of repetitions."
+    ]
+  },
+  {
+    "id": "behind-the-neck-pull-ups",
+    "name": "Behind-the-Neck Pull-Up",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/behind-the-neck-pull-ups-start.webp",
+    "instructions": [
+      "Grip the pull-up bar with an overhand grip wider than shoulder-width and hang at full arm extension with your legs together.",
+      "Keep your torso vertical rather than leaning back, and pull your elbows down and out to the sides.",
+      "Continue pulling until the bar passes behind your head and the back of your neck comes level with it, without letting the bar touch your neck.",
+      "Lower yourself under control back to a full dead hang, keeping your head still rather than letting it snap forward.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "bench-adductor-stretch",
+    "name": "Bench Adductor Stretch",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/bench-adductor-stretch-main.webp",
+    "instructions": [
+      "Stand side-on to a bench.",
+      "Rest one straight leg up on the bench out to the side.",
+      "Keep your torso upright and shift gently toward the bench.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
+    "id": "bench-ankle-stretch",
+    "name": "Bench Ankle Stretch",
+    "muscle": "calves",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/bench-ankle-stretch-main.webp",
+    "instructions": [
+      "Place one whole foot flat on top of a bench.",
+      "Keep your torso upright.",
+      "Drive that knee forward over your toes.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
+    "id": "bench-bulgarian-split-stretch",
+    "name": "Bench Bulgarian Split Stretch",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/bench-bulgarian-split-stretch-main.webp",
+    "instructions": [
+      "Rest the top of your rear foot on a bench behind you.",
+      "Set the front foot flat and bend that knee.",
+      "Sink your hips straight down.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
+    "id": "bench-calf-stretch",
+    "name": "Bench Calf Stretch",
+    "muscle": "calves",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/bench-calf-stretch-main.webp",
+    "instructions": [
+      "Place the ball of one foot on the edge of a bench.",
+      "Keep that knee straight.",
+      "Let your heel drop down below the toes.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
+    "id": "bench-chest-stretch",
+    "name": "Bench Chest Stretch",
+    "muscle": "chest",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/bench-chest-stretch-main.webp",
+    "instructions": [
+      "Kneel with your back to a bench.",
+      "Place both hands behind you on the edge of the bench.",
+      "Sink your hips down to open the chest.",
+      "Hold for 20 to 30 seconds, breathing steadily."
+    ]
+  },
+  {
+    "id": "bench-childs-pose",
+    "name": "Bench Child's Pose",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/bench-childs-pose-main.webp",
+    "instructions": [
+      "Kneel on the floor in front of a bench.",
+      "Extend both arms forward and rest them on the bench.",
+      "Sit your hips back toward your heels and let the chest sink.",
+      "Hold for 20 to 30 seconds, breathing steadily."
+    ]
+  },
+  {
+    "id": "bench-couch-stretch",
+    "name": "Bench Couch Stretch",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/bench-couch-stretch-main.webp",
+    "instructions": [
+      "Kneel with your rear shin against the front of a bench.",
+      "Place the front foot flat on the floor.",
+      "Bring your torso upright until the front of the thigh stretches.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
     "id": "Bench_Dips",
     "name": "Bench Dips",
     "muscle": "triceps",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bench_Dips/0.jpg",
     "instructions": [
       "For this exercise you will need to place a bench behind your back. With the bench perpendicular to your body, and while looking away from it, hold on to the bench on its edge with the hands fully extended, separated at shoulder width. The legs will be extended forward, bent at the waist and perpendicular to your torso. This will be your starting position.",
@@ -934,10 +1800,41 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "bench-figure-4-glute-stretch",
+    "name": "Bench Figure-4 Glute Stretch",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/bench-figure-4-glute-stretch-main.webp",
+    "instructions": [
+      "Sit on the end of a bench.",
+      "Cross one ankle over the opposite knee.",
+      "Keep your back flat and hinge forward over the crossed leg.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
+    "id": "bench-hamstring-stretch",
+    "name": "Bench Hamstring Stretch",
+    "muscle": "hamstrings",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/bench-hamstring-stretch-main.webp",
+    "instructions": [
+      "Place one heel on a bench with that leg straight.",
+      "Stand tall on the supporting leg.",
+      "Hinge forward from the hips over the raised leg.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
     "id": "Bench_Jump",
     "name": "Bench Jump",
     "muscle": "quads",
     "equipment": "bodyweight",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bench_Jump/0.jpg",
     "instructions": [
       "Begin with a box or bench 1-2 feet in front of you. Stand with your feet shoulder width apart. This will be your starting position.",
@@ -948,10 +1845,25 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "bench-lat-stretch",
+    "name": "Bench Lat Stretch",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/bench-lat-stretch-main.webp",
+    "instructions": [
+      "Kneel on the floor in front of a bench.",
+      "Place both hands on top of the bench.",
+      "Sit your hips back and let your chest sink down.",
+      "Hold for 20 to 30 seconds, breathing steadily."
+    ]
+  },
+  {
     "id": "Bench_Press_-_Powerlifting",
     "name": "Bench Press - Powerlifting",
     "muscle": "triceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bench_Press_-_Powerlifting/0.jpg",
     "instructions": [
       "Begin by lying on the bench, getting your head beyond the bar if possible. Tuck your feet underneath you and arch your back. Using the bar to help support your weight, lift your shoulder off the bench and retract them, squeezing the shoulder blades together. Use your feet to drive your traps into the bench. Maintain this tight body position throughout the movement.",
@@ -965,6 +1877,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Bench Press - With Bands",
     "muscle": "chest",
     "equipment": "band",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bench_Press_-_With_Bands/0.jpg",
     "instructions": [
       "Using a flat bench secure a band under the leg of the bench that is nearest to your head.",
@@ -981,6 +1894,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Bench Press with Chains",
     "muscle": "triceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bench_Press_with_Chains/0.jpg",
     "instructions": [
       "Adjust the leader chain, shortening it to the desired length.Place the chains on the sleeves of the bar.",
@@ -990,10 +1904,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "bench-pull",
+    "name": "Bench Pull",
+    "muscle": "back",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/bench-pull-start.webp",
+    "instructions": [
+      "Lie face down on an elevated bench with arms hanging straight down.",
+      "Grip a barbell or dumbbells below you.",
+      "Row the weight up to the underside of the bench.",
+      "Squeeze your shoulder blades at the top.",
+      "Lower under control and repeat."
+    ]
+  },
+  {
     "id": "Bench_Sprint",
     "name": "Bench Sprint",
     "muscle": "quads",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bench_Sprint/0.jpg",
     "instructions": [
       "Stand on the ground with one foot resting on a bench or box with your heel close to the edge.",
@@ -1003,53 +1933,11 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Bent-Arm_Barbell_Pullover",
-    "name": "Bent-Arm Barbell Pullover",
-    "muscle": "back",
-    "equipment": "barbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bent-Arm_Barbell_Pullover/0.jpg",
-    "instructions": [
-      "Lie on a flat bench with a barbell using a shoulder grip width.",
-      "Hold the bar straight over your chest with a bend in your arms. This will be your starting position.",
-      "While keeping your arms in the bent arm position, lower the weight slowly in an arc behind your head while breathing in until you feel a stretch on the chest.",
-      "At that point, bring the barbell back to the starting position using the arc through which the weight was lowered and exhale as you perform this movement.",
-      "Hold the weight on the initial position for a second and repeat the motion for the prescribed number of repetitions."
-    ]
-  },
-  {
-    "id": "Bent-Arm_Dumbbell_Pullover",
-    "name": "Bent-Arm Dumbbell Pullover",
-    "muscle": "chest",
-    "equipment": "dumbbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bent-Arm_Dumbbell_Pullover/0.jpg",
-    "instructions": [
-      "Place a dumbbell standing up on a flat bench.",
-      "Ensuring that the dumbbell stays securely placed at the top of the bench, lie perpendicular to the bench (torso across it as in forming a cross) with only your shoulders lying on the surface. Hips should be below the bench and legs bent with feet firmly on the floor. The head will be off the bench as well.",
-      "Grasp the dumbbell with both hands and hold it straight over your chest with a bend in your arms. Both palms should be pressing against the underside one of the sides of the dumbbell. This will be your starting position. Caution: Always ensure that the dumbbell used for this exercise is secure. Using a dumbbell with loose plates can result in the dumbbell falling apart and falling on your face.",
-      "While keeping your arms locked in the bent arm position, lower the weight slowly in an arc behind your head while breathing in until you feel a stretch on the chest.",
-      "At that point, bring the dumbbell back to the starting position using the arc through which the weight was lowered and exhale as you perform this movement.",
-      "Hold the weight on the initial position for a second and repeat the motion for the prescribed number of repetitions."
-    ]
-  },
-  {
-    "id": "Bent-Knee_Hip_Raise",
-    "name": "Bent-Knee Hip Raise",
-    "muscle": "core",
-    "equipment": "bodyweight",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bent-Knee_Hip_Raise/0.jpg",
-    "instructions": [
-      "Lay flat on the floor with your arms next to your sides.",
-      "Now bend your knees at around a 75 degree angle and lift your feet off the floor by around 2 inches.",
-      "Using your lower abs, bring your knees in towards you as you maintain the 75 degree angle bend in your legs. Continue this movement until you raise your hips off of the floor by rolling your pelvis backward. Breathe out as you perform this portion of the movement. Tip: At the end of the movement your knees will be over your chest.",
-      "Squeeze your abs at the top of the movement for a second and then return to the starting position slowly as you breathe in. Tip: Maintain a controlled motion at all times.",
-      "Repeat for the recommended amount of repetitions."
-    ]
-  },
-  {
     "id": "Bent_Over_Barbell_Row",
     "name": "Bent Over Barbell Row",
     "muscle": "back",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bent_Over_Barbell_Row/0.jpg",
     "instructions": [
       "Holding a barbell with a pronated grip (palms facing down), bend your knees slightly and bring your torso forward, by bending at the waist, while keeping the back straight until it is almost parallel to the floor. Tip: Make sure that you keep the head up. The barbell should hang directly in front of you as your arms hang perpendicular to the floor and your torso. This is your starting position.",
@@ -1063,6 +1951,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Bent Over Dumbbell Rear Delt Raise With Head On Bench",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bent_Over_Dumbbell_Rear_Delt_Raise_With_Head_On_Bench/0.jpg",
     "instructions": [
       "Stand up straight while holding a dumbbell in each hand and with an incline bench in front of you.",
@@ -1077,6 +1966,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Bent Over Low-Pulley Side Lateral",
     "muscle": "shoulders",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bent_Over_Low-Pulley_Side_Lateral/0.jpg",
     "instructions": [
       "Select a weight and hold the handle of the low pulley with your right hand.",
@@ -1091,6 +1981,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Bent Over One-Arm Long Bar Row",
     "muscle": "back",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bent_Over_One-Arm_Long_Bar_Row/0.jpg",
     "instructions": [
       "Put weight on one of the ends of an Olympic barbell. Make sure that you either place the other end of the barbell in the corner of two walls; or put a heavy object on the ground so the barbell cannot slide backward.",
@@ -1106,6 +1997,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Bent Over Two-Arm Long Bar Row",
     "muscle": "back",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bent_Over_Two-Arm_Long_Bar_Row/0.jpg",
     "instructions": [
       "Put weight on one of the ends of an Olympic barbell. Make sure that you either place the other end of the barbell in the corner of two walls; or put a heavy object on the ground so the barbell cannot slide backward.",
@@ -1121,6 +2013,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Bent Over Two-Dumbbell Row",
     "muscle": "back",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bent_Over_Two-Dumbbell_Row/0.jpg",
     "instructions": [
       "With a dumbbell in each hand (palms facing your torso), bend your knees slightly and bring your torso forward by bending at the waist; as you bend make sure to keep your back straight until it is almost parallel to the floor. Tip: Make sure that you keep the head up. The weights should hang directly in front of you as your arms hang perpendicular to the floor and your torso. This is your starting position.",
@@ -1134,6 +2027,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Bent Over Two-Dumbbell Row With Palms In",
     "muscle": "back",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bent_Over_Two-Dumbbell_Row_With_Palms_In/0.jpg",
     "instructions": [
       "With a dumbbell in each hand (palms facing each other), bend your knees slightly and bring your torso forward, by bending at the waist, while keeping the back straight until it is almost parallel to the floor. Tip: Make sure that you keep the head up. The weights should hang directly in front of you as your arms hang perpendicular to the floor and your torso. This is your starting position.",
@@ -1147,6 +2041,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Bent Press",
     "muscle": "core",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bent_Press/0.jpg",
     "instructions": [
       "Clean a kettlebell to your shoulder. Clean the kettlebell to your shoulders by extending through the legs and hips as you raise the kettlebell towards your shoulder. The wrist should rotate as you do so. This will be your starting position.",
@@ -1155,10 +2050,101 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "Bent-Arm_Barbell_Pullover",
+    "name": "Bent-Arm Barbell Pullover",
+    "muscle": "back",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bent-Arm_Barbell_Pullover/0.jpg",
+    "instructions": [
+      "Lie on a flat bench with a barbell using a shoulder grip width.",
+      "Hold the bar straight over your chest with a bend in your arms. This will be your starting position.",
+      "While keeping your arms in the bent arm position, lower the weight slowly in an arc behind your head while breathing in until you feel a stretch on the chest.",
+      "At that point, bring the barbell back to the starting position using the arc through which the weight was lowered and exhale as you perform this movement.",
+      "Hold the weight on the initial position for a second and repeat the motion for the prescribed number of repetitions."
+    ]
+  },
+  {
+    "id": "Bent-Arm_Dumbbell_Pullover",
+    "name": "Bent-Arm Dumbbell Pullover",
+    "muscle": "chest",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bent-Arm_Dumbbell_Pullover/0.jpg",
+    "instructions": [
+      "Place a dumbbell standing up on a flat bench.",
+      "Ensuring that the dumbbell stays securely placed at the top of the bench, lie perpendicular to the bench (torso across it as in forming a cross) with only your shoulders lying on the surface. Hips should be below the bench and legs bent with feet firmly on the floor. The head will be off the bench as well.",
+      "Grasp the dumbbell with both hands and hold it straight over your chest with a bend in your arms. Both palms should be pressing against the underside one of the sides of the dumbbell. This will be your starting position. Caution: Always ensure that the dumbbell used for this exercise is secure. Using a dumbbell with loose plates can result in the dumbbell falling apart and falling on your face.",
+      "While keeping your arms locked in the bent arm position, lower the weight slowly in an arc behind your head while breathing in until you feel a stretch on the chest.",
+      "At that point, bring the dumbbell back to the starting position using the arc through which the weight was lowered and exhale as you perform this movement.",
+      "Hold the weight on the initial position for a second and repeat the motion for the prescribed number of repetitions."
+    ]
+  },
+  {
+    "id": "bent-arm-ez-bar-pullover",
+    "name": "Bent-Arm EZ-Bar Pullover",
+    "muscle": "back",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/bent-arm-ez-bar-pullover-start.webp",
+    "instructions": [
+      "Lie on a flat bench holding an EZ-bar with a narrow overhand grip on the inner bends.",
+      "Start with the bar above your chest, elbows bent to roughly 90 degrees.",
+      "Keep the elbow angle fixed and lower the bar back in an arc overhead until a deep stretch is felt in the lats and pecs.",
+      "Pull the bar back over the chest along the same arc, without straightening the elbows.",
+      "Repeat for the recommended number of repetitions."
+    ]
+  },
+  {
+    "id": "Bent-Knee_Hip_Raise",
+    "name": "Bent-Knee Hip Raise",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bent-Knee_Hip_Raise/0.jpg",
+    "instructions": [
+      "Lay flat on the floor with your arms next to your sides.",
+      "Now bend your knees at around a 75 degree angle and lift your feet off the floor by around 2 inches.",
+      "Using your lower abs, bring your knees in towards you as you maintain the 75 degree angle bend in your legs. Continue this movement until you raise your hips off of the floor by rolling your pelvis backward. Breathe out as you perform this portion of the movement. Tip: At the end of the movement your knees will be over your chest.",
+      "Squeeze your abs at the top of the movement for a second and then return to the starting position slowly as you breathe in. Tip: Maintain a controlled motion at all times.",
+      "Repeat for the recommended amount of repetitions."
+    ]
+  },
+  {
+    "id": "bent-over-ez-bar-row",
+    "name": "Bent-Over EZ-Bar Row",
+    "muscle": "back",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/bent-over-ez-bar-row-start.webp",
+    "instructions": [
+      "Hold an EZ-bar with an overhand grip, hinge at the hips to 45 degrees.",
+      "Pull the bar to your lower ribcage.",
+      "Lower under control.",
+      "Repeat."
+    ]
+  },
+  {
+    "id": "bicycle-crunch",
+    "name": "Bicycle Crunch",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/bicycle-crunch-start.webp",
+    "instructions": [
+      "Lie on your back with hands behind your head and legs raised.",
+      "Bring one knee toward your chest while rotating your torso to meet it with the opposite elbow.",
+      "Extend that leg while bringing the other knee in.",
+      "Continue alternating in a pedaling motion.",
+      "Repeat."
+    ]
+  },
+  {
     "id": "Bicycling",
     "name": "Bicycling",
     "muscle": "quads",
     "equipment": "other",
+    "category": "cardio",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bicycling/0.jpg",
     "instructions": [
       "To begin, seat yourself on the bike and adjust the seat to your height."
@@ -1169,6 +2155,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Bicycling, Stationary",
     "muscle": "quads",
     "equipment": "machine",
+    "category": "cardio",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bicycling_Stationary/0.jpg",
     "instructions": [
       "To begin, seat yourself on the bike and adjust the seat to your height.",
@@ -1176,10 +2163,56 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "wrist-curl",
+    "name": "Bilateral Dumbbell Wrist Curl",
+    "muscle": "other",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/wrist-curl-start.webp",
+    "instructions": [
+      "Sit on a bench holding a dumbbell in each hand, forearms resting on your thighs, palms up.",
+      "Let both dumbbells roll down to your fingertips.",
+      "Curl both dumbbells up by flexing your wrists.",
+      "Squeeze at the top, then lower under control.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "bird-dog-hold",
+    "name": "Bird Dog Hold",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/bird-dog-hold-main.webp",
+    "instructions": [
+      "Start on all fours with hands under shoulders and knees under hips.",
+      "Extend one arm forward and the opposite leg back.",
+      "Keep your core tight and body level.",
+      "Hold the position without rotating your torso.",
+      "Hold for time. Complete on one side, then switch."
+    ]
+  },
+  {
+    "id": "bird-dog",
+    "name": "Bird-Dog",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/bird-dog-start.webp",
+    "instructions": [
+      "Start on all fours with a neutral spine.",
+      "Extend your right arm forward and left leg back simultaneously.",
+      "Hold for a moment, then return.",
+      "Repeat on the other side.",
+      "Alternate."
+    ]
+  },
+  {
     "id": "Board_Press",
     "name": "Board Press",
     "muscle": "triceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Board_Press/0.jpg",
     "instructions": [
       "Begin by lying on the bench, getting your head beyond the bar if possible. One to five boards, made out of 2x6's, can be screwed together and held in place by a training partner, bands, or just tucked under your shirt.",
@@ -1189,16 +2222,18 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Body-Up",
-    "name": "Body-Up",
-    "muscle": "triceps",
+    "id": "boat-pose",
+    "name": "Boat Pose",
+    "muscle": "core",
     "equipment": "bodyweight",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Body-Up/0.jpg",
+    "category": "strength",
+    "image": "/repdb/boat-pose-main.webp",
     "instructions": [
-      "Assume a plank position on the ground. You should be supporting your bodyweight on your toes and forearms, keeping your torso straight. Your forearms should be shoulder-width apart. This will be your starting position.",
-      "Pressing your palms firmly into the ground, extend through the elbows to raise your body from the ground. Keep your torso rigid as you perform the movement.",
-      "Slowly lower your forearms back to the ground by allowing the elbows to flex.",
-      "Repeat."
+      "Sit on the floor with the knees bent and the feet flat, hands resting behind the thighs.",
+      "Lean back until you balance just behind the sit bones and lift the chest so the spine stays long.",
+      "Lift the shins until they are parallel to the floor, then straighten the legs as far as the back stays flat.",
+      "Reach the arms forward beside the legs and hold the position for the prescribed time.",
+      "Lower the feet under control to finish."
     ]
   },
   {
@@ -1206,6 +2241,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Body Tricep Press",
     "muscle": "triceps",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Body_Tricep_Press/0.jpg",
     "instructions": [
       "Position a bar in a rack at chest height.",
@@ -1216,10 +2252,40 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "Body-Up",
+    "name": "Body-Up",
+    "muscle": "triceps",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Body-Up/0.jpg",
+    "instructions": [
+      "Assume a plank position on the ground. You should be supporting your bodyweight on your toes and forearms, keeping your torso straight. Your forearms should be shoulder-width apart. This will be your starting position.",
+      "Pressing your palms firmly into the ground, extend through the elbows to raise your body from the ground. Keep your torso rigid as you perform the movement.",
+      "Slowly lower your forearms back to the ground by allowing the elbows to flex.",
+      "Repeat."
+    ]
+  },
+  {
+    "id": "bodyweight-calf-raise",
+    "name": "Bodyweight Calf Raise",
+    "muscle": "calves",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/bodyweight-calf-raise-start.webp",
+    "instructions": [
+      "Stand with feet hip-width apart on a flat surface.",
+      "Push up onto the balls of your feet as high as possible.",
+      "Squeeze your calves at the top.",
+      "Lower your heels back to the floor under control.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
     "id": "Bodyweight_Flyes",
     "name": "Bodyweight Flyes",
     "muscle": "chest",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bodyweight_Flyes/0.jpg",
     "instructions": [
       "Position two equally loaded EZ bars on the ground next to each other. Ensure they are able to roll.",
@@ -1230,10 +2296,41 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "bodyweight-good-morning",
+    "name": "Bodyweight Good Morning",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/bodyweight-good-morning-start.webp",
+    "instructions": [
+      "Stand with feet hip-width apart and hands behind your head.",
+      "Keep a slight bend in your knees and brace your core.",
+      "Hinge at the hips and lower your torso toward parallel.",
+      "Drive your hips forward to return to standing.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "bodyweight-lateral-raise",
+    "name": "Bodyweight Lateral Raise",
+    "muscle": "shoulders",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/bodyweight-lateral-raise-start.webp",
+    "instructions": [
+      "Stand upright with arms hanging at your sides.",
+      "Raise both arms out to the sides with a slight elbow bend until parallel with the floor.",
+      "Pause briefly at the top.",
+      "Lower slowly back to the starting position.",
+      "Repeat for the desired reps."
+    ]
+  },
+  {
     "id": "Bodyweight_Mid_Row",
     "name": "Bodyweight Mid Row",
     "muscle": "back",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bodyweight_Mid_Row/0.jpg",
     "instructions": [
       "Begin by taking a medium to wide grip on a pull-up apparatus with your palms facing away from you. From a hanging position, tuck your knees to your chest, leaning back and getting your legs over your side of the pull-up apparatus. This will be your starting position.",
@@ -1242,10 +2339,41 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "bodyweight-overhead-press",
+    "name": "Bodyweight Overhead Press",
+    "muscle": "shoulders",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/bodyweight-overhead-press-start.webp",
+    "instructions": [
+      "Stand facing a wall in a pike position with hands on the ground.",
+      "Walk your feet closer for a more vertical body line.",
+      "Lower your head toward the floor by bending your elbows.",
+      "Press through your hands to extend your arms.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "bodyweight-reverse-lunge",
+    "name": "Bodyweight Reverse Lunge",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/bodyweight-reverse-lunge-start.webp",
+    "instructions": [
+      "Stand tall with your feet hip-width apart.",
+      "Step one leg back and lower your knee toward the floor.",
+      "Lower until your front thigh is parallel to the floor.",
+      "Push through your front heel to return to standing.",
+      "Repeat on both sides."
+    ]
+  },
+  {
     "id": "Bodyweight_Squat",
     "name": "Bodyweight Squat",
     "muscle": "quads",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bodyweight_Squat/0.jpg",
     "instructions": [
       "Stand with your feet shoulder width apart. You can place your hands behind your head. This will be your starting position.",
@@ -1258,6 +2386,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Bodyweight Walking Lunge",
     "muscle": "quads",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bodyweight_Walking_Lunge/0.jpg",
     "instructions": [
       "Begin standing with your feet shoulder width apart and your hands on your hips.",
@@ -1271,6 +2400,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Bosu Ball Cable Crunch With Side Bends",
     "muscle": "core",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bosu_Ball_Cable_Crunch_With_Side_Bends/0.jpg",
     "instructions": [
       "Connect a standard handle to each arm of a cable machine, and position them in the most downward position.",
@@ -1286,21 +2416,11 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Bottoms-Up_Clean_From_The_Hang_Position",
-    "name": "Bottoms-Up Clean From The Hang Position",
-    "muscle": "other",
-    "equipment": "other",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bottoms-Up_Clean_From_The_Hang_Position/0.jpg",
-    "instructions": [
-      "Initiate the exercise by standing upright with a kettlebell in one hand.",
-      "Swing the kettlebell back forcefully and then reverse the motion forcefully. Crush the kettlebell handle as hard as possible and raise the kettlebell to your shoulder."
-    ]
-  },
-  {
     "id": "Bottoms_Up",
     "name": "Bottoms Up",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bottoms_Up/0.jpg",
     "instructions": [
       "Begin by lying on your back on the ground. Your legs should be straight and your arms at your side. This will be your starting position.",
@@ -1309,10 +2429,53 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "Bottoms-Up_Clean_From_The_Hang_Position",
+    "name": "Bottoms-Up Clean From The Hang Position",
+    "muscle": "other",
+    "equipment": "other",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bottoms-Up_Clean_From_The_Hang_Position/0.jpg",
+    "instructions": [
+      "Initiate the exercise by standing upright with a kettlebell in one hand.",
+      "Swing the kettlebell back forcefully and then reverse the motion forcefully. Crush the kettlebell handle as hard as possible and raise the kettlebell to your shoulder."
+    ]
+  },
+  {
+    "id": "bow-pose",
+    "name": "Bow Pose",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/bow-pose-main.webp",
+    "instructions": [
+      "Lie face down with the arms beside the body and the forehead resting on the mat.",
+      "Bend the knees and take hold of the outside of both ankles.",
+      "Press the shins back into the hands so the chest and thighs lift away from the floor.",
+      "Hold the lifted position for the prescribed time, keeping the neck long and the gaze forward.",
+      "Release the ankles and lower down under control."
+    ]
+  },
+  {
+    "id": "box-jump",
+    "name": "Box Jump",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "plyometrics",
+    "image": "/repdb/box-jump-start.webp",
+    "instructions": [
+      "Stand a foot in front of a sturdy box with feet shoulder-width.",
+      "Drop into a quarter-squat and swing the arms back.",
+      "Drive the arms up and explode off the floor onto the box.",
+      "Land softly with both feet flat and knees bent.",
+      "Step down — do not jump down — and reset."
+    ]
+  },
+  {
     "id": "Box_Jump_Multiple_Response",
     "name": "Box Jump (Multiple Response)",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Box_Jump_Multiple_Response/0.jpg",
     "instructions": [
       "Assume a relaxed stance facing the box or platform approximately an arm's length away. Arms should be down at the sides and legs slightly bent.",
@@ -1325,6 +2488,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Box Skip",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Box_Skip/0.jpg",
     "instructions": [
       "You will need several boxes lined up about 8 feet apart.",
@@ -1339,6 +2503,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Box Squat",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Box_Squat/0.jpg",
     "instructions": [
       "The box squat allows you to squat to desired depth and develop explosive strength in the squat movement. Begin in a power rack with a box at the appropriate height behind you. Typically, you would aim for a box height that brings you to a parallel squat, but you can train higher or lower if desired.",
@@ -1352,6 +2517,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Box Squat with Bands",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Box_Squat_with_Bands/0.jpg",
     "instructions": [
       "Begin in a power rack with a box at the appropriate height behind you. Set up the bands on the sleeves, secured to either band pegs, the rack, or dumbbells so that there is appropriate tension. If dumbbells are used, secure them so that they don't move. Also, ensure that the dumbbells you are using are heavy enough for the bands that you are using. Additional plates can be used to hold the dumbbells down. If more tension is needed, you can either widen the base on the floor or choke the bands. Typically, you would aim for a box height that brings you to a parallel squat, but you can train higher or lower if desired.",
@@ -1365,6 +2531,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Box Squat with Chains",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Box_Squat_with_Chains/0.jpg",
     "instructions": [
       "Begin in a power rack with a box at the appropriate height behind you. Typically, you would aim for a box height that brings you to a parallel squat, but you can train higher or lower if desired.",
@@ -1379,6 +2546,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Brachialis-SMR",
     "muscle": "biceps",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Brachialis-SMR/0.jpg",
     "instructions": [
       "Lie on your side, with your upper arm against the foam roller. The upper arm should be more or less aligned with your body, with the outside of the bicep pressed against the foam roller.",
@@ -1390,6 +2558,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Bradford/Rocky Presses",
     "muscle": "shoulders",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Bradford_Rocky_Presses/0.jpg",
     "instructions": [
       "Sit on a Military Press Bench with a bar at shoulder level with a pronated grip (palms facing forward). Tip: Your grip should be wider than shoulder width and it should create a 90-degree angle between the forearm and the upper arm as the barbell goes down. This is your starting position.",
@@ -1401,10 +2570,54 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "bulgarian-split-squat",
+    "name": "Bulgarian Split Squat",
+    "muscle": "glutes",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/bulgarian-split-squat-start.webp",
+    "instructions": [
+      "Stand in front of a bench, place one foot behind you on the bench.",
+      "Hold dumbbells at your sides.",
+      "Lower your body until your front thigh is parallel to the floor.",
+      "Push through your front heel to stand back up.",
+      "Repeat on both sides."
+    ]
+  },
+  {
+    "id": "burpees",
+    "name": "Burpees",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "cardio",
+    "image": "/repdb/burpees-main.webp",
+    "instructions": [
+      "Stand with feet shoulder-width apart.",
+      "Squat down and place the hands on the floor in front of you.",
+      "Jump or step the feet back into a plank, then perform a push-up.",
+      "Jump or step the feet forward to the hands.",
+      "Stand up and jump explosively, reaching the arms overhead."
+    ]
+  },
+  {
+    "id": "Butt_Lift_Bridge",
+    "name": "Butt Lift (Bridge)",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Butt_Lift_Bridge/0.jpg",
+    "instructions": [
+      "Lie flat on the floor on your back with the hands by your side and your knees bent. Your feet should be placed around shoulder width. This will be your starting position.",
+      "Pushing mainly with your heels, lift your hips off the floor while keeping your back straight. Breathe out as you perform this part of the motion and hold at the top for a second.",
+      "Slowly go back to the starting position as you breathe in."
+    ]
+  },
+  {
     "id": "Butt-Ups",
     "name": "Butt-Ups",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Butt-Ups/0.jpg",
     "instructions": [
       "Begin a pushup position but with your elbows on the ground and resting on your forearms. Your arms should be bent at a 90 degree angle.",
@@ -1415,22 +2628,11 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Butt_Lift_Bridge",
-    "name": "Butt Lift (Bridge)",
-    "muscle": "glutes",
-    "equipment": "bodyweight",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Butt_Lift_Bridge/0.jpg",
-    "instructions": [
-      "Lie flat on the floor on your back with the hands by your side and your knees bent. Your feet should be placed around shoulder width. This will be your starting position.",
-      "Pushing mainly with your heels, lift your hips off the floor while keeping your back straight. Breathe out as you perform this part of the motion and hold at the top for a second.",
-      "Slowly go back to the starting position as you breathe in."
-    ]
-  },
-  {
     "id": "Butterfly",
     "name": "Butterfly",
     "muscle": "chest",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Butterfly/0.jpg",
     "instructions": [
       "Sit on the machine with your back flat on the pad.",
@@ -1441,10 +2643,40 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "butterfly-stretch",
+    "name": "Butterfly Stretch",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/butterfly-stretch-main.webp",
+    "instructions": [
+      "Sit tall and press the soles of your feet together.",
+      "Let your knees drop out toward the floor.",
+      "Hold your feet and sit up tall.",
+      "Hold for 20 to 30 seconds, breathing steadily."
+    ]
+  },
+  {
+    "id": "cable-bent-over-row",
+    "name": "Cable Bent-Over Row",
+    "muscle": "back",
+    "equipment": "cable",
+    "category": "strength",
+    "image": "/repdb/cable-bent-over-row-start.webp",
+    "instructions": [
+      "Attach a straight or V-bar to a low cable pulley.",
+      "Hinge at the hips with knees slightly bent.",
+      "Pull the handle toward your lower chest.",
+      "Squeeze your shoulder blades at the top.",
+      "Lower with control and repeat."
+    ]
+  },
+  {
     "id": "Cable_Chest_Press",
     "name": "Cable Chest Press",
     "muscle": "chest",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Chest_Press/0.jpg",
     "instructions": [
       "Adjust the weight to an appropriate amount and be seated, grasping the handles. Your upper arms should be about 45 degrees to the body, with your head and chest up. The elbows should be bent to about 90 degrees. This will be your starting position.",
@@ -1458,6 +2690,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Cable Crossover",
     "muscle": "chest",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Crossover/0.jpg",
     "instructions": [
       "To get yourself into the starting position, place the pulleys on a high position (above your head), select the resistance to be used and hold the pulleys in each hand.",
@@ -1472,6 +2705,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Cable Crunch",
     "muscle": "core",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Crunch/0.jpg",
     "instructions": [
       "Kneel below a high pulley that contains a rope attachment.",
@@ -1483,10 +2717,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "cable-curl",
+    "name": "Cable Curl",
+    "muscle": "biceps",
+    "equipment": "cable",
+    "category": "strength",
+    "image": "/repdb/cable-curl-start.webp",
+    "instructions": [
+      "Stand facing a low cable pulley with a straight bar or EZ-bar attachment.",
+      "Grip the bar with an underhand grip, elbows at your sides.",
+      "Curl the bar up toward your shoulders.",
+      "Lower with control.",
+      "Repeat."
+    ]
+  },
+  {
     "id": "Cable_Deadlifts",
     "name": "Cable Deadlifts",
     "muscle": "quads",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Deadlifts/0.jpg",
     "instructions": [
       "Move the cables to the bottom of the towers and select an appropriate weight. Stand directly in between the uprights.",
@@ -1496,10 +2746,86 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "cable-external-rotation",
+    "name": "Cable External Rotation",
+    "muscle": "shoulders",
+    "equipment": "cable",
+    "category": "strength",
+    "image": "/repdb/cable-external-rotation-start.webp",
+    "instructions": [
+      "Set a cable pulley to elbow height and grip the handle.",
+      "Stand side-on to the machine with your working elbow bent at 90 degrees.",
+      "Keep your elbow glued to your side and rotate your forearm outward.",
+      "Pause at the end of the movement.",
+      "Return under control. Complete reps on one side, then switch."
+    ]
+  },
+  {
+    "id": "face-pull",
+    "name": "Cable Face Pull",
+    "muscle": "shoulders",
+    "equipment": "cable",
+    "category": "strength",
+    "image": "/repdb/face-pull-start.webp",
+    "instructions": [
+      "Attach a rope to a high cable pulley.",
+      "Pull the rope toward your face, separating the ends.",
+      "Squeeze your rear deltoids and external rotators.",
+      "Return to the starting position with control.",
+      "Repeat."
+    ]
+  },
+  {
+    "id": "cable-fly",
+    "name": "Cable Fly",
+    "muscle": "chest",
+    "equipment": "cable",
+    "category": "strength",
+    "image": "/repdb/cable-fly-start.webp",
+    "instructions": [
+      "Stand between two cable columns with handles attached to high pulleys.",
+      "With a slight bend in your elbows, open your arms wide.",
+      "Bring your hands together in front of your chest in a hugging motion.",
+      "Slowly return to the starting position.",
+      "Repeat."
+    ]
+  },
+  {
+    "id": "cable-kickback",
+    "name": "Cable Glute Kickback",
+    "muscle": "glutes",
+    "equipment": "cable",
+    "category": "strength",
+    "image": "/repdb/cable-kickback-start.webp",
+    "instructions": [
+      "Attach an ankle cuff to a low cable pulley and fasten it around one ankle.",
+      "Stand facing the machine, holding the frame lightly for balance, and hinge slightly forward at the hips.",
+      "Kick the cuffed leg straight back, extending the hip fully while keeping the knee nearly straight.",
+      "Squeeze the glute at full hip extension, then return the foot slowly to the start.",
+      "Complete all reps on one side before switching."
+    ]
+  },
+  {
+    "id": "cable-hammer-curl",
+    "name": "Cable Hammer Curl",
+    "muscle": "biceps",
+    "equipment": "cable",
+    "category": "strength",
+    "image": "/repdb/cable-hammer-curl-start.webp",
+    "instructions": [
+      "Attach a rope to a low cable pulley and stand facing the machine.",
+      "Grip the rope with a neutral (hammer) grip, palms facing each other.",
+      "Curl the rope upward toward your shoulders, keeping elbows pinned at your sides.",
+      "Squeeze at the top, then lower slowly to full extension.",
+      "Repeat for the desired reps."
+    ]
+  },
+  {
     "id": "Cable_Hammer_Curls_-_Rope_Attachment",
     "name": "Cable Hammer Curls - Rope Attachment",
     "muscle": "biceps",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Hammer_Curls_-_Rope_Attachment/0.jpg",
     "instructions": [
       "Attach a rope attachment to a low pulley and stand facing the machine about 12 inches away from it.",
@@ -1515,6 +2841,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Cable Hip Adduction",
     "muscle": "quads",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Hip_Adduction/0.jpg",
     "instructions": [
       "Stand in front of a low pulley facing forward with one leg next to the pulley and the other one away.",
@@ -1531,6 +2858,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Cable Incline Pushdown",
     "muscle": "back",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Incline_Pushdown/0.jpg",
     "instructions": [
       "Lie on incline an bench facing away from a high pulley machine that has a straight bar attachment on it.",
@@ -1545,6 +2873,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Cable Incline Triceps Extension",
     "muscle": "triceps",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Incline_Triceps_Extension/0.jpg",
     "instructions": [
       "Lie on incline an bench facing away from a high pulley machine that has a straight bar attachment on it.",
@@ -1559,6 +2888,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Cable Internal Rotation",
     "muscle": "shoulders",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Internal_Rotation/0.jpg",
     "instructions": [
       "Sit next to a low pulley sideways (with legs stretched in front of you or crossed) and grasp the single hand cable attachment with the arm nearest to the cable. Tip: If you can adjust the pulley's height, you can use a flat bench to sit on instead.",
@@ -1573,6 +2903,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Cable Iron Cross",
     "muscle": "chest",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Iron_Cross/0.jpg",
     "instructions": [
       "Begin by moving the pulleys to the high position, select the resistance to be used, and take a handle in each hand.",
@@ -1587,6 +2918,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Cable Judo Flip",
     "muscle": "core",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Judo_Flip/0.jpg",
     "instructions": [
       "Connect a rope attachment to a tower, and move the cable to the lowest pulley position. Stand with your side to the cable with a wide stance, and grab the rope with both hands.",
@@ -1597,10 +2929,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "cable-lateral-raise",
+    "name": "Cable Lateral Raise",
+    "muscle": "shoulders",
+    "equipment": "cable",
+    "category": "strength",
+    "image": "/repdb/cable-lateral-raise-start.webp",
+    "instructions": [
+      "Stand sideways to a low pulley, grip the handle with the outside hand.",
+      "Keep a soft bend in the elbow and the cable in front of the working leg.",
+      "Raise the arm out to the side until parallel to the floor.",
+      "Lower under control. Complete reps per side, then switch.",
+      "Maintain tension — do not let the weight rest at the bottom."
+    ]
+  },
+  {
     "id": "Cable_Lying_Triceps_Extension",
     "name": "Cable Lying Triceps Extension",
     "muscle": "triceps",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Lying_Triceps_Extension/0.jpg",
     "instructions": [
       "Lie on a flat bench and grasp the straight bar attachment of a low pulley with a narrow overhand grip. Tip: The easiest way to do this is to have someone hand you the bar as you lay down.",
@@ -1615,6 +2963,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Cable One Arm Tricep Extension",
     "muscle": "triceps",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_One_Arm_Tricep_Extension/0.jpg",
     "instructions": [
       "With your right hand, grasp a single handle attached to the high-cable pulley using a supinated (underhand; palms facing up) grip. You should be standing directly in front of the weight stack.",
@@ -1626,10 +2975,27 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "cable-pallof-press",
+    "name": "Cable Pallof Press",
+    "muscle": "core",
+    "equipment": "cable",
+    "category": "strength",
+    "image": "/repdb/cable-pallof-press-start.webp",
+    "instructions": [
+      "Set a cable at chest height and take the handle in both hands, standing side-on to the machine.",
+      "Step away until there is real tension on the cable, with your feet about shoulder-width apart and knees softly bent.",
+      "Bring the handle to the centre of your chest and brace your trunk and glutes.",
+      "Press the handle straight out in front of you until your arms are extended, resisting the pull that wants to rotate you toward the machine.",
+      "Hold the extended position for a moment, then bring the handle back to your chest under control.",
+      "Complete the desired reps, then turn around and repeat facing the other way."
+    ]
+  },
+  {
     "id": "Cable_Preacher_Curl",
     "name": "Cable Preacher Curl",
     "muscle": "biceps",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Preacher_Curl/0.jpg",
     "instructions": [
       "Place a preacher bench about 2 feet in front of a pulley machine.",
@@ -1646,6 +3012,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Cable Rear Delt Fly",
     "muscle": "shoulders",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Rear_Delt_Fly/0.jpg",
     "instructions": [
       "Adjust the pulleys to the appropriate height and adjust the weight. The pulleys should be above your head.",
@@ -1659,6 +3026,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Cable Reverse Crunch",
     "muscle": "core",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Reverse_Crunch/0.jpg",
     "instructions": [
       "Connect an ankle strap attachment to a low pulley cable and position a mat on the floor in front of it.",
@@ -1674,6 +3042,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Cable Rope Overhead Triceps Extension",
     "muscle": "triceps",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Rope_Overhead_Triceps_Extension/0.jpg",
     "instructions": [
       "Attach a rope to the bottom pulley of the pulley machine.",
@@ -1688,6 +3057,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Cable Rope Rear-Delt Rows",
     "muscle": "shoulders",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Rope_Rear-Delt_Rows/0.jpg",
     "instructions": [
       "Sit in the same position on a low pulley row station as you would if you were doing seated cable rows for the back.",
@@ -1703,6 +3073,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Cable Russian Twists",
     "muscle": "core",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Russian_Twists/0.jpg",
     "instructions": [
       "Connect a standard handle attachment, and position the cable to a middle pulley position.",
@@ -1719,6 +3090,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Cable Seated Crunch",
     "muscle": "core",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Seated_Crunch/0.jpg",
     "instructions": [
       "Seat on a flat bench with your back facing a high pulley.",
@@ -1733,6 +3105,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Cable Seated Lateral Raise",
     "muscle": "shoulders",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Seated_Lateral_Raise/0.jpg",
     "instructions": [
       "Stand in the middle of two low pulleys that are opposite to each other and place a flat bench right behind you (in perpendicular fashion to you; the narrow edge of the bench should be the one behind you). Select the weight to be used on each pulley.",
@@ -1749,6 +3122,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Cable Shoulder Press",
     "muscle": "shoulders",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Shoulder_Press/0.jpg",
     "instructions": [
       "Move the cables to the bottom of the towers and select an appropriate weight.",
@@ -1762,6 +3136,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Cable Shrugs",
     "muscle": "back",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Shrugs/0.jpg",
     "instructions": [
       "Grasp a cable bar attachment that is attached to a low pulley with a shoulder width or slightly wider overhand (palms facing down) grip.",
@@ -1772,10 +3147,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "cable-tricep-kickback",
+    "name": "Cable Tricep Kickback",
+    "muscle": "triceps",
+    "equipment": "cable",
+    "category": "strength",
+    "image": "/repdb/cable-tricep-kickback-start.webp",
+    "instructions": [
+      "Attach a handle to a low cable and hinge forward at the hips.",
+      "Tuck your upper arm against your side with elbow bent 90 degrees.",
+      "Extend your elbow to push the handle back behind you.",
+      "Squeeze your triceps at the end of the movement.",
+      "Return under control. Complete reps on one side, then switch."
+    ]
+  },
+  {
     "id": "Cable_Wrist_Curl",
     "name": "Cable Wrist Curl",
     "muscle": "other",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cable_Wrist_Curl/0.jpg",
     "instructions": [
       "Start out by placing a flat bench in front of a low pulley cable that has a straight bar attachment.",
@@ -1787,23 +3178,11 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Calf-Machine_Shoulder_Shrug",
-    "name": "Calf-Machine Shoulder Shrug",
-    "muscle": "back",
-    "equipment": "machine",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Calf-Machine_Shoulder_Shrug/0.jpg",
-    "instructions": [
-      "Position yourself on the calf machine so that the shoulder pads are above your shoulders. Your torso should be straight with the arms extended normally by your side. This will be your starting position.",
-      "Raise your shoulders up towards your ears as you exhale and hold the contraction for a full second.",
-      "Slowly return to the starting position as you inhale.",
-      "Repeat for the recommended amount of repetitions."
-    ]
-  },
-  {
     "id": "Calf_Press",
     "name": "Calf Press",
     "muscle": "calves",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Calf_Press/0.jpg",
     "instructions": [
       "Adjust the seat so that your legs are only slightly bent in the start position. The balls of your feet should be firmly on the platform.",
@@ -1817,6 +3196,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Calf Press On The Leg Press Machine",
     "muscle": "calves",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Calf_Press_On_The_Leg_Press_Machine/0.jpg",
     "instructions": [
       "Using a leg press machine, sit down on the machine and place your legs on the platform directly in front of you at a medium (shoulder width) foot stance.",
@@ -1831,6 +3211,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Calf Raise On A Dumbbell",
     "muscle": "calves",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Calf_Raise_On_A_Dumbbell/0.jpg",
     "instructions": [
       "Hang on to a sturdy object for balance and stand on a dumbbell handle, preferably one with round plates so that it rolls as in this manner you have to work harder to stabilize yourself; thus increasing the effectiveness of the exercise.",
@@ -1845,6 +3226,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Calf Raises - With Bands",
     "muscle": "calves",
     "equipment": "band",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Calf_Raises_-_With_Bands/0.jpg",
     "instructions": [
       "Grab an exercise band and stand on it with your toes making sure that the length of the band between the foot and the arms is the same for both sides.",
@@ -1859,6 +3241,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Calf Stretch Elbows Against Wall",
     "muscle": "calves",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Calf_Stretch_Elbows_Against_Wall/0.jpg",
     "instructions": [
       "Stand facing a wall from a couple feet away.",
@@ -1871,6 +3254,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Calf Stretch Hands Against Wall",
     "muscle": "calves",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Calf_Stretch_Hands_Against_Wall/0.jpg",
     "instructions": [
       "Stand facing a wall from several feet away. Stagger your stance, placing one foot forward.",
@@ -1879,10 +3263,25 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "Calf-Machine_Shoulder_Shrug",
+    "name": "Calf-Machine Shoulder Shrug",
+    "muscle": "back",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Calf-Machine_Shoulder_Shrug/0.jpg",
+    "instructions": [
+      "Position yourself on the calf machine so that the shoulder pads are above your shoulders. Your torso should be straight with the arms extended normally by your side. This will be your starting position.",
+      "Raise your shoulders up towards your ears as you exhale and hold the contraction for a full second.",
+      "Slowly return to the starting position as you inhale.",
+      "Repeat for the recommended amount of repetitions."
+    ]
+  },
+  {
     "id": "Calves-SMR",
     "name": "Calves-SMR",
     "muscle": "calves",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Calves-SMR/0.jpg",
     "instructions": [
       "Begin seated on the floor. Place a foam roller underneath your lower leg. Your other leg can either be crossed over the opposite or be placed on the floor, supporting some of your weight. This will be your starting position.",
@@ -1890,10 +3289,56 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "camel-pose",
+    "name": "Camel Pose",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/camel-pose-main.webp",
+    "instructions": [
+      "Kneel with the knees hip-width apart and the hips stacked over the knees.",
+      "Place the hands on the back of the pelvis with the fingers pointing down and lift the chest.",
+      "Press the hips forward and arch back, reaching for the heels if the position stays comfortable.",
+      "Hold the pose for the prescribed time, keeping the neck in line with the spine.",
+      "Bring the hands back to the pelvis and come up chest-first."
+    ]
+  },
+  {
+    "id": "captains-chair-knee-raise",
+    "name": "Captain's Chair Knee Raise",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/captains-chair-knee-raise-start.webp",
+    "instructions": [
+      "Position yourself in the captain's chair with your back flat against the pad and forearms on the armrests.",
+      "Let your legs hang straight down.",
+      "Engage your core and raise your knees toward your chest.",
+      "Hold briefly at the top, then lower slowly to the starting position.",
+      "Repeat for the desired reps."
+    ]
+  },
+  {
+    "id": "captains-chair-leg-raise",
+    "name": "Captain's Chair Leg Raise",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/captains-chair-leg-raise-start.webp",
+    "instructions": [
+      "Position yourself in the captain's chair with your back flat against the pad and forearms on the armrests.",
+      "Let your legs hang straight down.",
+      "Keeping your legs straight, raise them until parallel with the floor or higher.",
+      "Hold briefly at the top, then lower slowly.",
+      "Repeat for the desired reps."
+    ]
+  },
+  {
     "id": "Car_Deadlift",
     "name": "Car Deadlift",
     "muscle": "quads",
     "equipment": "other",
+    "category": "strongman",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Car_Deadlift/0.jpg",
     "instructions": [
       "This event apparatus typically has neutral grip handles, however some have a straight bar that you can approach like a normal deadlift. The apparatus can be loaded with a vehicle or other heavy objects such as tractor tires or kegs.",
@@ -1907,6 +3352,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Car Drivers",
     "muscle": "shoulders",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Car_Drivers/0.jpg",
     "instructions": [
       "While standing upright, hold a barbell plate in both hands at the 3 and 9 o'clock positions. Your palms should be facing each other and your arms should be extended straight out in front of you. This will be your starting position.",
@@ -1920,6 +3366,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Carioca Quick Step",
     "muscle": "glutes",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Carioca_Quick_Step/0.jpg",
     "instructions": [
       "Begin with your feet a few inches apart and your left arm up in a relaxed, athletic position.",
@@ -1932,6 +3379,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Cat Stretch",
     "muscle": "back",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cat_Stretch/0.jpg",
     "instructions": [
       "Position yourself on the floor on your hands and knees.",
@@ -1940,10 +3388,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "cat-cow",
+    "name": "Cat-Cow",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/cat-cow-main.webp",
+    "instructions": [
+      "Start on all fours with the hands under the shoulders and the knees under the hips.",
+      "Exhale and round the spine towards the ceiling, tucking the tailbone and letting the head drop.",
+      "Inhale and reverse it: let the belly sink, lift the chest and tailbone, and look slightly forward.",
+      "Move between the two shapes slowly, one breath per position.",
+      "Finish in a neutral spine and sit back onto the heels."
+    ]
+  },
+  {
     "id": "Catch_and_Overhead_Throw",
     "name": "Catch and Overhead Throw",
     "muscle": "back",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Catch_and_Overhead_Throw/0.jpg",
     "instructions": [
       "Begin standing while facing a wall or a partner.",
@@ -1956,6 +3420,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Chain Handle Extension",
     "muscle": "triceps",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Chain_Handle_Extension/0.jpg",
     "instructions": [
       "You will need two cable handle attachments and a flat bench, as well as chains, for this exercise. Clip the middle of the chains to the handles, and position yourself on the flat bench. Your elbows should be pointing straight up.",
@@ -1968,6 +3433,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Chain Press",
     "muscle": "chest",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Chain_Press/0.jpg",
     "instructions": [
       "Begin by connecting the chains to the cable handle attachments. Position yourself on the flat bench in the same position as for a dumbbell press. Your wrists should be pronated and arms perpendicular to the floor. This will be your starting position.",
@@ -1980,6 +3446,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Chair Leg Extended Stretch",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Chair_Leg_Extended_Stretch/0.jpg",
     "instructions": [
       "Sit upright in a chair and grip the seat on the sides.",
@@ -1993,6 +3460,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Chair Lower Back Stretch",
     "muscle": "back",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Chair_Lower_Back_Stretch/0.jpg",
     "instructions": [
       "Sit upright on a chair.",
@@ -2001,10 +3469,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "chair-pose",
+    "name": "Chair Pose",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/chair-pose-main.webp",
+    "instructions": [
+      "Stand with the feet together or hip-width apart and the weight in the heels.",
+      "Bend the knees and send the hips back as if sitting down onto a chair.",
+      "Raise the arms overhead beside the ears, keeping the ribs from flaring.",
+      "Hold the position for the prescribed time with the chest lifted and the knees tracking over the toes.",
+      "Press through the heels to stand back up."
+    ]
+  },
+  {
     "id": "Chair_Squat",
     "name": "Chair Squat",
     "muscle": "quads",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Chair_Squat/0.jpg",
     "instructions": [
       "To begin, first set the bar to a position that best matches your height. Once the bar is loaded, step under it and position it across the back of your shoulders.",
@@ -2020,6 +3504,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Chair Upper Body Stretch",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Chair_Upper_Body_Stretch/0.jpg",
     "instructions": [
       "Sit on the edge of a chair, gripping the back of it.",
@@ -2027,10 +3512,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "cheat-curl",
+    "name": "Cheat Curl",
+    "muscle": "biceps",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/cheat-curl-start.webp",
+    "instructions": [
+      "Stand holding weight at thigh level with an underhand grip.",
+      "Use a slight hip drive to start the curl.",
+      "Curl the weight up toward your shoulders explosively.",
+      "Lower the weight slowly under control through the full range.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
     "id": "Chest_And_Front_Of_Shoulder_Stretch",
     "name": "Chest And Front Of Shoulder Stretch",
     "muscle": "chest",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Chest_And_Front_Of_Shoulder_Stretch/0.jpg",
     "instructions": [
       "Start off by standing with your legs together, holding a bodybar or a broomstick.",
@@ -2039,15 +3540,18 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Chest_Push_from_3_point_stance",
-    "name": "Chest Push from 3 point stance",
+    "id": "dips",
+    "name": "Chest Dips",
     "muscle": "chest",
-    "equipment": "other",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Chest_Push_from_3_point_stance/0.jpg",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/dips-start.webp",
     "instructions": [
-      "Begin in a three point stance, squatted down with your back flat and one hand on the ground. Place the medicine ball directly in front of you.",
-      "To begin, take your first step as you pull the ball to your chest, positioning both hands to prepare for the throw.",
-      "As you execute the second step, explosively release the ball forward as hard as possible."
+      "Grip parallel dip bars and lift yourself to the top position with arms locked.",
+      "Lean your torso forward slightly.",
+      "Lower your body by bending your elbows until shoulders are below elbows.",
+      "Press back up to the starting position.",
+      "Repeat."
     ]
   },
   {
@@ -2055,6 +3559,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Chest Push (multiple response)",
     "muscle": "chest",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Chest_Push_multiple_response/0.jpg",
     "instructions": [
       "Begin in a kneeling position facing a wall or utilize a partner. Hold the ball with both hands tight into the chest.",
@@ -2068,6 +3573,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Chest Push (single response)",
     "muscle": "chest",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Chest_Push_single_response/0.jpg",
     "instructions": [
       "Begin in a kneeling position holding the medicine ball with both hands tightly into the chest.",
@@ -2076,10 +3582,24 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "Chest_Push_from_3_point_stance",
+    "name": "Chest Push from 3 point stance",
+    "muscle": "chest",
+    "equipment": "other",
+    "category": "plyometrics",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Chest_Push_from_3_point_stance/0.jpg",
+    "instructions": [
+      "Begin in a three point stance, squatted down with your back flat and one hand on the ground. Place the medicine ball directly in front of you.",
+      "To begin, take your first step as you pull the ball to your chest, positioning both hands to prepare for the throw.",
+      "As you execute the second step, explosively release the ball forward as hard as possible."
+    ]
+  },
+  {
     "id": "Chest_Push_with_Run_Release",
     "name": "Chest Push with Run Release",
     "muscle": "chest",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Chest_Push_with_Run_Release/0.jpg",
     "instructions": [
       "Begin in an athletic stance with the knees bent, hips back, and back flat. Hold the medicine ball near your legs. This will be your starting position.",
@@ -2092,6 +3612,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Chest Stretch on Stability Ball",
     "muscle": "chest",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Chest_Stretch_on_Stability_Ball/0.jpg",
     "instructions": [
       "Get on your hands and knees next to an exercise ball.",
@@ -2100,10 +3621,70 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "chest-supported-dumbbell-shrug",
+    "name": "Chest Supported Dumbbell Shrug",
+    "muscle": "back",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/chest-supported-dumbbell-shrug-start.webp",
+    "instructions": [
+      "Set an incline bench to about 30 degrees.",
+      "Lie face down on the bench holding dumbbells at arm's length.",
+      "Shrug your shoulders up and back toward your ears.",
+      "Squeeze your upper traps at the top.",
+      "Lower under control and repeat."
+    ]
+  },
+  {
+    "id": "chest-supported-db-row",
+    "name": "Chest-Supported Dumbbell Row",
+    "muscle": "back",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/chest-supported-db-row-start.webp",
+    "instructions": [
+      "Lie face-down on an incline bench with dumbbells hanging beneath.",
+      "Row the dumbbells up to your sides.",
+      "Squeeze at the top, then lower.",
+      "Repeat."
+    ]
+  },
+  {
+    "id": "chest-supported-kettlebell-row",
+    "name": "Chest-Supported Kettlebell Row",
+    "muscle": "back",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/chest-supported-kettlebell-row-start.webp",
+    "instructions": [
+      "Lie face down on an incline bench, allowing your arms to hang freely with a kettlebell in each hand.",
+      "Brace your core and retract your shoulder blades.",
+      "Pull the kettlebells towards your hips, squeezing your shoulder blades together.",
+      "Pause briefly at the top, feeling the contraction in your back.",
+      "Slowly lower the kettlebells back to the starting position with control."
+    ]
+  },
+  {
+    "id": "chest-supported-smith-machine-row",
+    "name": "Chest-Supported Smith Machine Row",
+    "muscle": "back",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/chest-supported-smith-machine-row-start.webp",
+    "instructions": [
+      "Set an incline bench inside the Smith machine facing the bar, and set the bar low enough that your arms hang straight when you lean on the pad.",
+      "Stand astride the bench with your feet planted and your chest resting against the top of the pad.",
+      "Take an overhand grip a little wider than shoulder-width and unhook the bar with your arms extended.",
+      "Pull the bar up to your lower chest, leading with your elbows and squeezing the shoulder blades together at the top.",
+      "Lower the bar under control until your arms are straight again, and repeat for the desired number of repetitions."
+    ]
+  },
+  {
     "id": "Childs_Pose",
     "name": "Child's Pose",
     "muscle": "back",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Childs_Pose/0.jpg",
     "instructions": [
       "Get on your hands and knees, walk your hands in front of you.",
@@ -2112,10 +3693,38 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "Chin_To_Chest_Stretch",
+    "name": "Chin To Chest Stretch",
+    "muscle": "other",
+    "equipment": "other",
+    "category": "stretching",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Chin_To_Chest_Stretch/0.jpg",
+    "instructions": [
+      "Get into a seated position on the floor.",
+      "Place both hands at the rear of your head, fingers interlocked, thumbs pointing down and elbows pointing straight ahead. Slowly pull your head down to your chest. Hold for 20-30 seconds."
+    ]
+  },
+  {
+    "id": "chin-tuck-hold",
+    "name": "Chin Tuck Hold",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/chin-tuck-hold-main.webp",
+    "instructions": [
+      "Stand or sit tall with your shoulders relaxed.",
+      "Pull your chin straight back, creating a double chin.",
+      "Keep your head level without tilting.",
+      "Hold the position for the desired duration.",
+      "Release and repeat for multiple sets."
+    ]
+  },
+  {
     "id": "Chin-Up",
     "name": "Chin-Up",
     "muscle": "back",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Chin-Up/0.jpg",
     "instructions": [
       "Grab the pull-up bar with the palms facing your torso and a grip closer than the shoulder width.",
@@ -2126,21 +3735,11 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Chin_To_Chest_Stretch",
-    "name": "Chin To Chest Stretch",
-    "muscle": "other",
-    "equipment": "other",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Chin_To_Chest_Stretch/0.jpg",
-    "instructions": [
-      "Get into a seated position on the floor.",
-      "Place both hands at the rear of your head, fingers interlocked, thumbs pointing down and elbows pointing straight ahead. Slowly pull your head down to your chest. Hold for 20-30 seconds."
-    ]
-  },
-  {
     "id": "Circus_Bell",
     "name": "Circus Bell",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strongman",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Circus_Bell/0.jpg",
     "instructions": [
       "The circus bell is an oversized dumbbell with a thick handle. Begin with the dumbbell between your feet, and grip the handle with both hands.",
@@ -2150,10 +3749,56 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "clamshells-hold",
+    "name": "Clamshell Hold",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/clamshells-hold-main.webp",
+    "instructions": [
+      "Lie on one side with the hips and knees bent about 45 and 90 degrees, heels together and knees stacked.",
+      "Stack the shoulders and hips vertically and brace the trunk so the pelvis cannot roll backwards.",
+      "Open the upper knee as far as it goes without the pelvis rotating, keeping the heels touching.",
+      "Hold that open position for the prescribed time, breathing normally.",
+      "Lower the knee under control and repeat on the other side."
+    ]
+  },
+  {
+    "id": "clamshells",
+    "name": "Clamshells",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/clamshells-start.webp",
+    "instructions": [
+      "Lie on your side with knees bent and stacked on top of each other.",
+      "Keep your feet together and hips stacked.",
+      "Open your top knee toward the ceiling without rotating your hips.",
+      "Squeeze your outer glute at the top.",
+      "Lower under control. Complete reps on one side, then switch."
+    ]
+  },
+  {
+    "id": "clap-push-ups",
+    "name": "Clap Push-Ups",
+    "muscle": "chest",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/clap-push-ups-start.webp",
+    "instructions": [
+      "Begin in a standard push-up position.",
+      "Lower your chest to the floor.",
+      "Explosively push up so hands leave the ground.",
+      "Clap your hands together and land softly, returning to start.",
+      "Repeat."
+    ]
+  },
+  {
     "id": "Clean",
     "name": "Clean",
     "muscle": "hamstrings",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Clean/0.jpg",
     "instructions": [
       "With a barbell on the floor close to the shins, take an overhand (or hook) grip just outside the legs. Lower your hips with the weight focused on the heels, back straight, head facing forward, chest up, with your shoulders just in front of the bar. This will be your starting position.",
@@ -2165,45 +3810,11 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Clean_Deadlift",
-    "name": "Clean Deadlift",
-    "muscle": "hamstrings",
-    "equipment": "barbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Clean_Deadlift/0.jpg",
-    "instructions": [
-      "Begin standing with a barbell close to your shins. Your feet should be directly under your hips with your feet turned out slightly. Grip the bar with a double overhand grip or hook grip, about shoulder width apart. Squat down to the bar. Your spine should be in full extension, with a back angle that places your shoulders in front of the bar and your back as vertical as possible.",
-      "Begin by driving through the floor through the front of your heels. As the bar travels upward, maintain a constant back angle. Flare your knees out to the side to help keep them out of the bar's path.",
-      "After the bar crosses the knees, complete the lift by driving the hips into the bar until your hips and knees are extended."
-    ]
-  },
-  {
-    "id": "Clean_Pull",
-    "name": "Clean Pull",
-    "muscle": "quads",
-    "equipment": "barbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Clean_Pull/0.jpg",
-    "instructions": [
-      "With a barbell on the floor close to the shins, take an overhand or hook grip just outside the legs. Lower your hips with the weight focused on the heels, back straight, head facing forward, chest up, with your shoulders just in front of the bar. This will be your starting position.",
-      "Begin the first pull by driving through the heels, extending your knees. Your back angle should stay the same, and your arms should remain straight and elbows out. Move the weight with control as you continue to above the knees.",
-      "Next comes the second pull, the main source of acceleration for the clean. As the bar approaches the mid-thigh position, begin extending through the hips. In a jumping motion, accelerate by extending the hips, knees, and ankles, using speed to move the bar upward. There should be no need to actively pull through the arms to accelerate the weight; at the end of the second pull, the body should be fully extended, leaning slightly back, with the arms still extended. Full extension should be violent and abrupt, and ensure that you do not prolong the extension for longer than necessary."
-    ]
-  },
-  {
-    "id": "Clean_Shrug",
-    "name": "Clean Shrug",
-    "muscle": "back",
-    "equipment": "barbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Clean_Shrug/0.jpg",
-    "instructions": [
-      "Begin with a shoulder width, double overhand or hook grip, with the bar hanging at the mid thigh position. Your back should be straight and inclined slightly forward.",
-      "Shrug your shoulders towards your ears. While this exercise can usually by loaded with heavier weight than a clean, avoid overloading to the point that the execution slows down."
-    ]
-  },
-  {
     "id": "Clean_and_Jerk",
     "name": "Clean and Jerk",
     "muscle": "shoulders",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Clean_and_Jerk/0.jpg",
     "instructions": [
       "With a barbell on the floor close to the shins, take an overhand or hook grip just outside the legs. Lower your hips with the weight focused on the heels, back straight, head facing forward, chest up, with your shoulders just in front of the bar. This will be your starting position.",
@@ -2221,6 +3832,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Clean and Press",
     "muscle": "shoulders",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Clean_and_Press/0.jpg",
     "instructions": [
       "Assume a shoulder-width stance, with knees inside the arms. Now while keeping the back flat, bend at the knees and hips so that you can grab the bar with the arms fully extended and a pronated grip that is slightly wider than shoulder width. Point the elbows out to sides. The bar should be close to the shins. Position the shoulders over or slightly ahead of the bar. Establish a flat back posture. This will be your starting position.",
@@ -2233,10 +3845,24 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "Clean_Deadlift",
+    "name": "Clean Deadlift",
+    "muscle": "hamstrings",
+    "equipment": "barbell",
+    "category": "olympic",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Clean_Deadlift/0.jpg",
+    "instructions": [
+      "Begin standing with a barbell close to your shins. Your feet should be directly under your hips with your feet turned out slightly. Grip the bar with a double overhand grip or hook grip, about shoulder width apart. Squat down to the bar. Your spine should be in full extension, with a back angle that places your shoulders in front of the bar and your back as vertical as possible.",
+      "Begin by driving through the floor through the front of your heels. As the bar travels upward, maintain a constant back angle. Flare your knees out to the side to help keep them out of the bar's path.",
+      "After the bar crosses the knees, complete the lift by driving the hips into the bar until your hips and knees are extended."
+    ]
+  },
+  {
     "id": "Clean_from_Blocks",
     "name": "Clean from Blocks",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Clean_from_Blocks/0.jpg",
     "instructions": [
       "With a barbell on boxes or stands of the desired height, take an overhand or hook grip just outside the legs. Lower your hips with the weight focused on the heels, back straight, head facing forward, chest up, with your shoulders just in front of the bar. This will be your starting position.",
@@ -2246,10 +3872,36 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "Clean_Pull",
+    "name": "Clean Pull",
+    "muscle": "quads",
+    "equipment": "barbell",
+    "category": "olympic",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Clean_Pull/0.jpg",
+    "instructions": [
+      "With a barbell on the floor close to the shins, take an overhand or hook grip just outside the legs. Lower your hips with the weight focused on the heels, back straight, head facing forward, chest up, with your shoulders just in front of the bar. This will be your starting position.",
+      "Begin the first pull by driving through the heels, extending your knees. Your back angle should stay the same, and your arms should remain straight and elbows out. Move the weight with control as you continue to above the knees.",
+      "Next comes the second pull, the main source of acceleration for the clean. As the bar approaches the mid-thigh position, begin extending through the hips. In a jumping motion, accelerate by extending the hips, knees, and ankles, using speed to move the bar upward. There should be no need to actively pull through the arms to accelerate the weight; at the end of the second pull, the body should be fully extended, leaning slightly back, with the arms still extended. Full extension should be violent and abrupt, and ensure that you do not prolong the extension for longer than necessary."
+    ]
+  },
+  {
+    "id": "Clean_Shrug",
+    "name": "Clean Shrug",
+    "muscle": "back",
+    "equipment": "barbell",
+    "category": "olympic",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Clean_Shrug/0.jpg",
+    "instructions": [
+      "Begin with a shoulder width, double overhand or hook grip, with the bar hanging at the mid thigh position. Your back should be straight and inclined slightly forward.",
+      "Shrug your shoulders towards your ears. While this exercise can usually by loaded with heavier weight than a clean, avoid overloading to the point that the execution slows down."
+    ]
+  },
+  {
     "id": "Clock_Push-Up",
     "name": "Clock Push-Up",
     "muscle": "chest",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Clock_Push-Up/0.jpg",
     "instructions": [
       "Move into a prone position on the floor, supporting your weight on your hands and toes.",
@@ -2261,10 +3913,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "close-grip-push-ups",
+    "name": "Close Grip Push Ups",
+    "muscle": "chest",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/close-grip-push-ups-start.webp",
+    "instructions": [
+      "Assume a push-up position with hands directly under your shoulders.",
+      "Keep your elbows tucked close to your ribs.",
+      "Lower your chest toward the floor.",
+      "Press back up to the starting position.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
     "id": "Close-Grip_Barbell_Bench_Press",
     "name": "Close-Grip Barbell Bench Press",
     "muscle": "triceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Close-Grip_Barbell_Bench_Press/0.jpg",
     "instructions": [
       "Lie back on a flat bench. Using a close grip (around shoulder width), lift the bar from the rack and hold it straight over you with your arms locked. This will be your starting position.",
@@ -2275,10 +3943,40 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "close-grip-barbell-curl",
+    "name": "Close-Grip Barbell Curl",
+    "muscle": "biceps",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/close-grip-barbell-curl-start.webp",
+    "instructions": [
+      "Stand holding a barbell with an underhand grip, hands closer than shoulder-width apart.",
+      "Start with the bar at the thighs, arms extended, elbows tucked to the sides.",
+      "Curl the bar up to the shoulders by flexing the elbows.",
+      "Squeeze the biceps at the top, then lower under control.",
+      "Repeat for the recommended number of repetitions."
+    ]
+  },
+  {
+    "id": "close-grip-db-bench-press",
+    "name": "Close-Grip Dumbbell Bench Press",
+    "muscle": "triceps",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/close-grip-db-bench-press-start.webp",
+    "instructions": [
+      "Lie on a flat bench and hold two dumbbells together over your chest.",
+      "Lower them to your chest keeping elbows close.",
+      "Press back up.",
+      "Repeat."
+    ]
+  },
+  {
     "id": "Close-Grip_Dumbbell_Press",
     "name": "Close-Grip Dumbbell Press",
     "muscle": "triceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Close-Grip_Dumbbell_Press/0.jpg",
     "instructions": [
       "Place a dumbbell standing up on a flat bench.",
@@ -2289,10 +3987,40 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "Close-Grip_EZ_Bar_Curl",
+    "name": "Close-Grip EZ Bar Curl",
+    "muscle": "biceps",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Close-Grip_EZ_Bar_Curl/0.jpg",
+    "instructions": [
+      "Stand up with your torso upright while holding an E-Z Curl Bar at the closer inner handle. The palm of your hands should be facing forward and they should be slightly tilted inwards due to the shape of the bar. The elbows should be close to the torso. This will be your starting position.",
+      "While holding the upper arms stationary, curl the weights forward while contracting the biceps as you breathe out. Tip: Only the forearms should move.",
+      "Continue the movement until your biceps are fully contracted and the bar is at shoulder level. Hold the contracted position for a second and squeeze the biceps hard.",
+      "Slowly begin to bring the bar back to starting position as your breathe in.",
+      "Repeat for the recommended amount of repetitions."
+    ]
+  },
+  {
+    "id": "close-grip-ez-bar-bench-press",
+    "name": "Close-Grip EZ-Bar Bench Press",
+    "muscle": "triceps",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/close-grip-ez-bar-bench-press-start.webp",
+    "instructions": [
+      "Lie on a flat bench and grip the inner curves of the EZ-bar.",
+      "Lower the bar to your chest with elbows tucked.",
+      "Press back up to full extension.",
+      "Repeat."
+    ]
+  },
+  {
     "id": "Close-Grip_EZ-Bar_Curl_with_Band",
     "name": "Close-Grip EZ-Bar Curl with Band",
     "muscle": "biceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Close-Grip_EZ-Bar_Curl_with_Band/0.jpg",
     "instructions": [
       "Attach a band to each end of the bar. Take the bar, placing a foot on the middle of the band. Stand upright with a narrow, supinated grip on the EZ bar. The elbows should be close to the torso. This will be your starting position.",
@@ -2307,6 +4035,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Close-Grip EZ-Bar Press",
     "muscle": "triceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Close-Grip_EZ-Bar_Press/0.jpg",
     "instructions": [
       "Lie on a flat bench with an EZ bar loaded to an appropriate weight.",
@@ -2317,24 +4046,11 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Close-Grip_EZ_Bar_Curl",
-    "name": "Close-Grip EZ Bar Curl",
-    "muscle": "biceps",
-    "equipment": "barbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Close-Grip_EZ_Bar_Curl/0.jpg",
-    "instructions": [
-      "Stand up with your torso upright while holding an E-Z Curl Bar at the closer inner handle. The palm of your hands should be facing forward and they should be slightly tilted inwards due to the shape of the bar. The elbows should be close to the torso. This will be your starting position.",
-      "While holding the upper arms stationary, curl the weights forward while contracting the biceps as you breathe out. Tip: Only the forearms should move.",
-      "Continue the movement until your biceps are fully contracted and the bar is at shoulder level. Hold the contracted position for a second and squeeze the biceps hard.",
-      "Slowly begin to bring the bar back to starting position as your breathe in.",
-      "Repeat for the recommended amount of repetitions."
-    ]
-  },
-  {
     "id": "Close-Grip_Front_Lat_Pulldown",
     "name": "Close-Grip Front Lat Pulldown",
     "muscle": "back",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Close-Grip_Front_Lat_Pulldown/0.jpg",
     "instructions": [
       "Sit down on a pull-down machine with a wide bar attached to the top pulley. Make sure that you adjust the knee pad of the machine to fit your height. These pads will prevent your body from being raised by the resistance attached to the bar.",
@@ -2346,10 +4062,39 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "close-grip-incline-bench",
+    "name": "Close-Grip Incline Bench Press",
+    "muscle": "triceps",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/close-grip-incline-bench-start.webp",
+    "instructions": [
+      "Set bench to an incline. Grip the barbell with hands shoulder-width or closer.",
+      "Lower the bar to your upper chest.",
+      "Press back up.",
+      "Repeat."
+    ]
+  },
+  {
+    "id": "close-grip-pull-ups",
+    "name": "Close-Grip Pull-Ups",
+    "muscle": "biceps",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/close-grip-pull-ups-start.webp",
+    "instructions": [
+      "Hang from a pull-up bar with hands shoulder-width or narrower, palms away.",
+      "Pull yourself up until chin clears the bar.",
+      "Lower under control.",
+      "Repeat."
+    ]
+  },
+  {
     "id": "Close-Grip_Push-Up_off_of_a_Dumbbell",
     "name": "Close-Grip Push-Up off of a Dumbbell",
     "muscle": "triceps",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Close-Grip_Push-Up_off_of_a_Dumbbell/0.jpg",
     "instructions": [
       "Lie on the floor and place your hands on an upright dumbbell. Supporting your weight on your toes and hands, keep your torso rigid and your elbows in with your arms straight. This will be your starting position.",
@@ -2363,6 +4108,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Close-Grip Standing Barbell Curl",
     "muscle": "biceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Close-Grip_Standing_Barbell_Curl/0.jpg",
     "instructions": [
       "Hold a barbell with both hands, palms up and a few inches apart.",
@@ -2373,10 +4119,40 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "close-stance-leg-press",
+    "name": "Close-Stance Leg Press",
+    "muscle": "quads",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/close-stance-leg-press-start.webp",
+    "instructions": [
+      "Set the seat and back pad so your lower back stays supported throughout the repetition.",
+      "Place your feet close together near the middle of the platform, with the toes and knees pointing along the same line.",
+      "Lower the sled by bending the knees and hips while keeping both feet flat and the knees tracking over the toes.",
+      "Press the platform away through the whole foot until the legs are extended without snapping the knees straight.",
+      "Return under control and repeat for the desired number of repetitions."
+    ]
+  },
+  {
+    "id": "cobra-stretch",
+    "name": "Cobra Stretch",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/cobra-stretch-main.webp",
+    "instructions": [
+      "Lie face down with your hands under your shoulders.",
+      "Press through your hands to lift your chest off the floor.",
+      "Keep your hips and legs on the floor, shoulders relaxed.",
+      "Hold for 20 to 30 seconds, breathing steadily."
+    ]
+  },
+  {
     "id": "Cocoons",
     "name": "Cocoons",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cocoons/0.jpg",
     "instructions": [
       "Begin by lying on your back on the ground. Your legs should be straight and your arms extended behind your head. This will be your starting position.",
@@ -2389,6 +4165,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Conan's Wheel",
     "muscle": "quads",
     "equipment": "other",
+    "category": "strongman",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Conans_Wheel/0.jpg",
     "instructions": [
       "With the weight loaded, take a zurcher hold on the end of the implement. Place the bar in the crook of the elbow and hold onto your wrist. Try to keep the weight off of the forearms.",
@@ -2400,6 +4177,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Concentration Curls",
     "muscle": "biceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Concentration_Curls/0.jpg",
     "instructions": [
       "Sit down on a flat bench with one dumbbell in front of you between your legs. Your legs should be spread with your knees bent and feet on the floor.",
@@ -2410,17 +4188,78 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Cross-Body_Crunch",
-    "name": "Cross-Body Crunch",
-    "muscle": "core",
+    "id": "savasana",
+    "name": "Corpse Pose",
+    "muscle": "back",
     "equipment": "bodyweight",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cross-Body_Crunch/0.jpg",
+    "category": "stretching",
+    "image": "/repdb/savasana-main.webp",
     "instructions": [
-      "Lie flat on your back and bend your knees about 60 degrees.",
-      "Keep your feet flat on the floor and place your hands loosely behind your head. This will be your starting position.",
-      "Now curl up and bring your right elbow and shoulder across your body while bring your left knee in toward your left shoulder at the same time. Reach with your elbow and try to touch your knee. Exhale as you perform this movement. Tip: Try to bring your shoulder up towards your knee rather than just your elbow and remember that the key is to contract the abs as you perform the movement; not just to move the elbow.",
-      "Now go back down to the starting position as you inhale and repeat with the left elbow and the right knee.",
-      "Continue alternating in this manner until all prescribed repetitions are done."
+      "Lie on your back with the legs a comfortable distance apart and the feet falling open.",
+      "Rest the arms slightly away from the body with the palms facing up.",
+      "Let the whole body soften into the floor, including the jaw, the eyes and the hands.",
+      "Stay for the prescribed time, breathing naturally without controlling the breath.",
+      "Bend the knees and roll to one side before sitting up slowly."
+    ]
+  },
+  {
+    "id": "cossack-squat",
+    "name": "Cossack Squat",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/cossack-squat-start.webp",
+    "instructions": [
+      "Stand in a wide stance with toes turned slightly out.",
+      "Shift your weight to one side, bending that knee and sinking into a deep squat.",
+      "Keep the trailing leg straight with the heel down and toes up.",
+      "Sink as low as your mobility allows, keeping the chest tall.",
+      "Drive through the bent leg back to center, then repeat to the other side."
+    ]
+  },
+  {
+    "id": "cow-face-pose",
+    "name": "Cow Face Pose",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/cow-face-pose-main.webp",
+    "instructions": [
+      "Sit on the floor and cross one knee directly over the other so the knees stack in the midline.",
+      "Walk the feet out towards the hips and settle both sit bones evenly on the floor.",
+      "Reach the arm on the top-knee side up and bend it behind the head, then reach the other arm up the back to clasp.",
+      "Hold the position for the prescribed time, keeping the chest open and the spine tall.",
+      "Release and repeat with the other leg and arm on top."
+    ]
+  },
+  {
+    "id": "crab-dips",
+    "name": "Crab Dips",
+    "muscle": "triceps",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/crab-dips-start.webp",
+    "instructions": [
+      "Sit with the knees bent, the feet flat and the hands on the floor behind you, fingers pointing towards the heels.",
+      "Press into the hands and feet and lift the hips until the trunk is roughly level with the knees.",
+      "Bend the elbows straight back to lower the hips towards the floor without sitting down.",
+      "Push back up until the arms are straight, keeping the hips lifted.",
+      "Repeat for the desired number of repetitions and lower the hips to finish."
+    ]
+  },
+  {
+    "id": "crescent-lunge",
+    "name": "Crescent Lunge",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/crescent-lunge-main.webp",
+    "instructions": [
+      "Step one foot forward into a long stance with the back heel lifted and the toes pointing forward.",
+      "Bend the front knee to about ninety degrees so it stacks over the ankle.",
+      "Draw the back hip forward so both hip points face the front of the mat, then raise the arms overhead.",
+      "Hold the position for the prescribed time with the ribs down and the back leg straight.",
+      "Step the feet together and repeat on the other side."
     ]
   },
   {
@@ -2428,6 +4267,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Cross Body Hammer Curl",
     "muscle": "biceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cross_Body_Hammer_Curl/0.jpg",
     "instructions": [
       "Stand up straight with a dumbbell in each hand. Your hands should be down at your side with your palms facing in.",
@@ -2441,6 +4281,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Cross Over - With Bands",
     "muscle": "chest",
     "equipment": "band",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cross_Over_-_With_Bands/0.jpg",
     "instructions": [
       "Secure an exercise band around a stationary post.",
@@ -2452,10 +4293,41 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "Cross-Body_Crunch",
+    "name": "Cross-Body Crunch",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cross-Body_Crunch/0.jpg",
+    "instructions": [
+      "Lie flat on your back and bend your knees about 60 degrees.",
+      "Keep your feet flat on the floor and place your hands loosely behind your head. This will be your starting position.",
+      "Now curl up and bring your right elbow and shoulder across your body while bring your left knee in toward your left shoulder at the same time. Reach with your elbow and try to touch your knee. Exhale as you perform this movement. Tip: Try to bring your shoulder up towards your knee rather than just your elbow and remember that the key is to contract the abs as you perform the movement; not just to move the elbow.",
+      "Now go back down to the starting position as you inhale and repeat with the left elbow and the right knee.",
+      "Continue alternating in this manner until all prescribed repetitions are done."
+    ]
+  },
+  {
+    "id": "cross-body-shoulder-stretch",
+    "name": "Cross-Body Shoulder Stretch",
+    "muscle": "shoulders",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/cross-body-shoulder-stretch-main.webp",
+    "instructions": [
+      "Stand tall and bring one straight arm across your chest.",
+      "Hook your other forearm under it.",
+      "Gently pull the arm closer to your chest.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
     "id": "Crossover_Reverse_Lunge",
     "name": "Crossover Reverse Lunge",
     "muscle": "back",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Crossover_Reverse_Lunge/0.jpg",
     "instructions": [
       "Stand with your feet shoulder width apart. This will be your starting position.",
@@ -2464,10 +4336,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "crow-pose",
+    "name": "Crow Pose",
+    "muscle": "shoulders",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/crow-pose-main.webp",
+    "instructions": [
+      "Squat with the feet close together and place the palms shoulder-width apart on the floor in front of you.",
+      "Bend the elbows straight back and set the knees high onto the backs of the upper arms.",
+      "Shift the weight forward onto the hands until the feet float off the floor.",
+      "Hold the balance for the prescribed time, rounding the upper back and looking slightly forward.",
+      "Lower the feet under control."
+    ]
+  },
+  {
     "id": "Crucifix",
     "name": "Crucifix",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strongman",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Crucifix/0.jpg",
     "instructions": [
       "In the crucifix, you statically hold weights out to the side for time. While the event can be practiced using dumbbells, it is best to practice with one of the various implements used, such as axes and hammers, as it feels different.",
@@ -2479,6 +4367,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Crunch - Hands Overhead",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Crunch_-_Hands_Overhead/0.jpg",
     "instructions": [
       "Lie on the floor with your back flat and knees bent with around a 60-degree angle between the hamstrings and the calves.",
@@ -2493,6 +4382,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Crunch - Legs On Exercise Ball",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Crunch_-_Legs_On_Exercise_Ball/0.jpg",
     "instructions": [
       "Lie flat on your back with your feet resting on an exercise ball and your knees bent at a 90 degree angle.",
@@ -2509,6 +4399,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Crunches",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Crunches/0.jpg",
     "instructions": [
       "Lie flat on your back with your feet flat on the ground, or resting on a bench with your knees bent at a 90 degree angle. If you are resting your feet on a bench, place them three to four inches apart and point your toes inward so they touch.",
@@ -2524,6 +4415,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Cuban Press",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Cuban_Press/0.jpg",
     "instructions": [
       "Take a dumbbell in each hand with a pronated grip in a standing position. Raise your upper arms so that they are parallel to the floor, allowing your lower arms to hang in the \"scarecrow\" position. This will be your starting position.",
@@ -2534,10 +4426,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "dancer-pose",
+    "name": "Dancer Pose",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/dancer-pose-main.webp",
+    "instructions": [
+      "Stand tall and shift the weight onto one foot, keeping that knee soft.",
+      "Bend the other knee and take hold of the inside of that ankle behind you.",
+      "Press the lifted foot back into the hand and reach the opposite arm forward as the chest lifts.",
+      "Hold the shape for the prescribed time with the standing hip level and the gaze steady.",
+      "Release the foot and repeat on the other side."
+    ]
+  },
+  {
     "id": "Dancers_Stretch",
     "name": "Dancer's Stretch",
     "muscle": "back",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dancers_Stretch/0.jpg",
     "instructions": [
       "Sit up on the floor.",
@@ -2551,6 +4459,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Dead Bug",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dead_Bug/0.jpg",
     "instructions": [
       "Begin lying on your back with your hands extended above you toward the ceiling.",
@@ -2563,10 +4472,41 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "dead-bug-hold",
+    "name": "Dead Bug Hold",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/dead-bug-hold-main.webp",
+    "instructions": [
+      "Lie on your back with the arms pointing at the ceiling and the hips and knees bent to 90 degrees.",
+      "Press the lower back into the floor and keep it there for the whole set.",
+      "Extend one arm overhead and straighten the opposite leg until both hover just above the floor.",
+      "Hold that extended position for the prescribed time without letting the ribs flare or the back arch.",
+      "Return to the start and repeat with the other arm and leg."
+    ]
+  },
+  {
+    "id": "dead-hang",
+    "name": "Dead Hang",
+    "muscle": "other",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/dead-hang-main.webp",
+    "instructions": [
+      "Grip a pull-up bar with palms facing away, shoulder-width apart.",
+      "Hang with your arms fully extended and feet off the ground.",
+      "Relax your shoulders and let your body hang.",
+      "Keep your core lightly engaged.",
+      "Hold for the desired duration."
+    ]
+  },
+  {
     "id": "Deadlift_with_Bands",
     "name": "Deadlift with Bands",
     "muscle": "back",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Deadlift_with_Bands/0.jpg",
     "instructions": [
       "To deadlift with short bands, simply loop them over the bar before you start, and step into them to set up. For long bands, they will need to be anchored to a secure base, such as heavy dumbbells or a rack.",
@@ -2579,6 +4519,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Deadlift with Chains",
     "muscle": "back",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Deadlift_with_Chains/0.jpg",
     "instructions": [
       "You can attach the chains to the sleeves of the bar, or just drape the middle over the bar so there is a greater weight increase as you lift.",
@@ -2592,6 +4533,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Decline Barbell Bench Press",
     "muscle": "chest",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Decline_Barbell_Bench_Press/0.jpg",
     "instructions": [
       "Secure your legs at the end of the decline bench and slowly lay down on the bench.",
@@ -2603,10 +4545,25 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "decline-bench-press",
+    "name": "Decline Bench Press",
+    "muscle": "chest",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/decline-bench-press-start.webp",
+    "instructions": [
+      "Set the bench to a decline angle. Lie down and secure your feet.",
+      "Unrack the barbell and lower it to your lower chest.",
+      "Press back up to the start.",
+      "Repeat."
+    ]
+  },
+  {
     "id": "Decline_Close-Grip_Bench_To_Skull_Crusher",
     "name": "Decline Close-Grip Bench To Skull Crusher",
     "muscle": "triceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Decline_Close-Grip_Bench_To_Skull_Crusher/0.jpg",
     "instructions": [
       "Secure your legs at the end of the decline bench and slowly lay down on the bench.",
@@ -2623,6 +4580,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Decline Crunch",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Decline_Crunch/0.jpg",
     "instructions": [
       "Secure your legs at the end of the decline bench and lie down.",
@@ -2638,6 +4596,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Decline Dumbbell Bench Press",
     "muscle": "chest",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Decline_Dumbbell_Bench_Press/0.jpg",
     "instructions": [
       "Secure your legs at the end of the decline bench and lie down with a dumbbell on each hand on top of your thighs. The palms of your hand will be facing each other.",
@@ -2653,6 +4612,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Decline Dumbbell Flyes",
     "muscle": "chest",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Decline_Dumbbell_Flyes/0.jpg",
     "instructions": [
       "Secure your legs at the end of the decline bench and lie down with a dumbbell on each hand on top of your thighs. The palms of your hand will be facing each other.",
@@ -2667,6 +4627,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Decline Dumbbell Triceps Extension",
     "muscle": "triceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Decline_Dumbbell_Triceps_Extension/0.jpg",
     "instructions": [
       "Secure your legs at the end of the decline bench and lie down with a dumbbell on each hand on top of your thighs. The palms of your hand will be facing each other.",
@@ -2681,6 +4642,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Decline EZ Bar Triceps Extension",
     "muscle": "triceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Decline_EZ_Bar_Triceps_Extension/0.jpg",
     "instructions": [
       "Secure your legs at the end of the decline bench and slowly lay down on the bench.",
@@ -2691,10 +4653,25 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "decline-bench-press-ez-bar",
+    "name": "Decline EZ-Bar Bench Press",
+    "muscle": "chest",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/decline-bench-press-ez-bar-start.webp",
+    "instructions": [
+      "Set the bench to a decline. Secure your feet and grip the EZ-bar.",
+      "Lower the bar to your lower chest.",
+      "Press back up explosively.",
+      "Repeat."
+    ]
+  },
+  {
     "id": "Decline_Oblique_Crunch",
     "name": "Decline Oblique Crunch",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Decline_Oblique_Crunch/0.jpg",
     "instructions": [
       "Secure your legs at the end of the decline bench and slowly lay down on the bench.",
@@ -2710,6 +4687,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Decline Push-Up",
     "muscle": "chest",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Decline_Push-Up/0.jpg",
     "instructions": [
       "Lie on the floor face down and place your hands about 36 inches apart while holding your torso up at arms length. Move your feet up to a box or bench. This will be your starting position.",
@@ -2723,6 +4701,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Decline Reverse Crunch",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Decline_Reverse_Crunch/0.jpg",
     "instructions": [
       "Lie on your back on a decline bench and hold on to the top of the bench with both hands. Don't let your body slip down from this position.",
@@ -2737,6 +4716,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Decline Smith Press",
     "muscle": "chest",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Decline_Smith_Press/0.jpg",
     "instructions": [
       "Place a decline bench underneath the Smith machine. Now place the barbell at a height that you can reach when lying down and your arms are almost fully extended. Using a pronated grip that is wider than shoulder width, unlock the bar from the rack and hold it straight over you with your arms extended. This will be your starting position.",
@@ -2751,6 +4731,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Deficit Deadlift",
     "muscle": "back",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Deficit_Deadlift/0.jpg",
     "instructions": [
       "Begin by having a platform or weight plates that you can stand on, usually 1-3 inches in height. Approach the bar so that it is centered over your feet. You feet should be about hip width apart. Bend at the hip to grip the bar at shoulder width, allowing your shoulder blades to protract. Typically, you would use an overhand grip or an over/under grip on heavier sets.",
@@ -2759,10 +4740,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "deficit-push-ups",
+    "name": "Deficit Push Ups",
+    "muscle": "chest",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/deficit-push-ups-start.webp",
+    "instructions": [
+      "Place your hands on two elevated surfaces like parallettes or blocks.",
+      "Assume a plank position with hands under your shoulders.",
+      "Lower your chest below the level of your hands.",
+      "Press back up to extend your arms.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
     "id": "Depth_Jump_Leap",
     "name": "Depth Jump Leap",
     "muscle": "quads",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Depth_Jump_Leap/0.jpg",
     "instructions": [
       "For this drill you will need two boxes or benches, one 12 to 16 inches high and the other 22 to 26 inches high.",
@@ -2772,10 +4769,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "diamond-push-ups",
+    "name": "Diamond Push Ups",
+    "muscle": "chest",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/diamond-push-ups-start.webp",
+    "instructions": [
+      "Assume a push-up position with hands close together forming a diamond.",
+      "Keep your elbows tucked close to your sides.",
+      "Lower your chest toward your hands.",
+      "Press back up to extend your arms.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
     "id": "Dip_Machine",
     "name": "Dip Machine",
     "muscle": "triceps",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dip_Machine/0.jpg",
     "instructions": [
       "Sit securely in a dip machine, select the weight and firmly grasp the handles.",
@@ -2790,6 +4803,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Dips - Chest Version",
     "muscle": "chest",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dips_-_Chest_Version/0.jpg",
     "instructions": [
       "For this exercise you will need access to parallel bars. To get yourself into the starting position, hold your body at arms length (arms locked) above the bars.",
@@ -2803,6 +4817,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Dips - Triceps Version",
     "muscle": "triceps",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dips_-_Triceps_Version/0.jpg",
     "instructions": [
       "To get into the starting position, hold your body at arm's length with your arms nearly locked above the bars.",
@@ -2812,10 +4827,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "dolphin-pose",
+    "name": "Dolphin Pose",
+    "muscle": "shoulders",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/dolphin-pose-main.webp",
+    "instructions": [
+      "Kneel and place the forearms on the floor shoulder-width apart with the elbows under the shoulders.",
+      "Tuck the toes and lift the hips up and back until the body forms an inverted V.",
+      "Press the forearms down and draw the shoulders away from the ears; let the heels stay high.",
+      "Hold the position for the prescribed time, keeping the neck relaxed between the arms.",
+      "Lower the knees to the floor to come out."
+    ]
+  },
+  {
     "id": "Donkey_Calf_Raises",
     "name": "Donkey Calf Raises",
     "muscle": "calves",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Donkey_Calf_Raises/0.jpg",
     "instructions": [
       "For this exercise you will need access to a donkey calf raise machine. Start by positioning your lower back and hips under the padded lever provided. The tailbone area should be the one making contact with the pad.",
@@ -2826,10 +4857,56 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "doorway-chest-stretch",
+    "name": "Doorway Chest Stretch",
+    "muscle": "chest",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/doorway-chest-stretch-main.webp",
+    "instructions": [
+      "Stand tall and raise your arms into a goalpost position.",
+      "Bend your elbows ninety degrees, forearms vertical.",
+      "Draw your elbows back and squeeze your shoulder blades.",
+      "Hold for 20 to 30 seconds, breathing steadily."
+    ]
+  },
+  {
+    "id": "double-db-kickstand-deadlift",
+    "name": "Double Dumbbell Kickstand Deadlift",
+    "muscle": "glutes",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/double-db-kickstand-deadlift-start.webp",
+    "instructions": [
+      "Stand tall and step one foot back so only the toes touch the floor.",
+      "Hold a dumbbell in each hand at hip height.",
+      "Hinge at the hips, lowering both dumbbells toward mid-shin while keeping the back flat.",
+      "Keep most of your weight on the front foot throughout.",
+      "Drive through the front heel to return to standing. Switch sides after all reps."
+    ]
+  },
+  {
+    "id": "double-db-overhead-carry",
+    "name": "Double Dumbbell Overhead Carry",
+    "muscle": "shoulders",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/double-db-overhead-carry-main.webp",
+    "instructions": [
+      "Clean or press a dumbbell to lockout above each shoulder.",
+      "Straighten both elbows fully and pull your shoulder blades up into the weights rather than shrugging away from them.",
+      "Brace hard and keep your ribs down — with both arms overhead the temptation to arch is much stronger.",
+      "Walk forward with short, deliberate strides, keeping both dumbbells stacked over your shoulders.",
+      "Keep breathing shallowly and steadily instead of holding your breath for the whole carry.",
+      "Carry for the desired distance, then lower both weights under control."
+    ]
+  },
+  {
     "id": "Double_Kettlebell_Alternating_Hang_Clean",
     "name": "Double Kettlebell Alternating Hang Clean",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Double_Kettlebell_Alternating_Hang_Clean/0.jpg",
     "instructions": [
       "Place two kettlebells between your feet. To get in the starting position, push your butt back and look straight ahead.",
@@ -2838,10 +4915,87 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "double-kettlebell-bicep-curl",
+    "name": "Double Kettlebell Bicep Curl",
+    "muscle": "biceps",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/double-kettlebell-bicep-curl-start.webp",
+    "instructions": [
+      "Stand holding a kettlebell in each hand by the handle, palms facing forward.",
+      "Keep the elbows tucked to the sides and the bells hanging at arm length.",
+      "Curl both kettlebells up toward the shoulders by flexing the elbows.",
+      "Squeeze the biceps at the top, then lower under control to the starting position.",
+      "Repeat for the recommended number of repetitions."
+    ]
+  },
+  {
+    "id": "double-kettlebell-clean",
+    "name": "Double Kettlebell Clean",
+    "muscle": "glutes",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/double-kettlebell-clean-start.webp",
+    "instructions": [
+      "Stand with two kettlebells on the floor between your feet, handles angled slightly inward.",
+      "Hinge at the hips, grip the handles, and hike the kettlebells back between the legs.",
+      "Explosively extend the hips to drive the kettlebells up along the body.",
+      "As they reach chest height, spear your hands through the handles to catch them at the rack position on the shoulders.",
+      "Lower back to the hang by hinging at the hips and guiding the bells between the legs.",
+      "Repeat for the recommended number of repetitions."
+    ]
+  },
+  {
+    "id": "double-kettlebell-clean-and-press",
+    "name": "Double Kettlebell Clean and Press",
+    "muscle": "shoulders",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/double-kettlebell-clean-and-press-start.webp",
+    "instructions": [
+      "Stand with two kettlebells on the floor between your feet, feet about hip-width apart, and hinge at the hips to grip one handle in each hand.",
+      "Drive through your legs and extend your hips explosively to pull both kettlebells up, then rotate your elbows under and catch the bells in the racked position at the front of your shoulders.",
+      "Brace your core and press both kettlebells overhead until your arms are fully locked out.",
+      "Lower the kettlebells back to the racked position, then down to the floor under control.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "double-kettlebell-dead-clean",
+    "name": "Double Kettlebell Dead Clean",
+    "muscle": "glutes",
+    "equipment": "kettlebell",
+    "category": "olympic",
+    "image": "/repdb/double-kettlebell-dead-clean-start.webp",
+    "instructions": [
+      "Set two kettlebells on the floor between your feet.",
+      "Hinge down and grip both handles.",
+      "Drive explosively through your legs and hips.",
+      "Pull the kettlebells up and rotate them to the rack position.",
+      "Lower them back to the floor and repeat."
+    ]
+  },
+  {
+    "id": "double-kettlebell-dead-split-snatch",
+    "name": "Double Kettlebell Dead Split Snatch",
+    "muscle": "shoulders",
+    "equipment": "kettlebell",
+    "category": "olympic",
+    "image": "/repdb/double-kettlebell-dead-split-snatch-start.webp",
+    "instructions": [
+      "Set two kettlebells on the floor between your feet.",
+      "Hinge down and grip both handles firmly.",
+      "Explosively pull the kettlebells overhead in one motion.",
+      "Drop into a split stance to catch them at lockout.",
+      "Recover by stepping feet back together."
+    ]
+  },
+  {
     "id": "Double_Kettlebell_Jerk",
     "name": "Double Kettlebell Jerk",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Double_Kettlebell_Jerk/0.jpg",
     "instructions": [
       "Hold a kettlebell by the handle in each hand.",
@@ -2854,10 +5008,42 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "double-kettlebell-overhead-carry",
+    "name": "Double Kettlebell Overhead Carry",
+    "muscle": "shoulders",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/double-kettlebell-overhead-carry-main.webp",
+    "instructions": [
+      "Clean two kettlebells to the rack, then press or push press both to lockout overhead.",
+      "Straighten both elbows and settle each bell behind and above its wrist, with your wrists straight.",
+      "Pull your ribs down and brace hard before the first step; with both bells overhead there is nothing to counterbalance with.",
+      "Walk forward with short, controlled strides, keeping both bells stacked over your shoulders.",
+      "Keep looking straight ahead and breathe steadily through the carry.",
+      "Cover the desired distance, then lower both bells to the rack and down under control."
+    ]
+  },
+  {
+    "id": "double-kettlebell-overhead-press",
+    "name": "Double Kettlebell Overhead Press",
+    "muscle": "shoulders",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/double-kettlebell-overhead-press-start.webp",
+    "instructions": [
+      "Clean two kettlebells to the rack position at your shoulders.",
+      "Stand tall with feet hip-width apart.",
+      "Press both kettlebells straight overhead.",
+      "Lock out your arms at the top.",
+      "Lower back to the rack position and repeat."
+    ]
+  },
+  {
     "id": "Double_Kettlebell_Push_Press",
     "name": "Double Kettlebell Push Press",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Double_Kettlebell_Push_Press/0.jpg",
     "instructions": [
       "Clean two kettlebells to your shoulders.",
@@ -2866,10 +5052,42 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "double-kettlebell-rear-delt-row",
+    "name": "Double Kettlebell Rear Delt Row",
+    "muscle": "shoulders",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/double-kettlebell-rear-delt-row-start.webp",
+    "instructions": [
+      "Stand a kettlebell just outside each foot with your feet about hip-width apart.",
+      "Hinge at the hips with a flat back until your torso is close to parallel with the floor, letting your knees bend slightly.",
+      "Take both handles with an overhand grip and let your arms hang straight down from your shoulders.",
+      "Row both bells up by driving your elbows out to the sides, away from your ribs rather than back along them.",
+      "Stop when your upper arms are roughly in line with your shoulders, and squeeze your shoulder blades together.",
+      "Lower the bells under control until your arms hang straight again, and repeat for the desired reps."
+    ]
+  },
+  {
+    "id": "double-kettlebell-row",
+    "name": "Double Kettlebell Row",
+    "muscle": "back",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/double-kettlebell-row-start.webp",
+    "instructions": [
+      "Hold a kettlebell in each hand and hinge forward at the hips.",
+      "Let your arms hang straight down from your shoulders.",
+      "Row both kettlebells to your hips by driving elbows back.",
+      "Squeeze your shoulder blades at the top.",
+      "Lower under control and repeat."
+    ]
+  },
+  {
     "id": "Double_Kettlebell_Snatch",
     "name": "Double Kettlebell Snatch",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Double_Kettlebell_Snatch/0.jpg",
     "instructions": [
       "Place two kettlebells behind your feet. Bend your knees and sit back to pick up the kettlebells.",
@@ -2878,10 +5096,41 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "double-kettlebell-split-jerk",
+    "name": "Double Kettlebell Split Jerk",
+    "muscle": "shoulders",
+    "equipment": "kettlebell",
+    "category": "olympic",
+    "image": "/repdb/double-kettlebell-split-jerk-start.webp",
+    "instructions": [
+      "Clean two kettlebells to the rack position at your shoulders.",
+      "Dip slightly by bending your knees.",
+      "Drive the kettlebells overhead explosively.",
+      "Split your legs to catch them with locked arms.",
+      "Recover by stepping feet back together."
+    ]
+  },
+  {
+    "id": "double-kettlebell-swing-snatch",
+    "name": "Double Kettlebell Swing Snatch",
+    "muscle": "glutes",
+    "equipment": "kettlebell",
+    "category": "olympic",
+    "image": "/repdb/double-kettlebell-swing-snatch-start.webp",
+    "instructions": [
+      "Stand with feet shoulder-width apart holding two kettlebells.",
+      "Hinge at the hips to swing the bells between your legs.",
+      "Explosively drive your hips forward to swing the bells up.",
+      "Punch through to catch both kettlebells overhead with locked arms.",
+      "Lower under control and repeat."
+    ]
+  },
+  {
     "id": "Double_Kettlebell_Windmill",
     "name": "Double Kettlebell Windmill",
     "muscle": "core",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Double_Kettlebell_Windmill/0.jpg",
     "instructions": [
       "Place a kettlebell in front of your front foot and clean and press a kettlebell overhead with your opposite arm. Clean the kettlebell to your shoulder by extending through the legs and hips as you pull the kettlebell towards your shoulders. Rotate your wrist as you do so, so that the palm faces forward.",
@@ -2895,6 +5144,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Double Leg Butt Kick",
     "muscle": "quads",
     "equipment": "bodyweight",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Double_Leg_Butt_Kick/0.jpg",
     "instructions": [
       "Begin standing with your knees slightly bent.",
@@ -2904,10 +5154,101 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "downward-dog-knee-tuck",
+    "name": "Downward Dog Knee Tuck",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/downward-dog-knee-tuck-start.webp",
+    "instructions": [
+      "Set up in downward dog with the hands shoulder-width apart and the hips high.",
+      "Press the floor away and brace the trunk so the lower back stays long.",
+      "Draw one knee in towards the chest, rounding the upper back slightly as it comes in.",
+      "Extend the leg back to the starting position under control.",
+      "Repeat with the other leg and keep alternating for the desired number of repetitions."
+    ]
+  },
+  {
+    "id": "downward-dog-pedal",
+    "name": "Downward Dog Pedal",
+    "muscle": "calves",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/downward-dog-pedal-start.webp",
+    "instructions": [
+      "Set up in downward dog with the hands shoulder-width apart and the hips high.",
+      "Bend one knee and let that heel lift while the opposite heel presses down towards the floor.",
+      "Switch sides smoothly, as if pedalling, keeping the hips high throughout.",
+      "Keep the hands pressing evenly so the shoulders stay stable.",
+      "Continue alternating for the desired number of repetitions or time."
+    ]
+  },
+  {
+    "id": "downward-dog-to-knee-drive",
+    "name": "Downward Dog to Knee Drive",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/downward-dog-to-knee-drive-start.webp",
+    "instructions": [
+      "Set up in downward dog and lift one leg behind you into three-legged dog.",
+      "Press both hands down and shift the weight slightly forward.",
+      "Round the upper back and drive that knee forward towards the elbow or the nose.",
+      "Extend the leg back up to three-legged dog under control.",
+      "Finish the repetitions on that side and repeat on the other."
+    ]
+  },
+  {
+    "id": "downward-dog-to-low-lunge",
+    "name": "Downward Dog to Low Lunge",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/downward-dog-to-low-lunge-start.webp",
+    "instructions": [
+      "Start in downward dog with the hands shoulder-width apart.",
+      "Shift the weight forward and step one foot up between the hands.",
+      "Lower the back knee to the floor and sink the hips into a low lunge.",
+      "Press back through the hands, lift the back knee and step the front foot back to downward dog.",
+      "Repeat on the other side and keep alternating."
+    ]
+  },
+  {
+    "id": "downward-dog-to-plank",
+    "name": "Downward Dog to Plank",
+    "muscle": "shoulders",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/downward-dog-to-plank-start.webp",
+    "instructions": [
+      "Set up in downward dog with the hips high and the hands shoulder-width apart.",
+      "Shift the weight forward and lower the hips until the body forms a straight line in a high plank.",
+      "Hold the plank for a moment with the ribs down and the glutes engaged.",
+      "Press the floor away and lift the hips back up into downward dog.",
+      "Continue alternating for the desired number of repetitions."
+    ]
+  },
+  {
+    "id": "downward-dog-to-upward-dog",
+    "name": "Downward Dog to Upward Dog",
+    "muscle": "shoulders",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/downward-dog-to-upward-dog-start.webp",
+    "instructions": [
+      "Start in downward dog with the hips high and the hands shoulder-width apart.",
+      "Shift forward through plank and lower slightly, then press the chest through into upward dog with the thighs off the floor.",
+      "Draw the shoulders back and down and keep the neck long.",
+      "Tuck the toes, press the floor away and lift the hips back into downward dog.",
+      "Continue moving between the two positions for the desired number of repetitions."
+    ]
+  },
+  {
     "id": "Downward_Facing_Balance",
     "name": "Downward Facing Balance",
     "muscle": "glutes",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Downward_Facing_Balance/0.jpg",
     "instructions": [
       "Lie facedown on top of an exercise ball.",
@@ -2915,10 +5256,25 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "downward-dog",
+    "name": "Downward-Facing Dog",
+    "muscle": "calves",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/downward-dog-main.webp",
+    "instructions": [
+      "Start on all fours with hands slightly ahead of your shoulders.",
+      "Tuck your toes and lift your hips up and back.",
+      "Straighten your legs and press your heels toward the floor.",
+      "Hold for 20 to 30 seconds, breathing steadily."
+    ]
+  },
+  {
     "id": "Drag_Curl",
     "name": "Drag Curl",
     "muscle": "biceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Drag_Curl/0.jpg",
     "instructions": [
       "Grab a barbell with a supinated grip (palms facing forward) and get your elbows close to your torso and back. This will be your starting position.",
@@ -2928,10 +5284,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "dragon-flag",
+    "name": "Dragon Flag",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/dragon-flag-start.webp",
+    "instructions": [
+      "Lie on a bench and grip it firmly behind your head.",
+      "Raise your body up so only your upper back stays on the bench.",
+      "Keep your body rigid in a straight line.",
+      "Lower your body under control until nearly horizontal.",
+      "Raise back up and repeat."
+    ]
+  },
+  {
     "id": "Drop_Push",
     "name": "Drop Push",
     "muscle": "chest",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Drop_Push/0.jpg",
     "instructions": [
       "Position low boxes or other platforms 2-3 feet apart.",
@@ -2944,6 +5316,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Dumbbell Alternate Bicep Curl",
     "muscle": "biceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Alternate_Bicep_Curl/0.jpg",
     "instructions": [
       "Stand (torso upright) with a dumbbell in each hand held at arms length. The elbows should be close to the torso and the palms of your hand should be facing your thighs.",
@@ -2958,6 +5331,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Dumbbell Bench Press",
     "muscle": "chest",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Bench_Press/0.jpg",
     "instructions": [
       "Lie down on a flat bench with a dumbbell in each hand resting on top of your thighs. The palms of your hands will be facing each other.",
@@ -2972,6 +5346,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Dumbbell Bench Press with Neutral Grip",
     "muscle": "chest",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Bench_Press_with_Neutral_Grip/0.jpg",
     "instructions": [
       "Take a dumbbell in each hand and lay back onto a flat bench. Your feet should be flat on the floor and your shoulder blades retracted.",
@@ -2981,10 +5356,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "dumbbell-bench-pull",
+    "name": "Dumbbell Bench Pull",
+    "muscle": "back",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/dumbbell-bench-pull-start.webp",
+    "instructions": [
+      "Lie face down on an incline bench holding dumbbells.",
+      "Let your arms hang straight down.",
+      "Pull the dumbbells up toward your chest, squeezing your shoulder blades.",
+      "Lower with control.",
+      "Repeat."
+    ]
+  },
+  {
     "id": "Dumbbell_Bicep_Curl",
     "name": "Dumbbell Bicep Curl",
     "muscle": "biceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Bicep_Curl/0.jpg",
     "instructions": [
       "Stand up straight with a dumbbell in each hand at arm's length. Keep your elbows close to your torso and rotate the palms of your hands until they are facing forward. This will be your starting position.",
@@ -2994,10 +5385,27 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "dumbbell-calf-raise",
+    "name": "Dumbbell Calf Raise",
+    "muscle": "calves",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/dumbbell-calf-raise-start.webp",
+    "instructions": [
+      "Stand holding a dumbbell in each hand at your sides.",
+      "Place the balls of your feet on a raised surface with heels hanging off.",
+      "Press through the balls of your feet to raise your heels as high as possible.",
+      "Squeeze your calves at the top of the movement.",
+      "Lower your heels below the platform to stretch the calves.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
     "id": "Dumbbell_Clean",
     "name": "Dumbbell Clean",
     "muscle": "hamstrings",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Clean/0.jpg",
     "instructions": [
       "Begin standing with a dumbbell in each hand with your feet shoulder width apart.",
@@ -3008,10 +5416,58 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "dumbbell-deadlift",
+    "name": "Dumbbell Deadlift",
+    "muscle": "back",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/dumbbell-deadlift-start.webp",
+    "instructions": [
+      "Stand with dumbbells in front of your thighs, feet hip-width apart.",
+      "Hinge at the hips and lower the dumbbells along your legs with a flat back.",
+      "Keep the dumbbells close to your shins throughout the descent.",
+      "Drive through your heels to return to standing.",
+      "Extend your hips fully at the top without hyperextending your lower back.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "dumbbell-face-pull",
+    "name": "Dumbbell Face Pull",
+    "muscle": "shoulders",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/dumbbell-face-pull-start.webp",
+    "instructions": [
+      "Stand or sit holding a dumbbell in each hand with arms extended forward.",
+      "Bend your elbows and pull the dumbbells toward your face.",
+      "Flare your elbows out wide to shoulder height.",
+      "Squeeze your rear delts and upper back at the peak.",
+      "Lower the dumbbells back under control.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "dumbbell-farmers-walk",
+    "name": "Dumbbell Farmer's Walk",
+    "muscle": "other",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/dumbbell-farmers-walk-main.webp",
+    "instructions": [
+      "Stand tall with a dumbbell in each hand, arms extended at your sides.",
+      "Retract your shoulder blades and brace your core, maintaining a neutral spine.",
+      "Walk slowly and deliberately for a set distance or duration, taking short, controlled steps.",
+      "Keep your chest up and avoid leaning to one side as you walk.",
+      "Focus on maintaining a strong, stable posture throughout the movement."
+    ]
+  },
+  {
     "id": "Dumbbell_Floor_Press",
     "name": "Dumbbell Floor Press",
     "muscle": "triceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Floor_Press/0.jpg",
     "instructions": [
       "Lay on the floor holding dumbbells in your hands. Your knees can be bent. Begin with the weights fully extended above you.",
@@ -3024,6 +5480,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Dumbbell Flyes",
     "muscle": "chest",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Flyes/0.jpg",
     "instructions": [
       "Lie down on a flat bench with a dumbbell on each hand resting on top of your thighs. The palms of your hand will be facing each other.",
@@ -3034,10 +5491,56 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "dumbbell-front-squat",
+    "name": "Dumbbell Front Squat",
+    "muscle": "glutes",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/dumbbell-front-squat-start.webp",
+    "instructions": [
+      "Hold a dumbbell in each hand resting on top of your shoulders.",
+      "Keep your elbows high and torso upright.",
+      "Lower your hips by bending knees until thighs are parallel to the floor.",
+      "Drive through your heels to stand back up.",
+      "Maintain a neutral spine throughout.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "hammer-curl",
+    "name": "Dumbbell Hammer Curl",
+    "muscle": "biceps",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/hammer-curl-start.webp",
+    "instructions": [
+      "Stand holding dumbbells at your sides with palms facing each other.",
+      "Curl the weights up while keeping your palms facing inward.",
+      "Squeeze at the top, then lower under control.",
+      "Repeat."
+    ]
+  },
+  {
+    "id": "dumbbell-hip-thrust",
+    "name": "Dumbbell Hip Thrust",
+    "muscle": "glutes",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/dumbbell-hip-thrust-start.webp",
+    "instructions": [
+      "Sit on the floor with your upper back against a bench, knees bent, feet flat, and a dumbbell across your hips.",
+      "Brace your core and drive through your heels, lifting your hips off the floor until your body forms a straight line from shoulders to knees.",
+      "Squeeze your glutes powerfully at the top of the movement, ensuring full hip extension.",
+      "Slowly lower your hips back down to the starting position with control, maintaining tension.",
+      "Repeat for the desired number of repetitions."
+    ]
+  },
+  {
     "id": "Dumbbell_Incline_Row",
     "name": "Dumbbell Incline Row",
     "muscle": "back",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Incline_Row/0.jpg",
     "instructions": [
       "Using a neutral grip, lean into an incline bench.",
@@ -3051,6 +5554,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Dumbbell Incline Shoulder Raise",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Incline_Shoulder_Raise/0.jpg",
     "instructions": [
       "Sit on an Incline Bench while holding a dumbbell on each hand on top of your thighs.",
@@ -3061,10 +5565,40 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "db-kickstand-deadlift",
+    "name": "Dumbbell Kickstand Deadlift",
+    "muscle": "glutes",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/db-kickstand-deadlift-start.webp",
+    "instructions": [
+      "Stand tall and step one foot back so only the toes lightly touch the floor.",
+      "Hold a dumbbell in one hand at hip height.",
+      "Hinge at the hips, lowering the dumbbell toward mid-shin while keeping the back flat.",
+      "Keep most of your weight on the front foot throughout.",
+      "Drive through the front heel to return to standing. Complete all reps, then switch sides."
+    ]
+  },
+  {
+    "id": "lateral-raise",
+    "name": "Dumbbell Lateral Raise",
+    "muscle": "shoulders",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/lateral-raise-start.webp",
+    "instructions": [
+      "Stand holding dumbbells at your sides.",
+      "Raise the dumbbells out to the sides until arms are parallel to the floor.",
+      "Lower under control.",
+      "Repeat."
+    ]
+  },
+  {
     "id": "Dumbbell_Lunges",
     "name": "Dumbbell Lunges",
     "muscle": "quads",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Lunges/0.jpg",
     "instructions": [
       "Stand with your torso upright holding two dumbbells in your hands by your sides. This will be your starting position.",
@@ -3078,6 +5612,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Dumbbell Lying One-Arm Rear Lateral Raise",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Lying_One-Arm_Rear_Lateral_Raise/0.jpg",
     "instructions": [
       "While holding a dumbbell in one hand, lay with your chest down on a slightly inclined (around 15 degrees when measured from the floor) adjustable bench. The other hand can be used to hold to the leg of the bench for stability.",
@@ -3092,6 +5627,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Dumbbell Lying Pronation",
     "muscle": "other",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Lying_Pronation/0.jpg",
     "instructions": [
       "Lie on a flat bench face down with one arm holding a dumbbell and the other hand on top of the bench folded so that you can rest your head on it.",
@@ -3107,6 +5643,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Dumbbell Lying Rear Lateral Raise",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Lying_Rear_Lateral_Raise/0.jpg",
     "instructions": [
       "While holding a dumbbell in each hand, lay with your chest down on a slightly inclined (around 15 degrees when measured from the floor) adjustable bench.",
@@ -3121,6 +5658,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Dumbbell Lying Supination",
     "muscle": "other",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Lying_Supination/0.jpg",
     "instructions": [
       "Lie sideways on a flat bench with one arm holding a dumbbell and the other hand on top of the bench folded so that you can rest your head on it.",
@@ -3136,6 +5674,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Dumbbell One-Arm Shoulder Press",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_One-Arm_Shoulder_Press/0.jpg",
     "instructions": [
       "Grab a dumbbell and either sit on a military press bench or a utility bench that has a back support on it as you place the dumbbells upright on top of your thighs or stand up straight.",
@@ -3151,6 +5690,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Dumbbell One-Arm Triceps Extension",
     "muscle": "triceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_One-Arm_Triceps_Extension/0.jpg",
     "instructions": [
       "Grab a dumbbell and either sit on a military press bench or a utility bench that has a back support on it as you place the dumbbells upright on top of your thighs or stand up straight.",
@@ -3166,6 +5706,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Dumbbell One-Arm Upright Row",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_One-Arm_Upright_Row/0.jpg",
     "instructions": [
       "Grab a dumbbell and stand up straight with your arm extended in front of you with a slight bend at the elbows and your back straight. This will be your starting position. Tip: The dumbbell should be resting on top of your thigh with the palm of your hands facing your thighs.",
@@ -3176,10 +5717,43 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "db-overhead-carry",
+    "name": "Dumbbell Overhead Carry",
+    "muscle": "shoulders",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/db-overhead-carry-main.webp",
+    "instructions": [
+      "Clean or press a dumbbell to a locked-out position directly above your shoulder.",
+      "Push the arm all the way up so the elbow is straight and the biceps is close to your ear.",
+      "Brace your ribs down rather than letting your lower back arch to hold the weight up.",
+      "Walk forward with controlled strides, keeping the dumbbell stacked over your shoulder and hip.",
+      "Keep your eyes forward — tipping your head back to watch the weight drags your posture with it.",
+      "Carry for the desired distance, lower under control, then repeat with the other arm."
+    ]
+  },
+  {
+    "id": "dumbbell-pistol-squat",
+    "name": "Dumbbell Pistol Squat",
+    "muscle": "glutes",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/dumbbell-pistol-squat-start.webp",
+    "instructions": [
+      "Stand tall, holding a dumbbell in each hand with your arms hanging at your sides.",
+      "Lift one leg straight out in front of you, keeping it extended throughout the movement.",
+      "Lower your body by bending the knee of your standing leg, keeping your chest up and back straight.",
+      "Descend until your glutes are close to your heel or your thigh is parallel to the floor, maintaining balance.",
+      "Push through your heel to return to the starting position, extending your standing leg fully.",
+      "Complete all reps on one side, then switch legs and repeat for the other side per set."
+    ]
+  },
+  {
     "id": "Dumbbell_Prone_Incline_Curl",
     "name": "Dumbbell Prone Incline Curl",
     "muscle": "biceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Prone_Incline_Curl/0.jpg",
     "instructions": [
       "Grab a dumbbell on each hand and lie face down on an incline bench with your shoulders near top of the incline. Your knees can rest on the seat or your legs can be straddled to the sides (my preferred way).",
@@ -3191,10 +5765,41 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "db-pullover",
+    "name": "Dumbbell Pullover",
+    "muscle": "back",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/db-pullover-start.webp",
+    "instructions": [
+      "Lie on a flat bench with a dumbbell held above your chest, arms extended.",
+      "Lower the dumbbell behind your head in an arc, keeping slight bend in elbows.",
+      "Stretch until you feel tension in your lats and chest.",
+      "Pull the dumbbell back to the starting position.",
+      "Repeat."
+    ]
+  },
+  {
+    "id": "dumbbell-push-press",
+    "name": "Dumbbell Push Press",
+    "muscle": "shoulders",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/dumbbell-push-press-start.webp",
+    "instructions": [
+      "Stand holding dumbbells at shoulder height with palms facing forward.",
+      "Slightly bend your knees into a quarter squat.",
+      "Drive through your legs to generate momentum, then press the dumbbells overhead.",
+      "Lock out your arms at the top.",
+      "Lower the dumbbells back to shoulder height with control."
+    ]
+  },
+  {
     "id": "Dumbbell_Raise",
     "name": "Dumbbell Raise",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Raise/0.jpg",
     "instructions": [
       "Grab a dumbbell in each arm and stand up straight with your arms extended by your sides with a slight bend at the elbows and your back straight. This will be your starting position. Tip: The dumbbell should be next to your thighs with the palm of your hands facing back.",
@@ -3208,6 +5813,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Dumbbell Rear Lunge",
     "muscle": "quads",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Rear_Lunge/0.jpg",
     "instructions": [
       "Stand with your torso upright holding two dumbbells in your hands by your sides. This will be your starting position.",
@@ -3217,10 +5823,72 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "db-reverse-curl",
+    "name": "Dumbbell Reverse Curl",
+    "muscle": "biceps",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/db-reverse-curl-start.webp",
+    "instructions": [
+      "Hold dumbbells with an overhand grip at your sides.",
+      "Curl them up to shoulder height.",
+      "Lower under control.",
+      "Repeat."
+    ]
+  },
+  {
+    "id": "dumbbell-reverse-fly",
+    "name": "Dumbbell Reverse Fly",
+    "muscle": "shoulders",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/dumbbell-reverse-fly-start.webp",
+    "instructions": [
+      "Hinge forward at the hips holding dumbbells with arms hanging down.",
+      "Keep your back flat and knees slightly bent.",
+      "Raise the dumbbells out to the sides until level with your shoulders.",
+      "Squeeze your shoulder blades together at the top.",
+      "Lower the dumbbells back with control.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "db-reverse-wrist-curl",
+    "name": "Dumbbell Reverse Wrist Curl",
+    "muscle": "other",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/db-reverse-wrist-curl-start.webp",
+    "instructions": [
+      "Sit on a bench holding a dumbbell in each hand, forearms resting on your thighs, palms down.",
+      "Let both wrists drop, lowering the dumbbells toward the floor.",
+      "Lift the backs of your hands toward the ceiling by extending your wrists.",
+      "Squeeze at the top, then lower under control.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "dumbbell-romanian-deadlift",
+    "name": "Dumbbell Romanian Deadlift",
+    "muscle": "glutes",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/dumbbell-romanian-deadlift-start.webp",
+    "instructions": [
+      "Stand holding dumbbells in front of your thighs with a soft knee bend.",
+      "Hinge at the hips and push your glutes back.",
+      "Lower the dumbbells along your legs until you feel a hamstring stretch.",
+      "Keep your back flat and shoulders pulled back.",
+      "Drive your hips forward to return to standing.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
     "id": "Dumbbell_Scaption",
     "name": "Dumbbell Scaption",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Scaption/0.jpg",
     "instructions": [
       "This corrective exercise strengthens the muscles that stabilize your shoulder blade. Hold a light weight in each hand, hanging at your sides. Your thumbs should pointing up.",
@@ -3233,6 +5901,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Dumbbell Seated Box Jump",
     "muscle": "quads",
     "equipment": "dumbbell",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Seated_Box_Jump/0.jpg",
     "instructions": [
       "Position a box a couple feet to the side of a bench. Hold a dumbbell to your chest with both hands and seat yourself on the bench facing the box. This will be your starting position.",
@@ -3246,6 +5915,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Dumbbell Seated One-Leg Calf Raise",
     "muscle": "calves",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Seated_One-Leg_Calf_Raise/0.jpg",
     "instructions": [
       "Place a block on the floor about 12 inches from a flat bench.",
@@ -3261,6 +5931,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Dumbbell Shoulder Press",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Shoulder_Press/0.jpg",
     "instructions": [
       "While holding a dumbbell in each hand, sit on a military press bench or utility bench that has back support. Place the dumbbells upright on top of your thighs.",
@@ -3276,6 +5947,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Dumbbell Shrug",
     "muscle": "back",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Shrug/0.jpg",
     "instructions": [
       "Stand erect with a dumbbell on each hand (palms facing your torso), arms extended on the sides.",
@@ -3289,6 +5961,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Dumbbell Side Bend",
     "muscle": "core",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Side_Bend/0.jpg",
     "instructions": [
       "Stand up straight while holding a dumbbell on the left hand (palms facing the torso) as you have the right hand holding your waist. Your feet should be placed at shoulder width. This will be your starting position.",
@@ -3298,10 +5971,72 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "db-skull-crusher",
+    "name": "Dumbbell Skull Crusher",
+    "muscle": "triceps",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/db-skull-crusher-start.webp",
+    "instructions": [
+      "Lie on a flat bench holding dumbbells over your chest.",
+      "Lower the dumbbells toward the sides of your head.",
+      "Extend your arms back up.",
+      "Repeat."
+    ]
+  },
+  {
+    "id": "dumbbell-snatch",
+    "name": "Dumbbell Snatch",
+    "muscle": "shoulders",
+    "equipment": "dumbbell",
+    "category": "olympic",
+    "image": "/repdb/dumbbell-snatch-start.webp",
+    "instructions": [
+      "Stand with feet shoulder-width apart, dumbbell on the floor between your feet.",
+      "Hinge and grip the dumbbell with one hand.",
+      "Explosively extend hips, knees, and ankles to pull the dumbbell upward.",
+      "Punch the dumbbell overhead in one fluid motion.",
+      "Lock out your arm and stabilize at the top.",
+      "Complete reps on one side, then switch."
+    ]
+  },
+  {
+    "id": "db-somersault-squat",
+    "name": "Dumbbell Somersault Squat",
+    "muscle": "glutes",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/db-somersault-squat-start.webp",
+    "instructions": [
+      "Stand with feet shoulder-width holding a dumbbell in one hand at the shoulder.",
+      "Squat down while reaching the dumbbell forward and across the body.",
+      "Reach the bottom of the squat with the dumbbell extended past the opposite knee.",
+      "Drive through the heels to stand up, returning the dumbbell to the shoulder.",
+      "Complete reps per side, then switch."
+    ]
+  },
+  {
+    "id": "dumbbell-split-squat",
+    "name": "Dumbbell Split Squat",
+    "muscle": "glutes",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/dumbbell-split-squat-start.webp",
+    "instructions": [
+      "Stand in a split stance holding dumbbells at your sides.",
+      "Keep your torso upright and core braced.",
+      "Lower your back knee toward the floor by bending both knees.",
+      "Stop when your front thigh is parallel to the floor.",
+      "Drive through your front heel to return to standing.",
+      "Complete reps on one side, then switch."
+    ]
+  },
+  {
     "id": "Dumbbell_Squat",
     "name": "Dumbbell Squat",
     "muscle": "quads",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Squat/0.jpg",
     "instructions": [
       "Stand up straight while holding a dumbbell on each hand (palms facing the side of your legs).",
@@ -3316,6 +6051,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Dumbbell Squat To A Bench",
     "muscle": "quads",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Squat_To_A_Bench/0.jpg",
     "instructions": [
       "Stand up straight with a flat bench behind you while holding a dumbbell on each hand (palms facing the side of your legs).",
@@ -3330,6 +6066,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Dumbbell Step Ups",
     "muscle": "quads",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Step_Ups/0.jpg",
     "instructions": [
       "Stand up straight while holding a dumbbell on each hand (palms facing the side of your legs).",
@@ -3339,10 +6076,57 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "db-sumo-squat",
+    "name": "Dumbbell Sumo Squat",
+    "muscle": "glutes",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/db-sumo-squat-start.webp",
+    "instructions": [
+      "Stand with feet wider than shoulder-width, toes turned out about 30 degrees.",
+      "Hold a dumbbell in each hand at your sides.",
+      "Brace the core and keep the chest up.",
+      "Bend at the hips and knees to sit straight down into a deep squat.",
+      "Drive through the heels to return to standing.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "db-svend-press",
+    "name": "Dumbbell Svend Press",
+    "muscle": "chest",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/db-svend-press-start.webp",
+    "instructions": [
+      "Stand and press two dumbbells together horizontally at chest height.",
+      "Maintain the inward squeeze on the dumbbells throughout.",
+      "Press the dumbbells forward to full arm extension.",
+      "Pull them back to the chest under control.",
+      "Repeat for the prescribed reps."
+    ]
+  },
+  {
+    "id": "dumbbell-tricep-extension",
+    "name": "Dumbbell Tricep Extension",
+    "muscle": "triceps",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/dumbbell-tricep-extension-start.webp",
+    "instructions": [
+      "Stand holding a dumbbell in one hand overhead.",
+      "Lower the dumbbell behind your head by bending your elbow.",
+      "Extend your arm back to the starting position.",
+      "Keep your elbow close to your head.",
+      "Repeat on both sides."
+    ]
+  },
+  {
     "id": "Dumbbell_Tricep_Extension_-Pronated_Grip",
     "name": "Dumbbell Tricep Extension -Pronated Grip",
     "muscle": "triceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dumbbell_Tricep_Extension_-Pronated_Grip/0.jpg",
     "instructions": [
       "Lie down on a flat bench holding two dumbbells directly above your shoulders. Your arms should be fully extended and form a 90 degree angle from your torso and the floor.",
@@ -3352,10 +6136,57 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "dumbbell-upright-row",
+    "name": "Dumbbell Upright Row",
+    "muscle": "shoulders",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/dumbbell-upright-row-start.webp",
+    "instructions": [
+      "Stand holding two dumbbells in front of your thighs, palms facing your body.",
+      "Pull the dumbbells straight up along your body, leading with your elbows.",
+      "Raise until the dumbbells reach chin height and elbows are above the wrists.",
+      "Pause briefly, then lower with control.",
+      "Repeat for the desired reps."
+    ]
+  },
+  {
+    "id": "dumbbell-windmill",
+    "name": "Dumbbell Windmill",
+    "muscle": "shoulders",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/dumbbell-windmill-start.webp",
+    "instructions": [
+      "Stand with feet shoulder-width apart, holding a dumbbell overhead in one hand, arm locked.",
+      "Turn your feet slightly away from the dumbbell side, keeping the arm straight and eyes on the weight.",
+      "Hinge at your hips, pushing them out to the side of the dumbbell, and slowly lower your torso towards the floor.",
+      "Keep your back straight and the dumbbell arm vertical as you reach your free hand towards your foot or the floor.",
+      "Reverse the motion by driving through your hips and obliques to return to the starting position.",
+      "Complete all reps on one side, then switch and repeat for the other side."
+    ]
+  },
+  {
+    "id": "dumbbell-wrist-curl",
+    "name": "Dumbbell Wrist Curl",
+    "muscle": "other",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/dumbbell-wrist-curl-start.webp",
+    "instructions": [
+      "Sit on a bench with the forearm resting on the thigh, palm up.",
+      "Hold a dumbbell with the wrist hanging off the knee.",
+      "Let the dumbbell roll down to the fingertips.",
+      "Curl the dumbbell up by flexing the wrist.",
+      "Lower under control. Complete reps per side."
+    ]
+  },
+  {
     "id": "Dynamic_Back_Stretch",
     "name": "Dynamic Back Stretch",
     "muscle": "back",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dynamic_Back_Stretch/0.jpg",
     "instructions": [
       "Stand with your feet shoulder width apart. This will be your starting position.",
@@ -3367,6 +6198,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Dynamic Chest Stretch",
     "muscle": "chest",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Dynamic_Chest_Stretch/0.jpg",
     "instructions": [
       "Stand with your hands together, arms extended directly in front of you. This will be your starting position.",
@@ -3374,30 +6206,33 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "EZ-Bar_Curl",
-    "name": "EZ-Bar Curl",
-    "muscle": "biceps",
-    "equipment": "barbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/EZ-Bar_Curl/0.jpg",
+    "id": "eagle-pose",
+    "name": "Eagle Pose",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/eagle-pose-main.webp",
     "instructions": [
-      "Stand up straight while holding an EZ curl bar at the wide outer handle. The palms of your hands should be facing forward and slightly tilted inward due to the shape of the bar. Keep your elbows close to your torso. This will be your starting position.",
-      "Now, while keeping your upper arms stationary, exhale and curl the weights forward while contracting the biceps. Focus on only moving your forearms.",
-      "Continue to raise the weight until your biceps are fully contracted and the bar is at shoulder level. Hold the top contracted position for a moment and squeeze the biceps.",
-      "Then inhale and slowly lower the bar back to the starting position.",
-      "Repeat for the recommended amount of repetitions."
+      "Stand tall, bend both knees slightly and shift the weight onto one foot.",
+      "Cross the other thigh over the standing thigh and hook the foot behind the calf if it reaches.",
+      "Cross the opposite arm underneath, wind the forearms and bring the palms towards each other.",
+      "Sit down a little into the standing leg and hold for the prescribed time with the elbows lifted.",
+      "Unwind and repeat on the other side."
     ]
   },
   {
-    "id": "EZ-Bar_Skullcrusher",
-    "name": "EZ-Bar Skullcrusher",
-    "muscle": "triceps",
-    "equipment": "barbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/EZ-Bar_Skullcrusher/0.jpg",
+    "id": "easy-pose",
+    "name": "Easy Pose",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/easy-pose-main.webp",
     "instructions": [
-      "Using a close grip, lift the EZ bar and hold it with your elbows in as you lie on the bench. Your arms should be perpendicular to the floor. This will be your starting position.",
-      "Keeping the upper arms stationary, lower the bar by allowing the elbows to flex. Inhale as you perform this portion of the movement. Pause once the bar is directly above the forehead.",
-      "Lift the bar back to the starting position by extending the elbow and exhaling.",
-      "Repeat."
+      "Sit on the floor and cross the shins comfortably, each foot under the opposite knee.",
+      "Sit up on a folded blanket or cushion until the knees rest below the level of the hips.",
+      "Stack the ribs over the pelvis and let the hands rest on the thighs.",
+      "Hold the seat for the prescribed time, breathing slowly and evenly.",
+      "Switch which shin is in front on the next round so both sides get equal time."
     ]
   },
   {
@@ -3405,6 +6240,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Elbow Circles",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Elbow_Circles/0.jpg",
     "instructions": [
       "Sit or stand with your feet slightly apart.",
@@ -3417,6 +6253,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Elbow to Knee",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Elbow_to_Knee/0.jpg",
     "instructions": [
       "Lie on the floor, crossing your right leg across your bent left knee. Clasp your hands behind your head, beginning with your shoulder blades on the ground. This will be your starting position.",
@@ -3429,6 +6266,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Elbows Back",
     "muscle": "chest",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Elbows_Back/0.jpg",
     "instructions": [
       "Stand up straight.",
@@ -3441,6 +6279,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Elevated Back Lunge",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Elevated_Back_Lunge/0.jpg",
     "instructions": [
       "Position a bar onto a rack at shoulder height loaded to an appropriate weight. Place a short, raised platform behind you.",
@@ -3454,6 +6293,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Elevated Cable Rows",
     "muscle": "back",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Elevated_Cable_Rows/0.jpg",
     "instructions": [
       "Get a platform of some sort (it can be an aerobics or calf raise platform) that is around 4-6 inches in height.",
@@ -3470,6 +6310,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Elliptical Trainer",
     "muscle": "quads",
     "equipment": "machine",
+    "category": "cardio",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Elliptical_Trainer/0.jpg",
     "instructions": [
       "To begin, step onto the elliptical and select the desired option from the menu. Most ellipticals have a manual setting, or you can select a program to run. Typically, you can enter your age and weight to estimate the amount of calories burned during exercise. Elevation can be adjusted to change the intensity of the workout.",
@@ -3481,6 +6322,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Exercise Ball Crunch",
     "muscle": "core",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Exercise_Ball_Crunch/0.jpg",
     "instructions": [
       "Lie on an exercise ball with your lower back curvature pressed against the spherical surface of the ball. Your feet should be bent at the knee and pressed firmly against the floor. The upper torso should be hanging off the top of the ball. The arms should either be kept alongside the body or crossed on top of your chest as these positions avoid neck strains (as opposed to the hands behind the back of the head position).",
@@ -3495,6 +6337,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Exercise Ball Pull-In",
     "muscle": "core",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Exercise_Ball_Pull-In/0.jpg",
     "instructions": [
       "Place an exercise ball nearby and lay on the floor in front of it with your hands on the floor shoulder width apart in a push-up position.",
@@ -3509,6 +6352,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Extended Range One-Arm Kettlebell Floor Press",
     "muscle": "chest",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Extended_Range_One-Arm_Kettlebell_Floor_Press/0.jpg",
     "instructions": [
       "Lie on the floor and position a kettlebell for one arm to press. The kettlebell should be held by the handle. The leg on the same side that you are pressing should be bent, with the knee crossing over the midline of the body.",
@@ -3516,10 +6360,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "extended-side-angle",
+    "name": "Extended Side Angle Pose",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/extended-side-angle-main.webp",
+    "instructions": [
+      "Stand wide with the front foot turned out and the back foot angled slightly in.",
+      "Bend the front knee until it stacks over the ankle and keep the back leg straight.",
+      "Rest the front forearm on the thigh, or the hand on the floor or a block, and reach the top arm over the ear.",
+      "Hold the position for the prescribed time, turning the chest towards the ceiling.",
+      "Straighten the front leg to come up and repeat on the other side."
+    ]
+  },
+  {
     "id": "External_Rotation",
     "name": "External Rotation",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/External_Rotation/0.jpg",
     "instructions": [
       "Lie sideways on a flat bench with one arm holding a dumbbell and the other hand on top of the bench folded so that you can rest your head on it.",
@@ -3535,6 +6395,7 @@ export const generatedExercises: Exercise[] = [
     "name": "External Rotation with Band",
     "muscle": "shoulders",
     "equipment": "band",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/External_Rotation_with_Band/0.jpg",
     "instructions": [
       "Choke the band around a post. The band should be at the same height as your elbow. Stand with your left side to the band a couple of feet away.",
@@ -3549,6 +6410,7 @@ export const generatedExercises: Exercise[] = [
     "name": "External Rotation with Cable",
     "muscle": "shoulders",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/External_Rotation_with_Cable/0.jpg",
     "instructions": [
       "Adjust the cable to the same height as your elbow. Stand with your left side to the band a couple of feet away.",
@@ -3558,10 +6420,220 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "ez-bar-pullover",
+    "name": "EZ Bar Pullover",
+    "muscle": "back",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/ez-bar-pullover-start.webp",
+    "instructions": [
+      "Lie supine on a flat bench with your head slightly off the end, holding an EZ bar with a pronated grip.",
+      "Extend the bar straight above your chest, keeping a slight bend in your elbows.",
+      "Slowly lower the bar in an arc behind your head, feeling a stretch in your lats and chest.",
+      "Pull the bar back to the starting position using your lats and pectorals.",
+      "Maintain control throughout the movement, avoiding momentum."
+    ]
+  },
+  {
+    "id": "ez-bar-reverse-grip-row",
+    "name": "EZ Bar Reverse Grip Row",
+    "muscle": "biceps",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/ez-bar-reverse-grip-row-start.webp",
+    "instructions": [
+      "Stand with feet shoulder-width apart, holding an EZ bar with an underhand, shoulder-width grip.",
+      "Hinge at your hips, keeping a slight bend in your knees and your back straight, until your torso is nearly parallel to the floor.",
+      "Let the bar hang directly below your shoulders with arms fully extended.",
+      "Pull the bar towards your lower abdomen, squeezing your shoulder blades together and driving your elbows up.",
+      "Control the eccentric phase, slowly lowering the bar back to the starting position with full arm extension."
+    ]
+  },
+  {
+    "id": "ez-bar-spider-curl",
+    "name": "EZ Bar Spider Curl",
+    "muscle": "biceps",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/ez-bar-spider-curl-start.webp",
+    "instructions": [
+      "Lie chest down on an incline bench holding an EZ bar with underhand grip.",
+      "Let your arms hang straight down from your shoulders.",
+      "Curl the bar up toward your shoulders.",
+      "Squeeze your biceps at the top of the movement.",
+      "Lower the bar back down with control.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "ez-bar-bench-press",
+    "name": "EZ-Bar Bench Press",
+    "muscle": "chest",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/ez-bar-bench-press-start.webp",
+    "instructions": [
+      "Lie flat on a bench with your feet planted on the floor, gripping the EZ bar's angled bends over your chest.",
+      "Unrack the bar and hold it over your lower chest with your arms extended.",
+      "Lower the bar under control toward your lower chest.",
+      "Press the bar back up to full arm extension.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "EZ-Bar_Curl",
+    "name": "EZ-Bar Curl",
+    "muscle": "biceps",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/EZ-Bar_Curl/0.jpg",
+    "instructions": [
+      "Stand up straight while holding an EZ curl bar at the wide outer handle. The palms of your hands should be facing forward and slightly tilted inward due to the shape of the bar. Keep your elbows close to your torso. This will be your starting position.",
+      "Now, while keeping your upper arms stationary, exhale and curl the weights forward while contracting the biceps. Focus on only moving your forearms.",
+      "Continue to raise the weight until your biceps are fully contracted and the bar is at shoulder level. Hold the top contracted position for a moment and squeeze the biceps.",
+      "Then inhale and slowly lower the bar back to the starting position.",
+      "Repeat for the recommended amount of repetitions."
+    ]
+  },
+  {
+    "id": "ez-bar-front-raise",
+    "name": "EZ-Bar Front Raise",
+    "muscle": "shoulders",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/ez-bar-front-raise-start.webp",
+    "instructions": [
+      "Stand holding an EZ-bar with an overhand grip on the inner bends, arms hanging in front of the thighs.",
+      "Keep the elbows slightly bent and fixed throughout.",
+      "Raise the bar in a smooth arc up to shoulder height.",
+      "Pause briefly at the top, then lower under control.",
+      "Repeat for the recommended number of repetitions."
+    ]
+  },
+  {
+    "id": "ez-bar-lying-tricep-extension",
+    "name": "EZ-Bar Lying Triceps Extension",
+    "muscle": "triceps",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/ez-bar-lying-tricep-extension-start.webp",
+    "instructions": [
+      "Lie on a flat bench holding an EZ bar over your chest with a narrow grip.",
+      "Lower the bar toward your forehead by bending at the elbows.",
+      "Extend your arms back to the start.",
+      "Repeat."
+    ]
+  },
+  {
+    "id": "ez-bar-overhead-extension",
+    "name": "EZ-Bar Overhead Tricep Extension",
+    "muscle": "triceps",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/ez-bar-overhead-extension-start.webp",
+    "instructions": [
+      "Stand or sit holding an EZ-bar overhead with an overhand grip on the inner bends.",
+      "Arms fully extended, bar above the head.",
+      "Bend only the elbows to lower the bar behind the head in an arc.",
+      "Keep the upper arms vertical and close to the head; only the forearms move.",
+      "Extend the elbows to return the bar overhead.",
+      "Repeat for the recommended number of repetitions."
+    ]
+  },
+  {
+    "id": "ez-bar-reverse-curl",
+    "name": "EZ-Bar Reverse Curl",
+    "muscle": "biceps",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/ez-bar-reverse-curl-start.webp",
+    "instructions": [
+      "Hold an EZ-bar with an overhand grip.",
+      "Curl the bar up toward your shoulders.",
+      "Lower under control.",
+      "Repeat."
+    ]
+  },
+  {
+    "id": "ez-bar-romanian-deadlift",
+    "name": "EZ-Bar Romanian Deadlift",
+    "muscle": "glutes",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/romanian-deadlift-start.webp",
+    "instructions": [
+      "Stand holding an EZ-bar at mid-thigh with an overhand grip on the inner bends.",
+      "Feet hip-width, soft bend in the knees, chest up, lats engaged.",
+      "Push the hips back while letting the bar slide down the front of the legs.",
+      "Go until you feel a deep hamstring stretch without rounding the lower back.",
+      "Drive the hips forward to return to standing, keeping the bar close to the body.",
+      "Repeat for the recommended number of repetitions."
+    ]
+  },
+  {
+    "id": "ez-bar-shrug",
+    "name": "EZ-Bar Shrug",
+    "muscle": "back",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/ez-bar-shrug-start.webp",
+    "instructions": [
+      "Stand holding an EZ-bar in front of you.",
+      "Shrug your shoulders straight up.",
+      "Hold at the top, then lower.",
+      "Repeat."
+    ]
+  },
+  {
+    "id": "EZ-Bar_Skullcrusher",
+    "name": "EZ-Bar Skullcrusher",
+    "muscle": "triceps",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/EZ-Bar_Skullcrusher/0.jpg",
+    "instructions": [
+      "Using a close grip, lift the EZ bar and hold it with your elbows in as you lie on the bench. Your arms should be perpendicular to the floor. This will be your starting position.",
+      "Keeping the upper arms stationary, lower the bar by allowing the elbows to flex. Inhale as you perform this portion of the movement. Pause once the bar is directly above the forehead.",
+      "Lift the bar back to the starting position by extending the elbow and exhaling.",
+      "Repeat."
+    ]
+  },
+  {
+    "id": "ez-bar-upright-row",
+    "name": "EZ-Bar Upright Row",
+    "muscle": "shoulders",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/ez-bar-upright-row-start.webp",
+    "instructions": [
+      "Stand holding an EZ-bar with a shoulder-width grip on the angled portions.",
+      "Pull the bar straight up along your body toward your chin.",
+      "Lead with your elbows, keeping them above your hands.",
+      "Lower with control.",
+      "Repeat."
+    ]
+  },
+  {
+    "id": "ez-bar-wrist-curl",
+    "name": "EZ-Bar Wrist Curl",
+    "muscle": "other",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/ez-bar-wrist-curl-start.webp",
+    "instructions": [
+      "Sit on a bench with forearms resting on the thighs, palms up.",
+      "Grip an EZ-bar on the inner bends with hands shoulder-width.",
+      "Let the bar roll down to the fingertips.",
+      "Curl the bar up by flexing the wrists.",
+      "Lower under control."
+    ]
+  },
+  {
     "id": "Face_Pull",
     "name": "Face Pull",
     "muscle": "shoulders",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Face_Pull/0.jpg",
     "instructions": [
       "Facing a high pulley with a rope or dual handles attached, pull the weight directly towards your face, separating your hands as you do so. Keep your upper arms parallel to the ground."
@@ -3572,6 +6644,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Farmer's Walk",
     "muscle": "other",
     "equipment": "other",
+    "category": "strongman",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Farmers_Walk/0.jpg",
     "instructions": [
       "There are various implements that can be used for the farmers walk. These can also be performed with heavy dumbbells or short bars if these implements aren't available. Begin by standing between the implements.",
@@ -3584,6 +6657,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Fast Skipping",
     "muscle": "quads",
     "equipment": "bodyweight",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Fast_Skipping/0.jpg",
     "instructions": [
       "Start in a relaxed position with one leg slightly forward. This will be your starting position.",
@@ -3596,6 +6670,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Finger Curls",
     "muscle": "other",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Finger_Curls/0.jpg",
     "instructions": [
       "Hold a barbell with both hands and your palms facing up; hands spaced about shoulder width.",
@@ -3605,10 +6680,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "fish-pose",
+    "name": "Fish Pose",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/fish-pose-main.webp",
+    "instructions": [
+      "Lie on your back with the legs straight and the arms alongside the body, palms down under the hips.",
+      "Press the forearms into the floor and lift the chest towards the ceiling.",
+      "Let the crown of the head rest lightly on the floor without putting weight through the neck.",
+      "Hold the position for the prescribed time, breathing into the upper chest.",
+      "Lift the head, then lower the back down."
+    ]
+  },
+  {
     "id": "Flat_Bench_Cable_Flyes",
     "name": "Flat Bench Cable Flyes",
     "muscle": "chest",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Flat_Bench_Cable_Flyes/0.jpg",
     "instructions": [
       "Position a flat bench between two low pulleys so that when you are laying on it, your chest will be lined up with the cable pulleys.",
@@ -3625,6 +6716,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Flat Bench Leg Pull-In",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Flat_Bench_Leg_Pull-In/0.jpg",
     "instructions": [
       "Lie on an exercise mat or a flat bench with your legs off the end.",
@@ -3639,6 +6731,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Flat Bench Lying Leg Raise",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Flat_Bench_Lying_Leg_Raise/0.jpg",
     "instructions": [
       "Lie with your back flat on a bench and your legs extended in front of you off the end.",
@@ -3652,6 +6745,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Flexor Incline Dumbbell Curls",
     "muscle": "biceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Flexor_Incline_Dumbbell_Curls/0.jpg",
     "instructions": [
       "Hold the dumbbell towards the side farther from you so that you have more weight on the side closest to you. (This can be done for a good effect on all bicep dumbbell exercises). Now do a normal incline dumbbell curl, but keep your wrists as far back as possible so as to neutralize any stress that is placed on them.",
@@ -3663,10 +6757,25 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "floor-ez-bar-press",
+    "name": "Floor EZ-Bar Press",
+    "muscle": "chest",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/floor-ez-bar-press-start.webp",
+    "instructions": [
+      "Lie on the floor holding an EZ-bar over your chest.",
+      "Lower the bar until your elbows touch the floor.",
+      "Press back up to full extension.",
+      "Repeat."
+    ]
+  },
+  {
     "id": "Floor_Glute-Ham_Raise",
     "name": "Floor Glute-Ham Raise",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Floor_Glute-Ham_Raise/0.jpg",
     "instructions": [
       "You can use a partner for this exercise or brace your feet under something stable.",
@@ -3676,10 +6785,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "floor-kettlebell-pullover",
+    "name": "Floor Kettlebell Pullover",
+    "muscle": "back",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/floor-kettlebell-pullover-start.webp",
+    "instructions": [
+      "Lie face-up on the floor with knees bent and feet flat.",
+      "Hold a kettlebell by the handle with both hands above your chest, arms almost straight (slight elbow bend).",
+      "Keeping the elbow angle fixed, lower the bell overhead in an arc until the upper arms touch the floor.",
+      "Pull the bell back above the chest along the same arc.",
+      "Repeat for the recommended number of repetitions."
+    ]
+  },
+  {
     "id": "Floor_Press",
     "name": "Floor Press",
     "muscle": "triceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Floor_Press/0.jpg",
     "instructions": [
       "Adjust the j-hooks so they are at the appropriate height to rack the bar. Begin lying on the floor with your head near the end of a power rack. Keeping your shoulder blades pulled together; pull the bar off of the hooks.",
@@ -3692,6 +6817,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Floor Press with Chains",
     "muscle": "triceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Floor_Press_with_Chains/0.jpg",
     "instructions": [
       "Adjust the j-hooks so they are at the appropriate height to rack the bar. For this exercise, drape the chains directly over the end of the bar, trying to keep the ends away from the plates.",
@@ -3705,6 +6831,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Flutter Kicks",
     "muscle": "glutes",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Flutter_Kicks/0.jpg",
     "instructions": [
       "On a flat bench lie facedown with the hips on the edge of the bench, the legs straight with toes high off the floor and with the arms on top of the bench holding on to the front edge.",
@@ -3719,6 +6846,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Foot-SMR",
     "muscle": "calves",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Foot-SMR/0.jpg",
     "instructions": [
       "This exercise stretches the fascia of the muscles in the feet. Start off seated with your shoes removed. Using a foot roller or a similar object, such as a small section of pvc pipe, place your foot against the roller across the arch of your foot. This will be your starting position.",
@@ -3730,6 +6858,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Forward Drag with Press",
     "muscle": "chest",
     "equipment": "other",
+    "category": "strongman",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Forward_Drag_with_Press/0.jpg",
     "instructions": [
       "Attach a dual handled chain or rope attachment to the sled. You should be facing away from the sled, holding a handle in each hand.",
@@ -3741,6 +6870,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Frankenstein Squat",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Frankenstein_Squat/0.jpg",
     "instructions": [
       "This drill teaches you the proper positioning of both the bar and your body during the clean and front squat.",
@@ -3754,6 +6884,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Freehand Jump Squat",
     "muscle": "quads",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Freehand_Jump_Squat/0.jpg",
     "instructions": [
       "Cross your arms over your chest.",
@@ -3769,6 +6900,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Frog Hops",
     "muscle": "quads",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Frog_Hops/0.jpg",
     "instructions": [
       "Stand with your hands behind your head, and squat down keeping your torso upright and your head up. This will be your starting position.",
@@ -3780,6 +6912,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Frog Sit-Ups",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Frog_Sit-Ups/0.jpg",
     "instructions": [
       "Lie with your back flat on the floor (or exercise mat) and your legs extended in front of you.",
@@ -3796,6 +6929,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Front Barbell Squat",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Front_Barbell_Squat/0.jpg",
     "instructions": [
       "This exercise is best performed inside a squat rack for safety purposes. To begin, first set the bar on a rack that best matches your height. Once the correct height is chosen and the bar is loaded, bring your arms up under the bar while keeping the elbows high and the upper arm slightly above parallel to the floor. Rest the bar on top of the deltoids and cross your arms while grasping the bar for total control.",
@@ -3811,6 +6945,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Front Barbell Squat To A Bench",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Front_Barbell_Squat_To_A_Bench/0.jpg",
     "instructions": [
       "This exercise is best performed inside a squat rack for safety purposes. To begin, first set a flat bench behind you and set the bar on a rack that best matches your height. Once the correct height is chosen and the bar is loaded, bring your arms up under the bar while keeping the elbows high and the upper arm slightly above parallel to the floor. Rest the bar on top of the deltoids and cross your arms while grasping the bar for total control.",
@@ -3826,6 +6961,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Front Box Jump",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Front_Box_Jump/0.jpg",
     "instructions": [
       "Begin with a box of an appropriate height 1-2 feet in front of you. Stand with your feet should width apart. This will be your starting position.",
@@ -3839,6 +6975,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Front Cable Raise",
     "muscle": "shoulders",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Front_Cable_Raise/0.jpg",
     "instructions": [
       "Select the weight on a low pulley machine and grasp the single hand cable attachment that is attached to the low pulley with your left hand.",
@@ -3853,6 +6990,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Front Cone Hops (or hurdle hops)",
     "muscle": "quads",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Front_Cone_Hops_or_hurdle_hops/0.jpg",
     "instructions": [
       "Set up a row of cones or other small barriers, placing them a few feet apart.",
@@ -3867,6 +7005,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Front Dumbbell Raise",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Front_Dumbbell_Raise/0.jpg",
     "instructions": [
       "Pick a couple of dumbbells and stand with a straight torso and the dumbbells on front of your thighs at arms length with the palms of the hand facing your thighs. This will be your starting position.",
@@ -3880,6 +7019,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Front Incline Dumbbell Raise",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Front_Incline_Dumbbell_Raise/0.jpg",
     "instructions": [
       "Sit down on an incline bench with the incline set anywhere between 30 to 60 degrees while holding a dumbbell on each hand. Tip: You can change the angle to hit the muscle a little differently each time.",
@@ -3894,6 +7034,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Front Leg Raises",
     "muscle": "hamstrings",
     "equipment": "bodyweight",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Front_Leg_Raises/0.jpg",
     "instructions": [
       "Stand next to a chair or other support, holding on with one hand.",
@@ -3901,10 +7042,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "front-lever",
+    "name": "Front Lever",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/front-lever-main.webp",
+    "instructions": [
+      "Grip the bar with an overhand grip and hang.",
+      "Tuck your knees to your chest and drive your hips upward, rotating forward until your chest faces up.",
+      "Extend your body horizontally with arms straight and chest facing the ceiling.",
+      "Keep your body rigid and parallel to the floor.",
+      "Hold for the desired duration, then tuck and lower under control."
+    ]
+  },
+  {
     "id": "Front_Plate_Raise",
     "name": "Front Plate Raise",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Front_Plate_Raise/0.jpg",
     "instructions": [
       "While standing straight, hold a barbell plate in both hands at the 3 and 9 o'clock positions. Your palms should be facing each other and your arms should be extended and locked with a slight bend at the elbows and the plate should be down near your waist in front of you as far as you can go. Tip: The arms will remain in this position throughout the exercise. This will be your starting position.",
@@ -3918,6 +7075,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Front Raise And Pullover",
     "muscle": "chest",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Front_Raise_And_Pullover/0.jpg",
     "instructions": [
       "Lie on a flat bench while holding a barbell using a palms down grip that is about 15 inches apart.",
@@ -3928,10 +7086,25 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "front-squat",
+    "name": "Front Squat",
+    "muscle": "glutes",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/front-squat-start.webp",
+    "instructions": [
+      "Clean or rack the bar to your front deltoids with elbows high.",
+      "Squat down keeping torso upright until thighs are parallel.",
+      "Drive back up.",
+      "Repeat."
+    ]
+  },
+  {
     "id": "Front_Squat_Clean_Grip",
     "name": "Front Squat (Clean Grip)",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Front_Squat_Clean_Grip/0.jpg",
     "instructions": [
       "To begin, first set the bar in a rack slightly below shoulder level. Rest the bar on top of the deltoids, pushing into the clavicles, and lightly touching the throat. Your hands should be in a clean grip, touching the bar only with your fingers to help keep it in position.",
@@ -3945,6 +7118,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Front Squats With Two Kettlebells",
     "muscle": "quads",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Front_Squats_With_Two_Kettlebells/0.jpg",
     "instructions": [
       "Clean two kettlebells to your shoulders. Clean the kettlebells to your shoulders by extending through the legs and hips as you pull the kettlebells towards your shoulders. Rotate your wrists as you do so.",
@@ -3957,6 +7131,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Front Two-Dumbbell Raise",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Front_Two-Dumbbell_Raise/0.jpg",
     "instructions": [
       "Pick a couple of dumbbells and stand with a straight torso and the dumbbells on front of your thighs at arms length with the palms of the hand facing your thighs. This will be your starting position.",
@@ -3970,6 +7145,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Full Range-Of-Motion Lat Pulldown",
     "muscle": "back",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Full_Range-Of-Motion_Lat_Pulldown/0.jpg",
     "instructions": [
       "Either standing or seated on a high bench, grasp two stirrup cables that are attached to the high pulleys. Grab with the opposing hand so your arms are crisscrossed about you and your palms are facing forward.",
@@ -3977,10 +7153,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "garland-pose",
+    "name": "Garland Pose",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/garland-pose-main.webp",
+    "instructions": [
+      "Stand with the feet a little wider than the hips and the toes turned slightly out.",
+      "Squat down as low as the ankles allow, keeping the heels on the floor.",
+      "Bring the palms together at the chest and press the elbows against the inner knees.",
+      "Hold the position for the prescribed time with the chest lifted and the spine long.",
+      "Press through the feet to stand back up."
+    ]
+  },
+  {
     "id": "Gironda_Sternum_Chins",
     "name": "Gironda Sternum Chins",
     "muscle": "back",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Gironda_Sternum_Chins/0.jpg",
     "instructions": [
       "Grasp the pull-up bar with a shoulder width underhand grip.",
@@ -3992,10 +7184,41 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "glute-bridge",
+    "name": "Glute Bridge",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/glute-bridge-start.webp",
+    "instructions": [
+      "Lie on your back with knees bent and feet flat on the floor.",
+      "Drive your hips up by squeezing your glutes.",
+      "Hold briefly at the top with hips fully extended.",
+      "Lower your hips back down with control.",
+      "Repeat."
+    ]
+  },
+  {
+    "id": "glute-bridge-hold",
+    "name": "Glute Bridge Hold",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/glute-bridge-hold-main.webp",
+    "instructions": [
+      "Lie on your back with the knees bent and the feet flat, about hip-width apart and close enough to brush your fingertips with your heels.",
+      "Push through the heels and lift the hips until the body forms a straight line from the knees to the shoulders.",
+      "Squeeze the glutes and tuck the ribs down so the lower back does not take over.",
+      "Hold the top position for the prescribed time, keeping the weight in the heels.",
+      "Lower the hips under control to finish the set."
+    ]
+  },
+  {
     "id": "Glute_Ham_Raise",
     "name": "Glute Ham Raise",
     "muscle": "hamstrings",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Glute_Ham_Raise/0.jpg",
     "instructions": [
       "Begin by adjusting the equipment to fit your body. Place your feet against the footplate in between the rollers as you lie facedown. Your knees should be just behind the pad.",
@@ -4008,6 +7231,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Glute Kickback",
     "muscle": "glutes",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Glute_Kickback/0.jpg",
     "instructions": [
       "Kneel on the floor or an exercise mat and bend at the waist with your arms extended in front of you (perpendicular to the torso) in order to get into a kneeling push-up position but with the arms spaced at shoulder width. Your head should be looking forward and the bend of the knees should create a 90-degree angle between the hamstrings and the calves. This will be your starting position.",
@@ -4017,10 +7241,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "glute-kickback-hold",
+    "name": "Glute Kickback Hold",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/glute-kickback-hold-main.webp",
+    "instructions": [
+      "Start on all fours with the hands under the shoulders and the knees under the hips.",
+      "Brace the trunk and keep the pelvis level; do not let the working side rotate upwards.",
+      "Extend one leg back and up until the thigh is in line with the torso.",
+      "Hold that position for the prescribed time, keeping the neck long and the lower back flat.",
+      "Lower the leg under control and repeat on the other side."
+    ]
+  },
+  {
     "id": "Goblet_Squat",
     "name": "Goblet Squat",
     "muscle": "quads",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Goblet_Squat/0.jpg",
     "instructions": [
       "Stand holding a light kettlebell by the horns close to your chest. This will be your starting position.",
@@ -4033,6 +7273,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Good Morning",
     "muscle": "hamstrings",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Good_Morning/0.jpg",
     "instructions": [
       "Begin with a bar on a rack at shoulder height. Rack the bar across the rear of your shoulders as you would a power squat, not on top of your shoulders. Keep your back tight, shoulder blades pinched together, and your knees slightly bent. Step back from the rack.",
@@ -4045,6 +7286,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Good Morning off Pins",
     "muscle": "hamstrings",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Good_Morning_off_Pins/0.jpg",
     "instructions": [
       "Begin with a bar on a rack at about the same height as your stomach. Bend over underneath the bar and rack the bar across the rear of your shoulders as you would a power squat, not on top of your shoulders. At the proper height, you should be near parallel to the floor when bent over. Keep your back tight, shoulder blades pinched together, and your knees slightly bent. Keep your back arched and your cervical spine in proper alignment.",
@@ -4056,6 +7298,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Gorilla Chin/Crunch",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Gorilla_Chin_Crunch/0.jpg",
     "instructions": [
       "Hang from a chin-up bar using an underhand grip (palms facing you) that is slightly wider than shoulder width.",
@@ -4070,6 +7313,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Groin and Back Stretch",
     "muscle": "glutes",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Groin_and_Back_Stretch/0.jpg",
     "instructions": [
       "Sit on the floor with your knees bent and feet together.",
@@ -4082,6 +7326,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Groiners",
     "muscle": "glutes",
     "equipment": "bodyweight",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Groiners/0.jpg",
     "instructions": [
       "Begin in a pushup position on the floor. This will be your starting position.",
@@ -4094,6 +7339,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Hack Squat",
     "muscle": "quads",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hack_Squat/0.jpg",
     "instructions": [
       "Place the back of your torso against the back pad of the machine and hook your shoulders under the shoulder pads provided.",
@@ -4106,10 +7352,57 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "hack-squat-calf-raise",
+    "name": "Hack Squat Calf Raise",
+    "muscle": "calves",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/hack-squat-calf-raise-start.webp",
+    "instructions": [
+      "Load yourself into a hack squat machine with shoulders under the pads.",
+      "Place the balls of your feet on the platform with heels hanging off.",
+      "Keep your legs straight with a slight knee bend.",
+      "Press through the balls of your feet to raise your heels.",
+      "Lower your heels back below the platform for a stretch.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "half-moon-pose",
+    "name": "Half Moon Pose",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/half-moon-pose-main.webp",
+    "instructions": [
+      "From a wide standing stance, bend the front knee and place the bottom hand on the floor or a block ahead of the front foot.",
+      "Shift the weight forward and lift the back leg until it is parallel to the floor.",
+      "Straighten the standing leg and stack the top hip over the bottom one, reaching the top arm to the ceiling.",
+      "Hold the balance for the prescribed time with the lifted foot flexed.",
+      "Lower the back foot down and repeat on the other side."
+    ]
+  },
+  {
+    "id": "half-kneeling-hip-flexor-rock",
+    "name": "Half-Kneeling Hip Flexor Rock",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/half-kneeling-hip-flexor-rock-start.webp",
+    "instructions": [
+      "Kneel on one knee with the other foot flat on the floor in front of you.",
+      "Tuck the tailbone slightly and brace the trunk so the lower back stays neutral.",
+      "Rock the hips forward until you feel the front of the back thigh lengthen.",
+      "Rock back out of the position under control and repeat rhythmically.",
+      "Switch sides and repeat for the same number of repetitions."
+    ]
+  },
+  {
     "id": "Hammer_Curls",
     "name": "Hammer Curls",
     "muscle": "biceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hammer_Curls/0.jpg",
     "instructions": [
       "Stand up with your torso upright and a dumbbell on each hand being held at arms length. The elbows should be close to the torso.",
@@ -4124,6 +7417,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Hammer Grip Incline DB Bench Press",
     "muscle": "chest",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hammer_Grip_Incline_DB_Bench_Press/0.jpg",
     "instructions": [
       "Lie back on an incline bench with a dumbbell on each hand on top of your thighs. The palms of your hand will be facing each other.",
@@ -4136,22 +7430,11 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Hamstring-SMR",
-    "name": "Hamstring-SMR",
-    "muscle": "hamstrings",
-    "equipment": "other",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hamstring-SMR/0.jpg",
-    "instructions": [
-      "In a seated position, extend your legs over a foam roll so that it is position on the back of the upper legs. Place your hands to the side or behind you to help support your weight. This will be your starting position.",
-      "Using your hands, lift your hips off of the floor and shift your weight on the foam roll to one leg. Relax the hamstrings of the leg you are stretching.",
-      "Roll over the foam from below the hip to above the back of the knee, pausing at points of tension for 10-30 seconds. Repeat for the other leg."
-    ]
-  },
-  {
     "id": "Hamstring_Stretch",
     "name": "Hamstring Stretch",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hamstring_Stretch/0.jpg",
     "instructions": [
       "Lie on your back with one leg extended above you, with the hip at ninety degrees. Keep the other leg flat on the floor.",
@@ -4160,10 +7443,24 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "Hamstring-SMR",
+    "name": "Hamstring-SMR",
+    "muscle": "hamstrings",
+    "equipment": "other",
+    "category": "stretching",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hamstring-SMR/0.jpg",
+    "instructions": [
+      "In a seated position, extend your legs over a foam roll so that it is position on the back of the upper legs. Place your hands to the side or behind you to help support your weight. This will be your starting position.",
+      "Using your hands, lift your hips off of the floor and shift your weight on the foam roll to one leg. Relax the hamstrings of the leg you are stretching.",
+      "Roll over the foam from below the hip to above the back of the knee, pausing at points of tension for 10-30 seconds. Repeat for the other leg."
+    ]
+  },
+  {
     "id": "Handstand_Push-Ups",
     "name": "Handstand Push-Ups",
     "muscle": "shoulders",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Handstand_Push-Ups/0.jpg",
     "instructions": [
       "With your back to the wall bend at the waist and place both hands on the floor at shoulder width.",
@@ -4178,6 +7475,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Hang Clean",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hang_Clean/0.jpg",
     "instructions": [
       "Begin with a shoulder width, double overhand or hook grip, with the bar hanging at the mid thigh position. Your back should be straight and inclined slightly forward.",
@@ -4190,6 +7488,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Hang Clean - Below the Knees",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hang_Clean_-_Below_the_Knees/0.jpg",
     "instructions": [
       "Begin with a shoulder width, double overhand or hook grip, with the bar hanging just below the knees. Your back should be straight and inclined slightly forward.",
@@ -4199,10 +7498,27 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "hang-power-clean",
+    "name": "Hang Power Clean",
+    "muscle": "glutes",
+    "equipment": "barbell",
+    "category": "olympic",
+    "image": "/repdb/hang-power-clean-start.webp",
+    "instructions": [
+      "Stand with feet hip-width apart holding a barbell at your thighs.",
+      "Hinge at the hips to lower the bar to just above the knees.",
+      "Drive through your hips and legs explosively.",
+      "Pull the bar up and catch it on your front shoulders in a partial squat.",
+      "Stand tall with the bar racked on your shoulders.",
+      "Lower the bar back to the hang position."
+    ]
+  },
+  {
     "id": "Hang_Snatch",
     "name": "Hang Snatch",
     "muscle": "hamstrings",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hang_Snatch/0.jpg",
     "instructions": [
       "Begin with a wide grip on the bar, with an overhand or hook grip. The feet should be directly below the hips with the feet turned out. Your knees should be slightly bent, and the torso inclined forward. The spine should be fully extended and the head facing forward. The bar should be at the hips. This will be your starting position.",
@@ -4216,6 +7532,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Hang Snatch - Below Knees",
     "muscle": "hamstrings",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hang_Snatch_-_Below_Knees/0.jpg",
     "instructions": [
       "Begin with a wide grip on the bar, with an overhand or hook grip. The feet should be directly below the hips with the feet turned out. Your knees should be slightly bent, and the torso inclined forward. The spine should be fully extended and the head facing forward. The bar should be just below the knees. This will be your starting position.",
@@ -4229,6 +7546,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Hanging Bar Good Morning",
     "muscle": "hamstrings",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hanging_Bar_Good_Morning/0.jpg",
     "instructions": [
       "Begin with a bar on a rack at about the same height as your stomach. Suspend the bar using chains or suspension straps.",
@@ -4238,10 +7556,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "hanging-knee-raise",
+    "name": "Hanging Knee Raise",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/hanging-knee-raise-start.webp",
+    "instructions": [
+      "Hang from a pull-up bar with an overhand grip, arms fully extended.",
+      "Engage your core and raise your knees toward your chest.",
+      "Hold briefly at the top.",
+      "Lower your legs slowly back to the starting position.",
+      "Repeat for the desired reps."
+    ]
+  },
+  {
     "id": "Hanging_Leg_Raise",
     "name": "Hanging Leg Raise",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hanging_Leg_Raise/0.jpg",
     "instructions": [
       "Hang from a chin-up bar with both arms extended at arms length in top of you using either a wide grip or a medium grip. The legs should be straight down with the pelvis rolled slightly backwards. This will be your starting position.",
@@ -4255,6 +7589,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Hanging Pike",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hanging_Pike/0.jpg",
     "instructions": [
       "Hang from a chin-up bar with your legs and feet together using an overhand grip (palms facing away from you) that is slightly wider than shoulder width. Tip: You may use wrist wraps in order to facilitate holding on to the bar.",
@@ -4265,10 +7600,41 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "happy-baby",
+    "name": "Happy Baby Pose",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/happy-baby-main.webp",
+    "instructions": [
+      "Lie on your back and draw both knees towards the chest.",
+      "Take hold of the outside edges of the feet, or the shins if the feet are out of reach.",
+      "Open the knees wider than the ribs and stack the ankles above the knees, soles facing up.",
+      "Press the feet gently into the hands and hold for the prescribed time with the lower back on the floor.",
+      "Release the feet and lower the legs."
+    ]
+  },
+  {
+    "id": "head-to-knee-pose",
+    "name": "Head-to-Knee Pose",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/head-to-knee-pose-main.webp",
+    "instructions": [
+      "Sit with one leg straight in front of you and the other knee bent out to the side, that foot at the inner thigh.",
+      "Turn the chest towards the straight leg so the navel lines up with the thigh.",
+      "Hinge from the hips and reach forward along the straight leg with a long spine.",
+      "Hold the fold for the prescribed time, breathing into the back of the leg.",
+      "Come up with a flat back and repeat on the other side."
+    ]
+  },
+  {
     "id": "Heaving_Snatch_Balance",
     "name": "Heaving Snatch Balance",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Heaving_Snatch_Balance/0.jpg",
     "instructions": [
       "This drill helps you learn the snatch. Begin by holding a light weight across the back of the shoulders. Your feet should be slightly wider than hip width apart with the feet turned out, the same position that you would perform a squat with.",
@@ -4281,6 +7647,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Heavy Bag Thrust",
     "muscle": "chest",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Heavy_Bag_Thrust/0.jpg",
     "instructions": [
       "Utilize a heavy bag for this exercise. Assume an upright stance next to the bag, with your feet staggered, fairly wide apart. Place your hand on the bag at about chest height. This will be your starting position.",
@@ -4289,10 +7656,73 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "heel-elevated-squat",
+    "name": "Heel-Elevated Squat",
+    "muscle": "glutes",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/heel-elevated-squat-start.webp",
+    "instructions": [
+      "Place weight plates or a wedge under your heels, feet shoulder-width apart.",
+      "Hold a barbell across your upper back or hold dumbbells at your sides.",
+      "Brace your core and descend into a squat, keeping your torso upright.",
+      "Squat until thighs are parallel to the floor or lower.",
+      "Drive through your feet to return to the starting position."
+    ]
+  },
+  {
+    "id": "heel-to-toe-walk",
+    "name": "Heel-to-Toe Walk",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/heel-to-toe-walk-main.webp",
+    "instructions": [
+      "Pick a straight line on the floor and stand on it with your arms out to your sides at shoulder height.",
+      "Step forward and place your heel directly in front of — and touching — the toes of the standing foot.",
+      "Shift your weight onto the front foot under control, pausing for a moment before the next step.",
+      "Bring the back foot through and place it heel to toe again, staying on the line rather than stepping around it.",
+      "Look ahead at a fixed point instead of down at your feet, and use your arms to correct any wobble.",
+      "Walk the desired number of steps, then turn around and walk back."
+    ]
+  },
+  {
+    "id": "hero-pose",
+    "name": "Hero Pose",
+    "muscle": "quads",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/hero-pose-main.webp",
+    "instructions": [
+      "Kneel with the knees together and the feet slightly wider than the hips, tops of the feet flat.",
+      "Sit the hips back and down between the heels, using a block or cushion if the floor is out of reach.",
+      "Stack the ribs over the pelvis and rest the hands on the thighs.",
+      "Hold the seat for the prescribed time, keeping the weight even on both sit bones.",
+      "Come out by pressing into the hands and straightening one leg at a time."
+    ]
+  },
+  {
+    "id": "hex-bar-deadlift",
+    "name": "Hex Bar Deadlift",
+    "muscle": "back",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/hex-bar-deadlift-start.webp",
+    "instructions": [
+      "Stand inside a loaded trap bar with feet shoulder-width apart.",
+      "Hinge at the hips and knees to grip the handles.",
+      "Brace your core and set your back flat.",
+      "Drive through your heels and extend hips and knees to stand up.",
+      "Lock out at the top with shoulders pulled back.",
+      "Lower the bar back to the floor under control."
+    ]
+  },
+  {
     "id": "High_Cable_Curls",
     "name": "High Cable Curls",
     "muscle": "biceps",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/High_Cable_Curls/0.jpg",
     "instructions": [
       "Stand between a couple of high pulleys and grab a handle in each arm. Position your upper arms in a way that they are parallel to the floor with the palms of your hands facing you. This will be your starting position.",
@@ -4302,10 +7732,71 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "high-knees",
+    "name": "High Knees",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "cardio",
+    "image": "/repdb/high-knees-main.webp",
+    "instructions": [
+      "Stand tall with feet hip-width apart.",
+      "Drive one knee up toward the chest while pumping the opposite arm.",
+      "Quickly switch legs, mirroring the arm action.",
+      "Continue alternating at a fast pace.",
+      "Continue for the prescribed work interval."
+    ]
+  },
+  {
+    "id": "high-plank",
+    "name": "High Plank",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/high-plank-main.webp",
+    "instructions": [
+      "Start in a push-up position with arms fully extended.",
+      "Keep your body in a straight line from head to heels.",
+      "Brace your core and hold the position.",
+      "Breathe steadily throughout."
+    ]
+  },
+  {
+    "id": "high-foot-leg-press",
+    "name": "High-Foot Leg Press",
+    "muscle": "glutes",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/high-foot-leg-press-start.webp",
+    "instructions": [
+      "Set the back pad and seat so your lower back stays supported and your knees can bend without your pelvis rolling under.",
+      "Place both feet high on the platform at about shoulder width, with the toes tracking in the same direction as the knees.",
+      "Lower the sled by bending the hips and knees until you reach a comfortable depth without the lower back lifting from the pad.",
+      "Press through the whole foot and extend the hips and knees without locking the knees aggressively.",
+      "Lower the sled under control and repeat for the desired number of repetitions."
+    ]
+  },
+  {
+    "id": "hip-adduction",
+    "name": "Hip Adduction",
+    "muscle": "glutes",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/hip-adduction-start.webp",
+    "instructions": [
+      "Sit on the hip adduction machine with your back against the pad.",
+      "Place your legs against the pads with the machine set to a comfortable stretch.",
+      "Squeeze your legs together until the pads meet in the middle.",
+      "Hold the squeeze briefly in the fully closed position.",
+      "Let your legs open back out under control to the start.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
     "id": "Hip_Circles_prone",
     "name": "Hip Circles (prone)",
     "muscle": "glutes",
     "equipment": "bodyweight",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hip_Circles_prone/0.jpg",
     "instructions": [
       "Position yourself on your hands and knees on the ground. Maintaining good posture, raise one bent knee off of the ground. This will be your starting position.",
@@ -4318,6 +7809,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Hip Extension with Bands",
     "muscle": "glutes",
     "equipment": "band",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hip_Extension_with_Bands/0.jpg",
     "instructions": [
       "Secure one end of the band to the lower portion of a post and attach the other to one ankle.",
@@ -4331,6 +7823,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Hip Flexion with Band",
     "muscle": "quads",
     "equipment": "band",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hip_Flexion_with_Band/0.jpg",
     "instructions": [
       "Secure one end of the band to the lower portion of a post and attach the other to one ankle.",
@@ -4344,6 +7837,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Hip Lift with Band",
     "muscle": "glutes",
     "equipment": "band",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hip_Lift_with_Band/0.jpg",
     "instructions": [
       "After choosing a suitable band, lay down in the middle of the rack, after securing the band on either side of you. If your rack doesn't have pegs, the band can be secured using heavy dumbbells or similar objects, just ensure they won't move.",
@@ -4353,10 +7847,40 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "hollow-body-hold",
+    "name": "Hollow Body Hold",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/hollow-body-hold-main.webp",
+    "instructions": [
+      "Lie on your back with arms extended overhead and legs straight.",
+      "Press the lower back firmly into the floor.",
+      "Lift the shoulders, head, and legs slightly off the floor.",
+      "Hold the position with arms and legs extended, body in a shallow banana shape.",
+      "Hold for the prescribed time."
+    ]
+  },
+  {
+    "id": "horizontal-leg-press",
+    "name": "Horizontal Leg Press",
+    "muscle": "glutes",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/horizontal-leg-press-start.webp",
+    "instructions": [
+      "Sit in a horizontal leg press machine and place feet shoulder-width apart.",
+      "Unlock the machine and lower the platform toward your chest.",
+      "Press the platform back to the start.",
+      "Repeat."
+    ]
+  },
+  {
     "id": "Hug_A_Ball",
     "name": "Hug A Ball",
     "muscle": "back",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hug_A_Ball/0.jpg",
     "instructions": [
       "Seat yourself on the floor.",
@@ -4369,6 +7893,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Hug Knees To Chest",
     "muscle": "back",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hug_Knees_To_Chest/0.jpg",
     "instructions": [
       "Lie down on your back and pull both knees up to your chest.",
@@ -4377,10 +7902,27 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "human-flag",
+    "name": "Human Flag",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/human-flag-main.webp",
+    "instructions": [
+      "Stand close to a sturdy vertical pole.",
+      "Grip the pole high with the top hand (overhand) and lower with the bottom hand (underhand).",
+      "Kick the legs up and out while pressing the bottom arm hard against the pole.",
+      "Extend the body horizontally so it forms a straight line parallel to the ground.",
+      "Hold the position with the body rigid for the target time.",
+      "Lower under control."
+    ]
+  },
+  {
     "id": "Hurdle_Hops",
     "name": "Hurdle Hops",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hurdle_Hops/0.jpg",
     "instructions": [
       "Set up a row of hurdles or other small barriers, placing them a few feet apart.",
@@ -4394,6 +7936,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Hyperextensions (Back Extensions)",
     "muscle": "back",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hyperextensions_Back_Extensions/0.jpg",
     "instructions": [
       "Lie face down on a hyperextension bench, tucking your ankles securely under the footpads.",
@@ -4409,6 +7952,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Hyperextensions With No Hyperextension Bench",
     "muscle": "back",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Hyperextensions_With_No_Hyperextension_Bench/0.jpg",
     "instructions": [
       "With someone holding down your legs, slide yourself down to the edge a flat bench until your hips hang off the end of the bench. Tip: Your entire upper body should be hanging down towards the floor. Also, you will be in the same position as if you were on a hyperextension bench but the range of motion will be shorter due to the height of the flat bench vs. that of the hyperextension bench.",
@@ -4419,21 +7963,11 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "IT_Band_and_Glute_Stretch",
-    "name": "IT Band and Glute Stretch",
-    "muscle": "glutes",
-    "equipment": "other",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/IT_Band_and_Glute_Stretch/0.jpg",
-    "instructions": [
-      "Loop a belt, rope, or band around one of your feet, and swing that leg across your body to the opposite side, keeping the leg extended as you lay on the ground. This will be your starting position.",
-      "Keeping your foot off of the floor, pull on the belt, using the tension to pull the toes up. Hold for 10-20 seconds, and repeat on the other side."
-    ]
-  },
-  {
     "id": "Iliotibial_Tract-SMR",
     "name": "Iliotibial Tract-SMR",
     "muscle": "glutes",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Iliotibial_Tract-SMR/0.jpg",
     "instructions": [
       "Lay on your side, with the bottom leg placed onto a foam roller between the hip and the knee. The other leg can be crossed in front of you.",
@@ -4446,6 +7980,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Inchworm",
     "muscle": "hamstrings",
     "equipment": "bodyweight",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Inchworm/0.jpg",
     "instructions": [
       "Stand with your feet close together. Keeping your legs straight, stretch down and put your hands on the floor directly in front of you. This will be your starting position.",
@@ -4456,10 +7991,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "incline-bench-press",
+    "name": "Incline Barbell Bench Press",
+    "muscle": "chest",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/incline-bench-press-start.webp",
+    "instructions": [
+      "Lie on an incline bench set to 30-45 degrees.",
+      "Grip the bar slightly wider than shoulder-width and unrack.",
+      "Lower the bar to your upper chest.",
+      "Press the bar back up to full extension.",
+      "Repeat."
+    ]
+  },
+  {
     "id": "Incline_Barbell_Triceps_Extension",
     "name": "Incline Barbell Triceps Extension",
     "muscle": "triceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Incline_Barbell_Triceps_Extension/0.jpg",
     "instructions": [
       "Hold a barbell with an overhand grip (palms down) that is a little closer together than shoulder width.",
@@ -4475,6 +8026,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Incline Bench Pull",
     "muscle": "back",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Incline_Bench_Pull/0.jpg",
     "instructions": [
       "Grab a dumbbell in each hand and lie face down on an incline bench that is set to an incline that is approximately 30 degrees.",
@@ -4491,6 +8043,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Incline Cable Chest Press",
     "muscle": "chest",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Incline_Cable_Chest_Press/0.jpg",
     "instructions": [
       "Adjust the weight to an appropriate amount and be seated, grasping the handles. Your upper arms should be about 45 degrees to the body, with your head and chest up. The elbows should be bent to about 90 degrees. This will be your starting position.",
@@ -4503,6 +8056,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Incline Cable Flye",
     "muscle": "chest",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Incline_Cable_Flye/0.jpg",
     "instructions": [
       "To get yourself into the starting position, set the pulleys at the floor level (lowest level possible on the machine that is below your torso).",
@@ -4518,6 +8072,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Incline Dumbbell Bench With Palms Facing In",
     "muscle": "chest",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Incline_Dumbbell_Bench_With_Palms_Facing_In/0.jpg",
     "instructions": [
       "Lie back on an incline bench with a dumbbell on each hand on top of your thighs. The palms of your hand will be facing each other.",
@@ -4534,6 +8089,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Incline Dumbbell Curl",
     "muscle": "biceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Incline_Dumbbell_Curl/0.jpg",
     "instructions": [
       "Sit back on an incline bench with a dumbbell in each hand held at arms length. Keep your elbows close to your torso and rotate the palms of your hands until they are facing forward. This will be your starting position.",
@@ -4547,6 +8103,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Incline Dumbbell Flyes",
     "muscle": "chest",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Incline_Dumbbell_Flyes/0.jpg",
     "instructions": [
       "Hold a dumbbell on each hand and lie on an incline bench that is set to an incline angle of no more than 30 degrees.",
@@ -4562,6 +8119,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Incline Dumbbell Flyes - With A Twist",
     "muscle": "chest",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Incline_Dumbbell_Flyes_-_With_A_Twist/0.jpg",
     "instructions": [
       "Hold a dumbbell in each hand and lie on an incline bench that is set to an incline angle of no more than 30 degrees.",
@@ -4577,6 +8135,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Incline Dumbbell Press",
     "muscle": "chest",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Incline_Dumbbell_Press/0.jpg",
     "instructions": [
       "Lie back on an incline bench with a dumbbell in each hand atop your thighs. The palms of your hands will be facing each other.",
@@ -4589,10 +8148,25 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "incline-bench-ez-bar-press",
+    "name": "Incline EZ-Bar Bench Press",
+    "muscle": "chest",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/incline-bench-ez-bar-press-start.webp",
+    "instructions": [
+      "Set bench to 30–45 degrees. Grip the EZ-bar with hands on the angled sections.",
+      "Lower the bar to your upper chest.",
+      "Press back up to full extension.",
+      "Repeat."
+    ]
+  },
+  {
     "id": "Incline_Hammer_Curls",
     "name": "Incline Hammer Curls",
     "muscle": "biceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Incline_Hammer_Curls/0.jpg",
     "instructions": [
       "Seat yourself on an incline bench with a dumbbell in each hand. You should pressed firmly against he back with your feet together. Allow the dumbbells to hang straight down at your side, holding them with a neutral grip. This will be your starting position.",
@@ -4605,6 +8179,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Incline Inner Biceps Curl",
     "muscle": "biceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Incline_Inner_Biceps_Curl/0.jpg",
     "instructions": [
       "Hold a dumbbell in each hand and lie back on an incline bench.",
@@ -4619,6 +8194,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Incline Push-Up",
     "muscle": "chest",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Incline_Push-Up/0.jpg",
     "instructions": [
       "Stand facing bench or sturdy elevated platform. Place hands on edge of bench or platform, slightly wider than shoulder width.",
@@ -4631,6 +8207,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Incline Push-Up Close-Grip",
     "muscle": "triceps",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Incline_Push-Up_Close-Grip/0.jpg",
     "instructions": [
       "Stand facing a Smith machine bar or sturdy elevated platform at an appropriate height.",
@@ -4645,6 +8222,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Incline Push-Up Depth Jump",
     "muscle": "chest",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Incline_Push-Up_Depth_Jump/0.jpg",
     "instructions": [
       "For this drill you will need a box about 12 inches high, and two thick mats or aerobics steps.",
@@ -4658,6 +8236,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Incline Push-Up Medium",
     "muscle": "chest",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Incline_Push-Up_Medium/0.jpg",
     "instructions": [
       "Stand facing a Smith machine bar or sturdy elevated platform at an appropriate height.",
@@ -4672,6 +8251,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Incline Push-Up Reverse Grip",
     "muscle": "chest",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Incline_Push-Up_Reverse_Grip/0.jpg",
     "instructions": [
       "Stand facing a Smith machine bar or sturdy elevated platform at an appropriate height.",
@@ -4686,6 +8266,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Incline Push-Up Wide",
     "muscle": "chest",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Incline_Push-Up_Wide/0.jpg",
     "instructions": [
       "Stand facing a Smith machine bar or sturdy elevated platform at an appropriate height.",
@@ -4696,10 +8277,27 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "incline-treadmill-walk",
+    "name": "Incline Treadmill Walk",
+    "muscle": "glutes",
+    "equipment": "machine",
+    "category": "cardio",
+    "image": "/repdb/incline-treadmill-walk-main.webp",
+    "instructions": [
+      "Start the belt at a slow walking speed and step on, then raise the incline to your target gradient.",
+      "Walk with a long, deliberate stride, rolling from heel to toe and pushing the belt away behind you with each step.",
+      "Stand tall and lean from the ankles with the hill rather than folding forward at the waist.",
+      "Keep at least one foot on the belt at all times — walk the hill, do not break into a jog.",
+      "Let your arms swing naturally, or rest them lightly on the rails for balance without carrying your weight on them.",
+      "Hold the gradient for the desired time, then lower the incline and walk level for a few minutes to finish."
+    ]
+  },
+  {
     "id": "Intermediate_Groin_Stretch",
     "name": "Intermediate Groin Stretch",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Intermediate_Groin_Stretch/0.jpg",
     "instructions": [
       "Lie on your back with your legs extended. Loop a belt, rope, or band around one of your feet, and swing that leg as far to the side as you can. This will be your starting position.",
@@ -4711,6 +8309,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Intermediate Hip Flexor and Quad Stretch",
     "muscle": "quads",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Intermediate_Hip_Flexor_and_Quad_Stretch/0.jpg",
     "instructions": [
       "Lie face down on the floor, with a rope, belt, or band looped around one foot.",
@@ -4722,6 +8321,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Internal Rotation with Band",
     "muscle": "shoulders",
     "equipment": "band",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Internal_Rotation_with_Band/0.jpg",
     "instructions": [
       "Choke the band around a post. The band should be at the same height as your elbow. Stand with your right side to the band a couple of feet away.",
@@ -4736,6 +8336,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Inverted Row",
     "muscle": "back",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Inverted_Row/0.jpg",
     "instructions": [
       "Position a bar in a rack to about waist height. You can also use a smith machine.",
@@ -4750,6 +8351,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Inverted Row with Straps",
     "muscle": "back",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Inverted_Row_with_Straps/0.jpg",
     "instructions": [
       "Hang a rope or suspension straps from a rack or other stable object. Grasp the ends and position yourself in a supine position hanging from the ropes. Your body should be straight with your heels on the ground with your arms fully extended. This will be your starting position.",
@@ -4763,6 +8365,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Iron Cross",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Iron_Cross/0.jpg",
     "instructions": []
   },
@@ -4771,6 +8374,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Iron Crosses (stretch)",
     "muscle": "quads",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Iron_Crosses_stretch/0.jpg",
     "instructions": [
       "Lie face down on the floor, with your arms extended out to your side, palms pressed to the floor. This will be your starting position.",
@@ -4783,6 +8387,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Isometric Chest Squeezes",
     "muscle": "chest",
     "equipment": "bodyweight",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Isometric_Chest_Squeezes/0.jpg",
     "instructions": [
       "While either seating or standing, bend your arms at a 90-degree angle and place the palms of your hands together in front of your chest. Tip: Your hands should be open with the palms together and fingers facing forward (perpendicular to your torso).",
@@ -4797,6 +8402,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Isometric Neck Exercise - Front And Back",
     "muscle": "other",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Isometric_Neck_Exercise_-_Front_And_Back/0.jpg",
     "instructions": [
       "With your head and neck in a neutral position (normal position with head erect facing forward), place both of your hands on the front side of your head.",
@@ -4811,6 +8417,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Isometric Neck Exercise - Sides",
     "muscle": "other",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Isometric_Neck_Exercise_-_Sides/0.jpg",
     "instructions": [
       "With your head and neck in a neutral position (normal position with head erect facing forward), place your left hand on the left side of your head.",
@@ -4821,10 +8428,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "isometric-neck-side",
+    "name": "Isometric Neck Lateral Flexion",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/isometric-neck-side-main.webp",
+    "instructions": [
+      "Sit or stand tall. Place the palm of one hand against the side of the head, above the ear.",
+      "Press the head into the hand while resisting equally with the hand — the head does not move.",
+      "Hold the isometric contraction for 5 to 10 seconds.",
+      "Release slowly, then repeat on the same side for the set.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
     "id": "Isometric_Wipers",
     "name": "Isometric Wipers",
     "muscle": "chest",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Isometric_Wipers/0.jpg",
     "instructions": [
       "Assume a push-up position, supporting your weight on your hands and toes while keeping your body straight. Your hands should be just outside of shoulder width. This will be your starting position.",
@@ -4834,17 +8457,15 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "JM_Press",
-    "name": "JM Press",
-    "muscle": "triceps",
-    "equipment": "barbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/JM_Press/0.jpg",
+    "id": "IT_Band_and_Glute_Stretch",
+    "name": "IT Band and Glute Stretch",
+    "muscle": "glutes",
+    "equipment": "other",
+    "category": "stretching",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/IT_Band_and_Glute_Stretch/0.jpg",
     "instructions": [
-      "Start the exercise the same way you would a close grip bench press. You will lie on a flat bench while holding a barbell at arms length (fully extended) with the elbows in. However, instead of having the arms perpendicular to the torso, make sure the bar is set in a direct line above the upper chest. This will be your starting position.",
-      "Now beginning from a fully extended position lower the bar down as if performing a lying triceps extension. Inhale as you perform this movement. When you reach the half way point, let the bar roll back about one inch by moving the upper arms towards your legs until they are perpendicular to the torso. Tip: Keep the bend at the elbows constant as you bring the upper arms forward.",
-      "As you exhale, press the bar back up by using the triceps to perform a close grip bench press.",
-      "Now go back to the starting position and start over.",
-      "Repeat for the recommended amount of repetitions."
+      "Loop a belt, rope, or band around one of your feet, and swing that leg across your body to the opposite side, keeping the leg extended as you lay on the ground. This will be your starting position.",
+      "Keeping your foot off of the floor, pull on the belt, using the tension to pull the toes up. Hold for 10-20 seconds, and repeat on the other side."
     ]
   },
   {
@@ -4852,6 +8473,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Jackknife Sit-Up",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Jackknife_Sit-Up/0.jpg",
     "instructions": [
       "Lie flat on the floor (or exercise mat) on your back with your arms extended straight back behind your head and your legs extended also. This will be your starting position.",
@@ -4865,6 +8487,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Janda Sit-Up",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Janda_Sit-Up/0.jpg",
     "instructions": [
       "Position your body on the floor in the basic sit-up position; knees to a ninety degree angle with feet flat on the floor and arms either crossed over your chest or to the sides. This will be your starting position.",
@@ -4874,10 +8497,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "jefferson-curl",
+    "name": "Jefferson Curl",
+    "muscle": "back",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/jefferson-curl-start.webp",
+    "instructions": [
+      "Stand tall holding a light dumbbell with straight arms, feet roughly hip-width.",
+      "Tuck your chin and begin rounding the spine from the top, one vertebra at a time.",
+      "Curl down slowly, letting the weight hang and keeping the legs mostly straight.",
+      "Reach the bottom with the back fully rounded and a stretch through the hamstrings.",
+      "Reverse it, restacking the spine from the bottom up back to standing."
+    ]
+  },
+  {
     "id": "Jefferson_Squats",
     "name": "Jefferson Squats",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Jefferson_Squats/0.jpg",
     "instructions": [
       "Place a barbell on the floor.",
@@ -4894,6 +8533,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Jerk Balance",
     "muscle": "shoulders",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Jerk_Balance/0.jpg",
     "instructions": [
       "This drill helps you learn to drive yourself low enough during the jerk and corrects those who move backward during the movement. Begin with the bar racked in the jerk position, with the shoulders forward, torso upright, and the feet split slightly apart.",
@@ -4906,6 +8546,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Jerk Dip Squat",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Jerk_Dip_Squat/0.jpg",
     "instructions": [
       "This movement strengthens the dip portion of the jerk. Begin with the bar racked in the jerk position, with the shoulders forward to create a shelf and the bar lightly contacting the throat. The feet should be directly under the hips, with the feet turned out as is comfortable.",
@@ -4913,10 +8554,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "JM_Press",
+    "name": "JM Press",
+    "muscle": "triceps",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/JM_Press/0.jpg",
+    "instructions": [
+      "Start the exercise the same way you would a close grip bench press. You will lie on a flat bench while holding a barbell at arms length (fully extended) with the elbows in. However, instead of having the arms perpendicular to the torso, make sure the bar is set in a direct line above the upper chest. This will be your starting position.",
+      "Now beginning from a fully extended position lower the bar down as if performing a lying triceps extension. Inhale as you perform this movement. When you reach the half way point, let the bar roll back about one inch by moving the upper arms towards your legs until they are perpendicular to the torso. Tip: Keep the bend at the elbows constant as you bring the upper arms forward.",
+      "As you exhale, press the bar back up by using the triceps to perform a close grip bench press.",
+      "Now go back to the starting position and start over.",
+      "Repeat for the recommended amount of repetitions."
+    ]
+  },
+  {
     "id": "Jogging_Treadmill",
     "name": "Jogging, Treadmill",
     "muscle": "quads",
     "equipment": "machine",
+    "category": "cardio",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Jogging_Treadmill/0.jpg",
     "instructions": [
       "To begin, step onto the treadmill and select the desired option from the menu. Most treadmills have a manual setting, or you can select a program to run. Typically, you can enter your age and weight to estimate the amount of calories burned during exercise. Elevation can be adjusted to change the intensity of the workout.",
@@ -4924,10 +8581,56 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "jump-rope",
+    "name": "Jump Rope",
+    "muscle": "calves",
+    "equipment": "other",
+    "category": "cardio",
+    "image": "/repdb/jump-rope-main.webp",
+    "instructions": [
+      "Hold a jump rope handle in each hand with the rope behind you.",
+      "Swing the rope overhead and forward in a smooth arc.",
+      "Hop just high enough for the rope to pass under your feet.",
+      "Land softly on the balls of the feet, knees slightly bent.",
+      "Keep a steady rhythm for the prescribed interval."
+    ]
+  },
+  {
+    "id": "jump-squat",
+    "name": "Jump Squat",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "plyometrics",
+    "image": "/repdb/jump-squat-start.webp",
+    "instructions": [
+      "Stand with feet shoulder-width apart.",
+      "Drop into a quarter-squat with the arms back.",
+      "Explode upward, swinging the arms up and jumping as high as you can.",
+      "Land softly back into a quarter-squat to absorb impact.",
+      "Repeat without pausing for the prescribed reps."
+    ]
+  },
+  {
+    "id": "jumping-jacks",
+    "name": "Jumping Jacks",
+    "muscle": "calves",
+    "equipment": "bodyweight",
+    "category": "cardio",
+    "image": "/repdb/jumping-jacks-start.webp",
+    "instructions": [
+      "Stand tall with feet together and arms at your sides.",
+      "Simultaneously jump your feet out wide and raise your arms overhead.",
+      "Ensure your arms meet or nearly meet above your head.",
+      "Jump your feet back together while lowering your arms to your sides.",
+      "Maintain a continuous, rhythmic motion."
+    ]
+  },
+  {
     "id": "Keg_Load",
     "name": "Keg Load",
     "muscle": "back",
     "equipment": "other",
+    "category": "strongman",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Keg_Load/0.jpg",
     "instructions": [
       "To load kegs, place the desired number a distance from the loading platform, typically 30-50 feet.",
@@ -4941,6 +8644,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Kettlebell Arnold Press",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kettlebell_Arnold_Press/0.jpg",
     "instructions": [
       "Clean a kettlebell to your shoulder. Clean the kettlebell to your shoulder by extending through the legs and hips as you raise the kettlebell towards your shoulder. The palm should be facing inward.",
@@ -4949,10 +8653,58 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "kettlebell-bulgarian-split-squat",
+    "name": "Kettlebell Bulgarian Split Squat",
+    "muscle": "glutes",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-bulgarian-split-squat-start.webp",
+    "instructions": [
+      "Stand facing away from a bench, placing one foot on it behind you, laces down. Hold a kettlebell in the opposite hand.",
+      "Maintain an upright torso and engage your core.",
+      "Lower your body by bending both knees, allowing your front knee to track over your toes.",
+      "Descend until your front thigh is parallel to the floor or slightly below, keeping your rear knee close to the ground.",
+      "Drive through your front heel to return to the starting position, extending your hips and knees.",
+      "Complete all reps per side before switching."
+    ]
+  },
+  {
+    "id": "kettlebell-close-grip-floor-press",
+    "name": "Kettlebell Close-Grip Floor Press",
+    "muscle": "triceps",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-close-grip-floor-press-start.webp",
+    "instructions": [
+      "Lie on your back on the floor with the knees bent and feet flat.",
+      "Hold a single kettlebell by the handle with both hands, close together, the bell resting on the chest with elbows tucked tight to the ribs.",
+      "Brace the core and press the kettlebell straight up until the arms are fully extended.",
+      "Lower under control until the upper arms touch the floor and pause briefly.",
+      "Press back up to lockout.",
+      "Repeat for the recommended number of repetitions."
+    ]
+  },
+  {
+    "id": "kettlebell-concentration-curl",
+    "name": "Kettlebell Concentration Curl",
+    "muscle": "biceps",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-concentration-curl-start.webp",
+    "instructions": [
+      "Sit on a bench with your feet wide, holding a kettlebell in one hand.",
+      "Brace the back of your upper arm against the inside of your thigh, letting the kettlebell hang.",
+      "Curl the kettlebell up toward your shoulder, keeping the elbow pinned against your leg.",
+      "Squeeze the bicep at the top, then lower slowly under control.",
+      "Finish all reps on one side, then switch arms."
+    ]
+  },
+  {
     "id": "Kettlebell_Dead_Clean",
     "name": "Kettlebell Dead Clean",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kettlebell_Dead_Clean/0.jpg",
     "instructions": [
       "Place kettlebell between your feet. To get in the starting position, push your butt back and look straight ahead.",
@@ -4961,10 +8713,43 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "kettlebell-deadlift",
+    "name": "Kettlebell Deadlift",
+    "muscle": "back",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-deadlift-start.webp",
+    "instructions": [
+      "Stand with feet shoulder-width apart and kettlebell between your feet.",
+      "Hinge at the hips and bend your knees to grip the handle.",
+      "Brace your core and set your back flat.",
+      "Drive through your heels to stand up with the kettlebell.",
+      "Lock out at the top with shoulders pulled back.",
+      "Lower the kettlebell back to the floor with control."
+    ]
+  },
+  {
+    "id": "kettlebell-farmers-walk",
+    "name": "Kettlebell Farmer's Walk",
+    "muscle": "other",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-farmers-walk-main.webp",
+    "instructions": [
+      "Stand between two heavy dumbbells or farmer handles.",
+      "Hinge and grip the handles firmly with a neutral grip.",
+      "Stand tall with shoulders back and core braced.",
+      "Walk forward with short, controlled steps.",
+      "Maintain an upright posture throughout the walk.",
+      "Set the weights down at the end of the distance."
+    ]
+  },
+  {
     "id": "Kettlebell_Figure_8",
     "name": "Kettlebell Figure 8",
     "muscle": "core",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kettlebell_Figure_8/0.jpg",
     "instructions": [
       "Place one kettlebell between your legs and take a wider than shoulder width stance. Bend over by pushing your butt out and keeping your back flat.",
@@ -4972,10 +8757,87 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "kettlebell-floor-press",
+    "name": "Kettlebell Floor Press",
+    "muscle": "chest",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-floor-press-start.webp",
+    "instructions": [
+      "Lie on your back on the floor with knees bent, feet flat.",
+      "Hold a kettlebell in each hand at the chest, bells resting on the outer forearms.",
+      "Press both kettlebells straight up until the arms are fully extended.",
+      "Lower under control until the triceps touch the floor — do not bounce.",
+      "Repeat for the recommended number of repetitions."
+    ]
+  },
+  {
+    "id": "kettlebell-goblet-lunge",
+    "name": "Kettlebell Goblet Lunge",
+    "muscle": "glutes",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-goblet-lunge-start.webp",
+    "instructions": [
+      "Stand tall holding a kettlebell by its horns at chest height, elbows tucked, in the goblet position.",
+      "Take a controlled step forward with one leg, lowering your hips until both knees are bent at approximately 90 degrees.",
+      "Ensure your front knee is stacked over your ankle and your rear knee hovers just above the floor.",
+      "Drive through your front heel to return to the starting position, maintaining balance and core tension.",
+      "Complete all repetitions on one side before switching, or alternate legs per set."
+    ]
+  },
+  {
+    "id": "Kettlebell_Halo",
+    "name": "Kettlebell Halo",
+    "muscle": "shoulders",
+    "equipment": "other",
+    "category": "strength",
+    "image": null,
+    "instructions": [
+      "Stand tall with your feet hip-width apart. Hold a kettlebell upside down by the horns, with the bell above your hands and close to your chest. Brace your abdominals and squeeze your glutes so your ribcage stays down. This is your starting position.",
+      "Keeping your elbows close to your head, move the kettlebell up past one ear and around behind your head.",
+      "Continue the circle past the opposite ear and back down to the starting position in front of your chest, letting the bell pass close to your body throughout.",
+      "Complete the prescribed number of circles in one direction, then repeat the same number in the opposite direction.",
+      "Move slowly and keep your head, hips and lower back still. If your lower back arches or the bell drifts far from your head, use a lighter weight."
+    ]
+  },
+  {
+    "id": "Kettlebell_Halo_With_Overhead_Extension",
+    "name": "Kettlebell Halo with Overhead Extension",
+    "muscle": "shoulders",
+    "equipment": "other",
+    "category": "strength",
+    "image": null,
+    "instructions": [
+      "Stand tall with your feet hip-width apart. Hold a kettlebell upside down by the horns, with the bell above your hands and close to your chest. Brace your abdominals and squeeze your glutes so your ribcage stays down. This is your starting position.",
+      "Keeping your elbows close to your head, move the kettlebell up past one ear and around until it sits behind your head. Pause here.",
+      "From this position, extend your elbows to press the kettlebell up and overhead until your arms are straight, keeping your upper arms alongside your head.",
+      "Bend your elbows to lower the kettlebell back to the pause position behind your head, under control.",
+      "Continue the circle past the opposite ear and back down to the starting position in front of your chest to complete one repetition.",
+      "Alternate the direction of the circle on each repetition. Keep your head, hips and lower back still throughout; if your lower back arches or you cannot reach the overhead position without leaning back, use a lighter weight or perform the halo and the extension as separate exercises."
+    ]
+  },
+  {
+    "id": "kettlebell-hammer-curl",
+    "name": "Kettlebell Hammer Curl",
+    "muscle": "biceps",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-hammer-curl-start.webp",
+    "instructions": [
+      "Stand holding a kettlebell in one hand, gripping the handle in a neutral position (palm facing the body).",
+      "The bell rests on or beside the forearm.",
+      "Keep the elbow tucked to the side and curl the bell up toward the shoulder.",
+      "Squeeze at the top, then lower under control.",
+      "Complete all reps on one side, then switch."
+    ]
+  },
+  {
     "id": "Kettlebell_Hang_Clean",
     "name": "Kettlebell Hang Clean",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kettlebell_Hang_Clean/0.jpg",
     "instructions": [
       "Place kettlebell between your feet. To get in the starting position, push your butt back and look straight ahead.",
@@ -4984,10 +8846,73 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "kettlebell-hip-thrust",
+    "name": "Kettlebell Hip Thrust",
+    "muscle": "glutes",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-hip-thrust-start.webp",
+    "instructions": [
+      "Sit on the floor with your upper back against a bench, knees bent, and feet flat.",
+      "Place a kettlebell across your hips, holding it securely with both hands.",
+      "Drive through your heels, lifting your hips off the floor until your body forms a straight line from shoulders to knees.",
+      "Squeeze your glutes forcefully at the top of the movement.",
+      "Slowly lower your hips back down to the starting position with control."
+    ]
+  },
+  {
+    "id": "kettlebell-kickstand-deadlift",
+    "name": "Kettlebell Kickstand Deadlift",
+    "muscle": "glutes",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-kickstand-deadlift-start.webp",
+    "instructions": [
+      "Stand tall and step one foot back so only the toes touch the floor.",
+      "Hold a kettlebell in one hand at hip height.",
+      "Hinge at the hips, lowering the kettlebell toward mid-shin while keeping the back flat.",
+      "Keep most of your weight on the front foot throughout.",
+      "Drive through the front heel to return to standing. Switch sides after all reps."
+    ]
+  },
+  {
+    "id": "kettlebell-lunge-press",
+    "name": "Kettlebell Lunge Press",
+    "muscle": "shoulders",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-lunge-press-start.webp",
+    "instructions": [
+      "Hold a kettlebell at shoulder height with one arm.",
+      "Step forward into a lunge with the opposite leg.",
+      "As you lunge, press the kettlebell overhead.",
+      "Lock out the arm at the top of the press.",
+      "Step back to standing while lowering the kettlebell.",
+      "Complete reps on one side, then switch."
+    ]
+  },
+  {
+    "id": "kettlebell-offset-reverse-lunge-and-press",
+    "name": "Kettlebell Offset Reverse Lunge and Press",
+    "muscle": "shoulders",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-offset-reverse-lunge-and-press-start.webp",
+    "instructions": [
+      "Hold a kettlebell at shoulder height on one side.",
+      "Step backward into a reverse lunge with the opposite leg.",
+      "As you reach the bottom of the lunge, press the kettlebell overhead.",
+      "Drive through your front heel to return to standing.",
+      "Lower the kettlebell back to shoulder height.",
+      "Complete reps on one side, then switch."
+    ]
+  },
+  {
     "id": "Kettlebell_One-Legged_Deadlift",
     "name": "Kettlebell One-Legged Deadlift",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kettlebell_One-Legged_Deadlift/0.jpg",
     "instructions": [
       "Hold a kettlebell by the handle in one hand. Stand on one leg, on the same side that you hold the kettlebell.",
@@ -4996,10 +8921,42 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "kettlebell-overhead-carry",
+    "name": "Kettlebell Overhead Carry",
+    "muscle": "shoulders",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-overhead-carry-main.webp",
+    "instructions": [
+      "Clean and press a kettlebell to lockout, letting the bell settle on the back of your forearm.",
+      "Straighten the elbow fully and turn the arm so the bell sits behind and above your wrist rather than off to the side.",
+      "Pack the shoulder — push the weight up and let the shoulder blade travel with it instead of jamming it down.",
+      "Brace your trunk and walk forward with even strides, keeping the bell stacked over your shoulder and hip.",
+      "Keep your wrist straight; letting it bend back is what makes an overhead bell feel unstable.",
+      "Carry for the desired distance, lower under control, then repeat on the other side."
+    ]
+  },
+  {
+    "id": "Kettlebell_Overhead_Triceps_Extension",
+    "name": "Kettlebell Overhead Triceps Extension",
+    "muscle": "triceps",
+    "equipment": "other",
+    "category": "strength",
+    "image": null,
+    "instructions": [
+      "Stand with your feet hip-width apart, holding a kettlebell by the horns with both hands. Press it overhead until your arms are extended, with the bell hanging behind your hands.",
+      "Brace your abdominals and keep your upper arms vertical and close to your head. This is your starting position.",
+      "Bend at the elbows to lower the kettlebell behind your head, going as far as your shoulder mobility allows without your elbows flaring outward.",
+      "Extend your elbows to press the kettlebell back to the starting position, keeping your upper arms still throughout.",
+      "Keep your ribcage down and avoid arching your lower back as you extend."
+    ]
+  },
+  {
     "id": "Kettlebell_Pass_Between_The_Legs",
     "name": "Kettlebell Pass Between The Legs",
     "muscle": "core",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kettlebell_Pass_Between_The_Legs/0.jpg",
     "instructions": [
       "Place one kettlebell between your legs and take a comfortable stance. Bend over by pushing your butt out and keeping your back flat.",
@@ -5011,6 +8968,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Kettlebell Pirate Ships",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kettlebell_Pirate_Ships/0.jpg",
     "instructions": [
       "With a wide stance, hold a kettlebell with both hands. Allow it to hang at waist level with your arms extended. This will be your starting position.",
@@ -5024,6 +8982,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Kettlebell Pistol Squat",
     "muscle": "quads",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kettlebell_Pistol_Squat/0.jpg",
     "instructions": [
       "Pick up a kettlebell with two hands and hold it by the horns. Hold one leg off of the floor and squat down on the other.",
@@ -5033,10 +8992,87 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "kettlebell-pullover",
+    "name": "Kettlebell Pullover",
+    "muscle": "back",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-pullover-start.webp",
+    "instructions": [
+      "Lie on a flat bench holding a kettlebell by the horns with both hands above the chest, arms nearly straight (slight elbow bend).",
+      "Keeping the elbow angle fixed, lower the bell overhead in an arc until the upper arms are in line with the torso.",
+      "Pull the bell back above the chest along the same arc.",
+      "Repeat for the recommended number of repetitions."
+    ]
+  },
+  {
+    "id": "kettlebell-reverse-lunge",
+    "name": "Kettlebell Reverse Lunge",
+    "muscle": "glutes",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-reverse-lunge-start.webp",
+    "instructions": [
+      "Stand tall with a kettlebell held in one hand, arm extended down, on the same side as the leg that will lunge back.",
+      "Step one leg straight back, lowering your hips until both knees are bent at approximately 90 degrees.",
+      "Keep your front shin vertical and your chest upright, ensuring your back knee hovers just above the floor.",
+      "Drive through your front heel to return to the starting position.",
+      "Complete all reps per side before switching to the other side."
+    ]
+  },
+  {
+    "id": "kettlebell-reverse-wrist-curl",
+    "name": "Kettlebell Reverse Wrist Curl",
+    "muscle": "other",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-reverse-wrist-curl-start.webp",
+    "instructions": [
+      "Sit on a bench with the forearm on the thigh, palm down.",
+      "Hold a kettlebell by the handle with the wrist hanging off the knee.",
+      "Let the wrist drop, lowering the kettlebell.",
+      "Lift the back of the hand by extending the wrist.",
+      "Lower under control. Complete reps per side."
+    ]
+  },
+  {
+    "id": "kettlebell-rotational-lunge",
+    "name": "Kettlebell Rotational Lunge",
+    "muscle": "glutes",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-rotational-lunge-start.webp",
+    "instructions": [
+      "Hold a kettlebell with both hands at your chest.",
+      "Step to one side into a lateral lunge.",
+      "Rotate your torso toward the lunging leg.",
+      "Bring the kettlebell down toward the bent knee.",
+      "Push off the lunging leg to return to center.",
+      "Complete reps on one side, then switch."
+    ]
+  },
+  {
+    "id": "kettlebell-russian-twist",
+    "name": "Kettlebell Russian Twist",
+    "muscle": "core",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-russian-twist-start.webp",
+    "instructions": [
+      "Sit on the floor with your knees bent and feet lifted off the ground.",
+      "Hold a kettlebell with both hands in front of your chest.",
+      "Lean back slightly to engage your core.",
+      "Rotate your torso to one side, bringing the kettlebell next to your hip.",
+      "Rotate to the opposite side in a controlled motion.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
     "id": "Kettlebell_Seated_Press",
     "name": "Kettlebell Seated Press",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kettlebell_Seated_Press/0.jpg",
     "instructions": [
       "Sit on the floor and spread your legs out comfortably.",
@@ -5049,6 +9085,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Kettlebell Seesaw Press",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kettlebell_Seesaw_Press/0.jpg",
     "instructions": [
       "Clean two kettlebells two your shoulders.",
@@ -5057,10 +9094,89 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "kettlebell-shrug",
+    "name": "Kettlebell Shrug",
+    "muscle": "back",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-shrug-start.webp",
+    "instructions": [
+      "Stand tall with feet hip-width apart, holding a kettlebell in each hand with palms facing your body.",
+      "Keep your arms straight and shoulders relaxed.",
+      "Elevate your shoulders straight up towards your ears, squeezing your traps at the top.",
+      "Hold the contraction briefly.",
+      "Slowly lower your shoulders back to the starting position with control.",
+      "Repeat for the desired number of repetitions."
+    ]
+  },
+  {
+    "id": "kettlebell-single-leg-deadlift",
+    "name": "Kettlebell Single Leg Deadlift",
+    "muscle": "glutes",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-single-leg-deadlift-start.webp",
+    "instructions": [
+      "Hold a kettlebell in one hand and stand on the opposite leg.",
+      "Hinge at the hip and lower the kettlebell toward the floor.",
+      "Extend your free leg straight back for balance.",
+      "Lower until your torso is parallel to the floor.",
+      "Drive through your standing heel to return to standing.",
+      "Complete reps on one side, then switch."
+    ]
+  },
+  {
+    "id": "kettlebell-skull-crusher",
+    "name": "Kettlebell Skull Crusher",
+    "muscle": "triceps",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-skull-crusher-start.webp",
+    "instructions": [
+      "Lie on a flat bench holding a kettlebell by the horns with both hands, arms extended above the chest.",
+      "Bend only the elbows to lower the bell toward the forehead in a controlled arc.",
+      "Keep the upper arms vertical; only the forearms move.",
+      "Extend the elbows to press the bell back up.",
+      "Repeat for the recommended number of repetitions."
+    ]
+  },
+  {
+    "id": "kettlebell-squat",
+    "name": "Kettlebell Squat",
+    "muscle": "quads",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-squat-start.webp",
+    "instructions": [
+      "Stand with feet shoulder-width apart, holding a kettlebell with both hands in front of you.",
+      "Let the kettlebell hang naturally between your legs as you brace your core.",
+      "Bend your hips and knees to squat down, keeping the kettlebell close to your body.",
+      "Drive through your feet to stand back up to the starting position.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "kettlebell-sumo-deadlift",
+    "name": "Kettlebell Sumo Deadlift",
+    "muscle": "glutes",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-sumo-deadlift-start.webp",
+    "instructions": [
+      "Stand in a wide stance with toes pointed slightly out, a kettlebell on the floor between the feet.",
+      "Hinge down with a flat back, knees tracking over the toes, and grip the handle with both hands.",
+      "Drive through the floor and extend the hips and knees together to stand up.",
+      "Squeeze the glutes at the top.",
+      "Lower the bell under control back to the floor by pushing the hips back.",
+      "Repeat for the recommended number of repetitions."
+    ]
+  },
+  {
     "id": "Kettlebell_Sumo_High_Pull",
     "name": "Kettlebell Sumo High Pull",
     "muscle": "back",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kettlebell_Sumo_High_Pull/0.jpg",
     "instructions": [
       "Place a kettlebell on the ground between your feet. Position your feet in a wide stance, and grasp the kettlebell with two hands. Set your hips back as far as possible, with your knees bent. Keep your chest and head up. This will be your starting position.",
@@ -5068,10 +9184,57 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "kettlebell-svend-press",
+    "name": "Kettlebell Svend Press",
+    "muscle": "chest",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-svend-press-start.webp",
+    "instructions": [
+      "Stand and press two kettlebells together by squeezing the bells at chest height.",
+      "Hold the kettlebells horizontal — bells touching, handles outward.",
+      "Press the kettlebells forward to full arm extension.",
+      "Pull them back to the chest under control.",
+      "Repeat for the prescribed reps."
+    ]
+  },
+  {
+    "id": "kettlebell-swing",
+    "name": "Kettlebell Swing",
+    "muscle": "glutes",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-swing-start.webp",
+    "instructions": [
+      "Stand with feet shoulder-width apart, kettlebell on the floor in front.",
+      "Hinge at the hips, grip the kettlebell, and hike it back between your legs.",
+      "Explosively drive your hips forward to swing the kettlebell to chest height.",
+      "Let the kettlebell swing back between your legs.",
+      "Repeat in a fluid motion."
+    ]
+  },
+  {
+    "id": "kettlebell-swing-clean",
+    "name": "Kettlebell Swing Clean",
+    "muscle": "glutes",
+    "equipment": "kettlebell",
+    "category": "olympic",
+    "image": "/repdb/kettlebell-swing-clean-start.webp",
+    "instructions": [
+      "Stand with feet shoulder-width apart, kettlebell between your feet.",
+      "Hinge at the hips and grip the handle with one hand.",
+      "Swing the kettlebell back between your legs.",
+      "Drive your hips forward to pull the kettlebell up to your shoulder.",
+      "Catch the kettlebell in the rack position on your shoulder.",
+      "Complete reps on one side, then switch."
+    ]
+  },
+  {
     "id": "Kettlebell_Thruster",
     "name": "Kettlebell Thruster",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kettlebell_Thruster/0.jpg",
     "instructions": [
       "Clean two kettlebells to your shoulders. Clean the kettlebells to your shoulders by extending through the legs and hips as you pull the kettlebells towards your shoulders. Rotate your wrists as you do so. This will be your starting position.",
@@ -5081,10 +9244,27 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "kettlebell-turkish-get-ups",
+    "name": "Kettlebell Turkish Get Ups",
+    "muscle": "shoulders",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-turkish-get-ups-start.webp",
+    "instructions": [
+      "Lie on your back holding a kettlebell pressed overhead in one hand.",
+      "Bend the knee on the same side and plant the foot flat.",
+      "Roll up onto your opposite elbow, then to your hand.",
+      "Drive your hips up and sweep your straight leg back into a lunge.",
+      "Stand up fully while keeping the kettlebell locked out overhead.",
+      "Reverse the sequence to return to the start."
+    ]
+  },
+  {
     "id": "Kettlebell_Turkish_Get-Up_Lunge_style",
     "name": "Kettlebell Turkish Get-Up (Lunge style)",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kettlebell_Turkish_Get-Up_Lunge_style/0.jpg",
     "instructions": [
       "Lie on your back on the floor and press a kettlebell to the top position by extending the elbow. Bend the knee on the same side as the kettlebell.",
@@ -5097,6 +9277,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Kettlebell Turkish Get-Up (Squat style)",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kettlebell_Turkish_Get-Up_Squat_style/0.jpg",
     "instructions": [
       "Lie on your back on the floor and press a kettlebell to the top position by extending the elbow. Bend the knee on the same side as the kettlebell.",
@@ -5109,6 +9290,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Kettlebell Windmill",
     "muscle": "core",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kettlebell_Windmill/0.jpg",
     "instructions": [
       "Place a kettlebell in front of your lead foot and clean and press it overhead with your opposite arm. Clean the kettlebell to your shoulder by extending through the legs and hips as you pull the kettlebell towards your shoulders. Rotate your wrist as you do so, so that the palm faces forward. Press it overhead by extending the elbow.",
@@ -5117,10 +9299,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "kettlebell-wrist-curl",
+    "name": "Kettlebell Wrist Curl",
+    "muscle": "other",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/kettlebell-wrist-curl-start.webp",
+    "instructions": [
+      "Sit on a bench with the forearm on the thigh, palm up.",
+      "Hold a kettlebell by the handle with the wrist hanging off the knee.",
+      "Let the kettlebell rotate down toward the fingertips.",
+      "Curl it up by flexing the wrist, controlling the offset weight.",
+      "Lower under control. Complete reps per side."
+    ]
+  },
+  {
     "id": "Kipping_Muscle_Up",
     "name": "Kipping Muscle Up",
     "muscle": "back",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kipping_Muscle_Up/0.jpg",
     "instructions": [
       "Grip the rings using a false grip, with the base of your palms on top of the rings.",
@@ -5135,6 +9333,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Knee Across The Body",
     "muscle": "glutes",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Knee_Across_The_Body/0.jpg",
     "instructions": [
       "Lie down on the floor with your right leg straight. Bend your left leg and lower it across your body, holding the knee down toward the floor with your right hand. (The knee doesn't need to touch the floor if you're tight.)",
@@ -5146,6 +9345,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Knee Circles",
     "muscle": "calves",
     "equipment": "bodyweight",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Knee_Circles/0.jpg",
     "instructions": [
       "Stand with your legs together and hands by your waist.",
@@ -5154,10 +9354,55 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "knee-push-ups",
+    "name": "Knee Push Ups",
+    "muscle": "chest",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/knee-push-ups-start.webp",
+    "instructions": [
+      "Start in a push-up position with your knees on the floor.",
+      "Place your hands shoulder-width apart on the ground.",
+      "Keep your body in a straight line from knees to shoulders.",
+      "Lower your chest toward the floor by bending your elbows.",
+      "Press through your hands to return to the starting position.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "Knee_Tuck_Jump",
+    "name": "Knee Tuck Jump",
+    "muscle": "hamstrings",
+    "equipment": "bodyweight",
+    "category": "plyometrics",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Knee_Tuck_Jump/0.jpg",
+    "instructions": [
+      "Begin in a comfortable standing position with your knees slightly bent. Hold your hands in front of you, palms down with your fingertips together at chest height. This will be your starting position.",
+      "Rapidly dip down into a quarter squat and immediately explode upward. Drive the knees towards the chest, attempting to touch them to the palms of the hands.",
+      "Jump as high as you can, raising your knees up, and then ensure a good land be re-extending your legs, absorbing impact through be allowing the knees to rebend."
+    ]
+  },
+  {
+    "id": "knee-to-chest-stretch",
+    "name": "Knee-to-Chest Stretch",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/knee-to-chest-stretch-main.webp",
+    "instructions": [
+      "Lie on your back with both legs straight.",
+      "Pull one knee in and hug it to your chest with both hands.",
+      "Keep the other leg relaxed on the floor.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
     "id": "Knee_Hip_Raise_On_Parallel_Bars",
     "name": "Knee/Hip Raise On Parallel Bars",
     "muscle": "core",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Knee_Hip_Raise_On_Parallel_Bars/0.jpg",
     "instructions": [
       "Position your body on the vertical leg raise bench so that your forearms are resting on the pads next to the torso and holding on to the handles. Your arms will be bent at a 90 degree angle.",
@@ -5168,22 +9413,11 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Knee_Tuck_Jump",
-    "name": "Knee Tuck Jump",
-    "muscle": "hamstrings",
-    "equipment": "bodyweight",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Knee_Tuck_Jump/0.jpg",
-    "instructions": [
-      "Begin in a comfortable standing position with your knees slightly bent. Hold your hands in front of you, palms down with your fingertips together at chest height. This will be your starting position.",
-      "Rapidly dip down into a quarter squat and immediately explode upward. Drive the knees towards the chest, attempting to touch them to the palms of the hands.",
-      "Jump as high as you can, raising your knees up, and then ensure a good land be re-extending your legs, absorbing impact through be allowing the knees to rebend."
-    ]
-  },
-  {
     "id": "Kneeling_Arm_Drill",
     "name": "Kneeling Arm Drill",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kneeling_Arm_Drill/0.jpg",
     "instructions": [
       "This drill helps increase arm efficiency during the run. Begin kneeling, left foot in front, right knee down. Apply pressure through the front heel to keep your glutes and hamstrings activated.",
@@ -5197,6 +9431,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Kneeling Cable Crunch With Alternating Oblique Twists",
     "muscle": "core",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kneeling_Cable_Crunch_With_Alternating_Oblique_Twists/0.jpg",
     "instructions": [
       "Connect a rope attachment to a high pulley cable and position a mat on the floor in front of it.",
@@ -5211,10 +9446,27 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "kneeling-cable-row",
+    "name": "Kneeling Cable Row",
+    "muscle": "back",
+    "equipment": "cable",
+    "category": "strength",
+    "image": "/repdb/kneeling-cable-row-start.webp",
+    "instructions": [
+      "Set a cable pulley to about chest height and attach a rope or double-D handle.",
+      "Kneel upright facing the stack far enough back that the weight stack doesn't bottom out.",
+      "Grab the handle with both hands and hold it out in front at chest height.",
+      "Row the handle to the sternum by driving the elbows back and squeezing the shoulder blades together.",
+      "Return under control to the stretched starting position.",
+      "Repeat for the recommended number of repetitions."
+    ]
+  },
+  {
     "id": "Kneeling_Cable_Triceps_Extension",
     "name": "Kneeling Cable Triceps Extension",
     "muscle": "triceps",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kneeling_Cable_Triceps_Extension/0.jpg",
     "instructions": [
       "Place a bench sideways in front of a high pulley machine.",
@@ -5231,6 +9483,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Kneeling Forearm Stretch",
     "muscle": "other",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kneeling_Forearm_Stretch/0.jpg",
     "instructions": [
       "Start by kneeling on a mat with your palms flat and your fingers pointing back toward your knees.",
@@ -5242,6 +9495,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Kneeling High Pulley Row",
     "muscle": "back",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kneeling_High_Pulley_Row/0.jpg",
     "instructions": [
       "Select the appropriate weight using a pulley that is above your head. Attach a rope to the cable and kneel a couple of feet away, holding the rope out in front of you with both arms extended. This will be your starting position.",
@@ -5254,6 +9508,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Kneeling Hip Flexor",
     "muscle": "quads",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kneeling_Hip_Flexor/0.jpg",
     "instructions": [
       "Kneel on a mat and bring your right knee up so the bottom of your foot is on the floor and extend your left leg out behind you so the top of your foot is on the floor.",
@@ -5265,6 +9520,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Kneeling Jump Squat",
     "muscle": "glutes",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kneeling_Jump_Squat/0.jpg",
     "instructions": [
       "Begin kneeling on the floor with a barbell racked across the back of your shoulders, or you can use your body weight for this exercise. This can be done inside of a power rack to make unracking easier.",
@@ -5278,6 +9534,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Kneeling Single-Arm High Pulley Row",
     "muscle": "back",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kneeling_Single-Arm_High_Pulley_Row/0.jpg",
     "instructions": [
       "Attach a single handle to a high pulley and make your weight selection.",
@@ -5291,6 +9548,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Kneeling Squat",
     "muscle": "glutes",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Kneeling_Squat/0.jpg",
     "instructions": [
       "Set the bar to the proper height in a power rack. Kneel behind the bar; it may be beneficial to put a mat down to pad your knees. Slide under the bar, racking it across the back of your shoulders. Your shoulder blades should be retracted and the bar tight across your back. Unrack the weight.",
@@ -5299,10 +9557,41 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "kneeling-wrist-stretch",
+    "name": "Kneeling Wrist Stretch",
+    "muscle": "other",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/kneeling-wrist-stretch-main.webp",
+    "instructions": [
+      "Kneel on all fours and place your palms flat on the floor.",
+      "Turn your hands so the fingers point back toward your knees.",
+      "Keep your palms down and rock your weight back gently.",
+      "Hold for 20 to 30 seconds, breathing steadily."
+    ]
+  },
+  {
+    "id": "l-sit",
+    "name": "L Sit",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/l-sit-main.webp",
+    "instructions": [
+      "Sit on the floor or press up on parallel bars with arms straight.",
+      "Lock your elbows and depress your shoulders.",
+      "Lift your legs straight out in front of you parallel to the floor.",
+      "Form an L shape with your body.",
+      "Hold the position for the prescribed duration.",
+      "Lower your legs with control to exit."
+    ]
+  },
+  {
     "id": "Landmine_180s",
     "name": "Landmine 180's",
     "muscle": "core",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Landmine_180s/0.jpg",
     "instructions": [
       "Position a bar into a landmine or securely anchor it in a corner. Load the bar to an appropriate weight.",
@@ -5317,6 +9606,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Landmine Linear Jammer",
     "muscle": "shoulders",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Landmine_Linear_Jammer/0.jpg",
     "instructions": [
       "Position a bar into landmine or, lacking one, securely anchor it in a corner. Load the bar to an appropriate weight and position the handle attachment on the bar.",
@@ -5327,10 +9617,41 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "landmine-press",
+    "name": "Landmine Press",
+    "muscle": "shoulders",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/landmine-press-start.webp",
+    "instructions": [
+      "Load one end of a barbell into a landmine attachment and load the other end with a plate.",
+      "Stand in a staggered or square stance and cup the sleeve end of the barbell in both hands at chest height.",
+      "Brace your core and press the bar forward and upward along its natural arc.",
+      "Fully extend your arms without locking the elbows, then lower the bar back under control.",
+      "Keep both hands on the bar throughout and repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "lat-pulldown",
+    "name": "Lat Pulldown",
+    "muscle": "back",
+    "equipment": "cable",
+    "category": "strength",
+    "image": "/repdb/lat-pulldown-start.webp",
+    "instructions": [
+      "Sit at the lat pulldown machine with thighs secured under the pads.",
+      "Grip the wide bar with an overhand grip.",
+      "Pull the bar down to your upper chest, squeezing your lats.",
+      "Slowly return the bar to the starting position.",
+      "Repeat."
+    ]
+  },
+  {
     "id": "Lateral_Bound",
     "name": "Lateral Bound",
     "muscle": "glutes",
     "equipment": "bodyweight",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lateral_Bound/0.jpg",
     "instructions": [
       "Assume a half squat position facing 90 degrees from your direction of travel. This will be your starting position.",
@@ -5345,6 +9666,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Lateral Box Jump",
     "muscle": "glutes",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lateral_Box_Jump/0.jpg",
     "instructions": [
       "Assume a comfortable standing position, with a short box positioned next to you. This will be your starting position.",
@@ -5359,6 +9681,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Lateral Cone Hops",
     "muscle": "glutes",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lateral_Cone_Hops/0.jpg",
     "instructions": [
       "Position a number of cones in a row several feet apart.",
@@ -5372,6 +9695,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Lateral Raise - With Bands",
     "muscle": "shoulders",
     "equipment": "band",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lateral_Raise_-_With_Bands/0.jpg",
     "instructions": [
       "To begin, stand on an exercise band so that tension begins at arm's length. Grasp the handles using a pronated (palms facing your thighs) grip that is slightly less than shoulder width. The handles should be resting on the sides of your thighs. Your arms should be extended with a slight bend at the elbows and your back should be straight. This will be your starting position.",
@@ -5385,6 +9709,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Latissimus Dorsi-SMR",
     "muscle": "back",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Latissimus_Dorsi-SMR/0.jpg",
     "instructions": [
       "While lying on the floor, place a foam roll under your back and to one side, just behind your arm pit. This will be your starting position.",
@@ -5392,34 +9717,11 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Leg-Over_Floor_Press",
-    "name": "Leg-Over Floor Press",
-    "muscle": "chest",
-    "equipment": "other",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Leg-Over_Floor_Press/0.jpg",
-    "instructions": [
-      "Lie on the floor with one kettlebell in place on your chest, holding it by the handle. Extend leg on working side over leg on non-working side.Your free arm can be extended out to your side for support.",
-      "Press the kettlebll into a locked out position.",
-      "Lower the weight until the elbow touches the ground, keeping the kettlebell above the elbow. Repeat for the desired number of repetitions."
-    ]
-  },
-  {
-    "id": "Leg-Up_Hamstring_Stretch",
-    "name": "Leg-Up Hamstring Stretch",
-    "muscle": "hamstrings",
-    "equipment": "other",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Leg-Up_Hamstring_Stretch/0.jpg",
-    "instructions": [
-      "Lie flat on your back, bend one knee, and put that foot flat on the floor to stabilize your spine.",
-      "Extend the other leg in the air. If you're tight, you wont be able to straighten it. That's okay. Extend the knee so that the sole of the lifted foot faces the ceiling (or as close as you can get it).",
-      "Slowly straighten the legs as much as possible and then pull the leg toward your nose. Switch sides."
-    ]
-  },
-  {
     "id": "Leg_Extensions",
     "name": "Leg Extensions",
     "muscle": "quads",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Leg_Extensions/0.jpg",
     "instructions": [
       "For this exercise you will need to use a leg extension machine. First choose your weight and sit on the machine with your legs under the pad (feet pointed forward) and the hands holding the side bars. This will be your starting position. Tip: You will need to adjust the pad so that it falls on top of your lower leg (just above your feet). Also, make sure that your legs form a 90-degree angle between the lower and upper leg. If the angle is less than 90-degrees then that means the knee is over the toes which in turn creates undue stress at the knee joint. If the machine is designed that way, either look for another machine or just make sure that when you start executing the exercise you stop going down once you hit the 90-degree angle.",
@@ -5433,6 +9735,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Leg Lift",
     "muscle": "glutes",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Leg_Lift/0.jpg",
     "instructions": [
       "While standing up straight with both feet next to each other at around shoulder width, grab a sturdy surface such as the sides of a squat rack or the top of a chair to brace yourself and keep balance.",
@@ -5447,6 +9750,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Leg Press",
     "muscle": "quads",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Leg_Press/0.jpg",
     "instructions": [
       "Using a leg press machine, sit down on the machine and place your legs on the platform directly in front of you at a medium (shoulder width) foot stance. (Note: For the purposes of this discussion we will use the medium stance described above which targets overall development; however you can choose any of the three stances described in the foot positioning section).",
@@ -5461,6 +9765,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Leg Pull-In",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Leg_Pull-In/0.jpg",
     "instructions": [
       "Lie on an exercise mat with your legs extended and your hands either palms facing down next to you or under your glutes. Tip: My preference is with the hands next to me. This will be your starting position.",
@@ -5470,10 +9775,52 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "Leg-Over_Floor_Press",
+    "name": "Leg-Over Floor Press",
+    "muscle": "chest",
+    "equipment": "other",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Leg-Over_Floor_Press/0.jpg",
+    "instructions": [
+      "Lie on the floor with one kettlebell in place on your chest, holding it by the handle. Extend leg on working side over leg on non-working side.Your free arm can be extended out to your side for support.",
+      "Press the kettlebll into a locked out position.",
+      "Lower the weight until the elbow touches the ground, keeping the kettlebell above the elbow. Repeat for the desired number of repetitions."
+    ]
+  },
+  {
+    "id": "Leg-Up_Hamstring_Stretch",
+    "name": "Leg-Up Hamstring Stretch",
+    "muscle": "hamstrings",
+    "equipment": "other",
+    "category": "stretching",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Leg-Up_Hamstring_Stretch/0.jpg",
+    "instructions": [
+      "Lie flat on your back, bend one knee, and put that foot flat on the floor to stabilize your spine.",
+      "Extend the other leg in the air. If you're tight, you wont be able to straighten it. That's okay. Extend the knee so that the sole of the lifted foot faces the ceiling (or as close as you can get it).",
+      "Slowly straighten the legs as much as possible and then pull the leg toward your nose. Switch sides."
+    ]
+  },
+  {
+    "id": "legs-up-the-wall",
+    "name": "Legs-Up-the-Wall Pose",
+    "muscle": "hamstrings",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/legs-up-the-wall-main.webp",
+    "instructions": [
+      "Sit sideways next to a wall with one hip touching it.",
+      "Swing the legs up the wall as you lie back, so the hips end close to the base of the wall.",
+      "Let the legs rest against the wall with the feet relaxed and the arms open at the sides.",
+      "Stay for the prescribed time, breathing slowly.",
+      "Bend the knees and roll to one side to come out."
+    ]
+  },
+  {
     "id": "Leverage_Chest_Press",
     "name": "Leverage Chest Press",
     "muscle": "chest",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Leverage_Chest_Press/0.jpg",
     "instructions": [
       "Load an appropriate weight onto the pins and adjust the seat for your height. The handles should be near the bottom or middle of the pectorals at the beginning of the motion.",
@@ -5487,6 +9834,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Leverage Deadlift",
     "muscle": "quads",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Leverage_Deadlift/0.jpg",
     "instructions": [
       "Load the pins to an appropriate weight. Position yourself directly between the handles. Grasp the bottom handles with a comfortable grip, and then lower your hips as you take a breath. Look forward with your head and keep your chest up. This will be your starting position.",
@@ -5498,6 +9846,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Leverage Decline Chest Press",
     "muscle": "chest",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Leverage_Decline_Chest_Press/0.jpg",
     "instructions": [
       "Load an appropriate weight onto the pins and adjust the seat for your height. The handles should be near the bottom of the pectorals at the beginning of the motion. Your chest and head should be up and your shoulder blades retracted. This will be your starting position.",
@@ -5510,6 +9859,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Leverage High Row",
     "muscle": "back",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Leverage_High_Row/0.jpg",
     "instructions": [
       "Load an appropriate weight onto the pins and adjust the seat height so that you can just reach the handles above you. Adjust the knee pad to help keep you down. Grasp the handles with a pronated grip. This will be your starting position.",
@@ -5523,6 +9873,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Leverage Incline Chest Press",
     "muscle": "chest",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Leverage_Incline_Chest_Press/0.jpg",
     "instructions": [
       "Load an appropriate weight onto the pins and adjust the seat for your height. The handles should be near the top of the pectorals at the beginning of the motion. Your chest and head should be up and your shoulder blades retracted. This will be your starting position.",
@@ -5535,6 +9886,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Leverage Iso Row",
     "muscle": "back",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Leverage_Iso_Row/0.jpg",
     "instructions": [
       "Load an appropriate weight onto the pins and adjust the seat height so that the handles are at chest level. Grasp the handles with either a neutral or pronated grip. This will be your starting position.",
@@ -5547,6 +9899,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Leverage Shoulder Press",
     "muscle": "shoulders",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Leverage_Shoulder_Press/0.jpg",
     "instructions": [
       "Load an appropriate weight onto the pins and adjust the seat for your height. The handles should be near the top of the shoulders at the beginning of the motion. Your chest and head should be up and handles held with a pronated grip. This will be your starting position.",
@@ -5559,6 +9912,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Leverage Shrug",
     "muscle": "back",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Leverage_Shrug/0.jpg",
     "instructions": [
       "Load the pins to an appropriate weight. Position yourself directly between the handles.",
@@ -5573,6 +9927,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Linear 3-Part Start Technique",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Linear_3-Part_Start_Technique/0.jpg",
     "instructions": [
       "This drill helps you accelerate as quickly as possible into a sprint from a dead stop. It helps to use a line to start from. Begin with two feet on the line. Place your left foot with the toe next to your right ankle. Place your right foot 4-6 inches behind the left.",
@@ -5586,6 +9941,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Linear Acceleration Wall Drill",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Linear_Acceleration_Wall_Drill/0.jpg",
     "instructions": [
       "Lean at around 45 degrees against a wall. Your feet should be together, glutes contracted.",
@@ -5599,6 +9955,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Linear Depth Jump",
     "muscle": "quads",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Linear_Depth_Jump/0.jpg",
     "instructions": [
       "You will need two boxes or benches spaced a few feet away from each other. Begin by standing on one box facing towards the other platform.",
@@ -5608,10 +9965,41 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "lizard-stretch",
+    "name": "Lizard Stretch",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/lizard-stretch-main.webp",
+    "instructions": [
+      "Step one foot forward into a deep lunge, foot placed wide.",
+      "Lower both forearms toward the floor inside the front foot.",
+      "Extend the back leg straight and let the hips sink.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
+    "id": "locust-pose",
+    "name": "Locust Pose",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/locust-pose-main.webp",
+    "instructions": [
+      "Lie face down with the arms alongside the body and the forehead on the mat.",
+      "Lengthen the back of the neck and reach the fingertips towards the feet.",
+      "Lift the chest, arms and both legs off the floor at the same time.",
+      "Hold the lifted position for the prescribed time, keeping the gaze down.",
+      "Lower everything down together and rest."
+    ]
+  },
+  {
     "id": "Log_Lift",
     "name": "Log Lift",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strongman",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Log_Lift/0.jpg",
     "instructions": [
       "Begin standing with the log in front of you. Grasp the handles, and begin to clean the log. As you are bent over to start the clean, attempt to get the log as high as possible, pulling it into your chest. Extend through the hips and knees to bring it up to complete the clean.",
@@ -5624,6 +10012,7 @@ export const generatedExercises: Exercise[] = [
     "name": "London Bridges",
     "muscle": "back",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/London_Bridges/0.jpg",
     "instructions": [
       "Attach a climbing rope to a high beam or cross member. Below it, ensure that the smith machine bar is locked in place with the safeties and cannot move. Alternatively, a secure box could also be utilized.",
@@ -5637,6 +10026,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Looking At Ceiling",
     "muscle": "quads",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Looking_At_Ceiling/0.jpg",
     "instructions": [
       "Kneel on the floor, holding your heels with both hands.",
@@ -5648,6 +10038,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Low Cable Crossover",
     "muscle": "chest",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Low_Cable_Crossover/0.jpg",
     "instructions": [
       "To move into the starting position, place the pulleys at the low position, select the resistance to be used and grasp a handle in each hand.",
@@ -5661,6 +10052,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Low Cable Triceps Extension",
     "muscle": "triceps",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Low_Cable_Triceps_Extension/0.jpg",
     "instructions": [
       "Select the desired weight and lay down face up on the bench of a seated row machine that has a rope attached to it. Your head should be pointing towards the attachment.",
@@ -5672,10 +10064,41 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "low-lunge",
+    "name": "Low Lunge",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/low-lunge-main.webp",
+    "instructions": [
+      "From kneeling, step one foot forward so the knee stacks over the ankle.",
+      "Lower the back knee to the floor and untuck that foot.",
+      "Tuck the tailbone slightly and press the hips forward until you feel the front of the back thigh lengthen.",
+      "Lift the chest, raise the arms if it feels good, and hold for the prescribed time.",
+      "Step back and repeat on the other side."
+    ]
+  },
+  {
+    "id": "low-lunge-to-half-split",
+    "name": "Low Lunge to Half Split",
+    "muscle": "hamstrings",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/low-lunge-to-half-split-start.webp",
+    "instructions": [
+      "Start in a low lunge with the back knee on the floor and the front knee over the ankle.",
+      "Press the hands into the floor or onto blocks either side of the front foot.",
+      "Shift the hips back over the back knee and straighten the front leg, flexing that foot.",
+      "Hold the half split briefly, then glide the hips forward into the low lunge again.",
+      "Repeat for the desired number of repetitions and change sides."
+    ]
+  },
+  {
     "id": "Low_Pulley_Row_To_Neck",
     "name": "Low Pulley Row To Neck",
     "muscle": "shoulders",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Low_Pulley_Row_To_Neck/0.jpg",
     "instructions": [
       "Sit on a low pulley row machine with a rope attachment.",
@@ -5686,21 +10109,11 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Lower_Back-SMR",
-    "name": "Lower Back-SMR",
-    "muscle": "back",
-    "equipment": "other",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lower_Back-SMR/0.jpg",
-    "instructions": [
-      "In a seated position, place a foam roll under your lower back. Cross your arms in front of you and protract your shoulders. This will be your starting position.",
-      "Raise your hips off of the floor and lean back, keeping your weight on your lower back. Now shift your weight slightly to one side, keeping your weight off of the spine and on the muscles to the side of it. Roll over your lower back, holding points of tension for 10-30 seconds. Repeat on the other side."
-    ]
-  },
-  {
     "id": "Lower_Back_Curl",
     "name": "Lower Back Curl",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lower_Back_Curl/0.jpg",
     "instructions": [
       "Lie on your stomach with your arms out to your sides. This will be your starting position.",
@@ -5708,10 +10121,38 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "Lower_Back-SMR",
+    "name": "Lower Back-SMR",
+    "muscle": "back",
+    "equipment": "other",
+    "category": "stretching",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lower_Back-SMR/0.jpg",
+    "instructions": [
+      "In a seated position, place a foam roll under your lower back. Cross your arms in front of you and protract your shoulders. This will be your starting position.",
+      "Raise your hips off of the floor and lean back, keeping your weight on your lower back. Now shift your weight slightly to one side, keeping your weight off of the spine and on the muscles to the side of it. Roll over your lower back, holding points of tension for 10-30 seconds. Repeat on the other side."
+    ]
+  },
+  {
+    "id": "lunge",
+    "name": "Lunge",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/lunge-start.webp",
+    "instructions": [
+      "Stand tall with your feet hip-width apart.",
+      "Step forward with one leg into a long stride.",
+      "Lower your back knee toward the floor until both knees form 90-degree angles.",
+      "Drive through your front heel to return to standing.",
+      "Complete reps on one side, then switch."
+    ]
+  },
+  {
     "id": "Lunge_Pass_Through",
     "name": "Lunge Pass Through",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lunge_Pass_Through/0.jpg",
     "instructions": [
       "Stand with your torso upright holding a kettlebell in your right hand. This will be your starting position.",
@@ -5726,6 +10167,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Lunge Sprint",
     "muscle": "quads",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lunge_Sprint/0.jpg",
     "instructions": [
       "Adjust a bar in a Smith machine to an appropriate height. Position yourself under the bar, racking it across the back of your shoulders. Unrack the bar, and then split your feet, moving one foot forward and one foot back. This will be your starting position.",
@@ -5739,6 +10181,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Lying Bent Leg Groin",
     "muscle": "glutes",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_Bent_Leg_Groin/0.jpg",
     "instructions": [
       "Lie on your back with your knees bent and the soles of the feet pressed together. Have your partner hold your knees. This will be your starting position.",
@@ -5751,6 +10194,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Lying Cable Curl",
     "muscle": "biceps",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_Cable_Curl/0.jpg",
     "instructions": [
       "Grab a straight bar or E-Z bar attachment that is attached to the low pulley with both hands, using an underhand (palms facing up) shoulder-width grip.",
@@ -5766,6 +10210,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Lying Cambered Barbell Row",
     "muscle": "back",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_Cambered_Barbell_Row/0.jpg",
     "instructions": [
       "Place a cambered bar underneath an exercise bench.",
@@ -5779,6 +10224,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Lying Close-Grip Bar Curl On High Pulley",
     "muscle": "biceps",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_Close-Grip_Bar_Curl_On_High_Pulley/0.jpg",
     "instructions": [
       "Place a flat bench in front of a high pulley or lat pulldown machine.",
@@ -5795,6 +10241,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Lying Close-Grip Barbell Triceps Extension Behind The Head",
     "muscle": "triceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_Close-Grip_Barbell_Triceps_Extension_Behind_The_Head/0.jpg",
     "instructions": [
       "While holding a barbell or EZ Curl bar with a pronated grip (palms facing forward), lie on your back on a flat bench with your head close to the end of the bench. Tip: If you are holding a barbell grab it using a shoulder-width grip and if you are using an E-Z Bar grab it on the inner handles.",
@@ -5809,6 +10256,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Lying Close-Grip Barbell Triceps Press To Chin",
     "muscle": "triceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_Close-Grip_Barbell_Triceps_Press_To_Chin/0.jpg",
     "instructions": [
       "While holding a barbell or EZ Curl bar with a pronated grip (palms facing forward), lie on your back on a flat bench with your head off the end of the bench. Tip: If you are holding a barbell grab it using a shoulder-width grip and if you are using an E-Z Bar grab it on the inner handles.",
@@ -5823,6 +10271,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Lying Crossover",
     "muscle": "glutes",
     "equipment": "bodyweight",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_Crossover/0.jpg",
     "instructions": [
       "Lie on your back with your legs extended.",
@@ -5836,6 +10285,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Lying Dumbbell Tricep Extension",
     "muscle": "triceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_Dumbbell_Tricep_Extension/0.jpg",
     "instructions": [
       "Lie on a flat bench while holding two dumbbells directly in front of you. Your arms should be fully extended at a 90-degree angle from your torso and the floor. The palms should be facing in and the elbows should be tucked in. This is the starting position.",
@@ -5849,6 +10299,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Lying Face Down Plate Neck Resistance",
     "muscle": "other",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_Face_Down_Plate_Neck_Resistance/0.jpg",
     "instructions": [
       "Lie face down with your whole body straight on a flat bench while holding a weight plate behind your head. Tip: You will need to position yourself so that your shoulders are slightly above the end of a flat bench in order for the upper chest, neck and face to be off the bench. This will be your starting position.",
@@ -5862,6 +10313,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Lying Face Up Plate Neck Resistance",
     "muscle": "other",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_Face_Up_Plate_Neck_Resistance/0.jpg",
     "instructions": [
       "Lie face up with your whole body straight on a flat bench while holding a weight plate on top of your forehead. Tip: You will need to position yourself so that your shoulders are slightly above the end of a flat bench in order for the traps, neck and head to be off the bench. This will be your starting position.",
@@ -5875,6 +10327,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Lying Glute",
     "muscle": "glutes",
     "equipment": "bodyweight",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_Glute/0.jpg",
     "instructions": [
       "Lie on your back with your partner kneeling beside you.",
@@ -5888,6 +10341,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Lying Hamstring",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_Hamstring/0.jpg",
     "instructions": [
       "Lie on your back with your legs extended. Your partner should be kneeling beside you. Raise one leg up towards the ceiling and have your partner hold the ankle. Your partner can use their shoulder to brace your leg if necessary. This will be your starting position.",
@@ -5900,6 +10354,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Lying High Bench Barbell Curl",
     "muscle": "biceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_High_Bench_Barbell_Curl/0.jpg",
     "instructions": [
       "Lie face forward on a tall flat bench while holding a barbell with a supinated grip (palms facing up). Tip: If you are holding a barbell grab it using a shoulder-width grip and if you are using an E-Z Bar grab it on the inner handles. Your upper body should be positioned in a way that the upper chest is over the end of the bench and the barbell is hanging in front of you with the arms extended and perpendicular to the floor. This will be your starting position.",
@@ -5913,6 +10368,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Lying Leg Curls",
     "muscle": "hamstrings",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_Leg_Curls/0.jpg",
     "instructions": [
       "Adjust the machine lever to fit your height and lie face down on the leg curl machine with the pad of the lever on the back of your legs (just a few inches under the calves). Tip: Preferably use a leg curl machine that is angled as opposed to flat since an angled position is more favorable for hamstrings recruitment.",
@@ -5922,10 +10378,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "lying-leg-raise",
+    "name": "Lying Leg Raise",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/lying-leg-raise-start.webp",
+    "instructions": [
+      "Lie flat on your back with legs straight and hands under your lower back or gripping a stable surface behind your head.",
+      "Keeping your legs together and core braced, raise them to vertical (or as high as flexibility allows).",
+      "Pause briefly at the top.",
+      "Lower your legs slowly toward the floor without letting them touch.",
+      "Repeat for the desired reps."
+    ]
+  },
+  {
     "id": "Lying_Machine_Squat",
     "name": "Lying Machine Squat",
     "muscle": "quads",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_Machine_Squat/0.jpg",
     "instructions": [
       "Adjust the leg machine to a height that will allow you to get inside it with your knees bent and the thighs slightly below parallel.",
@@ -5941,6 +10413,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Lying One-Arm Lateral Raise",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_One-Arm_Lateral_Raise/0.jpg",
     "instructions": [
       "While holding a dumbbell in one hand, lay with your chest down on a flat bench. The other hand can be used to hold to the leg of the bench for stability.",
@@ -5955,6 +10428,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Lying Prone Quadriceps",
     "muscle": "quads",
     "equipment": "bodyweight",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_Prone_Quadriceps/0.jpg",
     "instructions": [
       "Lay face down on the floor with your partner kneeling beside you. Flex one knee and raise that leg off the ground, attempting to touch your glutes with your foot. Your partner should hold the knee and ankle. This will be your starting position.",
@@ -5968,6 +10442,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Lying Rear Delt Raise",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_Rear_Delt_Raise/0.jpg",
     "instructions": [
       "While holding a dumbbell in each hand, lay with your chest down on a flat bench.",
@@ -5982,6 +10457,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Lying Supine Dumbbell Curl",
     "muscle": "biceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_Supine_Dumbbell_Curl/0.jpg",
     "instructions": [
       "Lie down on a flat bench face up while holding a dumbbell in each arm on top of your thighs.",
@@ -5996,6 +10472,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Lying T-Bar Row",
     "muscle": "back",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_T-Bar_Row/0.jpg",
     "instructions": [
       "Load up the T-bar Row Machine with the desired weight and adjust the leg height so that your upper chest is at the top of the pad. Tip: In some machines all you can do is stand on the appropriate step that allows you to be at a height that has the upper chest at the top of the pad.",
@@ -6011,6 +10488,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Lying Triceps Press",
     "muscle": "triceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Lying_Triceps_Press/0.jpg",
     "instructions": [
       "Lie on a flat bench with either an e-z bar (my preference) or a straight bar placed on the floor behind your head and your feet on the floor.",
@@ -6021,10 +10499,41 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "assisted-dips",
+    "name": "Machine Assisted Dips",
+    "muscle": "chest",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/assisted-dips-start.webp",
+    "instructions": [
+      "Step onto the assisted dip machine with knees on the pad.",
+      "Grip the parallel bars and support your weight with straight arms.",
+      "Lower your body by bending your elbows until shoulders are below elbows.",
+      "Press back up to the start position.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "machine-back-extension",
+    "name": "Machine Back Extension",
+    "muscle": "back",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/machine-back-extension-start.webp",
+    "instructions": [
+      "Sit in the back extension machine with your feet flat on the foot platform and the roller pad set behind your upper back, just below the shoulder blades.",
+      "Grip the handles at your sides and let your torso come forward into a slight flexion — this is the starting position.",
+      "Push back against the pad by extending your spine until your torso is leaning back and your lower back is fully contracted.",
+      "Pause briefly at full extension, then return to the starting position under control, resisting the weight stack on the way back.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
     "id": "Machine_Bench_Press",
     "name": "Machine Bench Press",
     "muscle": "chest",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Machine_Bench_Press/0.jpg",
     "instructions": [
       "Sit down on the Chest Press Machine and select the weight.",
@@ -6041,6 +10550,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Machine Bicep Curl",
     "muscle": "biceps",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Machine_Bicep_Curl/0.jpg",
     "instructions": [
       "Adjust the seat to the appropriate height and make your weight selection. Place your upper arms against the pads and grasp the handles. This will be your starting position.",
@@ -6050,10 +10560,58 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "machine-calf-raise",
+    "name": "Machine Calf Raise",
+    "muscle": "calves",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/machine-calf-raise-start.webp",
+    "instructions": [
+      "Stand in the calf raise machine with the balls of your feet on the platform.",
+      "Position the shoulder pads firmly.",
+      "Lower your heels below the platform for a full stretch.",
+      "Push through the balls of your feet to rise onto your toes.",
+      "Squeeze your calves at the top.",
+      "Lower with control and repeat."
+    ]
+  },
+  {
+    "id": "machine-chest-fly",
+    "name": "Machine Chest Fly",
+    "muscle": "chest",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/machine-chest-fly-start.webp",
+    "instructions": [
+      "Sit in the chest fly machine and adjust the seat so the handles align with your chest.",
+      "Grip the handles with a slight bend in your elbows.",
+      "Bring the handles together in front of your chest in a smooth arc.",
+      "Squeeze your pectorals at the point of peak contraction.",
+      "Return under control to the starting position without slamming the weight.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "hip-abduction",
+    "name": "Machine Hip Abduction",
+    "muscle": "glutes",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/hip-abduction-start.webp",
+    "instructions": [
+      "Sit in the hip abduction machine with pads against your outer thighs.",
+      "Push your legs apart against the resistance.",
+      "Hold briefly at the widest point.",
+      "Return to the starting position with control.",
+      "Repeat."
+    ]
+  },
+  {
     "id": "Machine_Preacher_Curls",
     "name": "Machine Preacher Curls",
     "muscle": "biceps",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Machine_Preacher_Curls/0.jpg",
     "instructions": [
       "Sit down on the Preacher Curl Machine and select the weight.",
@@ -6064,10 +10622,27 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "machine-seated-crunch",
+    "name": "Machine Seated Crunch",
+    "muscle": "core",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/machine-seated-crunch-start.webp",
+    "instructions": [
+      "Sit in the abdominal crunch machine and grip the handles.",
+      "Position the chest pad against your upper body.",
+      "Contract your abs to crunch your torso forward and down.",
+      "Squeeze at the bottom of the movement.",
+      "Return to the starting position with control.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
     "id": "Machine_Shoulder_Military_Press",
     "name": "Machine Shoulder (Military) Press",
     "muscle": "shoulders",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Machine_Shoulder_Military_Press/0.jpg",
     "instructions": [
       "Sit down on the Shoulder Press Machine and select the weight.",
@@ -6082,6 +10657,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Machine Triceps Extension",
     "muscle": "triceps",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Machine_Triceps_Extension/0.jpg",
     "instructions": [
       "Adjust the seat to the appropriate height and make your weight selection. Place your upper arms against the pads and grasp the handles. This will be your starting position.",
@@ -6095,6 +10671,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Medicine Ball Chest Pass",
     "muscle": "chest",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Medicine_Ball_Chest_Pass/0.jpg",
     "instructions": [
       "You will need a partner for this exercise. Lacking one, this movement can be performed against a wall.",
@@ -6109,6 +10686,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Medicine Ball Full Twist",
     "muscle": "core",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Medicine_Ball_Full_Twist/0.jpg",
     "instructions": [
       "For this exercise you will need a medicine ball and a partner. Stand back to back with your partner, spaced 2-3 feet apart. This will be your starting position.",
@@ -6122,6 +10700,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Medicine Ball Scoop Throw",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Medicine_Ball_Scoop_Throw/0.jpg",
     "instructions": [
       "Assume a semisquat stance with a medicine ball in your hands. Your arms should hang so the ball is near your feet.",
@@ -6130,10 +10709,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "medicine-ball-slam",
+    "name": "Medicine Ball Slam",
+    "muscle": "core",
+    "equipment": "other",
+    "category": "strength",
+    "image": "/repdb/medicine-ball-slam-start.webp",
+    "instructions": [
+      "Stand with feet shoulder-width apart, holding a slam ball in front of your hips.",
+      "Lift the ball overhead by extending the hips and reaching tall.",
+      "Forcefully slam the ball into the floor between your feet, crunching through the core.",
+      "Catch the ball on the bounce or pick it up from the floor.",
+      "Repeat for the recommended number of repetitions."
+    ]
+  },
+  {
     "id": "Middle_Back_Shrug",
     "name": "Middle Back Shrug",
     "muscle": "back",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Middle_Back_Shrug/0.jpg",
     "instructions": [
       "Lie facedown on an incline bench while holding a dumbbell in each hand. Your arms should be fully extended hanging down and pointing towards the floor. The palms of your hands should be facing each other. This will be your starting position.",
@@ -6147,6 +10742,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Middle Back Stretch",
     "muscle": "back",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Middle_Back_Stretch/0.jpg",
     "instructions": [
       "Stand so your feet are shoulder width apart and your hands are on your hips.",
@@ -6158,6 +10754,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Mixed Grip Chin",
     "muscle": "back",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Mixed_Grip_Chin/0.jpg",
     "instructions": [
       "Using a spacing that is just about 1 inch wider than shoulder width, grab a pull-up bar with the palms of one hand facing forward and the palms of the other hand facing towards you. This will be your starting position.",
@@ -6172,6 +10769,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Monster Walk",
     "muscle": "glutes",
     "equipment": "band",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Monster_Walk/0.jpg",
     "instructions": [
       "Place a band around both ankles and another around both knees. There should be enough tension that they are tight when your feet are shoulder width apart.",
@@ -6184,6 +10782,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Mountain Climbers",
     "muscle": "quads",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Mountain_Climbers/0.jpg",
     "instructions": [
       "Begin in a pushup position, with your weight supported by your hands and toes. Flexing the knee and hip, bring one leg until the knee is approximately under the hip. This will be your starting position.",
@@ -6191,10 +10790,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "mountain-pose",
+    "name": "Mountain Pose",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/mountain-pose-main.webp",
+    "instructions": [
+      "Stand with the feet hip-width apart and spread the weight evenly across both feet.",
+      "Engage the thighs lightly and let the tailbone drop so the pelvis is neutral.",
+      "Stack the ribs over the pelvis and the head over the ribs, arms relaxed by the sides.",
+      "Hold the posture for the prescribed time, breathing evenly.",
+      "Notice where the weight sits and rebalance it towards the middle of each foot."
+    ]
+  },
+  {
     "id": "Moving_Claw_Series",
     "name": "Moving Claw Series",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Moving_Claw_Series/0.jpg",
     "instructions": [
       "This move helps prepare your running form to help you excel at sprinting. As you run, be sure to flex the knee, aiming to kick your glutes as the hip extends.",
@@ -6207,6 +10822,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Muscle Snatch",
     "muscle": "hamstrings",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Muscle_Snatch/0.jpg",
     "instructions": [
       "Begin with a loaded barbell held at the mid thigh position with a wide grip. The feet should be directly below the hips, with the feet turned out as needed. Lower the hips, with the chest up and the head looking forward. The shoulders should be just in front of the bar. This will be the starting position.",
@@ -6219,6 +10835,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Muscle Up",
     "muscle": "back",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Muscle_Up/0.jpg",
     "instructions": [
       "Grip the rings using a false grip, with the base of your palms on top of the rings. Initiate a pull up by pulling the elbows down to your side, flexing the elbows.",
@@ -6232,6 +10849,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Narrow Stance Hack Squats",
     "muscle": "quads",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Narrow_Stance_Hack_Squats/0.jpg",
     "instructions": [
       "Place the back of your torso against the back pad of the machine and hook your shoulders under the shoulder pads provided.",
@@ -6248,6 +10866,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Narrow Stance Leg Press",
     "muscle": "quads",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Narrow_Stance_Leg_Press/0.jpg",
     "instructions": [
       "Using a leg press machine, sit down on the machine and place your legs on the platform directly in front of you at a less-than-shoulder-width narrow stance with the toes slightly pointed out. Your feet should be around 3 inches or less apart. Tip: Keep your head up at all times and also maintain the back on the pad at all times.",
@@ -6262,6 +10881,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Narrow Stance Squats",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Narrow_Stance_Squats/0.jpg",
     "instructions": [
       "This exercise is best performed inside a squat rack for safety purposes. To begin, first set the bar on a rack that best matches your height. Once the correct height is chosen and the bar is loaded, step under the bar and place the back of your shoulders (slightly below the neck) across it.",
@@ -6277,6 +10897,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Natural Glute Ham Raise",
     "muscle": "hamstrings",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Natural_Glute_Ham_Raise/0.jpg",
     "instructions": [
       "Using the leg pad of a lat pulldown machine or a preacher bench, position yourself so that your ankles are under the pads, knees on the seat, and you are facing away from the machine. You should be upright and maintaining good posture.",
@@ -6286,21 +10907,11 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Neck-SMR",
-    "name": "Neck-SMR",
-    "muscle": "other",
-    "equipment": "other",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Neck-SMR/0.jpg",
-    "instructions": [
-      "Using a muscle roller or a rolling pin, place the roller behind your head and against your neck. Make sure that you do not place the roller directly against the spine, but turned slightly so that the roller is pressed against the muscles to either side of the spine. This will be your starting position.",
-      "Starting at the top of your neck, slowly roll down the muscles of your neck, pausing at points of tension for 10-30 seconds."
-    ]
-  },
-  {
     "id": "Neck_Press",
     "name": "Neck Press",
     "muscle": "chest",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Neck_Press/0.jpg",
     "instructions": [
       "Lie back on a flat bench. Using a medium-width grip (a grip that creates a 90-degree angle in the middle of the movement between the forearms and the upper arms), lift the bar from the rack and hold it straight over your neck with your arms locked. This will be your starting position.",
@@ -6311,10 +10922,71 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "Neck-SMR",
+    "name": "Neck-SMR",
+    "muscle": "other",
+    "equipment": "other",
+    "category": "stretching",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Neck-SMR/0.jpg",
+    "instructions": [
+      "Using a muscle roller or a rolling pin, place the roller behind your head and against your neck. Make sure that you do not place the roller directly against the spine, but turned slightly so that the roller is pressed against the muscles to either side of the spine. This will be your starting position.",
+      "Starting at the top of your neck, slowly roll down the muscles of your neck, pausing at points of tension for 10-30 seconds."
+    ]
+  },
+  {
+    "id": "negative-pull-ups",
+    "name": "Negative Pull Ups",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/negative-pull-ups-start.webp",
+    "instructions": [
+      "Use a box or jump to position yourself at the top of a pull-up.",
+      "Grip the bar with hands shoulder-width apart.",
+      "Hold your chin above the bar briefly.",
+      "Lower yourself slowly over 3-5 seconds with control.",
+      "Fully extend your arms at the bottom.",
+      "Reset and repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "neutral-grip-pull-ups",
+    "name": "Neutral Grip Pull Ups",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/neutral-grip-pull-ups-start.webp",
+    "instructions": [
+      "Grip parallel bars with palms facing each other.",
+      "Hang with your arms fully extended.",
+      "Pull yourself up until your chin clears the bar.",
+      "Squeeze your lats at the top of the movement.",
+      "Lower yourself with control to the starting position.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "nordic-hamstring-curl",
+    "name": "Nordic Hamstring Curl",
+    "muscle": "hamstrings",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/nordic-hamstring-curl-start.webp",
+    "instructions": [
+      "Kneel on a pad with your ankles anchored under a fixed support.",
+      "Keep your torso upright and your hips extended.",
+      "Slowly lower your body forward by resisting with your hamstrings.",
+      "Catch yourself with your hands just before hitting the floor.",
+      "Push back up and pull yourself to the starting position.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
     "id": "Oblique_Crunches",
     "name": "Oblique Crunches",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Oblique_Crunches/0.jpg",
     "instructions": [
       "Lie flat on the floor with your lower back pressed to the ground. For this exercise, you will need to put one hand beside your head and the other to the side against the floor.",
@@ -6331,6 +11003,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Oblique Crunches - On The Floor",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Oblique_Crunches_-_On_The_Floor/0.jpg",
     "instructions": [
       "Start out by lying on your right side with your legs lying on top of each other. Make sure your knees are bent a little bit.",
@@ -6345,6 +11018,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Olympic Squat",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Olympic_Squat/0.jpg",
     "instructions": [
       "Begin with a barbell supported on top of the traps. The chest should be up, and the head facing forward. Adopt a hip width stance with the feet turned out as needed.",
@@ -6353,10 +11027,23 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "On_Your_Side_Quad_Stretch",
+    "name": "On Your Side Quad Stretch",
+    "muscle": "quads",
+    "equipment": "other",
+    "category": "stretching",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/On_Your_Side_Quad_Stretch/0.jpg",
+    "instructions": [
+      "Start off by lying on your right side, with your right knee bent at a 90-degree angle resting on the floor in front of you (this stabilizes the torso).",
+      "Bend your left knee behind you and hold your left foot with your left hand. To stretch your hip flexor, press your left hip forward as you push your left foot back into your hand. Switch sides."
+    ]
+  },
+  {
     "id": "On-Your-Back_Quad_Stretch",
     "name": "On-Your-Back Quad Stretch",
     "muscle": "quads",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/On-Your-Back_Quad_Stretch/0.jpg",
     "instructions": [
       "Lie on a flat bench or step, and hang one leg and arm over the side.",
@@ -6366,14 +11053,264 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "On_Your_Side_Quad_Stretch",
-    "name": "On Your Side Quad Stretch",
+    "id": "One_Arm_Against_Wall",
+    "name": "One Arm Against Wall",
+    "muscle": "back",
+    "equipment": "other",
+    "category": "stretching",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One_Arm_Against_Wall/0.jpg",
+    "instructions": [
+      "From a standing position, place a bent arm against a wall or doorway.",
+      "Slowly lean toward your arm until you feel a stretch in your lats."
+    ]
+  },
+  {
+    "id": "One_Arm_Chin-Up",
+    "name": "One Arm Chin-Up",
+    "muscle": "back",
+    "equipment": "other",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One_Arm_Chin-Up/0.jpg",
+    "instructions": [
+      "For this exercise, start out by placing a towel around a chin up bar.",
+      "Grab the chin-up bar with your palm facing you. One hand will be grabbing the chin-up bar and the other will be grabbing the towel.",
+      "Bring your torso back around 30 degrees or so while creating a curvature on your lower back and sticking your chest out. This is your starting position.v",
+      "Pull your torso up until the bar touches your upper chest by drawing the shoulders and the upper arms down and back. Exhale as you perform this portion of the movement. Tip: Concentrate on squeezing the back muscles once you reach the full contracted position. The upper torso should remain stationary as it moves through space and only the arms should move. The forearms should do no other work other than hold the bar.",
+      "After a second on the contracted position, start to inhale and slowly lower your torso back to the starting position when your arms are fully extended and the lats are fully stretched.",
+      "Repeat this motion for the prescribed amount of repetitions.",
+      "Switch arms and repeat the movement."
+    ]
+  },
+  {
+    "id": "One_Arm_Dumbbell_Bench_Press",
+    "name": "One Arm Dumbbell Bench Press",
+    "muscle": "chest",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One_Arm_Dumbbell_Bench_Press/0.jpg",
+    "instructions": [
+      "Lie down on a flat bench with a dumbbell in one hand on top of your thigh.",
+      "By using your thigh to help you get the dumbbell up, clean the dumbbell up so that you can hold it in front of you at shoulder width. Use the hand you are not lifting with to help position the dumbbell over you properly.",
+      "Once at shoulder width, rotate your wrist forward so that the palm of your hand is facing away from you. This will be your starting position.",
+      "Bring down the weights slowly to your side as you breathe in. Keep full control of the dumbbell at all times. Tip: Use the hand that you are not lifting with to help keep the dumbbell balance as you may struggle a bit at first. Only use your non-lifting hand if it is needed. Otherwise, keep it resting to the side.",
+      "As you breathe out, push the dumbbells up using your pectoral muscles. Lock your arms in the contracted position, squeeze your chest, hold for a second and then start coming down slowly. Tip: It should take at least twice as long to go down than to come up.",
+      "Repeat the movement for the prescribed amount of repetitions of your training program.",
+      "Switch arms and repeat the movement."
+    ]
+  },
+  {
+    "id": "One_Arm_Dumbbell_Preacher_Curl",
+    "name": "One Arm Dumbbell Preacher Curl",
+    "muscle": "biceps",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One_Arm_Dumbbell_Preacher_Curl/0.jpg",
+    "instructions": [
+      "Grab a dumbbell with the right arm and place the upper arm on top of the preacher bench or the incline bench. The dumbbell should be held at shoulder length. This will be your starting position.",
+      "As you breathe in, slowly lower the dumbbell until your upper arm is extended and the biceps is fully stretched.",
+      "As you exhale, use the biceps to curl the weight up until your biceps is fully contracted and the dumbbell is at shoulder height. Again, remember that to ensure full contraction you need to bring that small finger higher than the thumb.",
+      "Squeeze the biceps hard for a second at the contracted position and repeat for the recommended amount of repetitions.",
+      "Switch arms and repeat the movement."
+    ]
+  },
+  {
+    "id": "One_Arm_Floor_Press",
+    "name": "One Arm Floor Press",
+    "muscle": "triceps",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One_Arm_Floor_Press/0.jpg",
+    "instructions": [
+      "Lie down on a flat surface with your back pressing against the floor or an exercise mat. Make sure your knees are bent.",
+      "Have a partner hand you the bar on one hand. When starting, your arm should be just about fully extended, similar to the starting position of a barbell bench press. However, this time your grip will be neutral (palms facing your torso).",
+      "Make sure the hand you are not using to lift the weight is placed by your side.",
+      "Begin the exercise by lowering the barbell until your elbow touches the ground. Make sure to breathe in as this is the eccentric (lowering part of the exercise).",
+      "Then start lifting the barbell back up to the original starting position. Remember to breathe out during the concentric (lifting part of the exercise).",
+      "Repeat until you have performed your recommended repetitions.",
+      "Switch arms and repeat the movement."
+    ]
+  },
+  {
+    "id": "one-arm-kettlebell-bicep-curl",
+    "name": "One Arm Kettlebell Bicep Curl",
+    "muscle": "biceps",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/one-arm-kettlebell-bicep-curl-start.webp",
+    "instructions": [
+      "Stand tall holding a kettlebell in one hand.",
+      "Keep your elbow pinned to your side.",
+      "Curl the kettlebell toward your shoulder by flexing your bicep.",
+      "Squeeze at the top of the movement.",
+      "Lower the kettlebell with control.",
+      "Complete reps on one side, then switch."
+    ]
+  },
+  {
+    "id": "one-arm-kettlebell-floor-glute-bridge-press",
+    "name": "One Arm Kettlebell Floor Glute Bridge Press",
+    "muscle": "glutes",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/one-arm-kettlebell-floor-glute-bridge-press-start.webp",
+    "instructions": [
+      "Lie on your back with knees bent and feet flat on the floor.",
+      "Hold a kettlebell in one hand at your shoulder.",
+      "Drive your hips up into a glute bridge.",
+      "Press the kettlebell straight up toward the ceiling.",
+      "Lower the kettlebell and your hips with control.",
+      "Complete reps on one side, then switch."
+    ]
+  },
+  {
+    "id": "one-arm-kettlebell-front-squat",
+    "name": "One Arm Kettlebell Front Squat",
+    "muscle": "glutes",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/one-arm-kettlebell-front-squat-start.webp",
+    "instructions": [
+      "Hold a kettlebell in the racked position at one shoulder.",
+      "Stand with feet shoulder-width apart.",
+      "Squat down by bending your knees and hips.",
+      "Keep your chest up and torso upright throughout.",
+      "Drive through your heels to stand back up.",
+      "Complete reps on one side, then switch."
+    ]
+  },
+  {
+    "id": "one-arm-kettlebell-shoulder-press",
+    "name": "One Arm Kettlebell Shoulder Press",
+    "muscle": "shoulders",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/one-arm-kettlebell-shoulder-press-start.webp",
+    "instructions": [
+      "Hold a kettlebell in the racked position at one shoulder.",
+      "Stand tall with feet hip-width apart.",
+      "Press the kettlebell straight overhead until your arm is locked out.",
+      "Keep your core tight throughout.",
+      "Lower the kettlebell back to the rack position with control.",
+      "Complete reps on one side, then switch."
+    ]
+  },
+  {
+    "id": "One_Arm_Lat_Pulldown",
+    "name": "One Arm Lat Pulldown",
+    "muscle": "back",
+    "equipment": "cable",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One_Arm_Lat_Pulldown/0.jpg",
+    "instructions": [
+      "Select an appropriate weight and adjust the knee pad to help keep you down. Grasp the handle with a pronated grip. This will be your starting position.",
+      "Pull the handle down, squeezing your elbow to your side as you flex the elbow.",
+      "Pause at the bottom of the motion, and then slowly return the handle to the starting position.",
+      "For multiple repetitions, avoid completely returning the weight to keep tension on the muscles being worked."
+    ]
+  },
+  {
+    "id": "One_Arm_Pronated_Dumbbell_Triceps_Extension",
+    "name": "One Arm Pronated Dumbbell Triceps Extension",
+    "muscle": "triceps",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One_Arm_Pronated_Dumbbell_Triceps_Extension/0.jpg",
+    "instructions": [
+      "Lie flat on a bench while holding a dumbbell at arms length. Your arm should be perpendicular to your body. The palm of your hand should be facing towards your feet as a pronated grip is required to perform this exercise.",
+      "Place your non lifting hand on your bicep for support.",
+      "Slowly begin to lower the dumbbell down as you breathe in.",
+      "Then, begin lifting the dumbbell upward as you contract the triceps. Remember to breathe out during the concentric (lifting part of the exercise).",
+      "Repeat until you have performed your set repetitions.",
+      "Switch arms and repeat the movement."
+    ]
+  },
+  {
+    "id": "One_Arm_Supinated_Dumbbell_Triceps_Extension",
+    "name": "One Arm Supinated Dumbbell Triceps Extension",
+    "muscle": "triceps",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One_Arm_Supinated_Dumbbell_Triceps_Extension/0.jpg",
+    "instructions": [
+      "Lie flat on a bench while holding a dumbbell at arms length. Your arm should be perpendicular to your body. The palm of your hand should be facing towards your face as a supinated grip is required to perform this exercise.",
+      "Place your non lifting hand on your bicep for support.",
+      "Slowly begin to lower the dumbbell down as you breathe in.",
+      "Then, begin lifting the dumbbell upward as you contract the triceps. Remember to breathe out during the concentric (lifting part of the exercise).",
+      "Repeat until you have performed your set repetitions.",
+      "Switch arms and repeat the movement.",
+      "Switch arms again and repeat the movement."
+    ]
+  },
+  {
+    "id": "One_Half_Locust",
+    "name": "One Half Locust",
     "muscle": "quads",
     "equipment": "other",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/On_Your_Side_Quad_Stretch/0.jpg",
+    "category": "stretching",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One_Half_Locust/0.jpg",
     "instructions": [
-      "Start off by lying on your right side, with your right knee bent at a 90-degree angle resting on the floor in front of you (this stabilizes the torso).",
-      "Bend your left knee behind you and hold your left foot with your left hand. To stretch your hip flexor, press your left hip forward as you push your left foot back into your hand. Switch sides."
+      "Lie facedown on the floor.",
+      "Put your left hand under your left hipbone to pad your hip and pubic bone.",
+      "Bend your right knee so you can hold the foot in your right hand.",
+      "Lift the foot in the air and simultaneously lift your shoulders off the floor. This also stretches the right hip flexor and the chest and shoulders. Switch sides. If it doesn't bother your back, you can try it with both arms and legs at the same time."
+    ]
+  },
+  {
+    "id": "One_Handed_Hang",
+    "name": "One Handed Hang",
+    "muscle": "back",
+    "equipment": "other",
+    "category": "stretching",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One_Handed_Hang/0.jpg",
+    "instructions": [
+      "Grab onto a chinup bar with one hand, using a pronated grip. Keep your feet on the floor or a step. Allow the majority of your weight to hang from that hand, while keeping your feet on the ground. Hold for 10-20 seconds and switch sides."
+    ]
+  },
+  {
+    "id": "One_Knee_To_Chest",
+    "name": "One Knee To Chest",
+    "muscle": "glutes",
+    "equipment": "other",
+    "category": "stretching",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One_Knee_To_Chest/0.jpg",
+    "instructions": [
+      "Start off by lying on the floor.",
+      "Extend one leg straight and pull the other knee to your chest. Hold under the knee joint to protect the kneecap.",
+      "Gently tug that knee toward your nose.",
+      "Switch sides. This stretches the buttocks and lower back of the bent leg and the hip flexor of the straight leg."
+    ]
+  },
+  {
+    "id": "One_Leg_Barbell_Squat",
+    "name": "One Leg Barbell Squat",
+    "muscle": "quads",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One_Leg_Barbell_Squat/0.jpg",
+    "instructions": [
+      "Start by standing about 2 to 3 feet in front of a flat bench with your back facing the bench. Have a barbell in front of you on the floor. Tip: Your feet should be shoulder width apart from each other.",
+      "Bend the knees and use a pronated grip with your hands being wider than shoulder width apart from each other to lift the barbell up until you can rest it on your chest.",
+      "Then lift the barbell over your head and rest it on the base of your neck. Move one foot back so that your toe is resting on the flat bench. Your other foot should be stationary in front of you. Keep your head up at all times as looking down will get you off balance and also maintain a straight back. Tip: Make sure your back is straight and chest is out while performing this exercise.",
+      "As you inhale, slowly lower your leg until your thigh is parallel to the floor. At this point, your knee should be over your toes. Your chest should be directly above the middle of your thigh.",
+      "Leading with the chest and hips and contracting the quadriceps, elevate your leg back to the starting position as you exhale.",
+      "Repeat for the recommended amount of repetitions.",
+      "Switch legs and repeat the movement."
+    ]
+  },
+  {
+    "id": "one-arm-dumbbell-push-press",
+    "name": "One-Arm Dumbbell Push Press",
+    "muscle": "shoulders",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/one-arm-dumbbell-push-press-start.webp",
+    "instructions": [
+      "Stand holding a dumbbell at one shoulder, palm facing inward (neutral).",
+      "Feet shoulder-width, core braced, free arm out to the side for balance.",
+      "Dip by bending the knees slightly, keeping the torso vertical.",
+      "Explosively extend the legs and press the dumbbell overhead in one motion.",
+      "Lock out overhead, then lower back to the shoulder under control.",
+      "Complete all reps on one side, then switch."
     ]
   },
   {
@@ -6381,6 +11318,7 @@ export const generatedExercises: Exercise[] = [
     "name": "One-Arm Dumbbell Row",
     "muscle": "back",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One-Arm_Dumbbell_Row/0.jpg",
     "instructions": [
       "Choose a flat bench and place a dumbbell on each side of it.",
@@ -6393,10 +11331,27 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "one-arm-dumbbell-swing",
+    "name": "One-Arm Dumbbell Swing",
+    "muscle": "glutes",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/one-arm-dumbbell-swing-start.webp",
+    "instructions": [
+      "Stand with feet shoulder-width apart, a dumbbell on the floor slightly in front of you.",
+      "Hinge at your hips, keeping a flat back, and grasp the dumbbell with one hand.",
+      "Hike the dumbbell back between your legs, then explosively drive your hips forward.",
+      "Swing the dumbbell up to chest height, keeping your arm relaxed and straight.",
+      "Allow the dumbbell to swing back down, hinging at the hips as it descends.",
+      "Repeat for desired reps per side, maintaining control."
+    ]
+  },
+  {
     "id": "One-Arm_Flat_Bench_Dumbbell_Flye",
     "name": "One-Arm Flat Bench Dumbbell Flye",
     "muscle": "chest",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One-Arm_Flat_Bench_Dumbbell_Flye/0.jpg",
     "instructions": [
       "Lie down on a flat bench with a dumbbell in one hand resting on top of your thigh. The palm of your hand with the dumbbell in it should be at a neutral grip.",
@@ -6412,6 +11367,7 @@ export const generatedExercises: Exercise[] = [
     "name": "One-Arm High-Pulley Cable Side Bends",
     "muscle": "core",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One-Arm_High-Pulley_Cable_Side_Bends/0.jpg",
     "instructions": [
       "Connect a standard handle to a tower. Move cable to highest pulley position.",
@@ -6429,6 +11385,7 @@ export const generatedExercises: Exercise[] = [
     "name": "One-Arm Incline Lateral Raise",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One-Arm_Incline_Lateral_Raise/0.jpg",
     "instructions": [
       "Lie down sideways on an incline bench press with a dumbbell in the hand. Make sure the shoulder is pressing against the incline bench and the arm is lying across your body with the palm around your navel.",
@@ -6440,10 +11397,27 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "one-arm-kettlebell-bottoms-up-press",
+    "name": "One-Arm Kettlebell Bottoms-Up Press",
+    "muscle": "shoulders",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/one-arm-kettlebell-bottoms-up-press-start.webp",
+    "instructions": [
+      "Clean a light kettlebell to the rack position, then tilt it so the bell points up and the handle is at the palm.",
+      "Grip the handle hard; wrist absolutely straight and vertical.",
+      "Brace the core and press the bell straight up without letting it tip.",
+      "Lock out overhead with the bell still perfectly upright.",
+      "Lower slowly back to the rack position keeping the bell vertical the entire descent.",
+      "Complete all reps on one side, then switch."
+    ]
+  },
+  {
     "id": "One-Arm_Kettlebell_Clean",
     "name": "One-Arm Kettlebell Clean",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One-Arm_Kettlebell_Clean/0.jpg",
     "instructions": [
       "Place a kettlebell between your feet. As you bend down to grab the kettlebell, push your butt back and keep your eyes looking forward.",
@@ -6456,6 +11430,7 @@ export const generatedExercises: Exercise[] = [
     "name": "One-Arm Kettlebell Clean and Jerk",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One-Arm_Kettlebell_Clean_and_Jerk/0.jpg",
     "instructions": [
       "Hold a kettlebell by the handle.",
@@ -6471,6 +11446,7 @@ export const generatedExercises: Exercise[] = [
     "name": "One-Arm Kettlebell Floor Press",
     "muscle": "chest",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One-Arm_Kettlebell_Floor_Press/0.jpg",
     "instructions": [
       "Lie on the floor holding a kettlebell with one hand, with your upper arm supported by the floor. The palm should be facing in.",
@@ -6483,6 +11459,7 @@ export const generatedExercises: Exercise[] = [
     "name": "One-Arm Kettlebell Jerk",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One-Arm_Kettlebell_Jerk/0.jpg",
     "instructions": [
       "Hold a kettlebell by the handle. Clean the kettlebell to your shoulder by extending through the legs and hips as you pull the kettlebell towards your shoulder. Rotate your wrist as you do so, so that the palm faces forward. This will be your starting position.",
@@ -6496,6 +11473,7 @@ export const generatedExercises: Exercise[] = [
     "name": "One-Arm Kettlebell Military Press To The Side",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One-Arm_Kettlebell_Military_Press_To_The_Side/0.jpg",
     "instructions": [
       "Clean a kettlebell to your shoulder. Clean the kettlebell to your shoulder by extending through the legs and hips as you pull the kettlebell towards your shoulder. Rotate your wrist as you do so, so that the palm faces inward. This will be your starting position.",
@@ -6508,6 +11486,7 @@ export const generatedExercises: Exercise[] = [
     "name": "One-Arm Kettlebell Para Press",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One-Arm_Kettlebell_Para_Press/0.jpg",
     "instructions": [
       "Clean a kettlebell to your shoulder. Clean the kettlebell to your shoulder by extending through the legs and hips as you pull the kettlebell towards your shoulder. Rotate your wrist as you do so, so that the palm faces forward. This will be your starting position.",
@@ -6520,6 +11499,7 @@ export const generatedExercises: Exercise[] = [
     "name": "One-Arm Kettlebell Push Press",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One-Arm_Kettlebell_Push_Press/0.jpg",
     "instructions": [
       "Hold a kettlebell by the handle. Clean the kettlebell to your shoulder by extending through the legs and hips as you pull the kettlebell towards your shoulder. Rotate your wrist as you do so, so that the palm faces forward. This will be your starting position.",
@@ -6532,6 +11512,7 @@ export const generatedExercises: Exercise[] = [
     "name": "One-Arm Kettlebell Row",
     "muscle": "back",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One-Arm_Kettlebell_Row/0.jpg",
     "instructions": [
       "Place a kettlebell in front of your feet. Bend your knees slightly and then push your butt out as much as possible as you bend over to get in the starting position. Grab the kettlebell and pull it to your stomach, retracting your shoulder blade and flexing the elbow. Keep your back straight. Lower and repeat."
@@ -6542,6 +11523,7 @@ export const generatedExercises: Exercise[] = [
     "name": "One-Arm Kettlebell Snatch",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One-Arm_Kettlebell_Snatch/0.jpg",
     "instructions": [
       "Place a kettlebell between your feet. Bend your knees and push your butt back to get in the proper starting position.",
@@ -6554,6 +11536,7 @@ export const generatedExercises: Exercise[] = [
     "name": "One-Arm Kettlebell Split Jerk",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One-Arm_Kettlebell_Split_Jerk/0.jpg",
     "instructions": [
       "Hold a kettlebell by the handle. Clean the kettlebell to your shoulder by extending through the legs and hips as you pull the kettlebell towards your shoulder. Rotate your wrist as you do so, so that the palm faces forward. This will be your starting position.",
@@ -6568,6 +11551,7 @@ export const generatedExercises: Exercise[] = [
     "name": "One-Arm Kettlebell Split Snatch",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One-Arm_Kettlebell_Split_Snatch/0.jpg",
     "instructions": [
       "Hold a kettlebell in one hand by the handle.",
@@ -6581,14 +11565,54 @@ export const generatedExercises: Exercise[] = [
     "name": "One-Arm Kettlebell Swings",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One-Arm_Kettlebell_Swings/0.jpg",
-    "instructions": []
+    "instructions": [
+      "Stand with feet shoulder-width apart and a kettlebell on the floor in front of you.",
+      "Hinge at the hips and grip the kettlebell with one hand.",
+      "Hike the kettlebell back between your legs.",
+      "Drive your hips forward to swing the kettlebell to chest height.",
+      "Let gravity bring the kettlebell back between your legs.",
+      "Complete reps on one side, then switch."
+    ]
+  },
+  {
+    "id": "one-arm-kettlebell-tricep-kickback",
+    "name": "One-Arm Kettlebell Tricep Kickback",
+    "muscle": "triceps",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/one-arm-kettlebell-tricep-kickback-start.webp",
+    "instructions": [
+      "Hinge forward at the hips with a flat back, knees softly bent.",
+      "Hold a kettlebell by the handle in one hand, palm facing the body.",
+      "Pin the upper arm to the side so it is parallel to the floor; the forearm hangs straight down.",
+      "Extend the elbow back to straighten the arm fully behind you, keeping the upper arm motionless.",
+      "Squeeze the tricep at lockout, then return under control to the starting position.",
+      "Complete all reps on one side, then switch hands."
+    ]
+  },
+  {
+    "id": "one-arm-landmine-press",
+    "name": "One-Arm Landmine Press",
+    "muscle": "shoulders",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/one-arm-landmine-press-start.webp",
+    "instructions": [
+      "Anchor one end of a barbell in a landmine attachment and load the free end.",
+      "Kneel on one knee or stand and grip the sleeve end at shoulder height with one hand.",
+      "Press the bar upward and forward along its arc until the arm is fully extended.",
+      "Lower the bar back to shoulder height under control.",
+      "Complete all reps before switching sides."
+    ]
   },
   {
     "id": "One-Arm_Long_Bar_Row",
     "name": "One-Arm Long Bar Row",
     "muscle": "back",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One-Arm_Long_Bar_Row/0.jpg",
     "instructions": [
       "Position a bar into a landmine or in a corner to keep it from moving. Load an appropriate weight onto your end.",
@@ -6603,6 +11627,7 @@ export const generatedExercises: Exercise[] = [
     "name": "One-Arm Medicine Ball Slam",
     "muscle": "core",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One-Arm_Medicine_Ball_Slam/0.jpg",
     "instructions": [
       "Start in a standing position with a staggered, athletic stance. Hold a medicine ball in one hand, on the same side as your back leg. This will be your starting position.",
@@ -6616,6 +11641,7 @@ export const generatedExercises: Exercise[] = [
     "name": "One-Arm Open Palm Kettlebell Clean",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One-Arm_Open_Palm_Kettlebell_Clean/0.jpg",
     "instructions": [
       "Place one kettlebell between your feet.",
@@ -6629,6 +11655,7 @@ export const generatedExercises: Exercise[] = [
     "name": "One-Arm Overhead Kettlebell Squats",
     "muscle": "quads",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One-Arm_Overhead_Kettlebell_Squats/0.jpg",
     "instructions": [
       "Clean and press a kettlebell with one arm. Clean the kettlebell to your shoulder by extending through the legs and hips as you pull the kettlebell towards your shoulder. Rotate your wrist as you do so. Press the weight overhead by extending through the elbow.This will be your starting position.",
@@ -6641,6 +11668,7 @@ export const generatedExercises: Exercise[] = [
     "name": "One-Arm Side Deadlift",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One-Arm_Side_Deadlift/0.jpg",
     "instructions": [
       "Stand to the side of a barbell next to its center. Bend your knees and lower your body until you are able to reach the barbell.",
@@ -6656,6 +11684,7 @@ export const generatedExercises: Exercise[] = [
     "name": "One-Arm Side Laterals",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One-Arm_Side_Laterals/0.jpg",
     "instructions": [
       "Pick a dumbbell and place it in one of your hands. Your non lifting hand should be used to grab something steady such as an incline bench press. Lean towards your lifting arm and away from the hand that is gripping the incline bench as this will allow you to keep your balance.",
@@ -6667,10 +11696,45 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "one-arm-single-leg-dumbbell-romanian-deadlift",
+    "name": "One-Arm Single-Leg Dumbbell Romanian Deadlift",
+    "muscle": "glutes",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/one-arm-single-leg-dumbbell-romanian-deadlift-start.webp",
+    "instructions": [
+      "Stand on one leg holding a dumbbell in the opposite hand.",
+      "Free arm out to the side for balance, free leg hovering just off the floor.",
+      "Hinge at the standing hip, pushing it back while the free leg extends behind to counterbalance.",
+      "Keep the hips square to the floor — do not open them to the side.",
+      "Lower the dumbbell toward the foot of the standing leg, feeling a deep hamstring stretch.",
+      "Drive the hip forward to return to standing under control.",
+      "Complete all reps on one side, then switch."
+    ]
+  },
+  {
+    "id": "one-arm-single-leg-kettlebell-romanian-deadlift",
+    "name": "One-Arm Single-Leg Kettlebell Romanian Deadlift",
+    "muscle": "glutes",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/one-arm-single-leg-kettlebell-romanian-deadlift-start.webp",
+    "instructions": [
+      "Stand on one leg holding a kettlebell in the opposite hand by the handle.",
+      "Free arm out to the side for balance, free leg hovering behind.",
+      "Hinge at the standing hip, pushing it back while the free leg extends to counterbalance.",
+      "Keep hips square to the floor; the kettlebell tracks straight down the shin.",
+      "Feel a deep hamstring stretch on the standing leg at the bottom.",
+      "Drive the hip forward to return to standing.",
+      "Complete all reps on one side, then switch."
+    ]
+  },
+  {
     "id": "One-Legged_Cable_Kickback",
     "name": "One-Legged Cable Kickback",
     "muscle": "glutes",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One-Legged_Cable_Kickback/0.jpg",
     "instructions": [
       "Hook a leather ankle cuff to a low cable pulley and then attach the cuff to your ankle.",
@@ -6682,179 +11746,11 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "One_Arm_Against_Wall",
-    "name": "One Arm Against Wall",
-    "muscle": "back",
-    "equipment": "other",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One_Arm_Against_Wall/0.jpg",
-    "instructions": [
-      "From a standing position, place a bent arm against a wall or doorway.",
-      "Slowly lean toward your arm until you feel a stretch in your lats."
-    ]
-  },
-  {
-    "id": "One_Arm_Chin-Up",
-    "name": "One Arm Chin-Up",
-    "muscle": "back",
-    "equipment": "other",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One_Arm_Chin-Up/0.jpg",
-    "instructions": [
-      "For this exercise, start out by placing a towel around a chin up bar.",
-      "Grab the chin-up bar with your palm facing you. One hand will be grabbing the chin-up bar and the other will be grabbing the towel.",
-      "Bring your torso back around 30 degrees or so while creating a curvature on your lower back and sticking your chest out. This is your starting position.v",
-      "Pull your torso up until the bar touches your upper chest by drawing the shoulders and the upper arms down and back. Exhale as you perform this portion of the movement. Tip: Concentrate on squeezing the back muscles once you reach the full contracted position. The upper torso should remain stationary as it moves through space and only the arms should move. The forearms should do no other work other than hold the bar.",
-      "After a second on the contracted position, start to inhale and slowly lower your torso back to the starting position when your arms are fully extended and the lats are fully stretched.",
-      "Repeat this motion for the prescribed amount of repetitions.",
-      "Switch arms and repeat the movement."
-    ]
-  },
-  {
-    "id": "One_Arm_Dumbbell_Bench_Press",
-    "name": "One Arm Dumbbell Bench Press",
-    "muscle": "chest",
-    "equipment": "dumbbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One_Arm_Dumbbell_Bench_Press/0.jpg",
-    "instructions": [
-      "Lie down on a flat bench with a dumbbell in one hand on top of your thigh.",
-      "By using your thigh to help you get the dumbbell up, clean the dumbbell up so that you can hold it in front of you at shoulder width. Use the hand you are not lifting with to help position the dumbbell over you properly.",
-      "Once at shoulder width, rotate your wrist forward so that the palm of your hand is facing away from you. This will be your starting position.",
-      "Bring down the weights slowly to your side as you breathe in. Keep full control of the dumbbell at all times. Tip: Use the hand that you are not lifting with to help keep the dumbbell balance as you may struggle a bit at first. Only use your non-lifting hand if it is needed. Otherwise, keep it resting to the side.",
-      "As you breathe out, push the dumbbells up using your pectoral muscles. Lock your arms in the contracted position, squeeze your chest, hold for a second and then start coming down slowly. Tip: It should take at least twice as long to go down than to come up.",
-      "Repeat the movement for the prescribed amount of repetitions of your training program.",
-      "Switch arms and repeat the movement."
-    ]
-  },
-  {
-    "id": "One_Arm_Dumbbell_Preacher_Curl",
-    "name": "One Arm Dumbbell Preacher Curl",
-    "muscle": "biceps",
-    "equipment": "dumbbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One_Arm_Dumbbell_Preacher_Curl/0.jpg",
-    "instructions": [
-      "Grab a dumbbell with the right arm and place the upper arm on top of the preacher bench or the incline bench. The dumbbell should be held at shoulder length. This will be your starting position.",
-      "As you breathe in, slowly lower the dumbbell until your upper arm is extended and the biceps is fully stretched.",
-      "As you exhale, use the biceps to curl the weight up until your biceps is fully contracted and the dumbbell is at shoulder height. Again, remember that to ensure full contraction you need to bring that small finger higher than the thumb.",
-      "Squeeze the biceps hard for a second at the contracted position and repeat for the recommended amount of repetitions.",
-      "Switch arms and repeat the movement."
-    ]
-  },
-  {
-    "id": "One_Arm_Floor_Press",
-    "name": "One Arm Floor Press",
-    "muscle": "triceps",
-    "equipment": "barbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One_Arm_Floor_Press/0.jpg",
-    "instructions": [
-      "Lie down on a flat surface with your back pressing against the floor or an exercise mat. Make sure your knees are bent.",
-      "Have a partner hand you the bar on one hand. When starting, your arm should be just about fully extended, similar to the starting position of a barbell bench press. However, this time your grip will be neutral (palms facing your torso).",
-      "Make sure the hand you are not using to lift the weight is placed by your side.",
-      "Begin the exercise by lowering the barbell until your elbow touches the ground. Make sure to breathe in as this is the eccentric (lowering part of the exercise).",
-      "Then start lifting the barbell back up to the original starting position. Remember to breathe out during the concentric (lifting part of the exercise).",
-      "Repeat until you have performed your recommended repetitions.",
-      "Switch arms and repeat the movement."
-    ]
-  },
-  {
-    "id": "One_Arm_Lat_Pulldown",
-    "name": "One Arm Lat Pulldown",
-    "muscle": "back",
-    "equipment": "cable",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One_Arm_Lat_Pulldown/0.jpg",
-    "instructions": [
-      "Select an appropriate weight and adjust the knee pad to help keep you down. Grasp the handle with a pronated grip. This will be your starting position.",
-      "Pull the handle down, squeezing your elbow to your side as you flex the elbow.",
-      "Pause at the bottom of the motion, and then slowly return the handle to the starting position.",
-      "For multiple repetitions, avoid completely returning the weight to keep tension on the muscles being worked."
-    ]
-  },
-  {
-    "id": "One_Arm_Pronated_Dumbbell_Triceps_Extension",
-    "name": "One Arm Pronated Dumbbell Triceps Extension",
-    "muscle": "triceps",
-    "equipment": "dumbbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One_Arm_Pronated_Dumbbell_Triceps_Extension/0.jpg",
-    "instructions": [
-      "Lie flat on a bench while holding a dumbbell at arms length. Your arm should be perpendicular to your body. The palm of your hand should be facing towards your feet as a pronated grip is required to perform this exercise.",
-      "Place your non lifting hand on your bicep for support.",
-      "Slowly begin to lower the dumbbell down as you breathe in.",
-      "Then, begin lifting the dumbbell upward as you contract the triceps. Remember to breathe out during the concentric (lifting part of the exercise).",
-      "Repeat until you have performed your set repetitions.",
-      "Switch arms and repeat the movement."
-    ]
-  },
-  {
-    "id": "One_Arm_Supinated_Dumbbell_Triceps_Extension",
-    "name": "One Arm Supinated Dumbbell Triceps Extension",
-    "muscle": "triceps",
-    "equipment": "dumbbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One_Arm_Supinated_Dumbbell_Triceps_Extension/0.jpg",
-    "instructions": [
-      "Lie flat on a bench while holding a dumbbell at arms length. Your arm should be perpendicular to your body. The palm of your hand should be facing towards your face as a supinated grip is required to perform this exercise.",
-      "Place your non lifting hand on your bicep for support.",
-      "Slowly begin to lower the dumbbell down as you breathe in.",
-      "Then, begin lifting the dumbbell upward as you contract the triceps. Remember to breathe out during the concentric (lifting part of the exercise).",
-      "Repeat until you have performed your set repetitions.",
-      "Switch arms and repeat the movement.",
-      "Switch arms again and repeat the movement."
-    ]
-  },
-  {
-    "id": "One_Half_Locust",
-    "name": "One Half Locust",
-    "muscle": "quads",
-    "equipment": "other",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One_Half_Locust/0.jpg",
-    "instructions": [
-      "Lie facedown on the floor.",
-      "Put your left hand under your left hipbone to pad your hip and pubic bone.",
-      "Bend your right knee so you can hold the foot in your right hand.",
-      "Lift the foot in the air and simultaneously lift your shoulders off the floor. This also stretches the right hip flexor and the chest and shoulders. Switch sides. If it doesn't bother your back, you can try it with both arms and legs at the same time."
-    ]
-  },
-  {
-    "id": "One_Handed_Hang",
-    "name": "One Handed Hang",
-    "muscle": "back",
-    "equipment": "other",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One_Handed_Hang/0.jpg",
-    "instructions": [
-      "Grab onto a chinup bar with one hand, using a pronated grip. Keep your feet on the floor or a step. Allow the majority of your weight to hang from that hand, while keeping your feet on the ground. Hold for 10-20 seconds and switch sides."
-    ]
-  },
-  {
-    "id": "One_Knee_To_Chest",
-    "name": "One Knee To Chest",
-    "muscle": "glutes",
-    "equipment": "other",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One_Knee_To_Chest/0.jpg",
-    "instructions": [
-      "Start off by lying on the floor.",
-      "Extend one leg straight and pull the other knee to your chest. Hold under the knee joint to protect the kneecap.",
-      "Gently tug that knee toward your nose.",
-      "Switch sides. This stretches the buttocks and lower back of the bent leg and the hip flexor of the straight leg."
-    ]
-  },
-  {
-    "id": "One_Leg_Barbell_Squat",
-    "name": "One Leg Barbell Squat",
-    "muscle": "quads",
-    "equipment": "barbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/One_Leg_Barbell_Squat/0.jpg",
-    "instructions": [
-      "Start by standing about 2 to 3 feet in front of a flat bench with your back facing the bench. Have a barbell in front of you on the floor. Tip: Your feet should be shoulder width apart from each other.",
-      "Bend the knees and use a pronated grip with your hands being wider than shoulder width apart from each other to lift the barbell up until you can rest it on your chest.",
-      "Then lift the barbell over your head and rest it on the base of your neck. Move one foot back so that your toe is resting on the flat bench. Your other foot should be stationary in front of you. Keep your head up at all times as looking down will get you off balance and also maintain a straight back. Tip: Make sure your back is straight and chest is out while performing this exercise.",
-      "As you inhale, slowly lower your leg until your thigh is parallel to the floor. At this point, your knee should be over your toes. Your chest should be directly above the middle of your thigh.",
-      "Leading with the chest and hips and contracting the quadriceps, elevate your leg back to the starting position as you exhale.",
-      "Repeat for the recommended amount of repetitions.",
-      "Switch legs and repeat the movement."
-    ]
-  },
-  {
     "id": "Open_Palm_Kettlebell_Clean",
     "name": "Open Palm Kettlebell Clean",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Open_Palm_Kettlebell_Clean/0.jpg",
     "instructions": [
       "Place one kettlebell between your feet. Clean the kettlebell by extending through the legs and hips as you raise the kettlebell towards your shoulders.",
@@ -6867,6 +11763,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Otis-Up",
     "muscle": "core",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Otis-Up/0.jpg",
     "instructions": [
       "Secure your feet and lay back on the floor. Your knees should be bent. Hold a weight with both hands to your chest. This will be your starting position.",
@@ -6880,6 +11777,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Overhead Cable Curl",
     "muscle": "biceps",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Overhead_Cable_Curl/0.jpg",
     "instructions": [
       "To begin, set a weight that is comfortable on each side of the pulley machine. Note: Make sure that the amount of weight selected is the same on each side.",
@@ -6895,6 +11793,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Overhead Lat",
     "muscle": "back",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Overhead_Lat/0.jpg",
     "instructions": [
       "Sit upright on the floor with your partner behind you. Raise one arm straight up, and flex the elbow, attempting to touch your hand to your back. Your parner should hold your tricep and wrist. This will be your starting position.",
@@ -6907,6 +11806,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Overhead Slam",
     "muscle": "back",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Overhead_Slam/0.jpg",
     "instructions": [
       "Hold a medine ball with both hands and stand with your feet at shoulder width. This will be your starting position.",
@@ -6920,6 +11820,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Overhead Squat",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Overhead_Squat/0.jpg",
     "instructions": [
       "Start out by having a barbell in front of you on the floor. Your feet should be wider than shoulder width apart from each other.",
@@ -6935,6 +11836,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Overhead Stretch",
     "muscle": "core",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Overhead_Stretch/0.jpg",
     "instructions": [
       "Standing straight up, lace your fingers together and open your palms to the ceiling. Keep your shoulders down as you extend your arms up.",
@@ -6942,10 +11844,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "overhead-tricep-extension",
+    "name": "Overhead Tricep Extension",
+    "muscle": "triceps",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/overhead-tricep-extension-start.webp",
+    "instructions": [
+      "Stand or sit holding a dumbbell overhead with both hands.",
+      "Lower the dumbbell behind your head by bending your elbows.",
+      "Extend your arms back to the starting position.",
+      "Keep your elbows close to your head throughout.",
+      "Repeat."
+    ]
+  },
+  {
     "id": "Overhead_Triceps",
     "name": "Overhead Triceps",
     "muscle": "triceps",
     "equipment": "bodyweight",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Overhead_Triceps/0.jpg",
     "instructions": [
       "Sit upright on the floor with your partner behind you. Raise one arm straight up, and flex the elbow, attempting to touch your hand to your back. Your parner should hold your elbow and wrist. This will be your starting position.",
@@ -6954,10 +11872,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "overhead-triceps-stretch",
+    "name": "Overhead Triceps Stretch",
+    "muscle": "triceps",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/overhead-triceps-stretch-main.webp",
+    "instructions": [
+      "Raise one arm overhead and bend the elbow.",
+      "Let your hand drop down behind your head.",
+      "Use the other hand to press the bent elbow back.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
     "id": "Pallof_Press",
     "name": "Pallof Press",
     "muscle": "core",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Pallof_Press/0.jpg",
     "instructions": [
       "Connect a standard handle to a tower, and—if possible—position the cable to shoulder height. If not, a low pulley will suffice.",
@@ -6973,6 +11907,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Pallof Press With Rotation",
     "muscle": "core",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Pallof_Press_With_Rotation/0.jpg",
     "instructions": [
       "Connect a standard handle to a tower, and position the cable to shoulder height.",
@@ -6991,6 +11926,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Palms-Down Dumbbell Wrist Curl Over A Bench",
     "muscle": "other",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Palms-Down_Dumbbell_Wrist_Curl_Over_A_Bench/0.jpg",
     "instructions": [
       "Start out by placing two dumbbells on one side of a flat bench.",
@@ -7007,6 +11943,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Palms-Down Wrist Curl Over A Bench",
     "muscle": "other",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Palms-Down_Wrist_Curl_Over_A_Bench/0.jpg",
     "instructions": [
       "Start out by placing a barbell on one side of a flat bench.",
@@ -7023,6 +11960,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Palms-Up Barbell Wrist Curl Over A Bench",
     "muscle": "other",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Palms-Up_Barbell_Wrist_Curl_Over_A_Bench/0.jpg",
     "instructions": [
       "Start out by placing a barbell on one side of a flat bench.",
@@ -7039,6 +11977,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Palms-Up Dumbbell Wrist Curl Over A Bench",
     "muscle": "other",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Palms-Up_Dumbbell_Wrist_Curl_Over_A_Bench/0.jpg",
     "instructions": [
       "Start out by placing two dumbbells on one side of a flat bench.",
@@ -7055,6 +11994,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Parallel Bar Dip",
     "muscle": "triceps",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Parallel_Bar_Dip/0.jpg",
     "instructions": [
       "Stand between a set of parallel bars. Place a hand on each bar, and then take a small jump to help you get into the starting position with your arms locked out.",
@@ -7064,10 +12004,120 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "pause-deadlift",
+    "name": "Pause Deadlift",
+    "muscle": "back",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/deadlift-start.webp",
+    "instructions": [
+      "Set up for a conventional deadlift.",
+      "Pull the bar off the floor and pause when it passes your knees.",
+      "Hold for 2–3 seconds, then complete the lift.",
+      "Lower under control.",
+      "Repeat."
+    ]
+  },
+  {
+    "id": "pause-pull-up",
+    "name": "Pause Pull-Up",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/pause-pull-up-start.webp",
+    "instructions": [
+      "Hang from a pull-up bar with an overhand grip, arms fully extended.",
+      "Pull yourself up until your chin clears the bar.",
+      "Pause and hold that top position for a moment.",
+      "Lower yourself back down under control to a full hang.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "pause-squat",
+    "name": "Pause Squat",
+    "muscle": "glutes",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/pause-squat-start.webp",
+    "instructions": [
+      "Unrack a barbell and rest it across your upper back.",
+      "Stand with feet shoulder-width apart.",
+      "Squat down until your thighs are parallel to the floor.",
+      "Hold the bottom position for 2-3 seconds.",
+      "Drive through your heels to stand back up.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "paused-bench-press",
+    "name": "Paused Bench Press",
+    "muscle": "chest",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/paused-bench-press-start.webp",
+    "instructions": [
+      "Lie on a flat bench and grip the barbell slightly wider than shoulder-width.",
+      "Unrack the bar and lower it to your chest.",
+      "Pause on your chest for 1-2 seconds.",
+      "Press the bar back up until your arms are fully extended.",
+      "Control the descent on every rep.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "paused-incline-bench-press",
+    "name": "Paused Incline Bench Press",
+    "muscle": "shoulders",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/paused-incline-bench-press-start.webp",
+    "instructions": [
+      "Lie on an incline bench and grip the barbell slightly wider than shoulder-width.",
+      "Unrack the bar and lower it to your upper chest.",
+      "Pause on your chest for 1-2 seconds.",
+      "Press the bar back up until your arms are fully extended.",
+      "Keep your shoulder blades retracted throughout.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "paused-ohp",
+    "name": "Paused Overhead Press",
+    "muscle": "shoulders",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/ohp-start.webp",
+    "instructions": [
+      "Set up with a barbell racked at shoulder height, feet shoulder-width apart, and the core braced.",
+      "Press the bar straight overhead until the elbows are fully locked out.",
+      "Lower the bar under control back down to the front of the shoulders.",
+      "Hold a full one-second pause at the shoulders, keeping tension and eliminating any bounce.",
+      "Press back up from the dead stop without using leg drive."
+    ]
+  },
+  {
+    "id": "pec-deck",
+    "name": "Pec Deck",
+    "muscle": "chest",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/pec-deck-start.webp",
+    "instructions": [
+      "Sit in the pec deck machine and place your forearms against the pads.",
+      "Adjust the seat so pads align with mid-chest height.",
+      "Squeeze the pads together in front of your chest.",
+      "Hold the contraction briefly at the center.",
+      "Return under control to the starting position.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
     "id": "Pelvic_Tilt_Into_Bridge",
     "name": "Pelvic Tilt Into Bridge",
     "muscle": "back",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Pelvic_Tilt_Into_Bridge/0.jpg",
     "instructions": [
       "Lie down with your feet on the floor, heels directly under your knees.",
@@ -7076,14 +12126,19 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Peroneals-SMR",
-    "name": "Peroneals-SMR",
-    "muscle": "calves",
-    "equipment": "other",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Peroneals-SMR/0.jpg",
+    "id": "pendlay-row",
+    "name": "Pendlay Row",
+    "muscle": "back",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/pendlay-row-start.webp",
     "instructions": [
-      "Lay on your side, supporting your weight on your forearm and on a foam roller placed on the outside of your lower leg. Your upper leg can either be on top of your lower leg, or you can cross it in front of you. This will be your starting position.",
-      "Raise your hips off of the ground and begin to roll from below the knee to above the ankle on the side of your leg, pausing at points of tension for 10-30 seconds. Repeat on the other leg."
+      "Load a barbell and set it on the floor.",
+      "Hinge at the hips until your torso is parallel to the ground, knees slightly bent.",
+      "Grip the bar slightly wider than shoulder-width with an overhand grip.",
+      "Explosively pull the bar to your lower chest.",
+      "Lower the bar back to the floor under control and pause before the next rep.",
+      "Repeat."
     ]
   },
   {
@@ -7091,6 +12146,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Peroneals Stretch",
     "muscle": "calves",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Peroneals_Stretch/0.jpg",
     "instructions": [
       "In a seated position, loop a belt, rope, or band around one foot. This will be your starting position.",
@@ -7098,10 +12154,23 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "Peroneals-SMR",
+    "name": "Peroneals-SMR",
+    "muscle": "calves",
+    "equipment": "other",
+    "category": "stretching",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Peroneals-SMR/0.jpg",
+    "instructions": [
+      "Lay on your side, supporting your weight on your forearm and on a foam roller placed on the outside of your lower leg. Your upper leg can either be on top of your lower leg, or you can cross it in front of you. This will be your starting position.",
+      "Raise your hips off of the ground and begin to roll from below the knee to above the ankle on the side of your leg, pausing at points of tension for 10-30 seconds. Repeat on the other leg."
+    ]
+  },
+  {
     "id": "Physioball_Hip_Bridge",
     "name": "Physioball Hip Bridge",
     "muscle": "glutes",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Physioball_Hip_Bridge/0.jpg",
     "instructions": [
       "Lay on a ball so that your upper back is on the ball with your hips unsupported. Both feet should be flat on the floor, hip width apart or wider. This will be your starting position.",
@@ -7110,10 +12179,177 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "pigeon-stretch",
+    "name": "Pigeon Stretch",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/pigeon-stretch-main.webp",
+    "instructions": [
+      "From all fours, bring one knee forward and lay the shin across in front.",
+      "Extend the other leg straight back, top of the foot down.",
+      "Sink your hips toward the floor and keep them square.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
+    "id": "pike-push-ups",
+    "name": "Pike Push Ups",
+    "muscle": "shoulders",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/pike-push-ups-start.webp",
+    "instructions": [
+      "Start in a downward dog position with hips high and hands shoulder-width apart.",
+      "Walk your feet closer to your hands.",
+      "Bend your elbows and lower your head toward the floor.",
+      "Keep your hips high throughout.",
+      "Press back up until your arms are fully extended.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "pilates-kneeling-side-kick",
+    "name": "Pilates Kneeling Side Kick",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/pilates-kneeling-side-kick-start.webp",
+    "instructions": [
+      "Kneel on one knee and place the same-side hand on the floor, the other hand behind the head.",
+      "Extend the top leg out to the side at hip height with the foot flexed.",
+      "Keep the trunk perfectly still and swing the leg forward as far as the pelvis stays square.",
+      "Swing the leg back behind the line of the body without arching the lower back.",
+      "Repeat for the desired number of repetitions and change sides."
+    ]
+  },
+  {
+    "id": "pilates-leg-pull-back",
+    "name": "Pilates Leg Pull Back",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/pilates-leg-pull-back-start.webp",
+    "instructions": [
+      "Sit with the legs straight and the hands on the floor behind the hips, fingers pointing forward.",
+      "Press into the hands and heels and lift the hips into a reverse plank.",
+      "Keeping the hips level and high, lift one straight leg as far as the pelvis stays still.",
+      "Lower the leg under control and repeat with the other one.",
+      "Finish the set and lower the hips to the floor."
+    ]
+  },
+  {
+    "id": "pilates-leg-pull-front",
+    "name": "Pilates Leg Pull Front",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/pilates-leg-pull-front-start.webp",
+    "instructions": [
+      "Set up in a high plank with the hands under the shoulders and the body in one line.",
+      "Brace the trunk and squeeze the glutes so the hips cannot rotate.",
+      "Lift one straight leg a few centimetres above hip height without letting the pelvis tilt.",
+      "Lower it under control and repeat with the other leg.",
+      "Keep alternating for the desired number of repetitions."
+    ]
+  },
+  {
+    "id": "pilates-roll-down",
+    "name": "Pilates Roll Down",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/pilates-roll-down-start.webp",
+    "instructions": [
+      "Stand tall with the feet hip-width apart and the arms hanging at the sides.",
+      "Drop the chin to the chest and start rolling down one vertebra at a time.",
+      "Let the arms and head hang heavy once the spine is fully rolled down.",
+      "Roll back up the same way, stacking the vertebrae one by one, head last.",
+      "Repeat for the desired number of repetitions."
+    ]
+  },
+  {
+    "id": "pilates-roll-over",
+    "name": "Pilates Roll Over",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/pilates-roll-over-start.webp",
+    "instructions": [
+      "Lie on your back with the legs straight and the arms pressed into the mat beside you.",
+      "Lift both legs to vertical without letting the lower back arch.",
+      "Press the arms down and take the legs overhead until they are parallel to the floor behind you.",
+      "Open the legs slightly, flex the feet, and roll the spine down one vertebra at a time.",
+      "Return the legs to vertical and repeat for the desired number of repetitions."
+    ]
+  },
+  {
+    "id": "pilates-saw",
+    "name": "Pilates Saw",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/pilates-saw-start.webp",
+    "instructions": [
+      "Sit tall with the legs straight and slightly wider than the hips, arms out to the sides.",
+      "Rotate the torso to one side, keeping both sit bones on the floor.",
+      "Fold forward over that leg and reach the opposite hand past the little toe.",
+      "Roll back up through the spine and return to the centre.",
+      "Repeat to the other side and continue alternating."
+    ]
+  },
+  {
+    "id": "pilates-side-bend",
+    "name": "Pilates Side Bend",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/pilates-side-bend-start.webp",
+    "instructions": [
+      "Sit on one hip with the legs bent to the side and the supporting hand on the floor under the shoulder.",
+      "Press into the hand and the lower leg to lift the hips off the floor.",
+      "Reach the top arm overhead so the body forms a long arc from the hand to the feet.",
+      "Lower the hips under control back towards the mat.",
+      "Complete the repetitions and change sides."
+    ]
+  },
+  {
+    "id": "pilates-spine-stretch-forward",
+    "name": "Pilates Spine Stretch Forward",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/pilates-spine-stretch-forward-start.webp",
+    "instructions": [
+      "Sit tall with the legs straight and slightly wider than the hips, feet flexed.",
+      "Reach the arms forward at shoulder height.",
+      "Drop the chin and curl the spine forward one vertebra at a time, reaching past the toes.",
+      "Restack the spine from the base upwards until you are sitting tall again.",
+      "Repeat for the desired number of repetitions."
+    ]
+  },
+  {
+    "id": "pilates-spine-twist",
+    "name": "Pilates Spine Twist",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/pilates-spine-twist-start.webp",
+    "instructions": [
+      "Sit tall with the legs straight and together, feet flexed, arms out to the sides at shoulder height.",
+      "Grow tall through the spine and press both sit bones into the floor.",
+      "Rotate the trunk to one side as far as the hips stay square, then return to the centre.",
+      "Rotate to the other side in the same way.",
+      "Keep alternating for the desired number of repetitions."
+    ]
+  },
+  {
     "id": "Pin_Presses",
     "name": "Pin Presses",
     "muscle": "triceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Pin_Presses/0.jpg",
     "instructions": [
       "Pin presses remove the eccentric phase of the bench press, developing starting strength. They also allow you to train a desired range of motion.",
@@ -7129,6 +12365,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Piriformis-SMR",
     "muscle": "glutes",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Piriformis-SMR/0.jpg",
     "instructions": [
       "Sit with your buttocks on top of a foam roll. Bend your knees, and then cross one leg so that the ankle is over the knee. This will be your starting position.",
@@ -7136,10 +12373,41 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "pistol-squat",
+    "name": "Pistol Squat",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/pistol-squat-start.webp",
+    "instructions": [
+      "Stand on one leg with the other extended forward, arms out for balance.",
+      "Hinge at the hips and bend the standing knee, keeping the chest up.",
+      "Descend slowly until the back of the thigh touches the calf.",
+      "Drive through the standing heel to return to standing.",
+      "Complete reps per side, then switch legs."
+    ]
+  },
+  {
+    "id": "planche",
+    "name": "Planche",
+    "muscle": "shoulders",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/planche-main.webp",
+    "instructions": [
+      "Begin in a push-up position with hands turned outward.",
+      "Lean forward until your center of mass is over your hands.",
+      "Lift your feet off the ground keeping the body horizontal.",
+      "Hold the position.",
+      "Return to the floor with control."
+    ]
+  },
+  {
     "id": "Plank",
     "name": "Plank",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Plank/0.jpg",
     "instructions": [
       "Get into a prone position on the floor, supporting your weight on your toes and your forearms. Your arms are bent and directly below the shoulder.",
@@ -7151,6 +12419,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Plate Pinch",
     "muscle": "other",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Plate_Pinch/0.jpg",
     "instructions": [
       "Grab two wide-rimmed plates and put them together with the smooth sides facing outward",
@@ -7161,10 +12430,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "plate-pullover",
+    "name": "Plate Pullover",
+    "muscle": "back",
+    "equipment": "other",
+    "category": "strength",
+    "image": "/repdb/plate-pullover-start.webp",
+    "instructions": [
+      "Lie flat on a bench holding a plate with both hands.",
+      "Press the plate over the chest with arms nearly straight.",
+      "Lower the plate back in an arc behind the head until you feel a stretch.",
+      "Pull the plate back over the chest along the same arc.",
+      "Repeat for the prescribed reps."
+    ]
+  },
+  {
     "id": "Plate_Twist",
     "name": "Plate Twist",
     "muscle": "core",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Plate_Twist/0.jpg",
     "instructions": [
       "Lie down on the floor or an exercise mat with your legs fully extended and your upper body upright. Grab the plate by its sides with both hands out in front of your abdominals with your arms slightly bent.",
@@ -7175,10 +12460,71 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "plate-loaded-donkey-calf-raise",
+    "name": "Plate-Loaded Donkey Calf Raise",
+    "muscle": "calves",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/plate-loaded-donkey-calf-raise-start.webp",
+    "instructions": [
+      "Load the plate horns and step onto the platform with the balls of your feet on the edge and your heels hanging free.",
+      "Bend forward at the hips and settle the pad across your hips, then rest your forearms on the support in front of you.",
+      "Keep your knees straight and your back flat, with your torso close to parallel to the floor.",
+      "Push through the balls of your feet and raise your heels as high as you can, pausing briefly at the top.",
+      "Lower your heels below the platform until you feel a strong calf stretch, and repeat for the desired number of repetitions."
+    ]
+  },
+  {
+    "id": "plate-loaded-glute-drive",
+    "name": "Plate-Loaded Glute Drive",
+    "muscle": "glutes",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/plate-loaded-glute-drive-start.webp",
+    "instructions": [
+      "Load the plate horns evenly and sit into the machine with your upper back against the pad and your feet flat on the platform.",
+      "Pull the hip pad or lap bar across your hips and adjust it so it sits on the crease of the hips, not on your stomach.",
+      "Set your feet so that your shins will be roughly vertical when your hips are at the top, and take hold of the handles.",
+      "Drive your hips up by squeezing the glutes until your thighs are level with your torso, and hold briefly at the top.",
+      "Lower under control until your hips are just short of the bottom of the range, and repeat for the desired number of repetitions."
+    ]
+  },
+  {
+    "id": "plate-loaded-lateral-raise",
+    "name": "Plate-Loaded Lateral Raise",
+    "muscle": "shoulders",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/plate-loaded-lateral-raise-start.webp",
+    "instructions": [
+      "Set the seat height so that the pivot of the arm pads lines up with the point of your shoulders when you sit down.",
+      "Load the plate horns evenly on both sides and sit with your back flat against the pad.",
+      "Place the outside of your upper arms against the pads with your elbows bent and your arms hanging down.",
+      "Push out and up against the pads until your upper arms are roughly level with your shoulders.",
+      "Lower under control until your arms are back at your sides, and repeat for the desired number of repetitions."
+    ]
+  },
+  {
+    "id": "plate-loaded-shrug",
+    "name": "Plate-Loaded Shrug",
+    "muscle": "back",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/plate-loaded-shrug-start.webp",
+    "instructions": [
+      "Load the plate horns evenly and stand on the machine platform, facing away from the frame.",
+      "Take a handle in each hand with your arms hanging straight down at your sides and your shoulders relaxed.",
+      "Stand tall with your chest up, your chin level and your knees soft.",
+      "Shrug your shoulders straight up toward your ears as high as they will go, and hold for a moment at the top.",
+      "Lower under control until your shoulders are fully down, and repeat for the desired number of repetitions."
+    ]
+  },
+  {
     "id": "Platform_Hamstring_Slides",
     "name": "Platform Hamstring Slides",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Platform_Hamstring_Slides/0.jpg",
     "instructions": [
       "For this movement a wooden floor or similar is needed. Lay on your back with your legs extended. Place a gym towel or a light weight underneath your heel. This will be your starting position.",
@@ -7192,6 +12538,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Plie Dumbbell Squat",
     "muscle": "quads",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Plie_Dumbbell_Squat/0.jpg",
     "instructions": [
       "Hold a dumbbell at the base with both hands and stand straight up. Move your legs so that they are wider than shoulder width apart from each other with your knees slightly bent.",
@@ -7202,10 +12549,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "plow-pose",
+    "name": "Plow Pose",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/plow-pose-main.webp",
+    "instructions": [
+      "Lie on your back with the arms alongside the body, palms down.",
+      "Lift both legs overhead and support the lower back with the hands.",
+      "Lower the toes towards the floor behind the head, keeping the legs as straight as comfort allows.",
+      "Hold the position for the prescribed time, breathing steadily and keeping the head still.",
+      "Roll down one vertebra at a time with the hands supporting the back."
+    ]
+  },
+  {
     "id": "Plyo_Kettlebell_Pushups",
     "name": "Plyo Kettlebell Pushups",
     "muscle": "chest",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Plyo_Kettlebell_Pushups/0.jpg",
     "instructions": [
       "Place a kettlebell on the floor. Place yourself in a pushup position, on your toes with one hand on the ground and one hand holding the kettlebell, with your elbows extended. This will be your starting position.",
@@ -7214,10 +12577,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "plyo-lunge",
+    "name": "Plyo Lunge",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "plyometrics",
+    "image": "/repdb/plyo-lunge-start.webp",
+    "instructions": [
+      "Start in a forward lunge with one foot ahead of the other.",
+      "Drop into a deep lunge with the back knee almost touching the floor.",
+      "Drive both feet off the floor, switching legs in mid-air.",
+      "Land softly in a lunge with the opposite leg forward.",
+      "Continue alternating without pausing."
+    ]
+  },
+  {
     "id": "Plyo_Push-up",
     "name": "Plyo Push-up",
     "muscle": "chest",
     "equipment": "bodyweight",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Plyo_Push-up/0.jpg",
     "instructions": [
       "Move into a prone position on the floor, supporting your weight on your hands and toes.",
@@ -7233,6 +12612,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Posterior Tibialis Stretch",
     "muscle": "calves",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Posterior_Tibialis_Stretch/0.jpg",
     "instructions": [
       "In a seated position, loop a belt, rope, or band around one foot. This will be your starting position.",
@@ -7244,6 +12624,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Power Clean",
     "muscle": "hamstrings",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Power_Clean/0.jpg",
     "instructions": [
       "Stand with your feet slightly wider than shoulder width apart and toes pointing out slightly.",
@@ -7277,6 +12658,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Power Clean from Blocks",
     "muscle": "hamstrings",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Power_Clean_from_Blocks/0.jpg",
     "instructions": [
       "With a barbell on boxes of the desired height, take a grip just outside the legs. Lower your hips with the weight focused on the heels, back straight, head facing forward, chest up, with your shoulders just in front of the bar. This will be your starting position.",
@@ -7291,6 +12673,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Power Jerk",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Power_Jerk/0.jpg",
     "instructions": [
       "Standing with the weight racked on the front of the shoulders, begin with the dip. With your feet directly under your hips, flex the knees without moving the hips backward. Go down only slightly, and reverse direction as powerfully as possible.",
@@ -7305,6 +12688,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Power Partials",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Power_Partials/0.jpg",
     "instructions": [
       "Stand up with your torso upright and a dumbbell on each hand being held at arms length. The elbows should be close to the torso.",
@@ -7319,6 +12703,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Power Snatch",
     "muscle": "hamstrings",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Power_Snatch/0.jpg",
     "instructions": [
       "Begin with a loaded barbell on the floor. The bar should be close to or touching the shins, and a wide grip should be taken on the bar. The feet should be directly below the hips, with the feet turned out as needed. Lower the hips, with the chest up and the head looking forward. The shoulders should be just in front of the bar. This will be the starting position.",
@@ -7333,6 +12718,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Power Snatch from Blocks",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Power_Snatch_from_Blocks/0.jpg",
     "instructions": [
       "Begin with a loaded barbell on boxes or stands of the desired height. A wide grip should be taken on the bar. The feet should be directly below the hips, with the feet turned out as needed. Lower the hips, with the chest up and the head looking forward. The shoulders should be just in front of the bar, with the elbows pointed out. This will be the starting position.",
@@ -7347,6 +12733,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Power Stairs",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "strongman",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Power_Stairs/0.jpg",
     "instructions": [
       "In the power stairs, implements are moved up a staircase. For training purposes, these can be performed with a tire or box.",
@@ -7360,6 +12747,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Preacher Curl",
     "muscle": "biceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Preacher_Curl/0.jpg",
     "instructions": [
       "To perform this movement you will need a preacher bench and an E-Z bar. Grab the E-Z curl bar at the close inner handle (either have someone hand you the bar which is preferable or grab the bar from the front bar rest provided by most preacher benches). The palm of your hands should be facing forward and they should be slightly tilted inwards due to the shape of the bar.",
@@ -7370,10 +12758,27 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "preacher-hammer-curl",
+    "name": "Preacher Hammer Curl",
+    "muscle": "biceps",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/preacher-hammer-curl-start.webp",
+    "instructions": [
+      "Sit at a preacher bench with a dumbbell in each hand.",
+      "Rest your upper arms on the pad with palms facing each other.",
+      "Curl the dumbbells up while keeping your wrists neutral.",
+      "Squeeze your biceps at the top of the movement.",
+      "Lower the dumbbells with control.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
     "id": "Preacher_Hammer_Dumbbell_Curl",
     "name": "Preacher Hammer Dumbbell Curl",
     "muscle": "biceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Preacher_Hammer_Dumbbell_Curl/0.jpg",
     "instructions": [
       "Place the upper part of both arms on top of the preacher bench as you hold a dumbbell in each hand with the palms facing each other (neutral grip).",
@@ -7387,6 +12792,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Press Sit-Up",
     "muscle": "core",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Press_Sit-Up/0.jpg",
     "instructions": [
       "To begin, lie down on a bench with a barbell resting on your chest. Position your legs so they are secure on the extension of the abdominal bench. This is the starting position.",
@@ -7400,6 +12806,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Prone Manual Hamstring",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Prone_Manual_Hamstring/0.jpg",
     "instructions": [
       "You will need a partner for this exercise. Lay face down with your legs straight. Your assistant will place their hand on your heel.",
@@ -7412,6 +12819,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Prowler Sprint",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "cardio",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Prowler_Sprint/0.jpg",
     "instructions": [
       "Place your sled on an appropriate surface, loaded to a suitable weight. The sled should provide enough resistance to require effort, but not so heavy that you are significantly slowed down.",
@@ -7420,10 +12828,27 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "pseudo-planche-push-ups",
+    "name": "Pseudo Planche Push Ups",
+    "muscle": "shoulders",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/pseudo-planche-push-ups-start.webp",
+    "instructions": [
+      "Start in a push-up position with your hands turned so fingers point back.",
+      "Lean your shoulders forward past your wrists.",
+      "Lower your chest toward the floor by bending your elbows.",
+      "Keep your body in a straight line.",
+      "Press back up while maintaining the forward lean.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
     "id": "Pull_Through",
     "name": "Pull Through",
     "muscle": "glutes",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Pull_Through/0.jpg",
     "instructions": [
       "Begin standing a few feet in front of a low pulley with a rope or handle attached. Face away from the machine, straddling the cable, with your feet set wide apart.",
@@ -7435,6 +12860,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Pullups",
     "muscle": "back",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Pullups/0.jpg",
     "instructions": [
       "Grab the pull-up bar with the palms facing forward using the prescribed grip. Note on grips: For a wide grip, your hands need to be spaced out at a distance wider than your shoulder width. For a medium grip, your hands need to be spaced out at a distance equal to your shoulder width and for a close grip at a distance smaller than your shoulder width.",
@@ -7445,10 +12871,86 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "puppy-pose",
+    "name": "Puppy Pose",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/puppy-pose-main.webp",
+    "instructions": [
+      "Kneel on all fours with the hips over the knees and the hands under the shoulders.",
+      "Walk the hands forward and lower the chest towards the floor, keeping the hips high.",
+      "Rest the forehead or the chin on the mat and let the armpits soften downwards.",
+      "Hold the position for the prescribed time, breathing into the upper back.",
+      "Walk the hands back and sit onto the heels to come out."
+    ]
+  },
+  {
+    "id": "push-jerk",
+    "name": "Push Jerk",
+    "muscle": "shoulders",
+    "equipment": "barbell",
+    "category": "olympic",
+    "image": "/repdb/push-jerk-start.webp",
+    "instructions": [
+      "Hold a barbell in the front rack position at your shoulders.",
+      "Stand with feet hip-width apart.",
+      "Dip by bending your knees slightly.",
+      "Drive explosively through your legs and press the bar overhead.",
+      "Drop into a quarter-squat under the bar and lock out your arms.",
+      "Stand up fully and lower the bar to repeat."
+    ]
+  },
+  {
+    "id": "Push_Press",
+    "name": "Push Press",
+    "muscle": "shoulders",
+    "equipment": "barbell",
+    "category": "olympic",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Push_Press/0.jpg",
+    "instructions": [
+      "Stand with a barbell racked on your front deltoids.",
+      "Dip slightly at the knees.",
+      "Drive up with your legs and press the bar overhead.",
+      "Lock out fully.",
+      "Lower to the start.",
+      "Repeat."
+    ]
+  },
+  {
+    "id": "Push_Press_-_Behind_the_Neck",
+    "name": "Push Press - Behind the Neck",
+    "muscle": "shoulders",
+    "equipment": "barbell",
+    "category": "olympic",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Push_Press_-_Behind_the_Neck/0.jpg",
+    "instructions": [
+      "Standing with the weight racked on the back of the shoulders, begin with the dip. With your feet directly under your hips, flex the knees without moving the hips backward. Go down only slightly, and reverse direction as powerfully as possible. Drive through the heels create as much speed and force as possible, moving the bar in a vertical path.",
+      "Using the momentum generated, finish pressing the weight overhead be extending through the arms.",
+      "Return to the starting position, using your legs to absorb the impact."
+    ]
+  },
+  {
+    "id": "Push_Up_to_Side_Plank",
+    "name": "Push Up to Side Plank",
+    "muscle": "chest",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Push_Up_to_Side_Plank/0.jpg",
+    "instructions": [
+      "Get into pushup position on the toes with your hands just outside of shoulder width.",
+      "Perform a pushup by allowing the elbows to flex. As you descend, keep your body straight.",
+      "Do one pushup and as you come up, shift your weight on the left side of the body, twist to the side while bringing the right arm up towards the ceiling in a side plank.",
+      "Lower the arm back to the floor for another pushup and then twist to the other side.",
+      "Repeat the series, alternating each side, for 10 or more reps."
+    ]
+  },
+  {
     "id": "Push-Up_Wide",
     "name": "Push-Up Wide",
     "muscle": "chest",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Push-Up_Wide/0.jpg",
     "instructions": [
       "With your hands wide apart, support your body on your toes and hands in a plank position. Your elbows should be extended and your body straight. Do not allow your hips to sag. This will be your starting position.",
@@ -7462,6 +12964,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Push-Ups - Close Triceps Position",
     "muscle": "triceps",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Push-Ups_-_Close_Triceps_Position/0.jpg",
     "instructions": [
       "Lie on the floor face down and place your hands closer than shoulder width for a close hand position. Make sure that you are holding your torso up at arms' length.",
@@ -7475,6 +12978,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Push-Ups With Feet Elevated",
     "muscle": "chest",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Push-Ups_With_Feet_Elevated/0.jpg",
     "instructions": [
       "Lie on the floor face down and place your hands about 36 inches apart from each other holding your torso up at arms length.",
@@ -7489,6 +12993,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Push-Ups With Feet On An Exercise Ball",
     "muscle": "chest",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Push-Ups_With_Feet_On_An_Exercise_Ball/0.jpg",
     "instructions": [
       "Lie on the floor face down and place your hands about 36 inches apart from each other holding your torso up at arms length.",
@@ -7499,44 +13004,11 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Push_Press",
-    "name": "Push Press",
-    "muscle": "shoulders",
-    "equipment": "barbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Push_Press/0.jpg",
-    "instructions": []
-  },
-  {
-    "id": "Push_Press_-_Behind_the_Neck",
-    "name": "Push Press - Behind the Neck",
-    "muscle": "shoulders",
-    "equipment": "barbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Push_Press_-_Behind_the_Neck/0.jpg",
-    "instructions": [
-      "Standing with the weight racked on the back of the shoulders, begin with the dip. With your feet directly under your hips, flex the knees without moving the hips backward. Go down only slightly, and reverse direction as powerfully as possible. Drive through the heels create as much speed and force as possible, moving the bar in a vertical path.",
-      "Using the momentum generated, finish pressing the weight overhead be extending through the arms.",
-      "Return to the starting position, using your legs to absorb the impact."
-    ]
-  },
-  {
-    "id": "Push_Up_to_Side_Plank",
-    "name": "Push Up to Side Plank",
-    "muscle": "chest",
-    "equipment": "bodyweight",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Push_Up_to_Side_Plank/0.jpg",
-    "instructions": [
-      "Get into pushup position on the toes with your hands just outside of shoulder width.",
-      "Perform a pushup by allowing the elbows to flex. As you descend, keep your body straight.",
-      "Do one pushup and as you come up, shift your weight on the left side of the body, twist to the side while bringing the right arm up towards the ceiling in a side plank.",
-      "Lower the arm back to the floor for another pushup and then twist to the other side.",
-      "Repeat the series, alternating each side, for 10 or more reps."
-    ]
-  },
-  {
     "id": "Pushups",
     "name": "Pushups",
     "muscle": "chest",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Pushups/0.jpg",
     "instructions": [
       "Lie on the floor face down and place your hands about 36 inches apart while holding your torso up at arms length.",
@@ -7550,6 +13022,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Pushups (Close and Wide Hand Positions)",
     "muscle": "chest",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Pushups_Close_and_Wide_Hand_Positions/0.jpg",
     "instructions": [
       "Lie on the floor face down and body straight with your toes on the floor and the hands wider than shoulder width for a wide hand position and closer than shoulder width for a close hand position. Make sure you are holding your torso up at arms length.",
@@ -7563,6 +13036,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Pyramid",
     "muscle": "back",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Pyramid/0.jpg",
     "instructions": [
       "Start off by rolling your torso forward onto the ball so your hips rest on top of the ball and become the highest point of your body.",
@@ -7570,10 +13044,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "pyramid-pose",
+    "name": "Pyramid Pose",
+    "muscle": "hamstrings",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/pyramid-pose-main.webp",
+    "instructions": [
+      "Step one foot back about a leg's length and turn the back foot out slightly.",
+      "Square both hip points towards the front of the mat and keep both legs straight.",
+      "Hinge from the hips and fold over the front leg, bringing the hands to the floor, blocks or the shin.",
+      "Hold the fold for the prescribed time with the spine long rather than rounded.",
+      "Press into the feet to come up and repeat on the other side."
+    ]
+  },
+  {
     "id": "Quad_Stretch",
     "name": "Quad Stretch",
     "muscle": "quads",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Quad_Stretch/0.jpg",
     "instructions": [
       "Lay on your side. Loop a belt, rope, or band around your top foot. Flex the knee and extend your hip, attempting to touch your glutes with your foot, and holding the belt with your hands. This will be your starting position.",
@@ -7585,6 +13075,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Quadriceps-SMR",
     "muscle": "quads",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Quadriceps-SMR/0.jpg",
     "instructions": [
       "Lay facedown on the floor with your weight supported by your hands or forearms. Place a foam roll underneath one leg on the quadriceps, and keep the foot off of the ground. Make sure to relax the leg as much as possible. This will be your starting position.",
@@ -7596,6 +13087,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Quick Leap",
     "muscle": "quads",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Quick_Leap/0.jpg",
     "instructions": [
       "You will need a box for this exerise.",
@@ -7609,6 +13101,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Rack Delivery",
     "muscle": "shoulders",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Rack_Delivery/0.jpg",
     "instructions": [
       "This drill teaches the delivery of the barbell to the rack position on the shoulders. Begin holding a bar in the scarecrow position, with the upper arms parallel to the floor, and the forearms hanging down. Use a hook grip, with your fingers wrapped over your thumbs.",
@@ -7621,6 +13114,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Rack Pull with Bands",
     "muscle": "back",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Rack_Pull_with_Bands/0.jpg",
     "instructions": [
       "Set up in a power rack with the bar on the pins. The pins should be set to the desired point; just below the knees, just above, or in the mid thigh position. Attach bands to the base of the rack, or secure them with dumbbells. Attach the other end to the bar. You may need to choke the bands to provide tension.",
@@ -7633,6 +13127,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Rack Pulls",
     "muscle": "back",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Rack_Pulls/0.jpg",
     "instructions": [
       "Set up in a power rack with the bar on the pins. The pins should be set to the desired point; just below the knees, just above, or in the mid thigh position. Position yourself against the bar in proper deadlifting position. Your feet should be under your hips, your grip shoulder width, back arched, and hips back to engage the hamstrings. Since the weight is typically heavy, you may use a mixed grip, a hook grip, or use straps to aid in holding the weight.",
@@ -7641,10 +13136,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "rear-delt-fly",
+    "name": "Rear Delt Fly",
+    "muscle": "shoulders",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/rear-delt-fly-start.webp",
+    "instructions": [
+      "Hold dumbbells and hinge forward at the hips.",
+      "With a slight bend in elbows, raise the dumbbells out to the sides.",
+      "Squeeze your shoulder blades at the top.",
+      "Lower with control.",
+      "Repeat."
+    ]
+  },
+  {
     "id": "Rear_Leg_Raises",
     "name": "Rear Leg Raises",
     "muscle": "quads",
     "equipment": "bodyweight",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Rear_Leg_Raises/0.jpg",
     "instructions": [
       "Place yourself on your hands knees on an exercise mat. Your head should be looking forward and the bend of the knees should create a 90-degree angle between the hamstrings and the calves. This will be your starting position.",
@@ -7656,6 +13167,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Recumbent Bike",
     "muscle": "quads",
     "equipment": "machine",
+    "category": "cardio",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Recumbent_Bike/0.jpg",
     "instructions": [
       "To begin, seat yourself on the bike and adjust the seat to your height.",
@@ -7668,6 +13180,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Return Push from Stance",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Return_Push_from_Stance/0.jpg",
     "instructions": [
       "You will need a partner for this drill.",
@@ -7682,6 +13195,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Reverse Band Bench Press",
     "muscle": "triceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Reverse_Band_Bench_Press/0.jpg",
     "instructions": [
       "Position a bench inside a power rack, with the bar set to the correct height. Begin by anchoring bands either to band pegs or to the top of the rack. Ensure that you will be position properly under the bands. Attach the other end to the barbell.",
@@ -7695,6 +13209,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Reverse Band Box Squat",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Reverse_Band_Box_Squat/0.jpg",
     "instructions": [
       "Begin in a power rack with a box at the appropriate height behind you. Set up the bands either on band pegs or attached to the top of the rack, ensuring they will be directly above the bar during the squat. Attach the other end to the bar.",
@@ -7708,6 +13223,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Reverse Band Deadlift",
     "muscle": "back",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Reverse_Band_Deadlift/0.jpg",
     "instructions": [
       "Set the bar up in a power rack. Attach bands to the top of the rack, using either bands pegs or the frame itself. Attach the other end of the bands to the bar.",
@@ -7722,6 +13238,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Reverse Band Power Squat",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Reverse_Band_Power_Squat/0.jpg",
     "instructions": [
       "Begin in a power rack with the pins and bar set at the appropriate height. After loading the bar, attach bands to the top of the rack, using either pegs or the frame itself. Attach the other end of the bands to the bar.",
@@ -7735,6 +13252,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Reverse Band Sumo Deadlift",
     "muscle": "hamstrings",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Reverse_Band_Sumo_Deadlift/0.jpg",
     "instructions": [
       "Begin with a bar loaded on the floor inside of a power rack. Attach bands to the top of the rack, using either pegs or the frame itself. Attach the other end to the barbell.",
@@ -7749,6 +13267,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Reverse Barbell Curl",
     "muscle": "biceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Reverse_Barbell_Curl/0.jpg",
     "instructions": [
       "Stand up with your torso upright while holding a barbell at shoulder width with the elbows close to the torso. The palm of your hands should be facing down (pronated grip). This will be your starting position.",
@@ -7762,6 +13281,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Reverse Barbell Preacher Curls",
     "muscle": "biceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Reverse_Barbell_Preacher_Curls/0.jpg",
     "instructions": [
       "Grab an EZ-bar using a shoulder width and palms down (pronated) grip.",
@@ -7776,6 +13296,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Reverse Cable Curl",
     "muscle": "biceps",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Reverse_Cable_Curl/0.jpg",
     "instructions": [
       "Stand up with your torso upright while holding a bar attachment that is attached to a low pulley using a pronated (palms down) and shoulder width grip. Make sure also that you keep the elbows close to the torso. This will be your starting position.",
@@ -7789,6 +13310,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Reverse Crunch",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Reverse_Crunch/0.jpg",
     "instructions": [
       "Lie down on the floor with your legs fully extended and arms to the side of your torso with the palms on the floor. Your arms should be stationary for the entire exercise.",
@@ -7799,10 +13321,25 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "reverse-curl",
+    "name": "Reverse Curl",
+    "muscle": "biceps",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/reverse-curl-start.webp",
+    "instructions": [
+      "Stand and hold a barbell with an overhand grip.",
+      "Curl the bar up toward your shoulders.",
+      "Lower under control.",
+      "Repeat."
+    ]
+  },
+  {
     "id": "Reverse_Flyes",
     "name": "Reverse Flyes",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Reverse_Flyes/0.jpg",
     "instructions": [
       "To begin, lie down on an incline bench with the chest and stomach pressing against the incline. Have the dumbbells in each hand with the palms facing each other (neutral grip).",
@@ -7818,6 +13355,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Reverse Flyes With External Rotation",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Reverse_Flyes_With_External_Rotation/0.jpg",
     "instructions": [
       "To begin, lie down on an incline bench set at a 30-degree angle with the chest and stomach pressing against the incline.",
@@ -7834,6 +13372,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Reverse Grip Bent-Over Rows",
     "muscle": "back",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Reverse_Grip_Bent-Over_Rows/0.jpg",
     "instructions": [
       "Stand erect while holding a barbell with a supinated grip (palms facing up).",
@@ -7844,10 +13383,28 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "reverse-grip-lat-pulldown",
+    "name": "Reverse Grip Lat Pulldown",
+    "muscle": "biceps",
+    "equipment": "cable",
+    "category": "strength",
+    "image": "/repdb/reverse-grip-lat-pulldown-start.webp",
+    "instructions": [
+      "Attach a straight bar to a lat pulldown machine.",
+      "Grip the bar with an underhand grip, shoulder-width apart.",
+      "Sit and secure your thighs under the pad.",
+      "Pull the bar down to your upper chest.",
+      "Squeeze your lats and biceps at the bottom.",
+      "Return the bar to the starting position with control.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
     "id": "Reverse_Grip_Triceps_Pushdown",
     "name": "Reverse Grip Triceps Pushdown",
     "muscle": "triceps",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Reverse_Grip_Triceps_Pushdown/0.jpg",
     "instructions": [
       "Start by setting a bar attachment (straight or e-z) on a high pulley machine.",
@@ -7862,6 +13419,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Reverse Hyperextension",
     "muscle": "hamstrings",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Reverse_Hyperextension/0.jpg",
     "instructions": [
       "Place your feet between the pads after loading an appropriate weight. Lay on the top pad, allowing your hips to hang off the back, while grasping the handles to hold your position.",
@@ -7872,10 +13430,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "reverse-lunge",
+    "name": "Reverse Lunge",
+    "muscle": "glutes",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/reverse-lunge-start.webp",
+    "instructions": [
+      "Stand holding dumbbells at your sides.",
+      "Step one leg back and lower your knee toward the floor.",
+      "Lower until your front thigh is parallel to the floor.",
+      "Push through your front heel to return to standing.",
+      "Repeat on both sides."
+    ]
+  },
+  {
     "id": "Reverse_Machine_Flyes",
     "name": "Reverse Machine Flyes",
     "muscle": "shoulders",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Reverse_Machine_Flyes/0.jpg",
     "instructions": [
       "Adjust the handles so that they are fully to the rear. Make an appropriate weight selection and adjust the seat height so the handles are at shoulder level. Grasp the handles with your hands facing inwards. This will be your starting position.",
@@ -7885,10 +13459,58 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "reverse-nordic-curl",
+    "name": "Reverse Nordic Curl",
+    "muscle": "quads",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/reverse-nordic-curl-start.webp",
+    "instructions": [
+      "Kneel on a pad with your feet flat and torso upright.",
+      "Keep your hips extended and core braced.",
+      "Slowly lean your torso backward while keeping your body in a straight line.",
+      "Lower as far as you can control with your quadriceps.",
+      "Pull yourself back up to the starting position.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "reverse-plank",
+    "name": "Reverse Plank",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/reverse-plank-main.webp",
+    "instructions": [
+      "Sit on the floor with your legs extended in front of you.",
+      "Place your hands behind you with fingers pointing toward your feet.",
+      "Lift your hips off the floor to form a straight line from head to heels.",
+      "Squeeze your glutes and brace your core.",
+      "Hold the position for the desired duration.",
+      "Lower your hips with control to exit."
+    ]
+  },
+  {
+    "id": "reverse-plank-dips",
+    "name": "Reverse Plank Dips",
+    "muscle": "triceps",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/reverse-plank-dips-start.webp",
+    "instructions": [
+      "Sit with the legs straight and the hands on the floor behind the hips, fingers pointing forward.",
+      "Press into the hands and heels and lift the hips into a straight-leg reverse plank.",
+      "Bend the elbows straight back and lower the hips a short way towards the floor.",
+      "Push back up until the arms lock out, keeping the hips high.",
+      "Repeat for the desired number of repetitions."
+    ]
+  },
+  {
     "id": "Reverse_Plate_Curls",
     "name": "Reverse Plate Curls",
     "muscle": "biceps",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Reverse_Plate_Curls/0.jpg",
     "instructions": [
       "Start by standing straight with a weighted plate held by both hands and arms fully extended. Use a pronated grip (palms facing down) and make sure your fingers grab the rough side of the plate while your thumb grabs the smooth side. Note: For the best results, grab the weighted plate at an 11:00 and 1:00 o'clock position.",
@@ -7899,10 +13521,41 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "reverse-tabletop-hip-pulses",
+    "name": "Reverse Tabletop Hip Pulses",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/reverse-tabletop-hip-pulses-start.webp",
+    "instructions": [
+      "Sit with the knees bent, the feet flat and the hands on the floor behind you.",
+      "Press into the hands and feet and lift the hips until the trunk is level with the knees.",
+      "Keeping the elbows straight, lower the hips a few centimetres.",
+      "Squeeze the glutes to lift them back to level.",
+      "Pulse for the desired number of repetitions and lower down."
+    ]
+  },
+  {
+    "id": "reverse-tabletop-hold",
+    "name": "Reverse Tabletop Hold",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/reverse-tabletop-hold-main.webp",
+    "instructions": [
+      "Sit with the knees bent, the feet flat and the hands on the floor behind you, fingers pointing towards the heels.",
+      "Press into the hands and feet and lift the hips until the trunk is level with the knees.",
+      "Open the chest, draw the shoulders away from the ears and look straight ahead.",
+      "Hold the position for the prescribed time with the hips high.",
+      "Lower the hips under control to finish."
+    ]
+  },
+  {
     "id": "Reverse_Triceps_Bench_Press",
     "name": "Reverse Triceps Bench Press",
     "muscle": "triceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Reverse_Triceps_Bench_Press/0.jpg",
     "instructions": [
       "Lie back on a flat bench. Using a close, supinated grip (around shoulder width), lift the bar from the rack and hold it straight over you with your arms locked extended in front of you and perpendicular to the floor. This will be your starting position.",
@@ -7913,10 +13566,41 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "revolved-chair-pose",
+    "name": "Revolved Chair Pose",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/revolved-chair-pose-main.webp",
+    "instructions": [
+      "Set up in chair pose with the knees bent, the hips back and the palms together at the chest.",
+      "Keep the knees level with each other so the hips do not open into the twist.",
+      "Rotate the chest to one side and hook the opposite elbow outside that thigh.",
+      "Press the palms together and hold for the prescribed time, lengthening the spine on each inhale.",
+      "Come back to centre and repeat on the other side."
+    ]
+  },
+  {
+    "id": "revolved-crescent-lunge",
+    "name": "Revolved Crescent Lunge",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/revolved-crescent-lunge-main.webp",
+    "instructions": [
+      "Step into a high lunge with the front knee over the ankle and the back heel lifted.",
+      "Bring the palms together at the chest and square both hips towards the front of the mat.",
+      "Rotate the chest towards the front leg and hook the opposite elbow outside the thigh.",
+      "Hold the twist for the prescribed time, pressing the back heel towards the wall behind you.",
+      "Unwind and repeat on the other side."
+    ]
+  },
+  {
     "id": "Rhomboids-SMR",
     "name": "Rhomboids-SMR",
     "muscle": "back",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Rhomboids-SMR/0.jpg",
     "instructions": [
       "Lay down with your back on the floor. Place a foam roll underneath your upper back, and cross your arms in front of you, protracting your shoulders. This will be your starting position.",
@@ -7928,6 +13612,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Rickshaw Carry",
     "muscle": "other",
     "equipment": "other",
+    "category": "strongman",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Rickshaw_Carry/0.jpg",
     "instructions": [
       "Position the frame at the starting point, and load with the appropriate weight. Standing in the center of the frame, begin by gripping the handles and driving through your heels to lift the frame. Ensure your chest and head are up and your back is straight.",
@@ -7939,6 +13624,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Rickshaw Deadlift",
     "muscle": "quads",
     "equipment": "other",
+    "category": "strongman",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Rickshaw_Deadlift/0.jpg",
     "instructions": [
       "Load the frame with the desired weight. Center yourself between the handles. You feet should be about hip width apart. Bend at the hips to grip the handles, allowing your shoulder blades to protract.",
@@ -7947,10 +13633,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "ring-dead-hang",
+    "name": "Ring Dead Hang",
+    "muscle": "other",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/ring-dead-hang-main.webp",
+    "instructions": [
+      "Grip a pair of gymnastic rings with a neutral grip, palms facing each other.",
+      "Hang with your arms fully extended and feet off the ground.",
+      "Let the rings rotate naturally; do not fight the grip.",
+      "Keep your shoulders engaged (no shrug to the ears) and core lightly braced.",
+      "Hold for the desired duration."
+    ]
+  },
+  {
     "id": "Ring_Dips",
     "name": "Ring Dips",
     "muscle": "triceps",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Ring_Dips/0.jpg",
     "instructions": [
       "Grip a ring in each hand, and then take a small jump to help you get into the starting position with your arms locked out.",
@@ -7960,10 +13662,85 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "ring-face-pull",
+    "name": "Ring Face Pull",
+    "muscle": "shoulders",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/ring-face-pull-start.webp",
+    "instructions": [
+      "Grip the rings and lean back so your body is at an angle.",
+      "Pull the rings toward your face, flaring elbows to the sides.",
+      "Hold briefly, then return.",
+      "Repeat."
+    ]
+  },
+  {
+    "id": "ring-muscle-up",
+    "name": "Ring Muscle-Up",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/ring-muscle-up-start.webp",
+    "instructions": [
+      "Hang from the rings with a false grip, palms facing each other.",
+      "Pull explosively, driving the chest up to the rings.",
+      "Transition the elbows over the rings as the chest rises.",
+      "Press to full arm extension at the top.",
+      "Lower under control through the transition back to the hang."
+    ]
+  },
+  {
+    "id": "ring-push-up",
+    "name": "Ring Push-Up",
+    "muscle": "chest",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/ring-push-up-start.webp",
+    "instructions": [
+      "Set the rings just above floor height.",
+      "Grip the rings and assume a plank position with arms straight.",
+      "Lower the chest toward the rings, keeping the elbows close to the body.",
+      "Press back up to full arm extension.",
+      "Repeat for the prescribed reps."
+    ]
+  },
+  {
+    "id": "ring-row",
+    "name": "Ring Row",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/ring-row-start.webp",
+    "instructions": [
+      "Set the rings at hip to chest height.",
+      "Grip the rings with palms facing each other, lean back at an angle with arms straight.",
+      "Brace the core and pull the chest toward the rings.",
+      "Squeeze the shoulder blades together at the top.",
+      "Lower under control to a full-arm extension."
+    ]
+  },
+  {
+    "id": "rings-inverted-row",
+    "name": "Rings Inverted Row",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/rings-inverted-row-start.webp",
+    "instructions": [
+      "Set the rings just above hip height.",
+      "Lie under the rings and grip them with palms facing each other.",
+      "Walk the feet forward so the body forms a straight line.",
+      "Pull the chest toward the rings, squeezing the shoulder blades.",
+      "Lower under control to a full-arm extension."
+    ]
+  },
+  {
     "id": "Rocket_Jump",
     "name": "Rocket Jump",
     "muscle": "quads",
     "equipment": "bodyweight",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Rocket_Jump/0.jpg",
     "instructions": [
       "Begin in a relaxed stance with your feet shoulder width apart and hold your arms close to the body.",
@@ -7976,6 +13753,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Rocking Standing Calf Raise",
     "muscle": "calves",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Rocking_Standing_Calf_Raise/0.jpg",
     "instructions": [
       "This exercise is best performed inside a squat rack for safety purposes. To begin, first set the bar on a rack that best matches your height. Once the correct height is chosen and the bar is loaded, step under the bar and place it on the back of your shoulders (slightly below the neck).",
@@ -7993,6 +13771,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Rocky Pull-Ups/Pulldowns",
     "muscle": "back",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Rocky_Pull-Ups_Pulldowns/0.jpg",
     "instructions": [
       "Grab the pull-up bar with the palms facing forward using a wide grip.",
@@ -8008,6 +13787,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Romanian Deadlift",
     "muscle": "hamstrings",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Romanian_Deadlift/0.jpg",
     "instructions": [
       "Put a barbell in front of you on the ground and grab it using a pronated (palms facing down) grip that a little wider than shoulder width. Tip: Depending on the weight used, you may need wrist wraps to perform the exercise and also a raised platform in order to allow for better range of motion.",
@@ -8022,6 +13802,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Romanian Deadlift from Deficit",
     "muscle": "hamstrings",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Romanian_Deadlift_from_Deficit/0.jpg",
     "instructions": [
       "Begin standing while holding a bar at arm's length in front of you. You can stand on a raised platform to increase the range of motion.",
@@ -8034,6 +13815,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Rope Climb",
     "muscle": "back",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Rope_Climb/0.jpg",
     "instructions": [
       "Grab the rope with both hands above your head. Pull down on the rope as you take a small jump.",
@@ -8048,6 +13830,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Rope Crunch",
     "muscle": "core",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Rope_Crunch/0.jpg",
     "instructions": [
       "Kneel 1-2 feet in front of a cable system with a rope attached.",
@@ -8062,6 +13845,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Rope Jumping",
     "muscle": "quads",
     "equipment": "other",
+    "category": "cardio",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Rope_Jumping/0.jpg",
     "instructions": [
       "Hold an end of the rope in each hand. Position the rope behind you on the ground. Raise your arms up and turn the rope over your head bringing it down in front of you. When it reaches the ground, jump over it. Find a good turning pace that can be maintained. Different speeds and techniques can be used to introduce variation.",
@@ -8073,6 +13857,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Rope Straight-Arm Pulldown",
     "muscle": "back",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Rope_Straight-Arm_Pulldown/0.jpg",
     "instructions": [
       "Attach a rope to a high pulley and make your weight selection. Stand a couple feet back from the pulley with your feet staggered and take the rope with both hands. Lean forward from the hip, keeping your back straight, with your arms extended up in front of you. This will be your starting position.",
@@ -8086,6 +13871,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Round The World Shoulder Stretch",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Round_The_World_Shoulder_Stretch/0.jpg",
     "instructions": [
       "Stand up straight with your legs together, holding a bodybar or broomstick.",
@@ -8094,10 +13880,27 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "rowing-machine",
+    "name": "Rowing Machine",
+    "muscle": "back",
+    "equipment": "machine",
+    "category": "cardio",
+    "image": "/repdb/rowing-machine-start.webp",
+    "instructions": [
+      "Sit on the rower, strap your feet into the footplates and take the handle with an overhand grip.",
+      "Slide forward into the catch: shins vertical, torso leaning slightly ahead of the hips, arms straight out toward the flywheel.",
+      "Drive through your legs first, pushing the seat back until your knees are almost straight.",
+      "Swing your torso back past vertical, then pull the handle in to your lower ribs with your elbows travelling past your sides.",
+      "Reverse the order on the recovery — arms away, torso forward, then bend the knees — and slide back to the catch for the next stroke.",
+      "Continue for the desired time, distance or number of strokes."
+    ]
+  },
+  {
     "id": "Rowing_Stationary",
     "name": "Rowing, Stationary",
     "muscle": "quads",
     "equipment": "machine",
+    "category": "cardio",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Rowing_Stationary/0.jpg",
     "instructions": [
       "To begin, seat yourself on the rower. Make sure that your heels are resting comfortably against the base of the foot pedals and that the straps are secured. Select the program that you wish to use, if applicable. Sit up straight and bend forward at the hips.",
@@ -8110,6 +13913,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Runner's Stretch",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Runners_Stretch/0.jpg",
     "instructions": [
       "It's easiest to get into this stretch if you start standing up, put one leg behind you, and slowly lower your torso down to the floor.",
@@ -8118,10 +13922,27 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "running",
+    "name": "Running",
+    "muscle": "calves",
+    "equipment": "bodyweight",
+    "category": "cardio",
+    "image": "/repdb/running-main.webp",
+    "instructions": [
+      "Start from an easy jog and build into your pace over the first few minutes rather than setting off at target speed.",
+      "Land with your foot under your hips, not out in front, and keep the contact with the ground short and quiet.",
+      "Run tall through the hips with a slight forward lean from the ankles, not a fold at the waist.",
+      "Bend your elbows to about ninety degrees and drive your arms forward and back, keeping them off your chest.",
+      "Breathe rhythmically and keep your shoulders, jaw and hands loose.",
+      "Hold the pace for the desired time or distance, then jog and walk for a few minutes to finish."
+    ]
+  },
+  {
     "id": "Running_Treadmill",
     "name": "Running, Treadmill",
     "muscle": "quads",
     "equipment": "machine",
+    "category": "cardio",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Running_Treadmill/0.jpg",
     "instructions": [
       "To begin, step onto the treadmill and select the desired option from the menu. Most treadmills have a manual setting, or you can select a program to run. Typically, you can enter your age and weight to estimate the amount of calories burned during exercise. Elevation can be adjusted to change the intensity of the workout.",
@@ -8133,6 +13954,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Russian Twist",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Russian_Twist/0.jpg",
     "instructions": [
       "Lie down on the floor placing your feet either under something that will not move or by having a partner hold them. Your legs should be bent at the knees.",
@@ -8147,6 +13969,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Sandbag Load",
     "muscle": "quads",
     "equipment": "other",
+    "category": "strongman",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Sandbag_Load/0.jpg",
     "instructions": [
       "To load sandbags or other objects, begin with the implements placed a distance from the loading platform, typically 50 feet.",
@@ -8160,6 +13983,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Scapular Pull-Up",
     "muscle": "back",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Scapular_Pull-Up/0.jpg",
     "instructions": [
       "Take a pronated grip on a pull-up bar.",
@@ -8172,6 +13996,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Scissor Kick",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Scissor_Kick/0.jpg",
     "instructions": [
       "To begin, lie down with your back pressed against the floor or on an exercise mat (optional). Your arms should be fully extended to the sides with your palms facing down. Note: The arms should be stationary the entire time.",
@@ -8186,6 +14011,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Scissors Jump",
     "muscle": "quads",
     "equipment": "bodyweight",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Scissors_Jump/0.jpg",
     "instructions": [
       "Assume a lunge stance position with one foot forward with the knee bent, and the rear knee nearly touching the ground.",
@@ -8199,6 +14025,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Band Hamstring Curl",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Band_Hamstring_Curl/0.jpg",
     "instructions": [
       "Secure a band close to the ground and place a bench a couple feet away from it.",
@@ -8212,6 +14039,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Barbell Military Press",
     "muscle": "shoulders",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Barbell_Military_Press/0.jpg",
     "instructions": [
       "Sit on a Military Press Bench with a bar behind your head and either have a spotter give you the bar (better on the rotator cuff this way) or pick it up yourself carefully with a pronated grip (palms facing forward). Tip: Your grip should be wider than shoulder width and it should create a 90-degree angle between the forearm and the upper arm as the barbell goes down.",
@@ -8222,10 +14050,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "seated-barbell-overhead-press",
+    "name": "Seated Barbell Overhead Press",
+    "muscle": "shoulders",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/seated-barbell-overhead-press-start.webp",
+    "instructions": [
+      "Set an upright bench inside a rack with the pins at about shoulder height when seated.",
+      "Sit with your back flat against the pad and unrack the barbell at the front of the shoulders.",
+      "Press the bar overhead until the arms are fully extended, tucking the head through at the top.",
+      "Lower the bar back to the collarbones under control.",
+      "Repeat for the recommended number of repetitions."
+    ]
+  },
+  {
     "id": "Seated_Barbell_Twist",
     "name": "Seated Barbell Twist",
     "muscle": "core",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Barbell_Twist/0.jpg",
     "instructions": [
       "Start out by sitting at the end of a flat bench with a barbell placed on top of your thighs. Your feet should be shoulder width apart from each other.",
@@ -8241,6 +14085,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Bent-Over One-Arm Dumbbell Triceps Extension",
     "muscle": "triceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Bent-Over_One-Arm_Dumbbell_Triceps_Extension/0.jpg",
     "instructions": [
       "Sit down at the end of a flat bench with a dumbbell in one arm using a neutral grip (palms of the hand facing you).",
@@ -8257,6 +14102,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Bent-Over Rear Delt Raise",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Bent-Over_Rear_Delt_Raise/0.jpg",
     "instructions": [
       "Place a couple of dumbbells looking forward in front of a flat bench.",
@@ -8272,6 +14118,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Bent-Over Two-Arm Dumbbell Triceps Extension",
     "muscle": "triceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Bent-Over_Two-Arm_Dumbbell_Triceps_Extension/0.jpg",
     "instructions": [
       "Sit down at the end of a flat bench with a dumbbell in both arms using a neutral grip (palms of the hand facing you).",
@@ -8287,6 +14134,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Biceps",
     "muscle": "biceps",
     "equipment": "bodyweight",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Biceps/0.jpg",
     "instructions": [
       "Sit on the floor with your knees bent and your partner standing behind you. Extend your arms straight behind you with your palms facing each other. Your partner will hold your wrists for you. This will be the starting position.",
@@ -8299,6 +14147,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Cable Rows",
     "muscle": "back",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Cable_Rows/0.jpg",
     "instructions": [
       "For this exercise you will need access to a low pulley row machine with a V-bar. Note: The V-bar will enable you to have a neutral grip where the palms of your hands face each other. To get into the starting position, first sit down on the machine and place your feet on the front platform or crossbar provided making sure that your knees are slightly bent and not locked.",
@@ -8313,6 +14162,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Cable Shoulder Press",
     "muscle": "shoulders",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Cable_Shoulder_Press/0.jpg",
     "instructions": [
       "Adjust the weight to an appropriate amount and be seated, grasping the handles. Your upper arms should be about 90 degrees to the body, with your head and chest up. The elbows should also be bent to about 90 degrees. This will be your starting position.",
@@ -8326,6 +14176,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Calf Raise",
     "muscle": "calves",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Calf_Raise/0.jpg",
     "instructions": [
       "Sit on the machine and place your toes on the lower portion of the platform provided with the heels extending off. Choose the toe positioning of your choice (forward, in, or out) as per the beginning of this chapter.",
@@ -8341,6 +14192,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Calf Stretch",
     "muscle": "calves",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Calf_Stretch/0.jpg",
     "instructions": [
       "Sit up straight on an exercise mat.",
@@ -8354,6 +14206,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Close-Grip Concentration Barbell Curl",
     "muscle": "biceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Close-Grip_Concentration_Barbell_Curl/0.jpg",
     "instructions": [
       "Sit down on a flat bench with a barbell or E-Z Bar in front of you in between your legs. Your legs should be spread with the knees bent and the feet on the floor.",
@@ -8368,6 +14221,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Dumbbell Curl",
     "muscle": "biceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Dumbbell_Curl/0.jpg",
     "instructions": [
       "Sit on a flat bench with a dumbbell on each hand being held at arms length. The elbows should be close to the torso.",
@@ -8382,6 +14236,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Dumbbell Inner Biceps Curl",
     "muscle": "biceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Dumbbell_Inner_Biceps_Curl/0.jpg",
     "instructions": [
       "Sit on the end of a flat bench with a dumbbell in each hand being held at arms length. The elbows should be close to the torso.",
@@ -8397,6 +14252,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Dumbbell Palms-Down Wrist Curl",
     "muscle": "other",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Dumbbell_Palms-Down_Wrist_Curl/0.jpg",
     "instructions": [
       "Start out by placing two dumbbells on the floor in front of a flat bench.",
@@ -8413,6 +14269,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Dumbbell Palms-Up Wrist Curl",
     "muscle": "other",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Dumbbell_Palms-Up_Wrist_Curl/0.jpg",
     "instructions": [
       "Start out by placing two dumbbells on the floor in front of a flat bench.",
@@ -8429,6 +14286,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Dumbbell Press",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Dumbbell_Press/0.jpg",
     "instructions": [
       "Grab a couple of dumbbells and sit on a military press bench or a utility bench that has a back support on it as you place the dumbbells upright on top of your thighs.",
@@ -8440,10 +14298,41 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "seated-db-press",
+    "name": "Seated Dumbbell Shoulder Press",
+    "muscle": "shoulders",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/seated-db-press-start.webp",
+    "instructions": [
+      "Sit on a bench with back support, holding dumbbells at shoulder height.",
+      "Press the dumbbells overhead until arms are fully extended.",
+      "Lower the dumbbells back to shoulder level.",
+      "Repeat."
+    ]
+  },
+  {
+    "id": "seated-dumbbell-tricep-extension",
+    "name": "Seated Dumbbell Tricep Extension",
+    "muscle": "triceps",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/seated-dumbbell-tricep-extension-start.webp",
+    "instructions": [
+      "Sit on a bench with a dumbbell held overhead in both hands.",
+      "Keep your upper arms vertical next to your ears.",
+      "Lower the dumbbell behind your head by bending your elbows.",
+      "Extend your arms to press the dumbbell back overhead.",
+      "Squeeze your triceps at the top.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
     "id": "Seated_Flat_Bench_Leg_Pull-In",
     "name": "Seated Flat Bench Leg Pull-In",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Flat_Bench_Leg_Pull-In/0.jpg",
     "instructions": [
       "Sit on a bench with the legs stretched out in front of you slightly below parallel and your arms holding on to the sides of the bench. Your torso should be leaning backwards around a 45-degree angle from the bench. This will be your starting position.",
@@ -8457,6 +14346,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Floor Hamstring Stretch",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Floor_Hamstring_Stretch/0.jpg",
     "instructions": [
       "Sit on a mat with your right leg extended in front of you and your left leg bent with your foot against your right inner thigh.",
@@ -8464,10 +14354,25 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "seated-forward-fold",
+    "name": "Seated Forward Fold",
+    "muscle": "hamstrings",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/seated-forward-fold-main.webp",
+    "instructions": [
+      "Sit on the floor with both legs straight out in front.",
+      "Keep your back long and hinge forward from the hips.",
+      "Reach your hands toward your feet.",
+      "Hold for 20 to 30 seconds, breathing steadily."
+    ]
+  },
+  {
     "id": "Seated_Front_Deltoid",
     "name": "Seated Front Deltoid",
     "muscle": "shoulders",
     "equipment": "bodyweight",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Front_Deltoid/0.jpg",
     "instructions": [
       "Sit upright on the floor with your legs bent, your partner standing behind you. Stick your arms straight out to your sides, with your palms facing the ground. Attempt to move them as far behind you as possible, as your assistant holds your wrists. This will be your starting position.",
@@ -8480,6 +14385,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Glute",
     "muscle": "glutes",
     "equipment": "bodyweight",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Glute/0.jpg",
     "instructions": [
       "In a seated position with your knees bent, cross one ankle over the opposite knee. Your partner will stand behind you. Now, lean forward as your partner braces your shoulders with their hands. This will be your starting position.",
@@ -8492,6 +14398,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Good Mornings",
     "muscle": "back",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Good_Mornings/0.jpg",
     "instructions": [
       "Set up a box in a power rack. The pins should be set at an appropriate height. Begin by stepping under the bar and placing it across the back of the shoulders, not on top of your traps. Squeeze your shoulder blades together and rotate your elbows forward, attempting to bend the bar across your shoulders.",
@@ -8505,6 +14412,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Hamstring",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Hamstring/0.jpg",
     "instructions": [
       "In a seated position with your legs extended, have your partner stand behind you. Now, lean forward as your partner braces your shoulders with their hands. This will be your starting position.",
@@ -8517,6 +14425,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Hamstring and Calf Stretch",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Hamstring_and_Calf_Stretch/0.jpg",
     "instructions": [
       "Loop a belt, rope, or band around one foot. Sit down with both legs extended . This will be your starting position.",
@@ -8528,6 +14437,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Head Harness Neck Resistance",
     "muscle": "other",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Head_Harness_Neck_Resistance/0.jpg",
     "instructions": [
       "Place a neck strap on the floor at the end of a flat bench. Once you have selected the weights, sit at the end of the flat bench with your feet wider than shoulder width apart from each other. Your toes should be pointed out.",
@@ -8543,6 +14453,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Leg Curl",
     "muscle": "hamstrings",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Leg_Curl/0.jpg",
     "instructions": [
       "Adjust the machine lever to fit your height and sit on the machine with your back against the back support pad.",
@@ -8557,6 +14468,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Leg Tucks",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Leg_Tucks/0.jpg",
     "instructions": [
       "Sit on a bench with the legs stretched out in front of you slightly below parallel and your arms holding on to the sides of the bench. Your torso should be leaning backwards around a 45-degree angle from the bench. This will be your starting position.",
@@ -8566,10 +14478,27 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "Seated_One-arm_Cable_Pulley_Rows",
+    "name": "Seated One-arm Cable Pulley Rows",
+    "muscle": "back",
+    "equipment": "cable",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_One-arm_Cable_Pulley_Rows/0.jpg",
+    "instructions": [
+      "To get into the starting position, first sit down on the machine and place your feet on the front platform or crossbar provided making sure that your knees are slightly bent and not locked.",
+      "Lean over as you keep the natural alignment of your back and grab the single handle attachment with your left arm using a palms-down grip.",
+      "With your arm extended pull back until your torso is at a 90-degree angle from your legs. Your back should be slightly arched and your chest should be sticking out. You should be feeling a nice stretch on your lat as you hold the bar in front of you. The right arm can be kept by the waist. This is the starting position of the exercise.",
+      "Keeping the torso stationary, pull the handles back towards your torso while keeping the arms close to it as you rotate the wrist, so that by the time your hand is by your abdominals it is in a neutral position (palms facing the torso). Breathe out as you perform that movement. At that point you should be squeezing your back muscles hard.",
+      "Hold that contraction for a second and slowly go back to the original position while breathing in. Tip: Remember to rotate the wrist as you go back to the starting position so that the palms are facing down again.",
+      "Repeat for the recommended amount of repetitions and then perform the same movement with the right hand."
+    ]
+  },
+  {
     "id": "Seated_One-Arm_Dumbbell_Palms-Down_Wrist_Curl",
     "name": "Seated One-Arm Dumbbell Palms-Down Wrist Curl",
     "muscle": "other",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_One-Arm_Dumbbell_Palms-Down_Wrist_Curl/0.jpg",
     "instructions": [
       "Sit on a flat bench with a dumbbell in your right hand.",
@@ -8585,6 +14514,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated One-Arm Dumbbell Palms-Up Wrist Curl",
     "muscle": "other",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_One-Arm_Dumbbell_Palms-Up_Wrist_Curl/0.jpg",
     "instructions": [
       "Sit on a flat bench with a dumbbell in your right hand.",
@@ -8596,25 +14526,11 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Seated_One-arm_Cable_Pulley_Rows",
-    "name": "Seated One-arm Cable Pulley Rows",
-    "muscle": "back",
-    "equipment": "cable",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_One-arm_Cable_Pulley_Rows/0.jpg",
-    "instructions": [
-      "To get into the starting position, first sit down on the machine and place your feet on the front platform or crossbar provided making sure that your knees are slightly bent and not locked.",
-      "Lean over as you keep the natural alignment of your back and grab the single handle attachment with your left arm using a palms-down grip.",
-      "With your arm extended pull back until your torso is at a 90-degree angle from your legs. Your back should be slightly arched and your chest should be sticking out. You should be feeling a nice stretch on your lat as you hold the bar in front of you. The right arm can be kept by the waist. This is the starting position of the exercise.",
-      "Keeping the torso stationary, pull the handles back towards your torso while keeping the arms close to it as you rotate the wrist, so that by the time your hand is by your abdominals it is in a neutral position (palms facing the torso). Breathe out as you perform that movement. At that point you should be squeezing your back muscles hard.",
-      "Hold that contraction for a second and slowly go back to the original position while breathing in. Tip: Remember to rotate the wrist as you go back to the starting position so that the palms are facing down again.",
-      "Repeat for the recommended amount of repetitions and then perform the same movement with the right hand."
-    ]
-  },
-  {
     "id": "Seated_Overhead_Stretch",
     "name": "Seated Overhead Stretch",
     "muscle": "core",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Overhead_Stretch/0.jpg",
     "instructions": [
       "Sit up straight on an exercise mat.",
@@ -8628,6 +14544,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Palm-Up Barbell Wrist Curl",
     "muscle": "other",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Palm-Up_Barbell_Wrist_Curl/0.jpg",
     "instructions": [
       "Hold a barbell with both hands and your palms facing up; hands spaced about shoulder width.",
@@ -8642,6 +14559,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Palms-Down Barbell Wrist Curl",
     "muscle": "other",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Palms-Down_Barbell_Wrist_Curl/0.jpg",
     "instructions": [
       "Hold a barbell with both hands and your palms facing down; hands spaced about shoulder width.",
@@ -8656,6 +14574,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Side Lateral Raise",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Side_Lateral_Raise/0.jpg",
     "instructions": [
       "Pick a couple of dumbbells and sit at the end of a flat bench with your feet firmly on the floor. Hold the dumbbells with your palms facing in and your arms straight down at your sides at arms' length. This will be your starting position.",
@@ -8665,10 +14584,56 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "seated-smith-machine-shoulder-press",
+    "name": "Seated Smith Machine Shoulder Press",
+    "muscle": "shoulders",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/seated-smith-machine-shoulder-press-start.webp",
+    "instructions": [
+      "Position a bench inside a Smith machine.",
+      "Sit facing forward with the bar at shoulder height.",
+      "Grip the bar slightly wider than shoulder-width.",
+      "Unrack and press the bar straight up until your arms are extended.",
+      "Lower the bar back to shoulder height with control.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "seated-spinal-twist",
+    "name": "Seated Spinal Twist",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/seated-spinal-twist-main.webp",
+    "instructions": [
+      "Sit with one leg straight and cross the other foot over it.",
+      "Brace the opposite elbow against the outside of the bent knee.",
+      "Rotate your torso toward the bent knee and look over your shoulder.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
+    "id": "seated-straddle-stretch",
+    "name": "Seated Straddle Stretch",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/seated-straddle-stretch-main.webp",
+    "instructions": [
+      "Sit with your legs straight and spread wide in a V.",
+      "Keep your back long and hinge forward from the hips.",
+      "Walk your hands forward along the floor.",
+      "Hold for 20 to 30 seconds, breathing steadily."
+    ]
+  },
+  {
     "id": "Seated_Triceps_Press",
     "name": "Seated Triceps Press",
     "muscle": "triceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Triceps_Press/0.jpg",
     "instructions": [
       "Sit down on a bench with back support and grasp a dumbbell with both hands and hold it overhead at arm's length. Tip: a better way is to have somebody hand it to you especially if it is very heavy. The resistance should be resting in the palms of your hands with your thumbs around it. The palm of the hand should be facing inward. This will be your starting position.",
@@ -8682,6 +14647,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Seated Two-Arm Palms-Up Low-Pulley Wrist Curl",
     "muscle": "other",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Seated_Two-Arm_Palms-Up_Low-Pulley_Wrist_Curl/0.jpg",
     "instructions": [
       "Put a bench in front of a low pulley machine that has a barbell or EZ Curl attachment on it.",
@@ -8700,6 +14666,7 @@ export const generatedExercises: Exercise[] = [
     "name": "See-Saw Press (Alternating Side Press)",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/See-Saw_Press_Alternating_Side_Press/0.jpg",
     "instructions": [
       "Grab a dumbbell with each hand and stand up erect.",
@@ -8714,6 +14681,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Shotgun Row",
     "muscle": "back",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Shotgun_Row/0.jpg",
     "instructions": [
       "Attach a single handle to a low cable.",
@@ -8727,6 +14695,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Shoulder Circles",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Shoulder_Circles/0.jpg",
     "instructions": [
       "With shoulders relaxed and arms resting loosely at your sides (or in your lap if you're seated), gently roll your shoulders forward, up, back, and down.",
@@ -8738,6 +14707,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Shoulder Press - With Bands",
     "muscle": "shoulders",
     "equipment": "band",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Shoulder_Press_-_With_Bands/0.jpg",
     "instructions": [
       "To begin, stand on an exercise band so that tension begins at arm's length. Grasp the handles and lift them so that the hands are at shoulder height at each side.",
@@ -8750,6 +14720,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Shoulder Raise",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Shoulder_Raise/0.jpg",
     "instructions": [
       "Relax your arms to your sides and raise your shoulders up toward your ears, then back down."
@@ -8760,20 +14731,10 @@ export const generatedExercises: Exercise[] = [
     "name": "Shoulder Stretch",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Shoulder_Stretch/0.jpg",
     "instructions": [
       "Reach your left arm across your body and hold it straight."
-    ]
-  },
-  {
-    "id": "Side-Lying_Floor_Stretch",
-    "name": "Side-Lying Floor Stretch",
-    "muscle": "back",
-    "equipment": "other",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Side-Lying_Floor_Stretch/0.jpg",
-    "instructions": [
-      "First lie on your left side, bending your left knee in front of you to stabilize your torso (use your abdominal muscles as well to hold you upright).",
-      "Straighten your right leg and rest the right foot on the floor behind your left. Straighten your right arm over your head and gently pull on your right wrist to stretch the entire right side of the body. Switch sides."
     ]
   },
   {
@@ -8781,6 +14742,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Side Bridge",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Side_Bridge/0.jpg",
     "instructions": []
   },
@@ -8789,6 +14751,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Side Hop-Sprint",
     "muscle": "quads",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Side_Hop-Sprint/0.jpg",
     "instructions": [
       "Stand to the side of a cone or hurdle.",
@@ -8801,6 +14764,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Side Jackknife",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Side_Jackknife/0.jpg",
     "instructions": []
   },
@@ -8809,6 +14773,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Side Lateral Raise",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Side_Lateral_Raise/0.jpg",
     "instructions": [
       "Pick a couple of dumbbells and stand with a straight torso and the dumbbells by your side at arms length with the palms of the hand facing you. This will be your starting position.",
@@ -8822,6 +14787,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Side Laterals to Front Raise",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Side_Laterals_to_Front_Raise/0.jpg",
     "instructions": [
       "In a standing position, hold a pair of dumbbells at your side. This will be your starting position.",
@@ -8837,6 +14803,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Side Leg Raises",
     "muscle": "glutes",
     "equipment": "bodyweight",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Side_Leg_Raises/0.jpg",
     "instructions": [
       "Stand next to a chair, which you may hold onto as a support. Stand on one leg. This will be your starting position.",
@@ -8845,10 +14812,27 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "side-lunge",
+    "name": "Side Lunge",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/side-lunge-start.webp",
+    "instructions": [
+      "Stand with feet hip-width apart and hands at your chest.",
+      "Step one leg wide to the side, keeping the other leg straight.",
+      "Bend the stepping knee and push your hips back into a lateral squat.",
+      "Keep your chest up and the working heel planted.",
+      "Drive through the bent leg to return to standing.",
+      "Complete reps on one side, then switch."
+    ]
+  },
+  {
     "id": "Side_Lying_Groin_Stretch",
     "name": "Side Lying Groin Stretch",
     "muscle": "glutes",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Side_Lying_Groin_Stretch/0.jpg",
     "instructions": [
       "Start off by lying on your right side and bend your right knee in front of you to stabilize the torso.",
@@ -8857,10 +14841,27 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "side-lying-hip-adduction",
+    "name": "Side Lying Hip Adduction",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/side-lying-hip-adduction-start.webp",
+    "instructions": [
+      "Lie on your side with your bottom leg straight.",
+      "Bend your top leg and place its foot flat in front of the bottom thigh.",
+      "Support your head with your bottom arm.",
+      "Lift the bottom leg upward toward the ceiling.",
+      "Lower the leg back down under control.",
+      "Complete reps on one side, then switch."
+    ]
+  },
+  {
     "id": "Side_Neck_Stretch",
     "name": "Side Neck Stretch",
     "muscle": "other",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Side_Neck_Stretch/0.jpg",
     "instructions": [
       "Start with your shoulders relaxed, gently tilt your head towards your shoulder.",
@@ -8868,10 +14869,56 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "side-plank",
+    "name": "Side Plank",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/side-plank-main.webp",
+    "instructions": [
+      "Lie on your side with your forearm on the floor, elbow under your shoulder.",
+      "Lift your hips off the floor, forming a straight line from head to feet.",
+      "Hold the position, keeping your core tight.",
+      "Breathe steadily.",
+      "Repeat on both sides."
+    ]
+  },
+  {
+    "id": "side-plank-leg-lift-hold",
+    "name": "Side Plank Leg Lift Hold",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/side-plank-leg-lift-hold-main.webp",
+    "instructions": [
+      "Set up in a side plank on the forearm with the elbow under the shoulder and the feet stacked.",
+      "Lift the hips until the body forms a straight line from the ankles to the head.",
+      "Raise the top leg to roughly hip height, keeping the toes pointing forward.",
+      "Hold the position for the prescribed time, keeping the hips high and the shoulder stacked.",
+      "Lower the leg and the hips under control and repeat on the other side."
+    ]
+  },
+  {
+    "id": "side-plank-leg-lift",
+    "name": "Side Plank with Leg Lift",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/side-plank-leg-lift-start.webp",
+    "instructions": [
+      "Lie on your side with the forearm on the floor, elbow under the shoulder.",
+      "Stack the feet and lift the hips into a side plank.",
+      "From this stable side plank, raise the top leg straight up toward the ceiling.",
+      "Lower the leg back down with control without dropping the hips.",
+      "Complete reps on one side, then switch."
+    ]
+  },
+  {
     "id": "Side_Standing_Long_Jump",
     "name": "Side Standing Long Jump",
     "muscle": "quads",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Side_Standing_Long_Jump/0.jpg",
     "instructions": [
       "Begin standing with your feet hip width apart in an athletic stance. Your head and chest should be up, knees and hips slightly bent. This will be your starting position.",
@@ -8880,10 +14927,24 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "Side_to_Side_Box_Shuffle",
+    "name": "Side to Side Box Shuffle",
+    "muscle": "quads",
+    "equipment": "other",
+    "category": "plyometrics",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Side_to_Side_Box_Shuffle/0.jpg",
+    "instructions": [
+      "Stand to one side of the box with your left foot resting on the middle of it.",
+      "To begin, jump up and over to the other side of the box, landing with your right foot on top of the box and your left foot on the floor. Swing your arms to aid your movement.",
+      "Continue shuffling back and forth across the box."
+    ]
+  },
+  {
     "id": "Side_To_Side_Chins",
     "name": "Side To Side Chins",
     "muscle": "back",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Side_To_Side_Chins/0.jpg",
     "instructions": [
       "Grab the pull-up bar with the palms facing forward using a wide grip.",
@@ -8900,6 +14961,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Side Wrist Pull",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Side_Wrist_Pull/0.jpg",
     "instructions": [
       "This stretch works best standing. Cross your left arm over the midline of your body and hold the left wrist in your right hand down at the level of your hips. Start the stretch with a bent left arm.",
@@ -8907,15 +14969,223 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Side_to_Side_Box_Shuffle",
-    "name": "Side to Side Box Shuffle",
+    "id": "Side-Lying_Floor_Stretch",
+    "name": "Side-Lying Floor Stretch",
+    "muscle": "back",
+    "equipment": "other",
+    "category": "stretching",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Side-Lying_Floor_Stretch/0.jpg",
+    "instructions": [
+      "First lie on your left side, bending your left knee in front of you to stabilize your torso (use your abdominal muscles as well to hold you upright).",
+      "Straighten your right leg and rest the right foot on the floor behind your left. Straighten your right arm over your head and gently pull on your right wrist to stretch the entire right side of the body. Switch sides."
+    ]
+  },
+  {
+    "id": "side-lying-hip-abduction",
+    "name": "Side-Lying Hip Abduction",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/side-lying-hip-abduction-start.webp",
+    "instructions": [
+      "Lie on your side with legs stacked.",
+      "Keep the bottom leg slightly bent.",
+      "Raise the top leg toward the ceiling.",
+      "Lower under control.",
+      "Repeat on both sides."
+    ]
+  },
+  {
+    "id": "side-lying-hip-abduction-hold",
+    "name": "Side-Lying Hip Abduction Hold",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/side-lying-hip-abduction-hold-main.webp",
+    "instructions": [
+      "Lie on one side with the legs stacked and straight, and support the head on the lower arm.",
+      "Brace the trunk so the torso stays square and does not roll backwards.",
+      "Lift the top leg to about 30 to 45 degrees, keeping the toes pointing forward.",
+      "Hold the leg there for the prescribed time, breathing normally.",
+      "Lower the leg under control and repeat on the other side."
+    ]
+  },
+  {
+    "id": "side-lying-hip-adduction-hold",
+    "name": "Side-Lying Hip Adduction Hold",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/side-lying-hip-adduction-hold-main.webp",
+    "instructions": [
+      "Lie on one side with the bottom leg straight and the top leg crossed over it, foot flat on the floor.",
+      "Support the head on the lower arm and keep the hips stacked vertically.",
+      "Lift the bottom leg as high as it will go with the knee straight and the toes pointing forward.",
+      "Hold that lifted position for the prescribed time without rolling the hips back.",
+      "Lower the leg under control and repeat on the other side."
+    ]
+  },
+  {
+    "id": "side-lying-lateral-raise",
+    "name": "Side-Lying Lateral Raise",
+    "muscle": "shoulders",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/side-lying-lateral-raise-start.webp",
+    "instructions": [
+      "Lie on your side on a flat bench with your bottom arm supporting your head or gripping the bench edge.",
+      "Hold a dumbbell in your top hand with your arm resting along your side.",
+      "Keeping your elbow slightly bent, raise the dumbbell upward until your arm is perpendicular to the floor.",
+      "Pause briefly at the top, then lower the dumbbell slowly back to your side.",
+      "Complete all reps on one side before switching."
+    ]
+  },
+  {
+    "id": "single-arm-tricep-pushdown",
+    "name": "Single Arm Tricep Pushdown",
+    "muscle": "triceps",
+    "equipment": "cable",
+    "category": "strength",
+    "image": "/repdb/single-arm-tricep-pushdown-start.webp",
+    "instructions": [
+      "Attach a single handle to a high cable pulley.",
+      "Grasp the handle with one hand and keep your elbow pinned to your side.",
+      "Press the handle down until your arm is fully extended.",
+      "Squeeze the triceps at the bottom.",
+      "Slowly return to the start position.",
+      "Complete reps on one side, then switch."
+    ]
+  },
+  {
+    "id": "Single_Dumbbell_Raise",
+    "name": "Single Dumbbell Raise",
+    "muscle": "shoulders",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Single_Dumbbell_Raise/0.jpg",
+    "instructions": [
+      "With a wide stance, hold a dumbell with both hands, grasping the head of the dumbbell instead of the handle. Your arms should be extended and hanging at the waist. This will be your starting position.",
+      "Raise the weight until it is above shoulder level, keeping your arms extended. Your torso and hips should remain stationary throughout the movement.",
+      "Return to the starting position and repeat for the recommended amount of repetitions."
+    ]
+  },
+  {
+    "id": "single-db-svend-press",
+    "name": "Single Dumbbell Svend Press",
+    "muscle": "chest",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/single-db-svend-press-start.webp",
+    "instructions": [
+      "Stand tall and hold a single dumbbell upright in front of your sternum, the handle running vertically between your flat palms.",
+      "Squeeze your palms hard into the dumbbell so the chest takes the tension and the weight cannot slip.",
+      "Press the dumbbell straight forward until your arms are fully extended, keeping it at chest height the whole way out.",
+      "Pause briefly without letting the squeeze go, then draw the dumbbell back to your chest under control.",
+      "Repeat for the recommended number of repetitions."
+    ]
+  },
+  {
+    "id": "Single_Leg_Butt_Kick",
+    "name": "Single Leg Butt Kick",
+    "muscle": "quads",
+    "equipment": "bodyweight",
+    "category": "plyometrics",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Single_Leg_Butt_Kick/0.jpg",
+    "instructions": [
+      "Begin by standing on one leg, with the bent knee raised. This will be your start position.",
+      "Using a countermovement jump, take off upward by extending the hip, knee, and ankle of the grounded leg.",
+      "Immediately flex the knee and attempt to touch your butt with the heel of your jumping leg.",
+      "Return the leg to a partially bent position underneath the hips and land. Your opposite leg should stay in relatively the same position throughout the drill."
+    ]
+  },
+  {
+    "id": "single-leg-calf-raise",
+    "name": "Single Leg Calf Raise",
+    "muscle": "calves",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/single-leg-calf-raise-start.webp",
+    "instructions": [
+      "Stand on one foot with the ball of the foot on a raised platform, heel free.",
+      "Hold a wall or rail for balance with one hand.",
+      "Drop the heel below platform level for a deep stretch.",
+      "Drive up onto the toes as high as possible.",
+      "Lower under control. Complete reps per side, then switch."
+    ]
+  },
+  {
+    "id": "Single_Leg_Glute_Bridge",
+    "name": "Single Leg Glute Bridge",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Single_Leg_Glute_Bridge/0.jpg",
+    "instructions": [
+      "Lay on the floor with your feet flat and knees bent.",
+      "Raise one leg off of the ground, pulling the knee to your chest. This will be your starting position.",
+      "Execute the movement by driving through the heel, extending your hip upward and raising your glutes off of the ground.",
+      "Extend as far as possible, pause and then return to the starting position."
+    ]
+  },
+  {
+    "id": "single-leg-lying-leg-curl",
+    "name": "Single Leg Lying Leg Curl",
+    "muscle": "hamstrings",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/single-leg-lying-leg-curl-start.webp",
+    "instructions": [
+      "Lie face down on a lying leg curl machine.",
+      "Position one ankle under the pad, keeping the other foot off the machine.",
+      "Curl the working leg by bringing your heel toward your glute.",
+      "Squeeze the hamstring at the top.",
+      "Lower the leg back down under control.",
+      "Complete reps on one side, then switch."
+    ]
+  },
+  {
+    "id": "single-leg-press",
+    "name": "Single Leg Press",
+    "muscle": "glutes",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/single-leg-press-start.webp",
+    "instructions": [
+      "Sit in a leg press machine with one foot placed on the platform.",
+      "Keep the other leg off the platform, resting to the side.",
+      "Release the safeties and lower the platform by bending your knee.",
+      "Stop when your knee is near a 90-degree angle.",
+      "Drive through the heel to press the platform back up.",
+      "Complete reps on one side, then switch."
+    ]
+  },
+  {
+    "id": "Single_Leg_Push-off",
+    "name": "Single Leg Push-off",
     "muscle": "quads",
     "equipment": "other",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Side_to_Side_Box_Shuffle/0.jpg",
+    "category": "plyometrics",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Single_Leg_Push-off/0.jpg",
     "instructions": [
-      "Stand to one side of the box with your left foot resting on the middle of it.",
-      "To begin, jump up and over to the other side of the box, landing with your right foot on top of the box and your left foot on the floor. Swing your arms to aid your movement.",
-      "Continue shuffling back and forth across the box."
+      "Stand on the ground with one foot resting on the box, heel close to the edge.",
+      "Push off with your foot on top of the box, trying to gain as much height as possible by extending through the hip and knee.",
+      "Land with the same foot on top of the box, returning your other foot back to the start position."
+    ]
+  },
+  {
+    "id": "single-leg-romanian-deadlift",
+    "name": "Single Leg Romanian Deadlift",
+    "muscle": "glutes",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/single-leg-romanian-deadlift-start.webp",
+    "instructions": [
+      "Stand on one leg holding a dumbbell in each hand in front of your thighs.",
+      "Keep a slight bend in the standing knee.",
+      "Hinge at the hip while extending the free leg behind you.",
+      "Lower the dumbbells along your standing leg until you feel a hamstring stretch.",
+      "Drive through the heel to return to upright.",
+      "Complete reps on one side, then switch."
     ]
   },
   {
@@ -8923,6 +15193,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Single-Arm Cable Crossover",
     "muscle": "chest",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Single-Arm_Cable_Crossover/0.jpg",
     "instructions": [
       "Begin by moving the pulleys to the high position, select the resistance to be used, and take a handle in each hand.",
@@ -8933,10 +15204,56 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "single-arm-chest-supported-dumbbell-row",
+    "name": "Single-Arm Chest-Supported Dumbbell Row",
+    "muscle": "back",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/single-arm-chest-supported-dumbbell-row-start.webp",
+    "instructions": [
+      "Lie face-down on an incline bench holding a dumbbell in one hand, arm hanging straight down.",
+      "Row the dumbbell up to your side, driving your elbow past your torso.",
+      "Squeeze your shoulder blade at the top, then lower under control.",
+      "Complete all reps on one side before switching arms."
+    ]
+  },
+  {
+    "id": "single-arm-dumbbell-overhead-tricep-extension",
+    "name": "Single-Arm Dumbbell Overhead Tricep Extension",
+    "muscle": "triceps",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/single-arm-dumbbell-overhead-tricep-extension-start.webp",
+    "instructions": [
+      "Stand or sit holding a dumbbell in one hand overhead, arm fully extended.",
+      "The palm faces forward; the other hand can hold your waist or an upright for stability.",
+      "Bend the elbow to lower the dumbbell behind the head in a controlled arc.",
+      "Keep the upper arm vertical and close to the head throughout.",
+      "Extend the elbow to return the dumbbell overhead.",
+      "Complete all reps on one side, then switch."
+    ]
+  },
+  {
+    "id": "single-arm-hammer-curl",
+    "name": "Single-Arm Hammer Curl",
+    "muscle": "biceps",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/single-arm-hammer-curl-start.webp",
+    "instructions": [
+      "Stand with your feet about hip-width apart and hold one dumbbell at your side with the palm facing inward.",
+      "Brace your trunk and keep the working upper arm beside your ribs as the arm hangs straight.",
+      "Curl the dumbbell toward your shoulder without rotating the palm or swinging the torso.",
+      "Squeeze the elbow flexors at the top, then lower the dumbbell under control until the arm is straight.",
+      "Complete the repetitions on one side, then switch arms and repeat."
+    ]
+  },
+  {
     "id": "Single-Arm_Linear_Jammer",
     "name": "Single-Arm Linear Jammer",
     "muscle": "shoulders",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Single-Arm_Linear_Jammer/0.jpg",
     "instructions": [
       "Position a bar into a landmine or securely anchor it in a corner. Load the bar to an appropriate weight.",
@@ -8946,10 +15263,41 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "single-arm-machine-shoulder-press",
+    "name": "Single-Arm Machine Shoulder Press",
+    "muscle": "shoulders",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/single-arm-machine-shoulder-press-start.webp",
+    "instructions": [
+      "Adjust the seat so the working handle starts around shoulder height and sit with your back firmly against the pad.",
+      "Grip one handle with the wrist straight and keep the free hand on the support or resting comfortably.",
+      "Press the handle upward without leaning away from the back pad or rotating the torso.",
+      "Lower the handle under control until the elbow is just below the starting line, then repeat.",
+      "Complete the repetitions on one side, adjust the seat if needed, and train the other side."
+    ]
+  },
+  {
+    "id": "single-arm-plate-loaded-lateral-raise",
+    "name": "Single-Arm Plate-Loaded Lateral Raise",
+    "muscle": "shoulders",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/single-arm-plate-loaded-lateral-raise-start.webp",
+    "instructions": [
+      "Set the seat height so the pad pivot lines up with your shoulder, and load only the side you are about to work.",
+      "Sit with your back flat against the pad and place the outside of your working upper arm against its pad.",
+      "Hold the handle on the free side or rest that hand in your lap, and keep your torso square to the seat.",
+      "Push the working arm out and up against the pad until the upper arm is level with your shoulder, then lower it under control.",
+      "Complete all the repetitions on that side, then load and work the other side."
+    ]
+  },
+  {
     "id": "Single-Arm_Push-Up",
     "name": "Single-Arm Push-Up",
     "muscle": "chest",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Single-Arm_Push-Up/0.jpg",
     "instructions": [
       "Begin laying prone on the ground. Move yourself into a position supporting your weight on your toes and one arm. Your working arm should be placed directly under the shoulder, fully extended. Your legs should be extended, and for this movement you may need a wider base, placing your feet further apart than in a normal push-up.",
@@ -8963,6 +15311,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Single-Cone Sprint Drill",
     "muscle": "quads",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Single-Cone_Sprint_Drill/0.jpg",
     "instructions": [
       "This drill teaches quick foot action. You need a single cone. Begin standing next to the cone with one arm back and one arm forward.",
@@ -8971,10 +15320,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "single-leg-glute-bridge-hold",
+    "name": "Single-Leg Glute Bridge Hold",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/single-leg-glute-bridge-hold-main.webp",
+    "instructions": [
+      "Lie on your back with one knee bent and that foot flat, and lift the other leg so the thigh is roughly vertical.",
+      "Push through the heel of the planted foot and lift the hips until the body is straight from the knee to the shoulders.",
+      "Level the pelvis so the lifted side does not drop, and tuck the ribs down.",
+      "Hold the top position for the prescribed time, keeping the lifted knee still.",
+      "Lower the hips under control and repeat on the other side."
+    ]
+  },
+  {
     "id": "Single-Leg_High_Box_Squat",
     "name": "Single-Leg High Box Squat",
     "muscle": "quads",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Single-Leg_High_Box_Squat/0.jpg",
     "instructions": [
       "Position a box in a rack. Secure a band or rope in place above the box.",
@@ -8987,6 +15352,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Single-Leg Hop Progression",
     "muscle": "quads",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Single-Leg_Hop_Progression/0.jpg",
     "instructions": [
       "Arrange a line of cones in front of you. Assume a relaxed standing position, balanced on one leg. Raise the knee of your opposite leg. This will be your starting position.",
@@ -9000,6 +15366,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Single-Leg Lateral Hop",
     "muscle": "quads",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Single-Leg_Lateral_Hop/0.jpg",
     "instructions": [
       "Stand to the side of a cone or hurdle. To get into the start position, stand on one leg with your knee slightly bent.",
@@ -9013,6 +15380,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Single-Leg Leg Extension",
     "muscle": "quads",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Single-Leg_Leg_Extension/0.jpg",
     "instructions": [
       "Seat yourself in the machine and adjust it so that you are positioned properly. The pad should be against the lower part of the shin but not in contact with the ankle. Adjust the seat so that the pivot point is in line with your knee. Select a weight appropriate for your abilities.",
@@ -9026,6 +15394,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Single-Leg Stride Jump",
     "muscle": "quads",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Single-Leg_Stride_Jump/0.jpg",
     "instructions": [
       "Stand to the side of a box with your inside foot on top of it, close to the edge.",
@@ -9034,53 +15403,16 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Single_Dumbbell_Raise",
-    "name": "Single Dumbbell Raise",
-    "muscle": "shoulders",
-    "equipment": "dumbbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Single_Dumbbell_Raise/0.jpg",
-    "instructions": [
-      "With a wide stance, hold a dumbell with both hands, grasping the head of the dumbbell instead of the handle. Your arms should be extended and hanging at the waist. This will be your starting position.",
-      "Raise the weight until it is above shoulder level, keeping your arms extended. Your torso and hips should remain stationary throughout the movement.",
-      "Return to the starting position and repeat for the recommended amount of repetitions."
-    ]
-  },
-  {
-    "id": "Single_Leg_Butt_Kick",
-    "name": "Single Leg Butt Kick",
-    "muscle": "quads",
-    "equipment": "bodyweight",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Single_Leg_Butt_Kick/0.jpg",
-    "instructions": [
-      "Begin by standing on one leg, with the bent knee raised. This will be your start position.",
-      "Using a countermovement jump, take off upward by extending the hip, knee, and ankle of the grounded leg.",
-      "Immediately flex the knee and attempt to touch your butt with the heel of your jumping leg.",
-      "Return the leg to a partially bent position underneath the hips and land. Your opposite leg should stay in relatively the same position throughout the drill."
-    ]
-  },
-  {
-    "id": "Single_Leg_Glute_Bridge",
-    "name": "Single Leg Glute Bridge",
-    "muscle": "glutes",
-    "equipment": "bodyweight",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Single_Leg_Glute_Bridge/0.jpg",
-    "instructions": [
-      "Lay on the floor with your feet flat and knees bent.",
-      "Raise one leg off of the ground, pulling the knee to your chest. This will be your starting position.",
-      "Execute the movement by driving through the heel, extending your hip upward and raising your glutes off of the ground.",
-      "Extend as far as possible, pause and then return to the starting position."
-    ]
-  },
-  {
-    "id": "Single_Leg_Push-off",
-    "name": "Single Leg Push-off",
+    "id": "Sit_Squats",
+    "name": "Sit Squats",
     "muscle": "quads",
     "equipment": "other",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Single_Leg_Push-off/0.jpg",
+    "category": "stretching",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Sit_Squats/0.jpg",
     "instructions": [
-      "Stand on the ground with one foot resting on the box, heel close to the edge.",
-      "Push off with your foot on top of the box, trying to gain as much height as possible by extending through the hip and knee.",
-      "Land with the same foot on top of the box, returning your other foot back to the start position."
+      "Stand with your feet shoulder width apart. This will be your starting position.",
+      "Begin the movement by flexing your knees and hips, sitting back with your hips.",
+      "Continue until you have squatted a portion of the way down, but are above parallel, and quickly reverse the motion until you return to the starting position. Repeat for 5-10 repetitions."
     ]
   },
   {
@@ -9088,6 +15420,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Sit-Up",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Sit-Up/0.jpg",
     "instructions": [
       "Lie down on the floor placing your feet either under something that will not move or by having a partner hold them. Your legs should be bent at the knees.",
@@ -9098,22 +15431,11 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Sit_Squats",
-    "name": "Sit Squats",
-    "muscle": "quads",
-    "equipment": "other",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Sit_Squats/0.jpg",
-    "instructions": [
-      "Stand with your feet shoulder width apart. This will be your starting position.",
-      "Begin the movement by flexing your knees and hips, sitting back with your hips.",
-      "Continue until you have squatted a portion of the way down, but are above parallel, and quickly reverse the motion until you return to the starting position. Repeat for 5-10 repetitions."
-    ]
-  },
-  {
     "id": "Skating",
     "name": "Skating",
     "muscle": "quads",
     "equipment": "other",
+    "category": "cardio",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Skating/0.jpg",
     "instructions": [
       "Roller skating is a fun activity which can be effective in improving cardiorespiratory fitness and muscular endurance. It requires relatively good balance and coordination. It is necessary to learn the basics of skating including turning and stopping and to wear protective gear to avoid possible injury.",
@@ -9121,10 +15443,25 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "skull-crusher",
+    "name": "Skull Crusher",
+    "muscle": "triceps",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/skull-crusher-start.webp",
+    "instructions": [
+      "Lie on a flat bench holding a barbell over your chest with a narrow grip.",
+      "Lower the bar toward your forehead by bending at the elbows.",
+      "Extend your arms back to the start.",
+      "Repeat."
+    ]
+  },
+  {
     "id": "Sled_Drag_-_Harness",
     "name": "Sled Drag - Harness",
     "muscle": "quads",
     "equipment": "other",
+    "category": "strongman",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Sled_Drag_-_Harness/0.jpg",
     "instructions": [
       "To begin, load the sled with the desired weight and attach the pulling strap. You can pull with handles, use a harness, or attach the pulling strap to a weight belt.",
@@ -9136,6 +15473,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Sled Overhead Backward Walk",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Sled_Overhead_Backward_Walk/0.jpg",
     "instructions": [
       "Attach dual handles to a sled connected by a rope or chain. Load the sled to a light weight.",
@@ -9148,6 +15486,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Sled Overhead Triceps Extension",
     "muscle": "triceps",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Sled_Overhead_Triceps_Extension/0.jpg",
     "instructions": [
       "Attach dual handles to a sled using a chain or rope. Load the sled to an appropriate load.",
@@ -9161,6 +15500,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Sled Push",
     "muscle": "quads",
     "equipment": "other",
+    "category": "strongman",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Sled_Push/0.jpg",
     "instructions": [
       "Load your pushing sled with the desired weight.",
@@ -9172,6 +15512,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Sled Reverse Flye",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Sled_Reverse_Flye/0.jpg",
     "instructions": [
       "Attach dual handles to a sled connected by a rope or chain. Load the sled to a light weight.",
@@ -9185,6 +15526,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Sled Row",
     "muscle": "back",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Sled_Row/0.jpg",
     "instructions": [
       "Attach dual handles to a sled connected by a rope or chain. Load the sled to an appropriate weight. Face the sled, backing up until there is some tension in the line.",
@@ -9198,6 +15540,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Sledgehammer Swings",
     "muscle": "core",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Sledgehammer_Swings/0.jpg",
     "instructions": [
       "You will need a tire and a sledgehammer for this exercise. Stand in front of the tire about two feet away from it with a staggered stance. Grip the sledgehammer.",
@@ -9211,6 +15554,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Smith Incline Shoulder Raise",
     "muscle": "shoulders",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Smith_Incline_Shoulder_Raise/0.jpg",
     "instructions": [
       "Place an incline bench underneath the smith machine. Place the barbell at a height that you can reach when lying down and your arms are almost fully extended. Once the weight you need is selected, lie down on the incline bench and make sure your shoulders are aligned right under the barbell.",
@@ -9226,6 +15570,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Smith Machine Behind the Back Shrug",
     "muscle": "back",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Smith_Machine_Behind_the_Back_Shrug/0.jpg",
     "instructions": [
       "With the bar at thigh level, load an appropriate weight.",
@@ -9240,6 +15585,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Smith Machine Bench Press",
     "muscle": "chest",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Smith_Machine_Bench_Press/0.jpg",
     "instructions": [
       "Place a flat bench underneath the smith machine. Now place the barbell at a height that you can reach when lying down and your arms are almost fully extended. Once the weight you need is selected, lie down on the flat bench. Using a pronated grip that is wider than shoulder width, unlock the bar from the rack and hold it straight over you with your arms locked. This will be your starting position.",
@@ -9254,6 +15600,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Smith Machine Bent Over Row",
     "muscle": "back",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Smith_Machine_Bent_Over_Row/0.jpg",
     "instructions": [
       "Set the barbell attached to the smith machine to a height that is about 2 inches below your knees.",
@@ -9265,10 +15612,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "smith-machine-bulgarian-split",
+    "name": "Smith Machine Bulgarian Split Squat",
+    "muscle": "glutes",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/smith-machine-bulgarian-split-start.webp",
+    "instructions": [
+      "Set up a bench behind the Smith machine. Rest the bar on your traps.",
+      "Place the rear foot on the bench and front foot forward.",
+      "Lower your back knee toward the floor.",
+      "Push through the front heel to return.",
+      "Repeat on both sides."
+    ]
+  },
+  {
     "id": "Smith_Machine_Calf_Raise",
     "name": "Smith Machine Calf Raise",
     "muscle": "calves",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Smith_Machine_Calf_Raise/0.jpg",
     "instructions": [
       "Place a block or weight plate below the bar on the Smith machine. Set the bar to a position that best matches your height. Once the correct height is chosen and the bar is loaded, step onto the plates with the balls of your feet and place the bar on the back of your shoulders.",
@@ -9283,6 +15646,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Smith Machine Close-Grip Bench Press",
     "muscle": "triceps",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Smith_Machine_Close-Grip_Bench_Press/0.jpg",
     "instructions": [
       "Place a flat bench underneath the smith machine. Place the barbell at a height that you can reach when lying down and your arms are almost fully extended. Once the weight you need is selected, lie down on the flat bench. Using a close and pronated grip (palms facing forward) that is around shoulder width, unlock the bar from the rack and hold it straight over you with your arms locked. This will be your starting position.",
@@ -9293,10 +15657,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "smith-machine-decline-bench-press",
+    "name": "Smith Machine Decline Bench Press",
+    "muscle": "chest",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/smith-machine-decline-bench-press-start.webp",
+    "instructions": [
+      "Set a decline bench in the machine so the bar lines up with your lower chest when you lie down, and hook your legs under the pads.",
+      "Lie back with your head at the low end, take an overhand grip slightly wider than your shoulders and unrack the bar.",
+      "Lower the bar under control until it touches your lower chest, keeping your elbows at roughly forty-five degrees from your torso.",
+      "Press the bar back up until your arms are extended, without locking the elbows out hard.",
+      "Repeat for the desired number of repetitions, then rack the bar before releasing your legs."
+    ]
+  },
+  {
     "id": "Smith_Machine_Decline_Press",
     "name": "Smith Machine Decline Press",
     "muscle": "chest",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Smith_Machine_Decline_Press/0.jpg",
     "instructions": [
       "Position a decline bench in the rack so that the bar will be above your chest. Load an appropriate weight and take your place on the bench.",
@@ -9307,10 +15687,41 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "smith-machine-front-squat",
+    "name": "Smith Machine Front Squat",
+    "muscle": "glutes",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/smith-machine-front-squat-start.webp",
+    "instructions": [
+      "Set the bar at upper-chest height and step under it so it rests across the front of your shoulders, against your collarbones.",
+      "Cross your arms over the bar or take an open front-rack grip, and drive your elbows up until your upper arms are close to parallel with the floor.",
+      "Unrack the bar and stand with your feet about shoulder-width apart and slightly forward of it.",
+      "Sit straight down, keeping your elbows high and your torso upright, until your thighs are at least parallel to the floor.",
+      "Drive through the middle of your feet to stand back up, and repeat for the desired number of repetitions."
+    ]
+  },
+  {
+    "id": "smith-machine-good-morning",
+    "name": "Smith Machine Good Morning",
+    "muscle": "back",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/smith-machine-good-morning-start.webp",
+    "instructions": [
+      "Set the bar at upper-back height, step under it and settle it across your traps, then unrack it with your feet about hip-width apart.",
+      "Soften your knees slightly and keep them there -- this is a hinge, not a squat.",
+      "Push your hips straight back and let your torso tip forward, keeping your back flat and your head in line with your spine.",
+      "Stop when you feel a strong stretch in your hamstrings, with your torso somewhere near parallel to the floor.",
+      "Drive your hips forward to stand back up, squeezing the glutes at the top, and repeat for the desired reps."
+    ]
+  },
+  {
     "id": "Smith_Machine_Hang_Power_Clean",
     "name": "Smith Machine Hang Power Clean",
     "muscle": "hamstrings",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Smith_Machine_Hang_Power_Clean/0.jpg",
     "instructions": [
       "Position the bar at knee height and load it to an appropriate weight.",
@@ -9326,6 +15737,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Smith Machine Hip Raise",
     "muscle": "core",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Smith_Machine_Hip_Raise/0.jpg",
     "instructions": [
       "Position a bench in the rack and load the bar to an appropriate weight. Lie down on the bench, placing the bottom of your feet against the bar. Unlock the bar and extend your legs. You may need to use your hands to assist you. For added stability grasp the sides of the Smith Machine. This will be your starting position.",
@@ -9335,10 +15747,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "smith-machine-hip-thrust",
+    "name": "Smith Machine Hip Thrust",
+    "muscle": "glutes",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/smith-machine-hip-thrust-start.webp",
+    "instructions": [
+      "Set a flat bench inside the Smith machine, parallel to the bar and positioned so the bar will sit over your hip crease.",
+      "Set the bar low enough that you can get under it while seated on the floor, then sit with your upper back against the bench.",
+      "Roll the bar over your hips, pad it if you need to, and unhook it with your feet flat and about hip-width apart.",
+      "Drive through your heels and extend your hips until your thighs and torso form a straight line, squeezing the glutes at the top.",
+      "Lower your hips under control until they are just off the floor, and repeat for the desired number of repetitions."
+    ]
+  },
+  {
     "id": "Smith_Machine_Incline_Bench_Press",
     "name": "Smith Machine Incline Bench Press",
     "muscle": "chest",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Smith_Machine_Incline_Bench_Press/0.jpg",
     "instructions": [
       "Place an incline bench underneath the smith machine. Place the barbell at a height that you can reach when lying down and your arms are almost fully extended. Once the weight you need is selected, lie down on the incline bench and make sure your upper chest is aligned with the barbell. Using a pronated grip (palms facing forward) that is wider than shoulder width, unlock the bar from the rack and hold it straight over you with your arms locked. This will be your starting position.",
@@ -9353,6 +15781,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Smith Machine Leg Press",
     "muscle": "quads",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Smith_Machine_Leg_Press/0.jpg",
     "instructions": [
       "Position a Smith machine bar a couple feet off of the ground. Ensure that it is resting on the safeties. After loading the bar to an appropriate weight, lie underneath the bar. Place the middle of your feet on the bar, tucking your knees to your chest. This will be your starting position.",
@@ -9365,6 +15794,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Smith Machine One-Arm Upright Row",
     "muscle": "shoulders",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Smith_Machine_One-Arm_Upright_Row/0.jpg",
     "instructions": [
       "With the bar at thigh level, load an appropriate weight.",
@@ -9379,6 +15809,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Smith Machine Overhead Shoulder Press",
     "muscle": "shoulders",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Smith_Machine_Overhead_Shoulder_Press/0.jpg",
     "instructions": [
       "To begin, place a flat bench (or preferably one with back support) underneath a smith machine. Position the barbell at a height so that when seated on the flat bench, the arms must be almost fully extended to reach the barbell.",
@@ -9393,6 +15824,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Smith Machine Pistol Squat",
     "muscle": "quads",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Smith_Machine_Pistol_Squat/0.jpg",
     "instructions": [
       "To begin, first set the bar to a position that best matches your height. Step under it and position the bar across the back of your shoulders.",
@@ -9407,6 +15839,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Smith Machine Reverse Calf Raises",
     "muscle": "calves",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Smith_Machine_Reverse_Calf_Raises/0.jpg",
     "instructions": [
       "Adjust the barbell on the smith machine to fit your height and align a raised platform right under the bar.",
@@ -9418,10 +15851,105 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "smith-machine-reverse-grip-bent-over-row",
+    "name": "Smith Machine Reverse Grip Bent Over Row",
+    "muscle": "biceps",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/smith-machine-reverse-grip-bent-over-row-start.webp",
+    "instructions": [
+      "Stand inside a Smith machine and grip the bar with an underhand grip.",
+      "Hinge forward at the hips until your torso is about 45 degrees.",
+      "Keep your back flat and core braced.",
+      "Pull the bar toward your lower abdomen.",
+      "Squeeze your lats and shoulder blades at the top.",
+      "Lower the bar under control and repeat."
+    ]
+  },
+  {
+    "id": "smith-machine-reverse-lunge",
+    "name": "Smith Machine Reverse Lunge",
+    "muscle": "glutes",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/smith-machine-reverse-lunge-start.webp",
+    "instructions": [
+      "Set the bar so it sits across your upper traps when you stand, then unrack it with your feet under your hips.",
+      "Step one foot straight back and lower the rear knee toward the floor, keeping the front shin vertical and most of your weight on the front foot.",
+      "Stop when the rear knee is just short of the floor and the front thigh is roughly parallel to it.",
+      "Push through the front heel and bring the rear foot back to standing under the bar.",
+      "Complete all the repetitions on one side, or alternate legs, then switch."
+    ]
+  },
+  {
+    "id": "smith-machine-rdl",
+    "name": "Smith Machine Romanian Deadlift",
+    "muscle": "hamstrings",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/smith-machine-rdl-start.webp",
+    "instructions": [
+      "Set the Smith machine bar at mid-thigh height and stand directly underneath with feet hip-width.",
+      "Unrack the bar with an overhand grip just outside the hips.",
+      "Push the hips back while letting the bar slide down the front of the legs.",
+      "Go until you feel a deep hamstring stretch, with a flat back and a soft knee bend.",
+      "Drive the hips forward to return to standing, keeping the bar close to the body.",
+      "Repeat for the recommended number of repetitions."
+    ]
+  },
+  {
+    "id": "smith-machine-shoulder-press",
+    "name": "Smith Machine Shoulder Press",
+    "muscle": "shoulders",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/smith-machine-shoulder-press-start.webp",
+    "instructions": [
+      "Sit on a bench positioned inside a Smith machine.",
+      "Grip the bar slightly wider than shoulder-width at shoulder level.",
+      "Unrack the bar and press it overhead until your arms are extended.",
+      "Lower the bar back to shoulder level under control.",
+      "Keep your core tight throughout.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "smith-machine-shrug",
+    "name": "Smith Machine Shrug",
+    "muscle": "back",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/smith-machine-shrug-start.webp",
+    "instructions": [
+      "Stand upright inside a Smith machine with the bar at thigh height.",
+      "Grip the bar slightly wider than shoulder-width with an overhand grip.",
+      "Unrack the bar and let it hang in front of your thighs.",
+      "Shrug your shoulders straight up toward your ears.",
+      "Hold the top for a moment, then lower slowly.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "smith-machine-split-squat",
+    "name": "Smith Machine Split Squat",
+    "muscle": "glutes",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/smith-machine-split-squat-start.webp",
+    "instructions": [
+      "Set the bar low enough that it will still clear your shoulders at the bottom of the rep, then step under it and rest it across your upper traps.",
+      "Unrack the bar and take a long stride forward with one foot, leaving the rear foot planted on the floor with the heel lifted.",
+      "Check that your front shin will stay roughly vertical when you descend; adjust the stride length before you start loading it.",
+      "Lower straight down by bending both knees until the rear knee is just above the floor and the front thigh is close to parallel.",
+      "Drive through the front heel to return to the start, keeping both feet in place, and repeat for the desired reps before switching sides."
+    ]
+  },
+  {
     "id": "Smith_Machine_Squat",
     "name": "Smith Machine Squat",
     "muscle": "quads",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Smith_Machine_Squat/0.jpg",
     "instructions": [
       "To begin, first set the bar on the height that best matches your height. Once the correct height is chosen and the bar is loaded, step under the bar and place the back of your shoulders (slightly below the neck) across it.",
@@ -9437,6 +15965,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Smith Machine Stiff-Legged Deadlift",
     "muscle": "hamstrings",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Smith_Machine_Stiff-Legged_Deadlift/0.jpg",
     "instructions": [
       "To begin, set the bar on the smith machine to a height that is around the middle of your thighs. Once the correct height is chosen and the bar is loaded, grasp the bar using a pronated (palms forward) grip that is shoulder width apart. You may need some wrist wraps if using a significant amount of weight.",
@@ -9451,6 +15980,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Smith Machine Upright Row",
     "muscle": "back",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Smith_Machine_Upright_Row/0.jpg",
     "instructions": [
       "To begin, set the bar on the smith machine to a height that is around the middle of your thighs. Once the correct height is chosen and the bar is loaded, grasp the bar using a pronated (palms forward) grip that is shoulder width apart. You may need some wrist wraps if using a significant amount of weight.",
@@ -9465,6 +15995,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Smith Single-Leg Split Squat",
     "muscle": "quads",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Smith_Single-Leg_Split_Squat/0.jpg",
     "instructions": [
       "To begin, place a flat bench 2-3 feet behind the smith machine. Then, set the bar on the height that best matches your height. Once the correct height is chosen and the bar is loaded, step under the bar and place the back of your shoulders (slightly below the neck) across it.",
@@ -9481,6 +16012,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Snatch",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Snatch/0.jpg",
     "instructions": [
       "Place your feet at a shoulder width stance with the barbell resting right above the connection between the toes and the rest of the foot.",
@@ -9497,6 +16029,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Snatch Balance",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Snatch_Balance/0.jpg",
     "instructions": [
       "Begin with the feet in the pulling position, the bar racked across the back of the shoulders, and the hands placed in a wide snatch grip.",
@@ -9510,6 +16043,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Snatch Deadlift",
     "muscle": "hamstrings",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Snatch_Deadlift/0.jpg",
     "instructions": [
       "The snatch deadlift strengthens the first pull of the snatch. Begin with a wide snatch grip with the barbell placed on the platform. The feet should be directly under the hips, with the feet turned out. Squat down to the bar, keeping the back in absolute extension with the head facing forward.",
@@ -9518,10 +16052,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "Snatch_from_Blocks",
+    "name": "Snatch from Blocks",
+    "muscle": "quads",
+    "equipment": "barbell",
+    "category": "olympic",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Snatch_from_Blocks/0.jpg",
+    "instructions": [
+      "Begin with a loaded barbell on boxes or stands of the desired height. A wide grip should be taken on the bar. The feet should be directly below the hips, with the feet turned out as needed. Lower the hips, with the chest up and the head looking forward. The shoulders should be just in front of the bar, with the elbows pointed out. This will be the starting position.",
+      "Begin the first pull by driving through the front of the heels, raising the bar from the boxes.",
+      "Transition into the second pull by extending through the hips knees and ankles, driving the bar up as quickly as possible. The bar should be close to the body. At peak extension, shrug the shoulders and allow the elbows to flex to the side.",
+      "As you move your feet into the receiving position, forcefully pull yourself below the bar as you elevate the bar overhead. The feet should move to just outside the hips, turned out as necessary. Receive the bar with your body as low as possible and the arms fully extended overhead.",
+      "Keeping the bar aligned over the front of the heels, your head and chest up, drive through heels of the feet to move to a standing position. Carefully return the weight to the boxes."
+    ]
+  },
+  {
     "id": "Snatch_Pull",
     "name": "Snatch Pull",
     "muscle": "hamstrings",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Snatch_Pull/0.jpg",
     "instructions": [
       "With a barbell on the floor close to the shins, take a wide snatch grip. Lower your hips with the weight focused on the heels, back straight, head facing forward, chest up, with your shoulders just in front of the bar. This will be your starting position.",
@@ -9535,6 +16085,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Snatch Shrug",
     "muscle": "back",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Snatch_Shrug/0.jpg",
     "instructions": [
       "Begin with a wide grip, with the bar hanging at the mid thigh position. You can use a hook or overhand grip. Your back should be straight and inclined slightly forward.",
@@ -9542,24 +16093,11 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Snatch_from_Blocks",
-    "name": "Snatch from Blocks",
-    "muscle": "quads",
-    "equipment": "barbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Snatch_from_Blocks/0.jpg",
-    "instructions": [
-      "Begin with a loaded barbell on boxes or stands of the desired height. A wide grip should be taken on the bar. The feet should be directly below the hips, with the feet turned out as needed. Lower the hips, with the chest up and the head looking forward. The shoulders should be just in front of the bar, with the elbows pointed out. This will be the starting position.",
-      "Begin the first pull by driving through the front of the heels, raising the bar from the boxes.",
-      "Transition into the second pull by extending through the hips knees and ankles, driving the bar up as quickly as possible. The bar should be close to the body. At peak extension, shrug the shoulders and allow the elbows to flex to the side.",
-      "As you move your feet into the receiving position, forcefully pull yourself below the bar as you elevate the bar overhead. The feet should move to just outside the hips, turned out as necessary. Receive the bar with your body as low as possible and the arms fully extended overhead.",
-      "Keeping the bar aligned over the front of the heels, your head and chest up, drive through heels of the feet to move to a standing position. Carefully return the weight to the boxes."
-    ]
-  },
-  {
     "id": "Speed_Band_Overhead_Triceps",
     "name": "Speed Band Overhead Triceps",
     "muscle": "triceps",
     "equipment": "band",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Speed_Band_Overhead_Triceps/0.jpg",
     "instructions": [
       "For this exercise anchor a band to the ground. We used an incline bench and anchored the band to the base, standing over the bench. Alternatively, this could be performed standing on the band.",
@@ -9573,6 +16111,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Speed Box Squat",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Speed_Box_Squat/0.jpg",
     "instructions": [
       "Attach bands to the bar that are securely anchored near the ground. You may need to choke the bands to get adequate tension.",
@@ -9587,6 +16126,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Speed Squats",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Speed_Squats/0.jpg",
     "instructions": [
       "This exercise is best performed inside a squat rack for safety purposes. To begin, first set the bar on a rack that best matches your height. Once the correct height is chosen and the bar is loaded, step under the bar and place the back of your shoulders (slightly below the neck) across it.",
@@ -9602,6 +16142,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Spell Caster",
     "muscle": "core",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Spell_Caster/0.jpg",
     "instructions": [
       "Hold a dumbbell in each hand with a pronated grip. Your feet should be wide with your hips and knees extended. This will be your starting position.",
@@ -9611,10 +16152,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "sphinx-pose",
+    "name": "Sphinx Pose",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/sphinx-pose-main.webp",
+    "instructions": [
+      "Lie face down and place the forearms on the floor with the elbows directly under the shoulders.",
+      "Press the forearms and the tops of the feet down and lift the chest.",
+      "Draw the shoulders away from the ears and lengthen the back of the neck.",
+      "Hold the position for the prescribed time, breathing into the front of the chest.",
+      "Lower the chest to the floor and rest."
+    ]
+  },
+  {
     "id": "Spider_Crawl",
     "name": "Spider Crawl",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Spider_Crawl/0.jpg",
     "instructions": [
       "Begin in a prone position on the floor. Support your weight on your hands and toes, with your feet together and your body straight. Your arms should be bent to 90 degrees. This will be your starting position.",
@@ -9627,6 +16184,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Spider Curl",
     "muscle": "biceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Spider_Curl/0.jpg",
     "instructions": [
       "Start out by setting the bar on the part of the preacher bench that you would normally sit on. Make sure to align the barbell properly so that it is balanced and will not fall off.",
@@ -9643,6 +16201,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Spinal Stretch",
     "muscle": "back",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Spinal_Stretch/0.jpg",
     "instructions": [
       "Sit in a chair so your back is straight and your feet planted on the floor.",
@@ -9656,6 +16215,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Split Clean",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Split_Clean/0.jpg",
     "instructions": [
       "With a barbell on the floor close to the shins, take an overhand grip just outside the legs. Lower your hips with the weight focused on the heels, back straight, head facing forward, chest up, with your shoulders just in front of the bar. This will be your starting position.",
@@ -9671,6 +16231,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Split Jerk",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Split_Jerk/0.jpg",
     "instructions": [
       "Standing with the weight racked on the front of the shoulders, begin with the dip. With your feet directly under your hips, flex the knees without moving the hips backward.",
@@ -9684,6 +16245,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Split Jump",
     "muscle": "quads",
     "equipment": "bodyweight",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Split_Jump/0.jpg",
     "instructions": [
       "Assume a lunge stance position with one foot forward with the knee bent, and the rear knee nearly touching the ground.",
@@ -9698,6 +16260,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Split Snatch",
     "muscle": "hamstrings",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Split_Snatch/0.jpg",
     "instructions": [
       "Begin with a loaded barbell on the floor. The bar should be close to or touching the shins, and a wide grip should be taken on the bar. The feet should be directly below the hips, with the feet turned out as needed. Lower the hips, with the chest up and the head looking forward. The shoulders should be just in front of the bar. This will be the starting position.",
@@ -9713,6 +16276,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Split Squat with Dumbbells",
     "muscle": "quads",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Split_Squat_with_Dumbbells/0.jpg",
     "instructions": [
       "Position yourself into a staggered stance with the rear foot elevated and front foot forward.",
@@ -9726,6 +16290,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Split Squats",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Split_Squats/0.jpg",
     "instructions": [
       "Being in a standing position. Jump into a split leg position, with one leg forward and one leg back, flexing the knees and lowering your hips slightly as you do so.",
@@ -9733,10 +16298,27 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "spoto-press",
+    "name": "Spoto Press",
+    "muscle": "chest",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/spoto-press-start.webp",
+    "instructions": [
+      "Lie on a flat bench and grip the barbell slightly wider than shoulders.",
+      "Unrack the bar and hold it over your chest with arms extended.",
+      "Lower the bar until it is one inch above your chest.",
+      "Pause there for a full second without touching the chest.",
+      "Press the bar back up until your arms are extended.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
     "id": "Squat_Jerk",
     "name": "Squat Jerk",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Squat_Jerk/0.jpg",
     "instructions": [
       "Standing with the weight racked on the front of the shoulders, begin with the dip. With your feet directly under your hips, flex the knees without moving the hips backward. Go down only slightly, and reverse direction as powerfully as possible. Drive through the heels create as much speed and force as possible, and be sure to move your head out of the way as the bar leaves the shoulders.",
@@ -9749,6 +16331,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Squat with Bands",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Squat_with_Bands/0.jpg",
     "instructions": [
       "Set up the bands on the sleeves, secured to either band pegs, the rack, or dumbbells so that there is appropriate tension.",
@@ -9762,6 +16345,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Squat with Chains",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Squat_with_Chains/0.jpg",
     "instructions": [
       "To set up the chains, begin by looping the leader chain over the sleeves of the bar. The heavy chain should be attached using a snap hook. Adjust the length of the lead chain so that a few links are still on the floor at the top of the movement.",
@@ -9775,6 +16359,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Squat with Plate Movers",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Squat_with_Plate_Movers/0.jpg",
     "instructions": [
       "To begin, first set the bar on a rack to just below shoulder level. Position a weight plate on the ground a couple feet back from the rack. Once the bar is loaded, step under it and place the back of your shoulders across it.",
@@ -9792,6 +16377,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Squats - With Bands",
     "muscle": "quads",
     "equipment": "band",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Squats_-_With_Bands/0.jpg",
     "instructions": [
       "To start out, make sure that the exercise band is at an even split between both the left and right side of the body. To do this, use your hands to grab both sides of the band and place both feet in the middle of the band. Your feet should be shoulder width apart from each other.",
@@ -9802,10 +16388,118 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "stability-ball-hip-bridge",
+    "name": "Stability Ball Hip Bridge",
+    "muscle": "glutes",
+    "equipment": "other",
+    "category": "strength",
+    "image": "/repdb/stability-ball-hip-bridge-start.webp",
+    "instructions": [
+      "Lie face-up on the floor and place both feet on top of a stability ball.",
+      "Arms rest at the sides on the floor for balance.",
+      "Squeeze the glutes and press the heels into the ball to raise the hips.",
+      "Finish with a straight line from shoulders to knees.",
+      "Lower the hips under control without the ball rolling away.",
+      "Repeat for the recommended number of repetitions."
+    ]
+  },
+  {
+    "id": "stability-ball-knee-tuck",
+    "name": "Stability Ball Knee Tuck",
+    "muscle": "core",
+    "equipment": "other",
+    "category": "strength",
+    "image": "/repdb/stability-ball-knee-tuck-start.webp",
+    "instructions": [
+      "Start in a high plank with both shins or the tops of the feet on top of a stability ball.",
+      "Hands are under the shoulders, body in a straight line.",
+      "Brace the core and pull the ball toward the chest by tucking the knees in.",
+      "Roll it back out by extending the legs fully back to the plank position.",
+      "Repeat for the recommended number of repetitions."
+    ]
+  },
+  {
+    "id": "ball-leg-curl",
+    "name": "Stability Ball Leg Curl",
+    "muscle": "hamstrings",
+    "equipment": "other",
+    "category": "strength",
+    "image": "/repdb/ball-leg-curl-start.webp",
+    "instructions": [
+      "Lie face-up on the floor with your heels and lower calves on top of a stability ball, arms out for balance.",
+      "Press through the heels to raise your hips into a straight line from shoulders to ankles.",
+      "Keeping the hips up, bend the knees to roll the ball toward your glutes.",
+      "Extend the legs back out under control without dropping the hips.",
+      "Complete all reps, then lower the hips and step off the ball."
+    ]
+  },
+  {
+    "id": "stability-ball-push-up",
+    "name": "Stability Ball Push-Up",
+    "muscle": "chest",
+    "equipment": "other",
+    "category": "strength",
+    "image": "/repdb/stability-ball-push-up-start.webp",
+    "instructions": [
+      "Kneel in front of a stability ball and place your shins or feet on top of it.",
+      "Set the hands on the floor under the shoulders in a high-plank position.",
+      "Brace the core hard — the ball will want to roll sideways.",
+      "Lower the chest to the floor by bending the elbows.",
+      "Press back up to the starting position without letting the ball wobble.",
+      "Repeat for the recommended number of repetitions."
+    ]
+  },
+  {
+    "id": "stability-ball-push-up-hands-on-ball",
+    "name": "Stability Ball Push-Up (Hands on Ball)",
+    "muscle": "chest",
+    "equipment": "other",
+    "category": "strength",
+    "image": "/repdb/stability-ball-push-up-hands-on-ball-start.webp",
+    "instructions": [
+      "Place both hands on top of a stability ball and walk your feet back into a straight-arm plank, body in a straight line from head to heels.",
+      "Brace your core and keep the ball steady beneath your hands.",
+      "Bend your elbows to lower your chest toward the ball under control.",
+      "Press back up to full arm extension without letting the ball roll.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "stability-ball-wall-squat",
+    "name": "Stability Ball Wall Squat",
+    "muscle": "glutes",
+    "equipment": "other",
+    "category": "strength",
+    "image": "/repdb/stability-ball-wall-squat-start.webp",
+    "instructions": [
+      "Place a stability ball between your lower back and a wall.",
+      "Step the feet forward about a foot, slightly wider than shoulder-width.",
+      "Squat down, letting the ball roll up the back as you descend.",
+      "Stop when thighs are parallel to the floor.",
+      "Drive through the heels to stand back up."
+    ]
+  },
+  {
+    "id": "stair-climber",
+    "name": "Stair Climber",
+    "muscle": "glutes",
+    "equipment": "machine",
+    "category": "cardio",
+    "image": "/repdb/stair-climber-main.webp",
+    "instructions": [
+      "Step onto the bottom stair with the machine at its slowest setting and take the rails lightly for balance.",
+      "Climb one step at a time, placing the whole foot on each stair rather than just the toes.",
+      "Stand upright with your chest open and your hips under your shoulders instead of hunching over the console.",
+      "Push the step down through the heel of the front foot, letting the glute of that leg do the work.",
+      "Set the pace so you can hold your posture, and keep climbing for the desired time or number of floors."
+    ]
+  },
+  {
     "id": "Stairmaster",
     "name": "Stairmaster",
     "muscle": "quads",
     "equipment": "machine",
+    "category": "cardio",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Stairmaster/0.jpg",
     "instructions": [
       "To begin, step onto the stairmaster and select the desired option from the menu. You can choose a manual setting, or you can select a program to run. Typically, you can enter your age and weight to estimate the amount of calories burned during exercise.",
@@ -9818,6 +16512,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Alternating Dumbbell Press",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Alternating_Dumbbell_Press/0.jpg",
     "instructions": [
       "Stand with a dumbbell in each hand. Raise the dumbbells to your shoulders with your palms facing forward and your elbows pointed out. This will be your starting position.",
@@ -9831,6 +16526,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Barbell Calf Raise",
     "muscle": "calves",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Barbell_Calf_Raise/0.jpg",
     "instructions": [
       "This exercise is best performed inside a squat rack for safety purposes. To begin, first set the bar on a rack that best matches your height. Once the correct height is chosen and the bar is loaded, step under the bar and place the bar on the back of your shoulders (slightly below the neck).",
@@ -9846,6 +16542,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Barbell Press Behind Neck",
     "muscle": "shoulders",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Barbell_Press_Behind_Neck/0.jpg",
     "instructions": [
       "This exercise is best performed inside a squat rack for easier pick up of the bar. To begin, first set the bar on a rack that best matches your height. Once the correct height is chosen and the bar is loaded, step under the bar and place the back of your shoulders (slightly below the neck) across it.",
@@ -9861,6 +16558,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Bent-Over One-Arm Dumbbell Triceps Extension",
     "muscle": "triceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Bent-Over_One-Arm_Dumbbell_Triceps_Extension/0.jpg",
     "instructions": [
       "With a dumbbell in one hand and the palm facing your torso, bend your knees slightly and bring your torso forward, by bending at the waist, while keeping the back straight until it is almost parallel to the floor. Make sure that you keep the head up.",
@@ -9876,6 +16574,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Bent-Over Two-Arm Dumbbell Triceps Extension",
     "muscle": "triceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Bent-Over_Two-Arm_Dumbbell_Triceps_Extension/0.jpg",
     "instructions": [
       "With a dumbbell in each hand and the palms facing your torso, bend your knees slightly and bring your torso forward, by bending at the waist, while keeping the back straight until it is almost parallel to the floor. Make sure that you keep the head up. The upper arms should be close to the torso and parallel to the floor while the forearms are pointing towards the floor as the hands hold the weights. Tip: There should be a 90-degree angle between the forearms and the upper arm. This is your starting position.",
@@ -9889,6 +16588,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Biceps Cable Curl",
     "muscle": "biceps",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Biceps_Cable_Curl/0.jpg",
     "instructions": [
       "Stand up with your torso upright while holding a cable curl bar that is attached to a low pulley. Grab the cable bar at shoulder width and keep the elbows close to the torso. The palm of your hands should be facing up (supinated grip). This will be your starting position.",
@@ -9902,6 +16602,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Biceps Stretch",
     "muscle": "biceps",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Biceps_Stretch/0.jpg",
     "instructions": [
       "Clasp your hands behind your back with your palms together, straighten arms and then rotate them so your palms face downward.",
@@ -9913,6 +16614,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Bradford Press",
     "muscle": "shoulders",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Bradford_Press/0.jpg",
     "instructions": [
       "Place a loaded bar at shoulder level in a rack. With a pronated grip at shoulder width, begin with the bar racked across the front of your shoulders. This is your starting position.",
@@ -9928,6 +16630,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Cable Chest Press",
     "muscle": "chest",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Cable_Chest_Press/0.jpg",
     "instructions": [
       "Position dual pulleys to chest height and select an appropriate weight. Stand a foot or two in front of the cables, holding one in each hand. You can stagger your stance for better stability.",
@@ -9941,6 +16644,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Cable Lift",
     "muscle": "core",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Cable_Lift/0.jpg",
     "instructions": [
       "Connect a standard handle on a tower, and move the cable to the lowest pulley position.",
@@ -9958,6 +16662,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Cable Wood Chop",
     "muscle": "core",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Cable_Wood_Chop/0.jpg",
     "instructions": [
       "Connect a standard handle to a tower, and move the cable to the highest pulley position.",
@@ -9975,6 +16680,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Calf Raises",
     "muscle": "calves",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Calf_Raises/0.jpg",
     "instructions": [
       "Adjust the padded lever of the calf raise machine to fit your height.",
@@ -9985,10 +16691,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "standing-calf-stretch",
+    "name": "Standing Calf Stretch",
+    "muscle": "calves",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/standing-calf-stretch-main.webp",
+    "instructions": [
+      "Step one foot back into a staggered stance.",
+      "Keep the back leg straight and the heel pressed down.",
+      "Bend the front knee and lean your weight forward.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
     "id": "Standing_Concentration_Curl",
     "name": "Standing Concentration Curl",
     "muscle": "biceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Concentration_Curl/0.jpg",
     "instructions": [
       "Taking a dumbbell in your working hand, lean forward. Allow your working arm to hang perpendicular to the ground with the elbow pointing out. This will be your starting position.",
@@ -10002,6 +16724,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Dumbbell Calf Raise",
     "muscle": "calves",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Dumbbell_Calf_Raise/0.jpg",
     "instructions": [
       "Stand with your torso upright holding two dumbbells in your hands by your sides. Place the ball of the foot on a sturdy and stable wooden board (that is around 2-3 inches tall) while your heels extend off and touch the floor. This will be your starting position.",
@@ -10015,6 +16738,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Dumbbell Press",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Dumbbell_Press/0.jpg",
     "instructions": [
       "Standing with your feet shoulder width apart, take a dumbbell in each hand. Raise the dumbbells to head height, the elbows out and about 90 degrees. This will be your starting position.",
@@ -10027,6 +16751,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Dumbbell Reverse Curl",
     "muscle": "biceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Dumbbell_Reverse_Curl/0.jpg",
     "instructions": [
       "To begin, stand straight with a dumbbell in each hand using a pronated grip (palms facing down). Your arms should be fully extended while your feet are shoulder width apart from each other. This is the starting position.",
@@ -10040,6 +16765,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Dumbbell Straight-Arm Front Delt Raise Above Head",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Dumbbell_Straight-Arm_Front_Delt_Raise_Above_Head/0.jpg",
     "instructions": [
       "Hold the dumbbells in front of your thighs, palms facing your thighs.",
@@ -10054,6 +16780,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Dumbbell Triceps Extension",
     "muscle": "triceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Dumbbell_Triceps_Extension/0.jpg",
     "instructions": [
       "To begin, stand up with a dumbbell held by both hands. Your feet should be about shoulder width apart from each other. Slowly use both hands to grab the dumbbell and lift it over your head until both arms are fully extended.",
@@ -10068,6 +16795,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Dumbbell Upright Row",
     "muscle": "back",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Dumbbell_Upright_Row/0.jpg",
     "instructions": [
       "Grasp a dumbbell in each hand with a pronated (palms forward) grip that is slightly less than shoulder width. The dumbbells should be resting on top of your thighs. Your arms should be extended with a slight bend at the elbows and your back should be straight. This will be your starting position.",
@@ -10081,6 +16809,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Elevated Quad Stretch",
     "muscle": "quads",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Elevated_Quad_Stretch/0.jpg",
     "instructions": [
       "Start by standing with your back about two to three feet away from a bench or step.",
@@ -10089,10 +16818,40 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "standing-forward-fold",
+    "name": "Standing Forward Fold",
+    "muscle": "hamstrings",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/standing-forward-fold-main.webp",
+    "instructions": [
+      "Stand tall with your feet hip-width apart and legs straight.",
+      "Hinge at your hips and fold your torso down toward the floor.",
+      "Let your hands and head hang toward your feet.",
+      "Hold for 20 to 30 seconds, breathing steadily."
+    ]
+  },
+  {
+    "id": "standing-forward-fold-to-half-lift",
+    "name": "Standing Forward Fold to Half Lift",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/standing-forward-fold-to-half-lift-start.webp",
+    "instructions": [
+      "Stand with the feet hip-width apart and fold forward from the hips.",
+      "Rest the hands on the shins, the floor or blocks.",
+      "Slide the hands up the shins and lift the chest until the back is flat and the spine is long.",
+      "Fold back down, letting the head and neck release.",
+      "Continue alternating between the two for the desired number of repetitions."
+    ]
+  },
+  {
     "id": "Standing_Front_Barbell_Raise_Over_Head",
     "name": "Standing Front Barbell Raise Over Head",
     "muscle": "shoulders",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Front_Barbell_Raise_Over_Head/0.jpg",
     "instructions": [
       "To begin, stand straight with a barbell in your hands. You should grip the bar with palms facing down and a closer than shoulder width grip apart from each other.",
@@ -10107,6 +16866,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Gastrocnemius Calf Stretch",
     "muscle": "calves",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Gastrocnemius_Calf_Stretch/0.jpg",
     "instructions": [
       "Place your right heel on a step with your knee extended and lean forward to grab your right toe with your right hand. Your left knee should be slightly bent and your back should be straight.",
@@ -10119,6 +16879,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Hamstring and Calf Stretch",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Hamstring_and_Calf_Stretch/0.jpg",
     "instructions": [
       "Being by looping a belt, band, or rope around one foot. While standing, place that foot forward.",
@@ -10131,6 +16892,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Hip Circles",
     "muscle": "glutes",
     "equipment": "bodyweight",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Hip_Circles/0.jpg",
     "instructions": [
       "Begin standing on one leg, holding to a vertical support.",
@@ -10144,6 +16906,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Hip Flexors",
     "muscle": "quads",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Hip_Flexors/0.jpg",
     "instructions": [
       "Stand up straight with the spine vertical, the left foot slightly in front of the right.",
@@ -10155,6 +16918,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Inner-Biceps Curl",
     "muscle": "biceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Inner-Biceps_Curl/0.jpg",
     "instructions": [
       "Stand up with a dumbbell in each hand being held at arms length. The elbows should be close to the torso. Your legs should be at about shoulder's width apart from each other.",
@@ -10171,6 +16935,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Lateral Stretch",
     "muscle": "core",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Lateral_Stretch/0.jpg",
     "instructions": [
       "Take a slightly wider than hip distance stance with your knees slightly bent.",
@@ -10184,6 +16949,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Leg Curl",
     "muscle": "hamstrings",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Leg_Curl/0.jpg",
     "instructions": [
       "Adjust the machine lever to fit your height and lie with your torso bent at the waist facing forward around 30-45 degrees (since an angled position is more favorable for hamstrings recruitment) with the pad of the lever on the back of your right leg (just a few inches under the calves) and the front of the right leg on top of the machine pad.",
@@ -10198,6 +16964,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Long Jump",
     "muscle": "quads",
     "equipment": "bodyweight",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Long_Jump/0.jpg",
     "instructions": [
       "This drill is best done in sand or other soft landing surface. Ensure that you are able to measure distance. Stand in a partial squat stance with feet shoulder width apart.",
@@ -10211,6 +16978,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Low-Pulley Deltoid Raise",
     "muscle": "shoulders",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Low-Pulley_Deltoid_Raise/0.jpg",
     "instructions": [
       "Start by standing to the right side of a low pulley row. Use your left hand to come across the body and grab a single handle attached to the low pulley with a pronated grip (palms facing down). Rest your arm in front of you. Your right hand should grab the machine for better support and balance.",
@@ -10226,6 +16994,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Low-Pulley One-Arm Triceps Extension",
     "muscle": "triceps",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Low-Pulley_One-Arm_Triceps_Extension/0.jpg",
     "instructions": [
       "Grab a single handle with your left arm next to the low pulley machine. Turn away from the machine keeping the handle to the side of your body with your arm fully extended. Now use both hands to elevate the single handle directly above the head with the palm facing forward. Keep your upper arm completely vertical (perpendicular to the floor) and put your right hand on your left elbow to help keep it steady. This is the starting position.",
@@ -10240,6 +17009,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Military Press",
     "muscle": "shoulders",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Military_Press/0.jpg",
     "instructions": [
       "Start by placing a barbell that is about chest high on a squat rack. Once you have selected the weights, grab the barbell using a pronated (palms facing forward) grip. Make sure to grip the bar wider than shoulder width apart from each other.",
@@ -10255,6 +17025,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Olympic Plate Hand Squeeze",
     "muscle": "other",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Olympic_Plate_Hand_Squeeze/0.jpg",
     "instructions": [
       "To begin, stand straight while holding a weight plate by the ridge at arm's length in each hand using a neutral grip (palms facing in). You feet should be shoulder width apart from each other. This will be your starting position.",
@@ -10268,6 +17039,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing One-Arm Cable Curl",
     "muscle": "biceps",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_One-Arm_Cable_Curl/0.jpg",
     "instructions": [
       "Start out by grabbing single handle next to the low pulley machine. Make sure you are far enough from the machine so that your arm is supporting the weight.",
@@ -10283,6 +17055,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing One-Arm Dumbbell Curl Over Incline Bench",
     "muscle": "biceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_One-Arm_Dumbbell_Curl_Over_Incline_Bench/0.jpg",
     "instructions": [
       "Stand on the back side of an incline bench as if you were going to be a spotter for someone. Have a dumbbell in one hand and rest it across the incline bench with a supinated (palms up) grip.",
@@ -10298,6 +17071,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing One-Arm Dumbbell Triceps Extension",
     "muscle": "triceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_One-Arm_Dumbbell_Triceps_Extension/0.jpg",
     "instructions": [
       "To begin, stand up with a dumbbell held in one hand. Your feet should be about shoulder width apart from each other. Now fully extend the arm with the dumbbell over your head. Tip: The small finger of your hand should be facing the ceiling and the palm of your hand should be facing forward. The dumbbell should be above your head.",
@@ -10313,6 +17087,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Overhead Barbell Triceps Extension",
     "muscle": "triceps",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Overhead_Barbell_Triceps_Extension/0.jpg",
     "instructions": [
       "To begin, stand up holding a barbell or e-z bar using a pronated grip (palms facing forward) with your hands closer than shoulder width apart from each other. Your feet should be about shoulder width apart.",
@@ -10327,6 +17102,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Palm-In One-Arm Dumbbell Press",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Palm-In_One-Arm_Dumbbell_Press/0.jpg",
     "instructions": [
       "Start by having a dumbbell in one hand with your arm fully extended to the side using a neutral grip. Use your other arm to hold on to an incline bench to keep your balance.",
@@ -10343,6 +17119,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Palms-In Dumbbell Press",
     "muscle": "shoulders",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Palms-In_Dumbbell_Press/0.jpg",
     "instructions": [
       "Start by having a dumbbell in each hand with your arm fully extended to the side using a neutral grip. Your feet should be shoulder width apart from each other. Now slowly lift the dumbbells up until you create a 90 degree angle with your arms. Note: Your forearms should be perpendicular to the floor. This the starting position.",
@@ -10356,6 +17133,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Palms-Up Barbell Behind The Back Wrist Curl",
     "muscle": "other",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Palms-Up_Barbell_Behind_The_Back_Wrist_Curl/0.jpg",
     "instructions": [
       "Start by standing straight and holding a barbell behind your glutes at arm's length while using a pronated grip (palms will be facing back away from the glutes) and having your hands shoulder width apart from each other.",
@@ -10371,6 +17149,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Pelvic Tilt",
     "muscle": "back",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Pelvic_Tilt/0.jpg",
     "instructions": [
       "Start off with your feet hip-distance apart.",
@@ -10379,10 +17158,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "standing-quad-stretch",
+    "name": "Standing Quad Stretch",
+    "muscle": "quads",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/standing-quad-stretch-main.webp",
+    "instructions": [
+      "Stand on one leg, holding a wall for balance if needed.",
+      "Bend the other knee and grab that ankle behind you.",
+      "Pull the heel toward your glute, keeping knees together.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
     "id": "Standing_Rope_Crunch",
     "name": "Standing Rope Crunch",
     "muscle": "core",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Rope_Crunch/0.jpg",
     "instructions": [
       "Attach a rope to a high pulley and select an appropriate weight.",
@@ -10392,10 +17187,41 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "standing-side-bend",
+    "name": "Standing Side Bend",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/standing-side-bend-main.webp",
+    "instructions": [
+      "Stand with feet hip-width and reach both arms overhead.",
+      "Clasp your hands and lengthen up tall.",
+      "Bend smoothly to one side in a long curve.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
+    "id": "standing-side-bend-flow",
+    "name": "Standing Side Bend Flow",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/standing-side-bend-flow-start.webp",
+    "instructions": [
+      "Stand with the feet hip-width apart and reach both arms overhead.",
+      "Bend the trunk to one side, keeping both feet planted and the hips level.",
+      "Return through the centre with the ribs stacked over the pelvis.",
+      "Bend to the other side in the same way.",
+      "Keep alternating for the desired number of repetitions."
+    ]
+  },
+  {
     "id": "Standing_Soleus_And_Achilles_Stretch",
     "name": "Standing Soleus And Achilles Stretch",
     "muscle": "calves",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Soleus_And_Achilles_Stretch/0.jpg",
     "instructions": [
       "Stand with your feet hip-distance apart, one foot slightly in front of the other.",
@@ -10403,10 +17229,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "standing-split",
+    "name": "Standing Split",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/standing-split-main.webp",
+    "instructions": [
+      "From a forward fold, place both hands on the floor or on blocks beside the standing foot.",
+      "Shift the weight onto one leg and lift the other leg behind you.",
+      "Keep the standing leg straight and the hips as level as the lift allows.",
+      "Hold the position for the prescribed time, drawing the chest towards the standing shin.",
+      "Lower the lifted foot down and repeat on the other side."
+    ]
+  },
+  {
     "id": "Standing_Toe_Touches",
     "name": "Standing Toe Touches",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Toe_Touches/0.jpg",
     "instructions": [
       "Stand with some space in front and behind you.",
@@ -10418,6 +17260,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Towel Triceps Extension",
     "muscle": "triceps",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Towel_Triceps_Extension/0.jpg",
     "instructions": [
       "To begin, stand up with both arms fully extended above the head holding one end of a towel with both hands. Your elbows should be in and the arms perpendicular to the floor with the palms facing each other while your feet should be shoulder width apart from each other. This is the starting position.",
@@ -10431,6 +17274,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Standing Two-Arm Overhead Throw",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Standing_Two-Arm_Overhead_Throw/0.jpg",
     "instructions": [
       "Stand with your feet shoulder width apart holding a medicine ball in both hands. To begin, reach the medicine ball deep behind your head as you bend the knees slightly and lean back.",
@@ -10443,6 +17287,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Star Jump",
     "muscle": "quads",
     "equipment": "bodyweight",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Star_Jump/0.jpg",
     "instructions": [
       "Begin in a relaxed stance with your feet shoulder width apart and hold your arms close to the body.",
@@ -10451,10 +17296,54 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "stationary-bike",
+    "name": "Stationary Bike",
+    "muscle": "quads",
+    "equipment": "machine",
+    "category": "cardio",
+    "image": "/repdb/stationary-bike-main.webp",
+    "instructions": [
+      "Set the saddle height so your knee stays slightly bent at the bottom of the pedal stroke, then sit down and place the balls of your feet on the pedals.",
+      "Take the handlebars with a relaxed grip and sit tall, with your back neutral and your shoulders down.",
+      "Push one pedal down and forward while the other rises, keeping the effort in your legs rather than pulling on the bars.",
+      "Keep pedalling in a smooth, even circle at a steady cadence, breathing in rhythm with the stroke.",
+      "Adjust the resistance to hold your target effort, and continue for the desired time or distance."
+    ]
+  },
+  {
+    "id": "Step_Mill",
+    "name": "Step Mill",
+    "muscle": "quads",
+    "equipment": "machine",
+    "category": "cardio",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Step_Mill/0.jpg",
+    "instructions": [
+      "To begin, step onto the stepmill and select the desired option from the menu. You can choose a manual setting, or you can select a program to run. Typically, you can enter your age and weight to estimate the amount of calories burned during exercise. Use caution so that you don't trip as you climb the stairs. It is recommended that you maintain your grip on the handles so that you don't fall.",
+      "Stepmills offer convenience, cardiovascular benefits, and usually have less impact than running outside while offering a similar rate of calories burned. They are typically much harder than other cardio equipment. A 150 lb person will typically burn over 300 calories in 30 minutes, compared to about 175 calories walking."
+    ]
+  },
+  {
+    "id": "step-ups",
+    "name": "Step Ups",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/step-ups-start.webp",
+    "instructions": [
+      "Stand facing a sturdy box or bench.",
+      "Place one foot fully on the box surface.",
+      "Drive through that heel to lift your body onto the box.",
+      "Bring your trailing foot up to stand fully on the box.",
+      "Step back down leading with the same foot.",
+      "Alternate legs or complete all reps on one side before switching."
+    ]
+  },
+  {
     "id": "Step-up_with_Knee_Raise",
     "name": "Step-up with Knee Raise",
     "muscle": "glutes",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Step-up_with_Knee_Raise/0.jpg",
     "instructions": [
       "Stand facing a box or bench of an appropriate height with your feet together. This will be your starting position.",
@@ -10463,14 +17352,35 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Step_Mill",
-    "name": "Step Mill",
-    "muscle": "quads",
-    "equipment": "machine",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Step_Mill/0.jpg",
+    "id": "Stiff_Leg_Barbell_Good_Morning",
+    "name": "Stiff Leg Barbell Good Morning",
+    "muscle": "back",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Stiff_Leg_Barbell_Good_Morning/0.jpg",
     "instructions": [
-      "To begin, step onto the stepmill and select the desired option from the menu. You can choose a manual setting, or you can select a program to run. Typically, you can enter your age and weight to estimate the amount of calories burned during exercise. Use caution so that you don't trip as you climb the stairs. It is recommended that you maintain your grip on the handles so that you don't fall.",
-      "Stepmills offer convenience, cardiovascular benefits, and usually have less impact than running outside while offering a similar rate of calories burned. They are typically much harder than other cardio equipment. A 150 lb person will typically burn over 300 calories in 30 minutes, compared to about 175 calories walking."
+      "This exercise is best performed inside a squat rack for safety purposes. To begin, first set the bar on a rack that best matches your height. Once the correct height is chosen and the bar is loaded, step under the bar and place the back of your shoulders (slightly below the neck) across it.",
+      "Hold on to the bar using both arms at each side and lift it off the rack by first pushing with your legs and at the same time straightening your torso.",
+      "Step away from the rack and position your legs using a shoulder width medium stance. Keep your head up at all times as looking down will get you off balance and also maintain a straight back. This will be your starting position.",
+      "Keeping your legs stationary, move your torso forward by bending at the hips while inhaling. Lower your torso until it is parallel with the floor.",
+      "Begin to raise the bar as you exhale by elevating your torso back to the starting position.",
+      "Repeat for the recommended amount of repetitions."
+    ]
+  },
+  {
+    "id": "stiff-leg-deadlift",
+    "name": "Stiff Leg Deadlift",
+    "muscle": "glutes",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/stiff-leg-deadlift-start.webp",
+    "instructions": [
+      "Stand with feet hip-width apart, holding a barbell in front of your thighs.",
+      "Keep your legs nearly straight with only a slight knee bend.",
+      "Hinge at the hips and lower the bar along your legs.",
+      "Go as low as your hamstring flexibility allows with a flat back.",
+      "Drive through your heels to return upright.",
+      "Repeat for the desired number of reps."
     ]
   },
   {
@@ -10478,6 +17388,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Stiff-Legged Barbell Deadlift",
     "muscle": "hamstrings",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Stiff-Legged_Barbell_Deadlift/0.jpg",
     "instructions": [
       "Grasp a bar using an overhand grip (palms facing down). You may need some wrist wraps if using a significant amount of weight.",
@@ -10492,6 +17403,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Stiff-Legged Dumbbell Deadlift",
     "muscle": "hamstrings",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Stiff-Legged_Dumbbell_Deadlift/0.jpg",
     "instructions": [
       "Grasp a couple of dumbbells holding them by your side at arm's length.",
@@ -10502,25 +17414,11 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Stiff_Leg_Barbell_Good_Morning",
-    "name": "Stiff Leg Barbell Good Morning",
-    "muscle": "back",
-    "equipment": "barbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Stiff_Leg_Barbell_Good_Morning/0.jpg",
-    "instructions": [
-      "This exercise is best performed inside a squat rack for safety purposes. To begin, first set the bar on a rack that best matches your height. Once the correct height is chosen and the bar is loaded, step under the bar and place the back of your shoulders (slightly below the neck) across it.",
-      "Hold on to the bar using both arms at each side and lift it off the rack by first pushing with your legs and at the same time straightening your torso.",
-      "Step away from the rack and position your legs using a shoulder width medium stance. Keep your head up at all times as looking down will get you off balance and also maintain a straight back. This will be your starting position.",
-      "Keeping your legs stationary, move your torso forward by bending at the hips while inhaling. Lower your torso until it is parallel with the floor.",
-      "Begin to raise the bar as you exhale by elevating your torso back to the starting position.",
-      "Repeat for the recommended amount of repetitions."
-    ]
-  },
-  {
     "id": "Stomach_Vacuum",
     "name": "Stomach Vacuum",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Stomach_Vacuum/0.jpg",
     "instructions": [
       "To begin, stand straight with your feet shoulder width apart from each other. Place your hands on your hips. This is the starting position.",
@@ -10531,10 +17429,53 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "Straight_Bar_Bench_Mid_Rows",
+    "name": "Straight Bar Bench Mid Rows",
+    "muscle": "back",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Straight_Bar_Bench_Mid_Rows/0.jpg",
+    "instructions": [
+      "Place a loaded barbell on the end of a bench. Standing on the bench behind the bar, take a medium, pronated grip. Stand with your hips back and chest up, maintaining a neutral spine. This will be your starting position.",
+      "Row the bar to your torso by retracting the shoulder blades and flexing the elbows. Use a controlled movement with no jerking.",
+      "After a brief pause, slowly return the bar to the starting position, ensuring to go all the way down."
+    ]
+  },
+  {
+    "id": "straight-bar-dips",
+    "name": "Straight Bar Dips",
+    "muscle": "chest",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/straight-bar-dips-start.webp",
+    "instructions": [
+      "Grip a straight overhead bar with both hands, hanging with arms extended and feet off the floor.",
+      "Keeping your body straight, press down through the bar to raise your shoulders and chest.",
+      "Pause briefly at the top of the movement.",
+      "Lower back down under control to the hanging position.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "Straight_Raises_on_Incline_Bench",
+    "name": "Straight Raises on Incline Bench",
+    "muscle": "shoulders",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Straight_Raises_on_Incline_Bench/0.jpg",
+    "instructions": [
+      "Place a bar on the ground behind the head of an incline bench.",
+      "Lay on the bench face down. With a pronated grip, pick the barbell up from the floor, keeping your arms straight. Allow the bar to hang straight down. This will be your starting position.",
+      "To begin, raise the barbell out in front of your head while keeping your arms extended.",
+      "Return to the starting position."
+    ]
+  },
+  {
     "id": "Straight-Arm_Dumbbell_Pullover",
     "name": "Straight-Arm Dumbbell Pullover",
     "muscle": "chest",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Straight-Arm_Dumbbell_Pullover/0.jpg",
     "instructions": [
       "Place a dumbbell standing up on a flat bench.",
@@ -10550,6 +17491,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Straight-Arm Pulldown",
     "muscle": "back",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Straight-Arm_Pulldown/0.jpg",
     "instructions": [
       "You will start by grabbing the wide bar from the top pulley of a pulldown machine and using a wider than shoulder-width pronated (palms down) grip. Step backwards two feet or so.",
@@ -10560,28 +17502,33 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Straight_Bar_Bench_Mid_Rows",
-    "name": "Straight Bar Bench Mid Rows",
-    "muscle": "back",
-    "equipment": "barbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Straight_Bar_Bench_Mid_Rows/0.jpg",
+    "id": "straight-bar-cable-front-raise",
+    "name": "Straight-Bar Cable Front Raise",
+    "muscle": "shoulders",
+    "equipment": "cable",
+    "category": "strength",
+    "image": "/repdb/straight-bar-cable-front-raise-start.webp",
     "instructions": [
-      "Place a loaded barbell on the end of a bench. Standing on the bench behind the bar, take a medium, pronated grip. Stand with your hips back and chest up, maintaining a neutral spine. This will be your starting position.",
-      "Row the bar to your torso by retracting the shoulder blades and flexing the elbows. Use a controlled movement with no jerking.",
-      "After a brief pause, slowly return the bar to the starting position, ensuring to go all the way down."
+      "Attach a straight bar to a low cable pulley and stand facing away from the machine with the cable running forward past your legs.",
+      "Hold the bar with an overhand grip, hands about shoulder-width apart, arms hanging straight down in front of your thighs.",
+      "Keep the elbows almost straight and the core braced so the torso does not lean back.",
+      "Raise the bar forward in a smooth arc until it reaches shoulder height.",
+      "Lower it under control back to the thighs and repeat for the desired number of repetitions."
     ]
   },
   {
-    "id": "Straight_Raises_on_Incline_Bench",
-    "name": "Straight Raises on Incline Bench",
-    "muscle": "shoulders",
-    "equipment": "barbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Straight_Raises_on_Incline_Bench/0.jpg",
+    "id": "strict-curl",
+    "name": "Strict Curl",
+    "muscle": "biceps",
+    "equipment": "dumbbell",
+    "category": "strength",
+    "image": "/repdb/strict-curl-start.webp",
     "instructions": [
-      "Place a bar on the ground behind the head of an incline bench.",
-      "Lay on the bench face down. With a pronated grip, pick the barbell up from the floor, keeping your arms straight. Allow the bar to hang straight down. This will be your starting position.",
-      "To begin, raise the barbell out in front of your head while keeping your arms extended.",
-      "Return to the starting position."
+      "Stand tall with a dumbbell in each hand, arms at your sides and palms facing forward.",
+      "Pin your elbows against your sides and brace your core so your torso cannot swing.",
+      "Curl both dumbbells up by bending only at the elbows.",
+      "Lower them under control until your arms are straight.",
+      "Repeat for the desired number of reps."
     ]
   },
   {
@@ -10589,6 +17536,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Stride Jump Crossover",
     "muscle": "quads",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Stride_Jump_Crossover/0.jpg",
     "instructions": [
       "Stand to the side of a box with your inside foot on top of it, close to the edge.",
@@ -10598,10 +17546,27 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "suitcase-carry",
+    "name": "Suitcase Carry",
+    "muscle": "other",
+    "equipment": "kettlebell",
+    "category": "strength",
+    "image": "/repdb/suitcase-carry-main.webp",
+    "instructions": [
+      "Stand beside a single kettlebell or dumbbell with your feet under your hips.",
+      "Hinge at the hips, take the handle in one hand and stand up with the weight hanging at your side.",
+      "Pull that shoulder down and back, and brace as if you were about to be pushed sideways.",
+      "Walk forward with normal, even strides, keeping your torso upright and square rather than leaning away from the weight.",
+      "Keep the free arm relaxed at your side instead of sticking it out as a counterweight.",
+      "Carry for the desired distance or time, set the weight down under control, then repeat on the other side."
+    ]
+  },
+  {
     "id": "Sumo_Deadlift",
     "name": "Sumo Deadlift",
     "muscle": "hamstrings",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Sumo_Deadlift/0.jpg",
     "instructions": [
       "Begin with a bar loaded on the ground. Approach the bar so that the bar intersects the middle of the feet. The feet should be set very wide, near the collars. Bend at the hips to grip the bar. The arms should be directly below the shoulders, inside the legs, and you can use a pronated grip, a mixed grip, or hook grip. Relax the shoulders, which in effect lengthens your arms.",
@@ -10615,6 +17580,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Sumo Deadlift with Bands",
     "muscle": "hamstrings",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Sumo_Deadlift_with_Bands/0.jpg",
     "instructions": [
       "To deadlift with short bands, simply loop them over the bar before you start, and step into them to set up. Ensure that they under the back half of your foot, directly where you are driving into the floor.",
@@ -10629,6 +17595,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Sumo Deadlift with Chains",
     "muscle": "hamstrings",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Sumo_Deadlift_with_Chains/0.jpg",
     "instructions": [
       "You can attach the chains to the sleeves of the bar, or just drape the middle over the bar so there is a greater weight increase as you lift. Attempt to keep the ends of the chains away from the plates so you don't hit them when you lower the weight.",
@@ -10639,10 +17606,27 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "sumo-squat",
+    "name": "Sumo Squat",
+    "muscle": "glutes",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/sumo-squat-start.webp",
+    "instructions": [
+      "Stand with feet wider than shoulder-width and toes turned out.",
+      "Hold a barbell across your upper back.",
+      "Brace your core and keep your chest up.",
+      "Bend at the hips and knees to lower into a deep squat.",
+      "Drive through your heels to stand back up.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
     "id": "Superman",
     "name": "Superman",
     "muscle": "back",
     "equipment": "bodyweight",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Superman/0.jpg",
     "instructions": [
       "To begin, lie straight and face down on the floor or exercise mat. Your arms should be fully extended in front of you. This is the starting position.",
@@ -10656,6 +17640,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Supine Chest Throw",
     "muscle": "triceps",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Supine_Chest_Throw/0.jpg",
     "instructions": [
       "This drill is great for chest passes when you lack a partner or a wall of sufficient strength. Lay on the ground on your back with your knees bent.",
@@ -10669,6 +17654,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Supine One-Arm Overhead Throw",
     "muscle": "core",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Supine_One-Arm_Overhead_Throw/0.jpg",
     "instructions": [
       "Lay on the ground on your back with your knees bent. Hold the ball with one hand, extending the arm fully behind your head. This will be your starting position.",
@@ -10677,10 +17663,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "supine-spinal-twist",
+    "name": "Supine Spinal Twist",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/supine-spinal-twist-main.webp",
+    "instructions": [
+      "Lie on your back and bend one knee toward your chest.",
+      "Guide that knee across your body toward the floor.",
+      "Stretch your arms out wide and turn your head away.",
+      "Hold for 20 to 30 seconds, breathing steadily.",
+      "Switch sides and repeat."
+    ]
+  },
+  {
     "id": "Supine_Two-Arm_Overhead_Throw",
     "name": "Supine Two-Arm Overhead Throw",
     "muscle": "core",
     "equipment": "other",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Supine_Two-Arm_Overhead_Throw/0.jpg",
     "instructions": [
       "Lay on the ground on your back with your knees bent.",
@@ -10690,10 +17692,41 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "supine-windshield-wipers",
+    "name": "Supine Windshield Wipers",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/supine-windshield-wipers-start.webp",
+    "instructions": [
+      "Lie on your back with the arms out to the sides and the knees bent over the hips.",
+      "Brace the trunk so the lower back does not lift off the floor.",
+      "Lower both legs together towards one side as far as the shoulders stay down.",
+      "Bring them back through the centre and lower to the other side.",
+      "Keep alternating for the desired number of repetitions."
+    ]
+  },
+  {
+    "id": "supported-shoulderstand",
+    "name": "Supported Shoulderstand",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/supported-shoulderstand-main.webp",
+    "instructions": [
+      "Lie on your back, ideally with a folded blanket under the shoulders and the head off it.",
+      "Lift the legs overhead and support the lower back with both hands, elbows shoulder-width apart.",
+      "Walk the hands up the back and stack the hips over the shoulders until the body is vertical.",
+      "Hold the position for the prescribed time, keeping the head and neck completely still.",
+      "Lower the legs overhead and roll down slowly with the hands supporting the back."
+    ]
+  },
+  {
     "id": "Suspended_Fallout",
     "name": "Suspended Fallout",
     "muscle": "core",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Suspended_Fallout/0.jpg",
     "instructions": [
       "Adjust the straps so the handles are at an appropriate height, below waist level.",
@@ -10708,6 +17741,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Suspended Push-Up",
     "muscle": "chest",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Suspended_Push-Up/0.jpg",
     "instructions": [
       "Anchor your suspension straps securely to the top of a rack or other object.",
@@ -10721,6 +17755,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Suspended Reverse Crunch",
     "muscle": "core",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Suspended_Reverse_Crunch/0.jpg",
     "instructions": [
       "Secure a set of suspension straps with the handles hanging about a foot off of the ground. Move yourself into a pushup plank position facing away from the rack.",
@@ -10734,6 +17769,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Suspended Row",
     "muscle": "back",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Suspended_Row/0.jpg",
     "instructions": [
       "Suspend your straps at around chest height. Take a handle in each hand and lean back. Keep your body erect and your head and chest up. Your arms should be fully extended. This will be your starting position.",
@@ -10746,6 +17782,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Suspended Split Squat",
     "muscle": "quads",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Suspended_Split_Squat/0.jpg",
     "instructions": [
       "Suspend your straps so the handles are 18-30 inches from the floor.",
@@ -10759,6 +17796,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Svend Press",
     "muscle": "chest",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Svend_Press/0.jpg",
     "instructions": [
       "Begin in a standing position.",
@@ -10768,10 +17806,27 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "t-bar-row",
+    "name": "T-Bar Row",
+    "muscle": "back",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/t-bar-row-start.webp",
+    "instructions": [
+      "Straddle the loaded T-bar with feet shoulder-width apart.",
+      "Hinge at the hips until your torso is around 45 degrees.",
+      "Grip the handles and keep your back flat.",
+      "Pull the bar up toward your chest by driving your elbows back.",
+      "Squeeze your shoulder blades at the top.",
+      "Lower the bar under control and repeat."
+    ]
+  },
+  {
     "id": "T-Bar_Row_with_Handle",
     "name": "T-Bar Row with Handle",
     "muscle": "back",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/T-Bar_Row_with_Handle/0.jpg",
     "instructions": [
       "Position a bar into a landmine or in a corner to keep it from moving. Load an appropriate weight onto your end.",
@@ -10786,6 +17841,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Tate Press",
     "muscle": "triceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Tate_Press/0.jpg",
     "instructions": [
       "Lie down on a flat bench with a dumbbell in each hand on top of your thighs. The palms of your hand will be facing each other.",
@@ -10800,6 +17856,7 @@ export const generatedExercises: Exercise[] = [
     "name": "The Straddle",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/The_Straddle/0.jpg",
     "instructions": [
       "Begin in a seated, upright position. Start by extending your legs in front of you in a V.",
@@ -10811,6 +17868,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Thigh Abductor",
     "muscle": "glutes",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Thigh_Abductor/0.jpg",
     "instructions": [
       "To begin, sit down on the abductor machine and select a weight you are comfortable with. When your legs are positioned properly, grip the handles on each side. Your entire upper body (from the waist up) should be stationary. This is the starting position.",
@@ -10824,6 +17882,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Thigh Adductor",
     "muscle": "glutes",
     "equipment": "machine",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Thigh_Adductor/0.jpg",
     "instructions": [
       "To begin, sit down on the adductor machine and select a weight you are comfortable with. When your legs are positioned properly on the leg pads of the machine, grip the handles on each side. Your entire upper body (from the waist up) should be stationary. This is the starting position.",
@@ -10833,10 +17892,88 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "thoracic-bridge",
+    "name": "Thoracic Bridge",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/thoracic-bridge-main.webp",
+    "instructions": [
+      "Sit on the floor with knees bent and hands behind you, fingers pointing back.",
+      "Press through your hands and feet to lift your hips off the floor.",
+      "Continue pressing until your chest opens and your arms are extended.",
+      "Drop your head back and hold the position.",
+      "Breathe steadily while maintaining the bridge.",
+      "Lower back down under control."
+    ]
+  },
+  {
+    "id": "thread-the-needle",
+    "name": "Thread the Needle",
+    "muscle": "shoulders",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/thread-the-needle-main.webp",
+    "instructions": [
+      "Start on all fours with the hands under the shoulders and the knees under the hips.",
+      "Slide one arm underneath the body, palm facing up, until the shoulder and the side of the head rest on the mat.",
+      "Keep the hips stacked over the knees and walk the top hand forward or wrap it behind the back.",
+      "Hold the twist for the prescribed time, breathing into the upper back.",
+      "Press the top hand into the floor to come up and repeat on the other side."
+    ]
+  },
+  {
+    "id": "thread-the-needle-flow",
+    "name": "Thread the Needle Flow",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/thread-the-needle-flow-start.webp",
+    "instructions": [
+      "Start on all fours with the hands under the shoulders and the knees under the hips.",
+      "Slide one arm under the body until the shoulder approaches the mat.",
+      "Reverse the motion and open that arm up towards the ceiling, following the hand with the eyes.",
+      "Return through the centre and repeat for the desired number of repetitions.",
+      "Change sides and repeat."
+    ]
+  },
+  {
+    "id": "three-legged-dog",
+    "name": "Three-Legged Downward Dog",
+    "muscle": "shoulders",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/three-legged-dog-main.webp",
+    "instructions": [
+      "Set up in downward dog with the hands shoulder-width apart and the hips high.",
+      "Press both hands evenly into the floor and shift the weight slightly forward.",
+      "Lift one leg behind you until it is in line with the spine, keeping both hip points level.",
+      "Hold the position for the prescribed time with the standing heel reaching down.",
+      "Lower the leg and repeat on the other side."
+    ]
+  },
+  {
+    "id": "thruster",
+    "name": "Thruster",
+    "muscle": "shoulders",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "/repdb/thruster-start.webp",
+    "instructions": [
+      "Hold a barbell in a front rack position with elbows high.",
+      "Stand with feet shoulder-width apart.",
+      "Squat down to parallel while keeping your torso upright.",
+      "Drive up out of the squat and press the bar overhead in one motion.",
+      "Lock out your arms at the top with the bar overhead.",
+      "Lower the bar back to the front rack and repeat."
+    ]
+  },
+  {
     "id": "Tire_Flip",
     "name": "Tire Flip",
     "muscle": "quads",
     "equipment": "other",
+    "category": "strongman",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Tire_Flip/0.jpg",
     "instructions": [
       "Begin by gripping the bottom of the tire on the tread, and position your feet back a bit. Your chest should be driving into the tire.",
@@ -10849,6 +17986,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Toe Touchers",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Toe_Touchers/0.jpg",
     "instructions": [
       "To begin, lie down on the floor or an exercise mat with your back pressed against the floor. Your arms should be lying across your sides with the palms facing down.",
@@ -10860,10 +17998,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "toes-to-bar",
+    "name": "Toes to Bar",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/toes-to-bar-start.webp",
+    "instructions": [
+      "Hang from a pull-up bar with an overhand grip, arms fully extended and body still.",
+      "Engage your lats and core to prevent swinging.",
+      "Raise your legs with straight knees, reaching your toes up toward the bar.",
+      "Touch the bar with your toes, then lower your legs under control.",
+      "Repeat for the desired reps."
+    ]
+  },
+  {
     "id": "Torso_Rotation",
     "name": "Torso Rotation",
     "muscle": "core",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Torso_Rotation/0.jpg",
     "instructions": [
       "Stand upright holding an exercise ball with both hands. Extend your arms so the ball is straight out in front of you. This will be your starting position.",
@@ -10875,6 +18029,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Trail Running/Walking",
     "muscle": "quads",
     "equipment": "other",
+    "category": "cardio",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Trail_Running_Walking/0.jpg",
     "instructions": [
       "Running or hiking on trails will get the blood pumping and heart beating almost immediately. Make sure you have good shoes. While you use the muscles in your calves and buttocks to pull yourself up a hill, the knees, joints and ankles absorb the bulk of the pounding coming back down. Take smaller steps as you walk downhill, keep your knees bent to reduce the impact and slow down to avoid falling.",
@@ -10886,6 +18041,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Trap Bar Deadlift",
     "muscle": "quads",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Trap_Bar_Deadlift/0.jpg",
     "instructions": [
       "For this exercise load a trap bar, also known as a hex bar, to an appropriate weight resting on the ground. Stand in the center of the apparatus and grasp both handles.",
@@ -10895,10 +18051,41 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "tree-pose",
+    "name": "Tree Pose",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/tree-pose-main.webp",
+    "instructions": [
+      "Stand tall and shift the weight onto one foot.",
+      "Place the sole of the other foot on the inner calf or the inner thigh, avoiding the knee.",
+      "Press the foot and the leg into each other and level the hips.",
+      "Bring the hands to the chest or overhead and hold for the prescribed time.",
+      "Lower the foot and repeat on the other side."
+    ]
+  },
+  {
+    "id": "triangle-pose",
+    "name": "Triangle Pose",
+    "muscle": "hamstrings",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/triangle-pose-main.webp",
+    "instructions": [
+      "Stand wide with the front foot turned out and the back foot angled slightly in.",
+      "Keep both legs straight and reach the front hand forward as the hips shift back.",
+      "Tilt sideways and bring the bottom hand to the shin, a block or the floor, top arm reaching up.",
+      "Hold the position for the prescribed time, turning the chest towards the ceiling.",
+      "Press into the feet to come up and repeat on the other side."
+    ]
+  },
+  {
     "id": "Tricep_Dumbbell_Kickback",
     "name": "Tricep Dumbbell Kickback",
     "muscle": "triceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Tricep_Dumbbell_Kickback/0.jpg",
     "instructions": [
       "Start with a dumbbell in each hand and your palms facing your torso. Keep your back straight with a slight bend in the knees and bend forward at the waist. Your torso should be almost parallel to the floor. Make sure to keep your head up. Your upper arms should be close to your torso and parallel to the floor. Your forearms should be pointed towards the floor as you hold the weights. There should be a 90-degree angle formed between your forearm and upper arm. This is your starting position.",
@@ -10912,6 +18099,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Tricep Side Stretch",
     "muscle": "triceps",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Tricep_Side_Stretch/0.jpg",
     "instructions": [
       "Bring right arm across your body and over your left shoulder, holding your elbow with your left hand, until you feel a stretch in your tricep. Then repeat for your other arm."
@@ -10922,6 +18110,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Triceps Overhead Extension with Rope",
     "muscle": "triceps",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Triceps_Overhead_Extension_with_Rope/0.jpg",
     "instructions": [
       "Attach a rope to a low pulley. After selecting an appropriate weight, grasp the rope with both hands and face away from the cable.",
@@ -10935,6 +18124,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Triceps Pushdown",
     "muscle": "triceps",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Triceps_Pushdown/0.jpg",
     "instructions": [
       "Attach a straight or angled bar to a high pulley and grab with an overhand grip (palms facing down) at shoulder width.",
@@ -10949,6 +18139,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Triceps Pushdown - Rope Attachment",
     "muscle": "triceps",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Triceps_Pushdown_-_Rope_Attachment/0.jpg",
     "instructions": [
       "Attach a rope attachment to a high pulley and grab with a neutral grip (palms facing each other).",
@@ -10963,6 +18154,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Triceps Pushdown - V-Bar Attachment",
     "muscle": "triceps",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Triceps_Pushdown_-_V-Bar_Attachment/0.jpg",
     "instructions": [
       "Attach a V-Bar to a high pulley and grab with an overhand grip (palms facing down) at shoulder width.",
@@ -10977,9 +18169,195 @@ export const generatedExercises: Exercise[] = [
     "name": "Triceps Stretch",
     "muscle": "triceps",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Triceps_Stretch/0.jpg",
     "instructions": [
       "Reach your hand behind your head, grasp your elbow and gently pull. Hold for 10 to 20 seconds, then switch sides."
+    ]
+  },
+  {
+    "id": "trx-bicep-curl",
+    "name": "TRX Bicep Curl",
+    "muscle": "biceps",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/trx-bicep-curl-start.webp",
+    "instructions": [
+      "Adjust the suspension trainer straps to a medium length.",
+      "Stand facing the anchor point, grasp the handles with an underhand grip, and lean back until your arms are fully extended.",
+      "Keep your body straight and core engaged, pull your chest towards your hands by bending your elbows.",
+      "Squeeze your biceps at the top of the movement.",
+      "Slowly extend your arms back to the starting position, controlling the descent.",
+      "Maintain tension throughout the set."
+    ]
+  },
+  {
+    "id": "trx-chest-press",
+    "name": "TRX Chest Press",
+    "muscle": "chest",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/trx-chest-press-start.webp",
+    "instructions": [
+      "Adjust the suspension trainer handles to mid-calf height.",
+      "Stand facing away from the anchor point, holding a handle in each hand, arms extended.",
+      "Lean forward into a plank position, keeping your body straight from head to heels.",
+      "Lower your chest towards your hands by bending your elbows, maintaining tension in the straps.",
+      "Press back up to the starting position, fully extending your arms and squeezing your chest."
+    ]
+  },
+  {
+    "id": "trx-face-pull",
+    "name": "TRX Face Pull",
+    "muscle": "shoulders",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/trx-face-pull-start.webp",
+    "instructions": [
+      "Grasp the TRX handles with an overhand grip, palms facing down.",
+      "Lean back until your arms are fully extended and your body forms a straight line.",
+      "Pull the handles towards your face, driving your elbows high and wide.",
+      "Squeeze your shoulder blades together at the peak contraction.",
+      "Slowly extend your arms back to the starting position with control."
+    ]
+  },
+  {
+    "id": "trx-hamstring-curl",
+    "name": "TRX Hamstring Curl",
+    "muscle": "hamstrings",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/trx-hamstring-curl-start.webp",
+    "instructions": [
+      "Lie on your back with heels in the suspension trainer cradles, knees bent at 90 degrees.",
+      "Lift your hips off the floor, creating a straight line from knees to shoulders.",
+      "Extend your legs forward, maintaining hip elevation and core tension.",
+      "Pull your heels back towards your glutes, contracting your hamstrings forcefully.",
+      "Control the movement, avoiding any drop in hip height throughout the set."
+    ]
+  },
+  {
+    "id": "trx-lunge",
+    "name": "TRX Lunge",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/trx-lunge-start.webp",
+    "instructions": [
+      "Stand facing away from the anchor point, holding the suspension trainer handles in front of you.",
+      "Place one foot into both foot cradles, extending the leg behind you.",
+      "Brace your core and lower your body by bending the front knee, keeping your torso upright.",
+      "Descend until your front thigh is parallel to the floor or just below, maintaining tension on the suspension trainer.",
+      "Drive through your front heel to return to the starting position, extending the front leg.",
+      "Complete all reps on one side, then switch legs and repeat per side."
+    ]
+  },
+  {
+    "id": "trx-pistol-squat",
+    "name": "TRX Pistol Squat",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/trx-pistol-squat-start.webp",
+    "instructions": [
+      "Anchor the suspension trainer and hold the handles with both hands, arms extended.",
+      "Stand tall, lift one leg straight out in front of you, keeping it off the ground.",
+      "Initiate the squat by pushing your hips back and bending the standing knee, lowering your body as deep as possible.",
+      "Keep your chest up, back straight, and use the TRX for balance and support as needed.",
+      "Drive through your heel to return to the starting position, extending the standing leg fully.",
+      "Complete all reps on one side before switching to the other."
+    ]
+  },
+  {
+    "id": "trx-plank",
+    "name": "TRX Plank",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/trx-plank-main.webp",
+    "instructions": [
+      "Place both feet in the TRX foot cradles.",
+      "Assume a forearm or high plank position on the floor.",
+      "Keep your body in a straight line from head to heels.",
+      "Brace your core and squeeze your glutes.",
+      "Hold the position for the desired time.",
+      "Lower your knees to exit safely."
+    ]
+  },
+  {
+    "id": "trx-row",
+    "name": "TRX Row",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/trx-row-start.webp",
+    "instructions": [
+      "Grasp the handles of a suspension trainer with an overhand grip, palms facing each other.",
+      "Lean back, extending your arms fully, keeping your body straight from head to heels.",
+      "Engage your core and pull your chest towards your hands, squeezing your shoulder blades together.",
+      "Pause briefly at the top, then slowly lower yourself back to the starting position with control.",
+      "Maintain a rigid body throughout the movement, avoiding any sagging in the hips."
+    ]
+  },
+  {
+    "id": "trx-side-plank",
+    "name": "TRX Side Plank",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/trx-side-plank-main.webp",
+    "instructions": [
+      "Place both feet in the TRX foot cradles and lie on your side.",
+      "Prop up on your bottom forearm with your elbow under your shoulder.",
+      "Lift your hips so your body forms a straight line.",
+      "Stack your top foot over the bottom foot.",
+      "Hold the position while breathing steadily.",
+      "Lower and switch sides after the set."
+    ]
+  },
+  {
+    "id": "trx-squat",
+    "name": "TRX Squat",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/trx-squat-start.webp",
+    "instructions": [
+      "Stand facing the anchor point, holding the handles with palms facing each other, arms extended.",
+      "Lean back slightly, keeping your body straight and core engaged, with feet shoulder-width apart.",
+      "Initiate the squat by pushing your hips back and bending your knees, lowering your body as if sitting in a chair.",
+      "Descend until your thighs are parallel to the floor or as deep as comfortable, maintaining tension on the straps.",
+      "Drive through your heels to return to the starting position, extending your hips and knees fully."
+    ]
+  },
+  {
+    "id": "trx-tricep-extension",
+    "name": "TRX Triceps Extension",
+    "muscle": "triceps",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/trx-tricep-extension-start.webp",
+    "instructions": [
+      "Stand facing the anchor point, holding the TRX handles with an overhand grip, palms facing down.",
+      "Lean forward, extending your arms straight out in front of you at shoulder height, creating tension in the straps.",
+      "Keeping your elbows high and fixed, bend them to lower your body by letting your hands move towards your temples.",
+      "Extend your elbows forcefully to push your body back to the starting position, squeezing your triceps.",
+      "Maintain a rigid plank position throughout the movement, engaging your core and glutes."
+    ]
+  },
+  {
+    "id": "trx-y-fly",
+    "name": "TRX Y-Fly",
+    "muscle": "shoulders",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/trx-y-fly-start.webp",
+    "instructions": [
+      "Stand facing the anchor point, holding the handles with an overhand grip, palms facing each other.",
+      "Lean back, extending your arms straight in front of you, maintaining a plank position with your body.",
+      "Initiate the movement by pulling your shoulder blades together and down, forming a 'Y' shape with your body.",
+      "Keep your arms straight and elbows slightly bent, squeezing your shoulder blades at the top.",
+      "Slowly control the descent back to the starting position, resisting the pull of the straps."
     ]
   },
   {
@@ -10987,6 +18365,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Tuck Crunch",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Tuck_Crunch/0.jpg",
     "instructions": [
       "To begin, lie down on the floor or an exercise mat with your back pressed against the floor. Your arms should be lying across your sides with the palms facing down.",
@@ -11002,6 +18381,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Two-Arm Dumbbell Preacher Curl",
     "muscle": "biceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Two-Arm_Dumbbell_Preacher_Curl/0.jpg",
     "instructions": [
       "Grab a dumbbell with each arm and place the upper arms on top of the preacher bench or the incline bench. The dumbbell should be held at shoulder length. This will be your starting position.",
@@ -11015,6 +18395,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Two-Arm Kettlebell Clean",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Two-Arm_Kettlebell_Clean/0.jpg",
     "instructions": [
       "Place two kettlebells between your feet. To get in the starting position, push your butt back and look straight ahead.",
@@ -11027,6 +18408,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Two-Arm Kettlebell Jerk",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Two-Arm_Kettlebell_Jerk/0.jpg",
     "instructions": [
       "Clean two kettlebells to your shoulders. Clean the kettlebells to your shoulders by extending through the legs and hips as you swing the kettlebells towards your shoulders. Rotate your wrists as you do so, so that the palms face forward. Squat down a few inches and reverse the motion rapidly driving both kettlebells overhead. Immediately after the initial push, squat down again and get under the kettlebells. Once the kettlebells are locked out, stand upright to complete the exercise."
@@ -11037,6 +18419,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Two-Arm Kettlebell Military Press",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Two-Arm_Kettlebell_Military_Press/0.jpg",
     "instructions": [
       "Clean two kettlebells to your shoulders. Clean the kettlebells to your shoulders by extending through the legs and hips as you swing the kettlebells towards your shoulders. Rotate your wrists as you do so, so that the palms face forward.",
@@ -11048,6 +18431,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Two-Arm Kettlebell Row",
     "muscle": "back",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Two-Arm_Kettlebell_Row/0.jpg",
     "instructions": [
       "Place two kettlebells in front of your feet. Bend your knees slightly and then push your butt out as much as possible as you bend over to get in the starting position.",
@@ -11059,6 +18443,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Underhand Cable Pulldowns",
     "muscle": "back",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Underhand_Cable_Pulldowns/0.jpg",
     "instructions": [
       "Sit down on a pull-down machine with a wide bar attached to the top pulley. Adjust the knee pad of the machine to fit your height. These pads will prevent your body from being raised by the resistance attached to the bar.",
@@ -11070,10 +18455,22 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "Upper_Back_Stretch",
+    "name": "Upper Back Stretch",
+    "muscle": "back",
+    "equipment": "other",
+    "category": "stretching",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Upper_Back_Stretch/0.jpg",
+    "instructions": [
+      "Clasp fingers together with your thumbs pointing down, round your shoulders as you reach your hands forward."
+    ]
+  },
+  {
     "id": "Upper_Back-Leg_Grab",
     "name": "Upper Back-Leg Grab",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Upper_Back-Leg_Grab/0.jpg",
     "instructions": [
       "While seated, bend forward to hug your thighs from underneath with both arms.",
@@ -11081,20 +18478,11 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Upper_Back_Stretch",
-    "name": "Upper Back Stretch",
-    "muscle": "back",
-    "equipment": "other",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Upper_Back_Stretch/0.jpg",
-    "instructions": [
-      "Clasp fingers together with your thumbs pointing down, round your shoulders as you reach your hands forward."
-    ]
-  },
-  {
     "id": "Upright_Barbell_Row",
     "name": "Upright Barbell Row",
     "muscle": "shoulders",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Upright_Barbell_Row/0.jpg",
     "instructions": [
       "Grasp a barbell with an overhand grip that is slightly less than shoulder width. The bar should be resting on the top of your thighs with your arms extended and a slight bend in your elbows. Your back should also be straight. This will be your starting position.",
@@ -11108,6 +18496,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Upright Cable Row",
     "muscle": "back",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Upright_Cable_Row/0.jpg",
     "instructions": [
       "Grasp a straight bar cable attachment that is attached to a low pulley with a pronated (palms facing your thighs) grip that is slightly less than shoulder width. The bar should be resting on top of your thighs. Your arms should be extended with a slight bend at the elbows and your back should be straight. This will be your starting position.",
@@ -11121,6 +18510,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Upright Row - With Bands",
     "muscle": "back",
     "equipment": "band",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Upright_Row_-_With_Bands/0.jpg",
     "instructions": [
       "To begin, stand on an exercise band so that tension begins at arm's length. Grasp the handles using a pronated (palms facing your thighs) grip that is slightly less than shoulder width. The handles should be resting on top of your thighs. Your arms should be extended with a slight bend at the elbows and your back should be straight. This will be your starting position.",
@@ -11134,6 +18524,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Upward Stretch",
     "muscle": "shoulders",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Upward_Stretch/0.jpg",
     "instructions": [
       "Extend both hands straight above your head, palms touching.",
@@ -11141,10 +18532,42 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "upward-dog",
+    "name": "Upward-Facing Dog",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/upward-dog-main.webp",
+    "instructions": [
+      "Lie face down with the hands beside the lower ribs and the tops of the feet on the floor.",
+      "Press the hands down and straighten the arms, lifting the chest and then the thighs off the mat.",
+      "Draw the shoulders back and down and keep the neck long.",
+      "Hold the position for the prescribed time with only the hands and the tops of the feet on the floor.",
+      "Bend the arms and lower down under control."
+    ]
+  },
+  {
+    "id": "v-ups",
+    "name": "V Ups",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/v-ups-start.webp",
+    "instructions": [
+      "Lie flat on your back with arms extended overhead and legs straight.",
+      "Simultaneously raise your legs and upper body toward each other.",
+      "Reach your hands toward your feet at the top, forming a V shape.",
+      "Keep your legs straight throughout the movement.",
+      "Lower both ends under control back to the floor.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
     "id": "V-Bar_Pulldown",
     "name": "V-Bar Pulldown",
     "muscle": "back",
     "equipment": "cable",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/V-Bar_Pulldown/0.jpg",
     "instructions": [
       "Sit down on a pull-down machine with a V-Bar attached to the top pulley.",
@@ -11160,6 +18583,7 @@ export const generatedExercises: Exercise[] = [
     "name": "V-Bar Pullup",
     "muscle": "back",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/V-Bar_Pullup/0.jpg",
     "instructions": [
       "Start by placing the middle of the V-bar in the middle of the pull-up bar (assuming that the pull-up station you are using does not have neutral grip handles). The V-Bar handles will be facing down so that you can hang from the pull-up bar through the use of the handles.",
@@ -11170,10 +18594,43 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "v-bar-tricep-pushdown",
+    "name": "V-Bar Tricep Pushdown",
+    "muscle": "triceps",
+    "equipment": "cable",
+    "category": "strength",
+    "image": "/repdb/v-bar-tricep-pushdown-start.webp",
+    "instructions": [
+      "Attach a V-bar handle to a high cable pulley.",
+      "Stand facing the stack and grip the V-bar with both hands, palms down.",
+      "Start with the elbows tucked to the sides, forearms parallel to the floor.",
+      "Press the handle down until the arms are fully extended.",
+      "Squeeze the triceps, then return under control to the starting position.",
+      "Repeat for the recommended number of repetitions."
+    ]
+  },
+  {
+    "id": "v-sit",
+    "name": "V-Sit",
+    "muscle": "core",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/v-sit-main.webp",
+    "instructions": [
+      "Sit on the floor with your legs extended in front of you.",
+      "Lean back slightly and lift your legs off the floor.",
+      "Reach your arms forward so your body forms a V shape.",
+      "Balance on your sit bones with core tight.",
+      "Hold the position while breathing steadily.",
+      "Lower your legs and torso to exit."
+    ]
+  },
+  {
     "id": "Vertical_Swing",
     "name": "Vertical Swing",
     "muscle": "hamstrings",
     "equipment": "dumbbell",
+    "category": "plyometrics",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Vertical_Swing/0.jpg",
     "instructions": [
       "Allow the dumbbell to hang at arms length between your legs, holding it with both hands. Keep your back straight and your head up.",
@@ -11183,10 +18640,43 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "walking",
+    "name": "Walking",
+    "muscle": "calves",
+    "equipment": "bodyweight",
+    "category": "cardio",
+    "image": "/repdb/walking-main.webp",
+    "instructions": [
+      "Stand tall with your weight over the middle of your feet and your shoulders relaxed, not pulled back.",
+      "Step forward and land on your heel, then roll through the foot and push off the ball and toes.",
+      "Keep at least one foot on the ground at all times — as soon as both leave the floor you are running, not walking.",
+      "Let your arms swing naturally from the shoulder, opposite arm to opposite leg, with the elbows softly bent.",
+      "Look ahead rather than down at your feet, and breathe through a steady, repeatable rhythm.",
+      "Continue for the desired time or distance, picking a pace at which you could still hold a conversation."
+    ]
+  },
+  {
+    "id": "walking-lunge",
+    "name": "Walking Lunge",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/walking-lunge-start.webp",
+    "instructions": [
+      "Stand tall with feet hip-width apart and hands on hips.",
+      "Step one foot forward into a long lunge.",
+      "Lower until both knees are around 90 degrees.",
+      "Drive through the front heel and step the back foot forward.",
+      "Continue alternating legs as you walk forward.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
     "id": "Walking_Treadmill",
     "name": "Walking, Treadmill",
     "muscle": "quads",
     "equipment": "machine",
+    "category": "cardio",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Walking_Treadmill/0.jpg",
     "instructions": [
       "To begin, step onto the treadmill and select the desired option from the menu. Most treadmills have a manual setting, or you can select a program to run. Typically, you can enter your age and weight to estimate the amount of calories burned during exercise. Elevation can be adjusted to change the intensity of the workout.",
@@ -11194,10 +18684,86 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "wall-push-ups",
+    "name": "Wall Push Ups",
+    "muscle": "chest",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/wall-push-ups-start.webp",
+    "instructions": [
+      "Stand facing a wall and place your palms on it at shoulder height.",
+      "Step your feet back until your arms are fully extended.",
+      "Bend your elbows to bring your chest toward the wall.",
+      "Keep your body in a straight line throughout.",
+      "Press back to the starting position.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "wall-sit",
+    "name": "Wall Sit",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/wall-sit-main.webp",
+    "instructions": [
+      "Stand with back against a wall.",
+      "Slide down until thighs are parallel to the floor.",
+      "Hold the position.",
+      "Stand back up when done."
+    ]
+  },
+  {
+    "id": "warrior-one",
+    "name": "Warrior I",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/warrior-one-main.webp",
+    "instructions": [
+      "Step one foot back and turn it out about forty-five degrees, planting the whole sole.",
+      "Bend the front knee until it stacks over the ankle and keep the back leg straight.",
+      "Draw both hip points towards the front of the mat and lift the arms overhead.",
+      "Hold the position for the prescribed time with the ribs down and the chest lifted.",
+      "Step the feet together and repeat on the other side."
+    ]
+  },
+  {
+    "id": "warrior-two",
+    "name": "Warrior II",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/warrior-two-main.webp",
+    "instructions": [
+      "Stand wide with the front foot turned out ninety degrees and the back foot slightly in.",
+      "Bend the front knee until it stacks over the ankle and tracks towards the middle toes.",
+      "Open the hips and chest to the side and extend the arms parallel to the floor.",
+      "Hold the position for the prescribed time, gazing over the front hand.",
+      "Straighten the front leg and repeat on the other side."
+    ]
+  },
+  {
+    "id": "warrior-three",
+    "name": "Warrior III",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/warrior-three-main.webp",
+    "instructions": [
+      "Stand on one leg with the knee soft and the hips level.",
+      "Hinge forward from the hips as the other leg lifts behind you.",
+      "Continue until the torso and the lifted leg are roughly parallel to the floor.",
+      "Reach the arms forward, back along the body or out to the sides, and hold for the prescribed time.",
+      "Lower the leg and repeat on the other side."
+    ]
+  },
+  {
     "id": "Weighted_Ball_Hyperextension",
     "name": "Weighted Ball Hyperextension",
     "muscle": "back",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Weighted_Ball_Hyperextension/0.jpg",
     "instructions": [
       "To begin, lie down on an exercise ball with your torso pressing against the ball and parallel to the floor. The ball of your feet should be pressed against the floor to help keep you balanced. Place a weighted plate under your chin or behind your neck. This is the starting position.",
@@ -11211,6 +18777,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Weighted Ball Side Bend",
     "muscle": "core",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Weighted_Ball_Side_Bend/0.jpg",
     "instructions": [
       "To begin, lie down on an exercise ball with your left side of the torso (waist, hips and shoulder) pressed against the ball.",
@@ -11227,6 +18794,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Weighted Bench Dip",
     "muscle": "triceps",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Weighted_Bench_Dip/0.jpg",
     "instructions": [
       "For this exercise you will need to place a bench behind your back and another one in front of you. With the benches perpendicular to your body, hold on to one bench on its edge with the hands close to your body, separated at shoulder width. Your arms should be fully extended.",
@@ -11241,6 +18809,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Weighted Crunches",
     "muscle": "core",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Weighted_Crunches/0.jpg",
     "instructions": [
       "Lie flat on your back with your feet flat on the ground or resting on a bench with your knees bent at a 90 degree angle.",
@@ -11251,10 +18820,26 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "weighted-dips",
+    "name": "Weighted Dips",
+    "muscle": "chest",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/weighted-dips-start.webp",
+    "instructions": [
+      "Attach a plate to a dip belt around your waist so the weight hangs between your legs.",
+      "Grip the parallel dip bars and press yourself up to the top position with your arms locked out and your feet off the floor.",
+      "Lean your torso slightly forward and lower your body by bending your elbows until your shoulders are below them.",
+      "Press back up through your palms until your arms are locked out again, keeping the hanging plate from swinging.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
     "id": "Weighted_Jump_Squat",
     "name": "Weighted Jump Squat",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Weighted_Jump_Squat/0.jpg",
     "instructions": [
       "Position a lightly loaded barbell across the back of your shoulders. You could also use a weighted vest, sandbag, or other type of resistance for this exercise.",
@@ -11268,6 +18853,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Weighted Pull Ups",
     "muscle": "back",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Weighted_Pull_Ups/0.jpg",
     "instructions": [
       "Attach a weight to a dip belt and secure it around your waist. Grab the pull-up bar with the palms of your hands facing forward. For a medium grip, your hands should be spaced at shoulder width. Both arms should be extended in front of you holding the bar at the chosen grip.",
@@ -11281,6 +18867,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Weighted Sissy Squat",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Weighted_Sissy_Squat/0.jpg",
     "instructions": [
       "Standing upright, with feet at shoulder width and toes raised, use one hand to hold onto the beams of a squat rack and the opposite arm to hold a plate on top of your chest. This is your starting position.",
@@ -11294,6 +18881,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Weighted Sit-Ups - With Bands",
     "muscle": "core",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Weighted_Sit-Ups_-_With_Bands/0.jpg",
     "instructions": [
       "Start out by strapping the bands around the base of the decline bench. Place the handles towards the inside of the decline bench so that when lying down, you can reach for both of them.",
@@ -11307,6 +18895,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Weighted Squat",
     "muscle": "quads",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Weighted_Squat/0.jpg",
     "instructions": [
       "Start by positioning two flat benches shoulder width apart from each other. Stand on top of them and wrap the weighted belt around your waist with the amount of weight you feel comfortable with. Make sure your toes are facing out.",
@@ -11317,102 +18906,65 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
-    "id": "Wide-Grip_Barbell_Bench_Press",
-    "name": "Wide-Grip Barbell Bench Press",
-    "muscle": "chest",
-    "equipment": "barbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Wide-Grip_Barbell_Bench_Press/0.jpg",
+    "id": "weighted-wall-crunch",
+    "name": "Weighted Wall Crunch",
+    "muscle": "core",
+    "equipment": "other",
+    "category": "strength",
+    "image": "/repdb/weighted-wall-crunch-start.webp",
     "instructions": [
-      "Lie back on a flat bench with feet firm on the floor. Using a wide, pronated (palms forward) grip that is around 3 inches away from shoulder width (for each hand), lift the bar from the rack and hold it straight over you with your arms locked. The bar will be perpendicular to the torso and the floor. This will be your starting position.",
-      "As you breathe in, come down slowly until you feel the bar on your middle chest.",
-      "After a second pause, bring the bar back to the starting position as you breathe out and push the bar using your chest muscles. Lock your arms and squeeze your chest in the contracted position, hold for a second and then start coming down slowly again. Tip: It should take at least twice as long to go down than to come up.",
-      "Repeat the movement for the prescribed amount of repetitions."
+      "Lie on your back and park your legs so your hips cannot help: brace your feet against a wall or a box, or hold your legs up with the knees bent.",
+      "Hold a weight against your chest with both hands -- a plate, a dumbbell, or a kettlebell all work.",
+      "Crunch up, lifting your shoulder blades off the floor.",
+      "Lower with control.",
+      "Repeat."
     ]
   },
   {
-    "id": "Wide-Grip_Decline_Barbell_Bench_Press",
-    "name": "Wide-Grip Decline Barbell Bench Press",
-    "muscle": "chest",
-    "equipment": "barbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Wide-Grip_Decline_Barbell_Bench_Press/0.jpg",
-    "instructions": [
-      "Lie back on a decline bench with the feet securely locked at the front of the bench. Using a wide, pronated (palms forward) grip that is around 3 inches away from shoulder width (for each hand), lift the bar from the rack and hold it straight over you with your arms locked. The bar will be perpendicular to the torso and the floor. This will be your starting position.",
-      "As you breathe in, come down slowly until you feel the bar on your lower chest.",
-      "After a second pause, bring the bar back to the starting position as you breathe out and push the bar using your chest muscles. Lock your arms and squeeze your chest in the contracted position, hold for a second and then start coming down slowly again. Tip: It should take at least twice as long to go down than to come up.",
-      "Repeat the movement for the prescribed amount of repetitions."
-    ]
-  },
-  {
-    "id": "Wide-Grip_Decline_Barbell_Pullover",
-    "name": "Wide-Grip Decline Barbell Pullover",
-    "muscle": "chest",
-    "equipment": "barbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Wide-Grip_Decline_Barbell_Pullover/0.jpg",
-    "instructions": [
-      "Lie down on a decline bench with both legs securely locked in position. Reach for the barbell behind the head using a pronated grip (palms facing out). Make sure to grab the barbell wider than shoulder width apart for this exercise. Slowly lift the barbell up from the floor by using your arms.",
-      "When positioned properly, your arms should be fully extended and perpendicular to the floor. This is the starting position.",
-      "Begin by moving the barbell back down in a semicircular motion as if you were going to place it on the floor, but instead, stop when the arms are parallel to the floor. Tip: Keep the arms fully extended at all times. The movement should only happen at the shoulder joint. Inhale as you perform this portion of the movement.",
-      "Now bring the barbell up while exhaling until you are back at the starting position. Remember to keep full control of the barbell at all times.",
-      "Repeat the movement for the prescribed amount of repetitions of your training program.",
-      "When finished with your set, slowly lower the barbell back down until it is level with your head and release it."
-    ]
-  },
-  {
-    "id": "Wide-Grip_Lat_Pulldown",
-    "name": "Wide-Grip Lat Pulldown",
-    "muscle": "back",
-    "equipment": "cable",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Wide-Grip_Lat_Pulldown/0.jpg",
-    "instructions": [
-      "Sit down on a pull-down machine with a wide bar attached to the top pulley. Make sure that you adjust the knee pad of the machine to fit your height. These pads will prevent your body from being raised by the resistance attached to the bar.",
-      "Grab the bar with the palms facing forward using the prescribed grip. Note on grips: For a wide grip, your hands need to be spaced out at a distance wider than shoulder width. For a medium grip, your hands need to be spaced out at a distance equal to your shoulder width and for a close grip at a distance smaller than your shoulder width.",
-      "As you have both arms extended in front of you holding the bar at the chosen grip width, bring your torso back around 30 degrees or so while creating a curvature on your lower back and sticking your chest out. This is your starting position.",
-      "As you breathe out, bring the bar down until it touches your upper chest by drawing the shoulders and the upper arms down and back. Tip: Concentrate on squeezing the back muscles once you reach the full contracted position. The upper torso should remain stationary and only the arms should move. The forearms should do no other work except for holding the bar; therefore do not try to pull down the bar using the forearms.",
-      "After a second at the contracted position squeezing your shoulder blades together, slowly raise the bar back to the starting position when your arms are fully extended and the lats are fully stretched. Inhale during this portion of the movement.",
-      "Repeat this motion for the prescribed amount of repetitions."
-    ]
-  },
-  {
-    "id": "Wide-Grip_Pulldown_Behind_The_Neck",
-    "name": "Wide-Grip Pulldown Behind The Neck",
-    "muscle": "back",
-    "equipment": "cable",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Wide-Grip_Pulldown_Behind_The_Neck/0.jpg",
-    "instructions": [
-      "Sit down on a pull-down machine with a wide bar attached to the top pulley. Make sure that you adjust the knee pad of the machine to fit your height. These pads will prevent your body from being raised by the resistance attached to the bar.",
-      "Grab the bar with the palms facing forward using the prescribed grip. Note on grips: For a wide grip, your hands need to be spaced out at a distance wider than your shoulder width. For a medium grip, your hands need to be spaced out at a distance equal to your shoulder width and for a close grip at a distance smaller than your shoulder width.",
-      "As you have both arms extended in front of you holding the bar at the chosen grip width, bring your torso and head forward. Think of an imaginary line from the center of the bar down to the back of your neck. This is your starting position.",
-      "As you breathe out, bring the bar down until it touches the back of your neck by drawing the shoulders and the upper arms down and back. Tip: Concentrate on squeezing the back muscles once you reach the full contracted position. The upper torso should remain stationary and only the arms should move. The forearms should do no other work except for holding the bar; therefore do not try to pull down the bar using the forearms.",
-      "After a second on the contracted position squeezing your shoulder blades together, slowly raise the bar back to the starting position when your arms are fully extended and the lats are fully stretched. Inhale during this portion of the movement.",
-      "Repeat this motion for the prescribed amount of repetitions."
-    ]
-  },
-  {
-    "id": "Wide-Grip_Rear_Pull-Up",
-    "name": "Wide-Grip Rear Pull-Up",
+    "id": "wide-grip-pull-ups",
+    "name": "Wide Grip Pull Ups",
     "muscle": "back",
     "equipment": "bodyweight",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Wide-Grip_Rear_Pull-Up/0.jpg",
+    "category": "strength",
+    "image": "/repdb/wide-grip-pull-ups-start.webp",
     "instructions": [
-      "Grab the pull-up bar with the palms facing forward using a wide grip.",
-      "As you have both arms extended in front of you holding the bar, bring your torso forward and head so that there is an imaginary line from the pull-up bar to the back of your neck. This is your starting position.",
-      "Pull your torso up until the bar is near the back of your neck. To do this, draw the shoulders and upper arms down and back while slightly leaning your head forward. Exhale as you perform this portion of the movement. Tip: Concentrate on squeezing the back muscles once you reach the full contracted position. The upper torso should remain stationary as it moves through space and only the arms should move. The forearms should do no other work other than hold the bar.",
-      "After a second on the contracted position, start to inhale and slowly lower your torso back to the starting position when your arms are fully extended and the lats are fully stretched.",
-      "Repeat this motion for the prescribed amount of repetitions."
+      "Grip the pull-up bar with an overhand grip wider than shoulder-width.",
+      "Hang with arms fully extended and core braced.",
+      "Pull your chest toward the bar by driving your elbows down.",
+      "Keep your shoulders pulled back as you rise.",
+      "Lower yourself under control to full extension.",
+      "Repeat for the desired number of reps."
     ]
   },
   {
-    "id": "Wide-Grip_Standing_Barbell_Curl",
-    "name": "Wide-Grip Standing Barbell Curl",
-    "muscle": "biceps",
-    "equipment": "barbell",
-    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Wide-Grip_Standing_Barbell_Curl/0.jpg",
+    "id": "wide-grip-push-ups",
+    "name": "Wide Grip Push Ups",
+    "muscle": "chest",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "/repdb/wide-grip-push-ups-start.webp",
     "instructions": [
-      "Stand up with your torso upright while holding a barbell at the wide outer handle. The palm of your hands should be facing forward. The elbows should be close to the torso. This will be your starting position.",
-      "While holding the upper arms stationary, curl the weights forward while contracting the biceps as you breathe out. Tip: Only the forearms should move.",
-      "Continue the movement until your biceps are fully contracted and the bar is at shoulder level. Hold the contracted position for a second and squeeze the biceps hard.",
-      "Slowly begin to bring the bar back to starting position as your breathe in.",
-      "Repeat for the recommended amount of repetitions."
+      "Start in a high plank with hands wider than shoulder-width.",
+      "Keep your body in a straight line from head to heels.",
+      "Lower your chest toward the floor by bending your elbows.",
+      "Keep your core braced and glutes engaged.",
+      "Press back up until your arms are extended.",
+      "Repeat for the desired number of reps."
+    ]
+  },
+  {
+    "id": "wide-grip-seated-cable-row",
+    "name": "Wide Grip Seated Cable Row",
+    "muscle": "back",
+    "equipment": "cable",
+    "category": "strength",
+    "image": "/repdb/wide-grip-seated-cable-row-start.webp",
+    "instructions": [
+      "Sit at a cable row station with feet on the platform.",
+      "Grip a wide bar with an overhand grip.",
+      "Pull the bar toward your upper abdomen, squeezing your shoulder blades.",
+      "Extend your arms back to the starting position with control.",
+      "Repeat."
     ]
   },
   {
@@ -11420,6 +18972,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Wide Stance Barbell Squat",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Wide_Stance_Barbell_Squat/0.jpg",
     "instructions": [
       "This exercise is best performed inside a squat rack for safety purposes. To begin, first set the bar on a rack that best matches your height. Once the correct height is chosen and the bar is loaded, step under the bar and place the back of your shoulders (slightly below the neck) across it.",
@@ -11435,6 +18988,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Wide Stance Stiff Legs",
     "muscle": "hamstrings",
     "equipment": "barbell",
+    "category": "olympic",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Wide_Stance_Stiff_Legs/0.jpg",
     "instructions": [
       "Begin with a barbell loaded on the floor. Adopt a wide stance, and then bend at the hips to grab the bar. Your hips should be as far back as possible, and your legs nearly straight. Keep your back straight, and your head and chest up. This will be your starting position.",
@@ -11442,10 +18996,147 @@ export const generatedExercises: Exercise[] = [
     ]
   },
   {
+    "id": "Wide-Grip_Barbell_Bench_Press",
+    "name": "Wide-Grip Barbell Bench Press",
+    "muscle": "chest",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Wide-Grip_Barbell_Bench_Press/0.jpg",
+    "instructions": [
+      "Lie back on a flat bench with feet firm on the floor. Using a wide, pronated (palms forward) grip that is around 3 inches away from shoulder width (for each hand), lift the bar from the rack and hold it straight over you with your arms locked. The bar will be perpendicular to the torso and the floor. This will be your starting position.",
+      "As you breathe in, come down slowly until you feel the bar on your middle chest.",
+      "After a second pause, bring the bar back to the starting position as you breathe out and push the bar using your chest muscles. Lock your arms and squeeze your chest in the contracted position, hold for a second and then start coming down slowly again. Tip: It should take at least twice as long to go down than to come up.",
+      "Repeat the movement for the prescribed amount of repetitions."
+    ]
+  },
+  {
+    "id": "Wide-Grip_Decline_Barbell_Bench_Press",
+    "name": "Wide-Grip Decline Barbell Bench Press",
+    "muscle": "chest",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Wide-Grip_Decline_Barbell_Bench_Press/0.jpg",
+    "instructions": [
+      "Lie back on a decline bench with the feet securely locked at the front of the bench. Using a wide, pronated (palms forward) grip that is around 3 inches away from shoulder width (for each hand), lift the bar from the rack and hold it straight over you with your arms locked. The bar will be perpendicular to the torso and the floor. This will be your starting position.",
+      "As you breathe in, come down slowly until you feel the bar on your lower chest.",
+      "After a second pause, bring the bar back to the starting position as you breathe out and push the bar using your chest muscles. Lock your arms and squeeze your chest in the contracted position, hold for a second and then start coming down slowly again. Tip: It should take at least twice as long to go down than to come up.",
+      "Repeat the movement for the prescribed amount of repetitions."
+    ]
+  },
+  {
+    "id": "Wide-Grip_Decline_Barbell_Pullover",
+    "name": "Wide-Grip Decline Barbell Pullover",
+    "muscle": "chest",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Wide-Grip_Decline_Barbell_Pullover/0.jpg",
+    "instructions": [
+      "Lie down on a decline bench with both legs securely locked in position. Reach for the barbell behind the head using a pronated grip (palms facing out). Make sure to grab the barbell wider than shoulder width apart for this exercise. Slowly lift the barbell up from the floor by using your arms.",
+      "When positioned properly, your arms should be fully extended and perpendicular to the floor. This is the starting position.",
+      "Begin by moving the barbell back down in a semicircular motion as if you were going to place it on the floor, but instead, stop when the arms are parallel to the floor. Tip: Keep the arms fully extended at all times. The movement should only happen at the shoulder joint. Inhale as you perform this portion of the movement.",
+      "Now bring the barbell up while exhaling until you are back at the starting position. Remember to keep full control of the barbell at all times.",
+      "Repeat the movement for the prescribed amount of repetitions of your training program.",
+      "When finished with your set, slowly lower the barbell back down until it is level with your head and release it."
+    ]
+  },
+  {
+    "id": "Wide-Grip_Lat_Pulldown",
+    "name": "Wide-Grip Lat Pulldown",
+    "muscle": "back",
+    "equipment": "cable",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Wide-Grip_Lat_Pulldown/0.jpg",
+    "instructions": [
+      "Sit down on a pull-down machine with a wide bar attached to the top pulley. Make sure that you adjust the knee pad of the machine to fit your height. These pads will prevent your body from being raised by the resistance attached to the bar.",
+      "Grab the bar with the palms facing forward using the prescribed grip. Note on grips: For a wide grip, your hands need to be spaced out at a distance wider than shoulder width. For a medium grip, your hands need to be spaced out at a distance equal to your shoulder width and for a close grip at a distance smaller than your shoulder width.",
+      "As you have both arms extended in front of you holding the bar at the chosen grip width, bring your torso back around 30 degrees or so while creating a curvature on your lower back and sticking your chest out. This is your starting position.",
+      "As you breathe out, bring the bar down until it touches your upper chest by drawing the shoulders and the upper arms down and back. Tip: Concentrate on squeezing the back muscles once you reach the full contracted position. The upper torso should remain stationary and only the arms should move. The forearms should do no other work except for holding the bar; therefore do not try to pull down the bar using the forearms.",
+      "After a second at the contracted position squeezing your shoulder blades together, slowly raise the bar back to the starting position when your arms are fully extended and the lats are fully stretched. Inhale during this portion of the movement.",
+      "Repeat this motion for the prescribed amount of repetitions."
+    ]
+  },
+  {
+    "id": "Wide-Grip_Pulldown_Behind_The_Neck",
+    "name": "Wide-Grip Pulldown Behind The Neck",
+    "muscle": "back",
+    "equipment": "cable",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Wide-Grip_Pulldown_Behind_The_Neck/0.jpg",
+    "instructions": [
+      "Sit down on a pull-down machine with a wide bar attached to the top pulley. Make sure that you adjust the knee pad of the machine to fit your height. These pads will prevent your body from being raised by the resistance attached to the bar.",
+      "Grab the bar with the palms facing forward using the prescribed grip. Note on grips: For a wide grip, your hands need to be spaced out at a distance wider than your shoulder width. For a medium grip, your hands need to be spaced out at a distance equal to your shoulder width and for a close grip at a distance smaller than your shoulder width.",
+      "As you have both arms extended in front of you holding the bar at the chosen grip width, bring your torso and head forward. Think of an imaginary line from the center of the bar down to the back of your neck. This is your starting position.",
+      "As you breathe out, bring the bar down until it touches the back of your neck by drawing the shoulders and the upper arms down and back. Tip: Concentrate on squeezing the back muscles once you reach the full contracted position. The upper torso should remain stationary and only the arms should move. The forearms should do no other work except for holding the bar; therefore do not try to pull down the bar using the forearms.",
+      "After a second on the contracted position squeezing your shoulder blades together, slowly raise the bar back to the starting position when your arms are fully extended and the lats are fully stretched. Inhale during this portion of the movement.",
+      "Repeat this motion for the prescribed amount of repetitions."
+    ]
+  },
+  {
+    "id": "Wide-Grip_Rear_Pull-Up",
+    "name": "Wide-Grip Rear Pull-Up",
+    "muscle": "back",
+    "equipment": "bodyweight",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Wide-Grip_Rear_Pull-Up/0.jpg",
+    "instructions": [
+      "Grab the pull-up bar with the palms facing forward using a wide grip.",
+      "As you have both arms extended in front of you holding the bar, bring your torso forward and head so that there is an imaginary line from the pull-up bar to the back of your neck. This is your starting position.",
+      "Pull your torso up until the bar is near the back of your neck. To do this, draw the shoulders and upper arms down and back while slightly leaning your head forward. Exhale as you perform this portion of the movement. Tip: Concentrate on squeezing the back muscles once you reach the full contracted position. The upper torso should remain stationary as it moves through space and only the arms should move. The forearms should do no other work other than hold the bar.",
+      "After a second on the contracted position, start to inhale and slowly lower your torso back to the starting position when your arms are fully extended and the lats are fully stretched.",
+      "Repeat this motion for the prescribed amount of repetitions."
+    ]
+  },
+  {
+    "id": "Wide-Grip_Standing_Barbell_Curl",
+    "name": "Wide-Grip Standing Barbell Curl",
+    "muscle": "biceps",
+    "equipment": "barbell",
+    "category": "strength",
+    "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Wide-Grip_Standing_Barbell_Curl/0.jpg",
+    "instructions": [
+      "Stand up with your torso upright while holding a barbell at the wide outer handle. The palm of your hands should be facing forward. The elbows should be close to the torso. This will be your starting position.",
+      "While holding the upper arms stationary, curl the weights forward while contracting the biceps as you breathe out. Tip: Only the forearms should move.",
+      "Continue the movement until your biceps are fully contracted and the bar is at shoulder level. Hold the contracted position for a second and squeeze the biceps hard.",
+      "Slowly begin to bring the bar back to starting position as your breathe in.",
+      "Repeat for the recommended amount of repetitions."
+    ]
+  },
+  {
+    "id": "wide-legged-forward-fold",
+    "name": "Wide-Legged Forward Fold",
+    "muscle": "glutes",
+    "equipment": "bodyweight",
+    "category": "stretching",
+    "image": "/repdb/wide-legged-forward-fold-main.webp",
+    "instructions": [
+      "Stand with the feet wide apart and the outer edges parallel.",
+      "Place the hands on the hips, lift the chest and hinge forward from the hip joints.",
+      "Bring the hands to the floor under the shoulders and let the head hang.",
+      "Hold the fold for the prescribed time, shifting the weight slightly into the balls of the feet.",
+      "Bring the hands back to the hips and come up with a flat back."
+    ]
+  },
+  {
+    "id": "wide-stance-leg-press",
+    "name": "Wide-Stance Leg Press",
+    "muscle": "glutes",
+    "equipment": "machine",
+    "category": "strength",
+    "image": "/repdb/wide-stance-leg-press-start.webp",
+    "instructions": [
+      "Set the back pad and seat so your lower back remains supported at the bottom of the repetition.",
+      "Place your feet wide on the platform with the toes turned out only as far as the knees can follow comfortably.",
+      "Lower the sled by bending the hips and knees while keeping the knees aligned with the toes and the feet flat.",
+      "Press through the whole foot and extend the hips and knees without forcing the knees into lockout.",
+      "Lower the sled under control and repeat for the desired number of repetitions."
+    ]
+  },
+  {
     "id": "Wind_Sprints",
     "name": "Wind Sprints",
     "muscle": "core",
     "equipment": "bodyweight",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Wind_Sprints/0.jpg",
     "instructions": [
       "Hang from a pull-up bar using a pronated grip. Your arms and legs should be extended. This will be your starting position.",
@@ -11459,6 +19150,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Windmills",
     "muscle": "glutes",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Windmills/0.jpg",
     "instructions": [
       "Lie on your back with your arms extended out to the sides and your legs straight. This will be your starting position.",
@@ -11471,6 +19163,7 @@ export const generatedExercises: Exercise[] = [
     "name": "World's Greatest Stretch",
     "muscle": "hamstrings",
     "equipment": "other",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Worlds_Greatest_Stretch/0.jpg",
     "instructions": [
       "This is a three-part stretch. Begin by lunging forward, with your front foot flat on the ground and on the toes of your back foot. With your knees bent, squat down until your knee is almost touching the ground. Keep your torso erect, and hold this position for 10-20 seconds.",
@@ -11483,6 +19176,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Wrist Circles",
     "muscle": "other",
     "equipment": "bodyweight",
+    "category": "stretching",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Wrist_Circles/0.jpg",
     "instructions": [
       "Start by standing straight with your feet being shoulder width apart from each other. Elevate your arms to the side of you until they are fully extended and parallel to the floor at a height that is evenly aligned with your shoulders. Tip: Your torso and arms should form the letter \"T: Your palms should be facing down. This is the starting position.",
@@ -11495,6 +19189,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Wrist Roller",
     "muscle": "other",
     "equipment": "other",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Wrist_Roller/0.jpg",
     "instructions": [
       "To begin, stand straight up grabbing a wrist roller using a pronated grip (palms facing down). Your feet should be shoulder width apart.",
@@ -11509,6 +19204,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Wrist Rotations with Straight Bar",
     "muscle": "other",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Wrist_Rotations_with_Straight_Bar/0.jpg",
     "instructions": [
       "Hold a barbell with both hands and your palms facing down; hands spaced about shoulder width. This will be your starting position.",
@@ -11521,6 +19217,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Yoke Walk",
     "muscle": "quads",
     "equipment": "other",
+    "category": "strongman",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Yoke_Walk/0.jpg",
     "instructions": [
       "The yoke is usually done with a yoke apparatus, but is sometimes seen with refrigerators or other heavy objects.",
@@ -11533,6 +19230,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Zercher Squats",
     "muscle": "quads",
     "equipment": "barbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Zercher_Squats/0.jpg",
     "instructions": [
       "This exercise is best performed inside a squat rack for safety purposes. To begin, first set the bar on a rack that best matches your height. The correct height should be anywhere above the waist but below the chest. Once the correct height is chosen and the bar is loaded, lock your hands together and place the bar on top of your arms in between the forearm and upper arm.",
@@ -11548,6 +19246,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Zottman Curl",
     "muscle": "biceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Zottman_Curl/0.jpg",
     "instructions": [
       "Stand up with your torso upright and a dumbbell in each hand being held at arms length. The elbows should be close to the torso.",
@@ -11565,6 +19264,7 @@ export const generatedExercises: Exercise[] = [
     "name": "Zottman Preacher Curl",
     "muscle": "biceps",
     "equipment": "dumbbell",
+    "category": "strength",
     "image": "https://cdn.jsdelivr.net/gh/yuhonas/free-exercise-db@main/exercises/Zottman_Preacher_Curl/0.jpg",
     "instructions": [
       "Grab a dumbbell in each hand and place your upper arms on top of the preacher bench or the incline bench. The dumbbells should be held at shoulder height and the elbows should be flexed. Hold the dumbbells with the palms of your hands facing down. This will be your starting position.",

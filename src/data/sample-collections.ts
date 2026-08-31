@@ -132,7 +132,7 @@ export const SAMPLE_COLLECTIONS: Collection[] = [
      * Deliberately not called pelvic floor, and not called postpartum.
      *
      * Those were the honest names for what was asked for, and this catalogue
-     * cannot pay for either: a search across all 873 movements returns five in
+     * cannot pay for either: a search across all 1,322 movements returns five in
      * that territory, none of them a pelvic floor exercise. What is here is deep
      * core, breathing and lumbar control — real work, useful for coming back
      * from a pause, and the kind of thing someone recovering may well be sent

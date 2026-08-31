@@ -25,7 +25,7 @@ pnpm dev        # http://localhost:3015 (strictPort)
 | `pnpm build` | type-check + production build + PWA service worker |
 | `pnpm lint` | oxlint |
 | `pnpm test` | vitest (lib: epley/progression/estimate/generator/parser) |
-| `node scripts/import-free-exercise-db.mjs` | regenerate exercise metadata from free-exercise-db |
+| `node scripts/import-exercises.mjs` | rebuild the movement catalogue from free-exercise-db + RepDB (add `--no-media` to skip downloading illustrations) |
 | `node scripts/build-image-map.mjs` | rebuild the movement image map from the RepDB files on disk |
 | `node scripts/generate-icons.mjs` | regenerate the favicon and PWA icons from the brand mark |
 
@@ -73,18 +73,20 @@ all fall back to the built-in deterministic generator.
 Clean-room rebuild: zero code or assets from openGym (AGPL). All movement
 imagery is freely licensed:
 
-- **free-exercise-db** is the primary source: names, muscles, instructions and
-  two photographs per movement (start and end of the rep), from
+- **free-exercise-db** covers 876 of the 1,322 movements: names, muscles,
+  instructions and two photographs each (start and end of the rep), from
   [yuhonas/free-exercise-db](https://github.com/yuhonas/free-exercise-db)
-  (Unlicense). All 873 movements are covered, which is why the catalogue reads
-  as one consistent set of real photography. Photos load from jsDelivr and are
-  runtime-cached, so anything you have looked at stays available offline. They
-  are not bundled: at roughly 60 KB each that would add about 50 MB to the app.
-- **RepDB free tier** is the offline fallback: 384 flat 512px WebP illustrations
-  in `public/repdb/`, shown when the photo CDN cannot be reached. Used with
-  visible in-app attribution to
-  [RepDB](https://repdb.co/free-exercise-dataset) under its free-tier
-  attribution licence.
+  (Unlicense). Photos load from jsDelivr and are runtime-cached, so anything you
+  have looked at stays available offline. They are not bundled: at roughly 60 KB
+  each that would add about 50 MB to the app.
+- **RepDB free tier** contributes the other 446 movements — the banded work,
+  the stretching and mobility library and most of the calisthenics skills — plus
+  1,056 flat 512px WebP illustrations in `public/repdb/`, which double as the
+  offline fallback when the photo CDN cannot be reached. It also supplies
+  `src/data/exercise-details-generated.json`: Spanish text, coaching tips, MET
+  values and difficulty for 601 movements, loaded as its own chunk rather than
+  bundled. Used with the visible credit "Exercise data by RepDB (repdb.co)"
+  required by its [free-tier licence](https://repdb.co).
 - Anything with neither gets a typographic muscle tile rendered in CSS. Nothing
   is fabricated to look like an illustration that does not exist.
 

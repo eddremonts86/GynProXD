@@ -1,4 +1,4 @@
-import type { OnboardingInput } from './types'
+import type { DayOfWeek, OnboardingInput } from './types'
 
 /**
  * How a field got its value, which the review step needs and a boolean cannot say.
@@ -114,6 +114,46 @@ export function parseOnboarding(text: string): ParseResult {
   const prose = text.trim()
   if (prose) partial.constraints = prose
 
+  /**
+   * The clause about a body part that hurts, lifted out of the prose.
+   *
+   * It is in `constraints` too — everything is — but this is the one input with a
+   * safety consequence, and a prompt that can point at a field says something
+   * different from one that says "read the paragraph". Deliberately greedy about
+   * what counts as a mention and deliberately shy about interpreting it: the
+   * clause travels as written, and the coach decides what it means.
+   */
+  const hurtM = text.match(
+    /[^.;\n]*\b(?:cuidado con|lesi[oó]n|lesionad|me duele|duele|molestia|hernia|tendinitis|operad|injur|pain|bad (?:knee|back|shoulder|hip)|careful with|recovering from)\b[^.;\n]*/i,
+  )
+  if (hurtM) {
+    const clause = hurtM[0].trim().replace(/^[,\s]+/, '')
+    if (clause.length > 3) set('limitations', clause.slice(0, 200), 'quoted')
+  }
+
+  /**
+   * Named weekdays, when somebody says which ones rather than how many.
+   *
+   * `daysPerWeek` is set from this too, and takes precedence over any count in
+   * the sentence: "lunes, miércoles y viernes" is three days stated more
+   * precisely than "3 días", so letting a stray digit elsewhere overwrite it
+   * would be losing information to a weaker signal.
+   */
+  const DAY_WORDS: Array<[RegExp, DayOfWeek]> = [
+    [/\blunes\b|\bmondays?\b|\bmon\b/i, 'mon'],
+    [/\bmartes\b|\btuesdays?\b|\btue\b/i, 'tue'],
+    [/\bmi[eé]rcoles\b|\bwednesdays?\b|\bwed\b/i, 'wed'],
+    [/\bjueves\b|\bthursdays?\b|\bthu\b/i, 'thu'],
+    [/\bviernes\b|\bfridays?\b|\bfri\b/i, 'fri'],
+    [/\bs[aá]bado\b|\bsaturdays?\b|\bsat\b/i, 'sat'],
+    [/\bdomingo\b|\bsundays?\b|\bsun\b/i, 'sun'],
+  ]
+  const named = DAY_WORDS.filter(([re]) => re.test(t)).map(([, d]) => d)
+  if (named.length > 0) {
+    set('trainingDays', named, 'quoted')
+    set('daysPerWeek', named.length, 'quoted')
+  }
+
   const ageM =
     t.match(/(\d{1,2})\s*(?:a[ñn]os|a[ñn]o)\b/i) ??
     t.match(/(\d{1,2})\s*(?:years?(?:\s+old)?|yo|yrs?)\b/i) ??
@@ -208,7 +248,7 @@ export function parseOnboarding(text: string): ParseResult {
     t.match(/(\d)\s*(?:veces|x)\s*(?:a la semana|por semana|semana|\/?\s*(?:a\s*)?week|weekly)?/i) ??
     t.match(/(\d)\s*(?:d[ií]as|days)/i) ??
     t.match(/(\d)\s*times?\s*(?:a|per)\s*week/i)
-  if (daysM) set('daysPerWeek', clampInt(Number(daysM[1]), 1, 6), 'quoted')
+  if (daysM && !partial.trainingDays) set('daysPerWeek', clampInt(Number(daysM[1]), 1, 6), 'quoted')
 
   const hoursM = t.match(/(\d+(?:[.,]\d+)?)\s*(?:h\b|hours?|hrs?\b)/i)
   const minsM = t.match(/(\d+)\s*(?:min|minutes?)/i)
@@ -300,6 +340,9 @@ export function mergeWithDefaults(partial: Partial<OnboardingInput>): Onboarding
     minsPerSession: partial.minsPerSession ?? 60,
     equipment: (partial.equipment as OnboardingInput['equipment']) ?? 'hibrido',
     effort: (partial.effort as OnboardingInput['effort']) ?? 3,
+    trainingDays: partial.trainingDays,
+    limitations: partial.limitations,
+    avoid: partial.avoid,
     constraints: partial.constraints,
   }
 }

@@ -151,3 +151,32 @@ describe('confidence stops claiming certainty it does not have', () => {
     expect(parseOnboarding('entreno en el gimnasio').confidence).toBeCloseTo(0.5 / 6, 2)
   })
 })
+
+describe('the inputs a programme could not previously be told about', () => {
+  it('lifts the clause about what hurts out of the prose', () => {
+    const r = parseOnboarding('entreno 4 dias. Cuidado con la rodilla izquierda, me duele al bajar.')
+    expect(r.partial.limitations).toMatch(/rodilla izquierda/i)
+  })
+
+  it('leaves limitations alone when nothing hurts', () => {
+    expect(parseOnboarding('quiero adelgazar, 3 dias').partial.limitations).toBeUndefined()
+  })
+
+  it('reads which days, not only how many', () => {
+    const r = parseOnboarding('entreno lunes, miercoles y viernes')
+    expect(r.partial.trainingDays).toEqual(['mon', 'wed', 'fri'])
+    expect(r.partial.daysPerWeek).toBe(3)
+  })
+
+  it('lets named days outrank a looser count in the same sentence', () => {
+    // "2 horas" holds a digit the day pattern could otherwise swallow; the named
+    // days are the stronger statement and must survive it.
+    const r = parseOnboarding('lunes y jueves, 2 horas cada uno')
+    expect(r.partial.trainingDays).toEqual(['mon', 'thu'])
+    expect(r.partial.daysPerWeek).toBe(2)
+  })
+
+  it('reads English day names too', () => {
+    expect(parseOnboarding('I train tuesday and saturday').partial.trainingDays).toEqual(['tue', 'sat'])
+  })
+})

@@ -70,8 +70,17 @@ const STAPLES: Record<string, string[]> = {
   core: ['Plank', 'Crunches', 'Hanging_Leg_Raise'],
 }
 
+/**
+ * A stretch and a lift can train the same muscle, and only one of them is a
+ * working set. Block rotation walks past the staples into the alphabetical
+ * tail, so without this the fourth block of a hamstring slot could hand
+ * somebody a banded hamstring stretch as their main movement.
+ */
+const TRAINABLE = new Set(['strength', 'plyometrics', 'strongman', 'olympic'])
+
 function allowedPool(equipment: OnboardingInput['equipment']) {
   return generatedExercises.filter((e) => {
+    if (e.category && !TRAINABLE.has(e.category)) return false
     if (equipment === 'hibrido') return true
     if (equipment === 'bodyweight') return e.equipment === 'bodyweight'
     if (equipment === 'barbell') return ['barbell', 'dumbbell', 'machine', 'cable'].includes(e.equipment)

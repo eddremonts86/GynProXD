@@ -6,25 +6,36 @@ attribution for end users.
 
 ## free-exercise-db (public domain)
 
-- **What**: exercise names, muscle groups, instructions and photograph
-  references used to build `src/data/exercises-generated.ts`.
+- **What**: 876 of the movements in `src/data/exercises-generated.ts` — names,
+  muscle groups, category, instructions and photograph references.
 - **Source**: <https://github.com/yuhonas/free-exercise-db>
 - **License**: Unlicense (public domain). No conditions.
 - Photographs are hot-loaded from the project's CDN URLs at runtime; they
   are not stored in this repository.
+- Its ids are the catalogue's primary keys and are written into every logged
+  workout, so they are frozen: `scripts/import-exercises.mjs` may add to them
+  but never renames one.
 
 ## RepDB free exercise dataset (free tier, attribution required)
 
-- **What**: 384 flat-style 512px WebP exercise illustrations stored in
-  `public/repdb/`, used as the offline fallback when the photo CDN is
-  unreachable.
-- **Source**: <https://repdb.co/free-exercise-dataset>
-- **License**: RepDB free tier, which requires attribution. Attribution is
-  given here and in the app's About section.
-- **Open question (tracked)**: whether the free tier permits redistributing
-  the files themselves in a public repository, as opposed to using them in
-  a deployed app. If RepDB's terms turn out to disallow it, the remedy is
-  to remove `public/repdb/` from the repo and fetch the set at build time.
+- **What**: the other 446 movements in the catalogue, the flat-style 512px
+  WebP illustrations in `public/repdb/`, and the whole of
+  `src/data/exercise-details-generated.json` — Spanish names, descriptions,
+  instructions and tips for 601 movements, plus MET values, difficulty and
+  mechanics. The illustrations also serve as the offline fallback when the
+  photo CDN is unreachable.
+- **Source**: <https://repdb.co> · dataset at
+  <https://github.com/RepDB/exercise-dataset>
+- **License**: RepDB free tier, which requires attribution. The required
+  credit — "Exercise data by RepDB (repdb.co)" — is given here, in the app's
+  About section and in the landing footer.
+- **Open question (tracked)**: term 3 of the current licence reads "no
+  redistribution as a dataset — don't republish, resell, or repackage it (or a
+  derivative) as a dataset, dataset repo, or API. In-app use only." A public
+  repository holding the raw WebP files sits close enough to that line to be
+  worth resolving. The remedy is unchanged and now cheap: drop `public/repdb/`
+  from version control and let `node scripts/import-exercises.mjs` fetch the
+  files at build time, which it already does for anything missing.
 
 ## USDA MyPlate Kitchen recipes (public domain)
 

@@ -21,11 +21,26 @@ export type MuscleGroup =
   | 'core'
   | 'other'
 
+/**
+ * What kind of movement this is, from the upstream datasets. The plan generator
+ * needs it: a hamstring stretch and a Romanian deadlift both train hamstrings,
+ * and only one of them belongs in a strength block.
+ */
+export type ExerciseCategory =
+  | 'strength'
+  | 'stretching'
+  | 'cardio'
+  | 'plyometrics'
+  | 'strongman'
+  | 'olympic'
+
 export interface Exercise {
   id: string
   name: string
   muscle: MuscleGroup
   equipment: Equipment
+  /** Absent on movements imported before the catalogue tracked it. */
+  category?: ExerciseCategory
   image?: string | null
   instructions?: string[]
 }
@@ -118,6 +133,23 @@ export interface OnboardingInput {
   minsPerSession: number
   equipment: Equipment | 'hibrido'
   effort: 1 | 2 | 3 | 4 | 5
+  /**
+   * Which days, not just how many.
+   *
+   * Monday-Wednesday-Friday and Saturday-Sunday are the same `daysPerWeek` and
+   * two different programmes: one alternates, the other has to survive two hard
+   * sessions back to back. The split depends on it and the coach could not see it.
+   */
+  trainingDays?: DayOfWeek[]
+  /**
+   * Injuries, pain, and anything to train around. Its own field rather than a
+   * line in the prose, because it is the one input with a safety consequence and
+   * the prompt has to be able to point at it.
+   */
+  limitations?: string
+  /** Movements they do not want. Adherence dies here faster than anywhere else. */
+  avoid?: string
+  /** Everything they typed, verbatim. The only channel for what has no field. */
   constraints?: string
 }
 

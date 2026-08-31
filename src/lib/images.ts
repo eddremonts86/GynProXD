@@ -36,19 +36,27 @@ export function exerciseImageCandidates(
 }
 
 /**
- * Each movement in the dataset ships two frames: `0.jpg` is the start position
- * and `1.jpg` the end of the rep. Together they explain the movement in a way
- * a single still cannot.
+ * Both datasets ship a movement as two frames, under their own naming: the
+ * photographs pair `0.jpg` with `1.jpg`, the RepDB illustrations pair
+ * `-start.webp` with `-peak.webp`. Together they explain the movement in a way
+ * a single still cannot. RepDB's holds and stretches ship one `-main.webp`
+ * frame instead, and correctly get no pair.
  */
 export function exercisePhotoFrames(
   exercise: Pick<Exercise, 'image'>,
 ): { start: string; end: string } | null {
   const start = exercise.image
-  if (!start || !start.endsWith('/0.jpg')) return null
-  return {
-    start: sameOriginImage(start),
-    end: sameOriginImage(`${start.slice(0, -'/0.jpg'.length)}/1.jpg`),
+  if (!start) return null
+  if (start.endsWith('/0.jpg')) {
+    return {
+      start: sameOriginImage(start),
+      end: sameOriginImage(`${start.slice(0, -'/0.jpg'.length)}/1.jpg`),
+    }
   }
+  if (start.endsWith('-start.webp')) {
+    return { start, end: `${start.slice(0, -'-start.webp'.length)}-peak.webp` }
+  }
+  return null
 }
 
 export function exerciseIllustration(exerciseId: string): string | null {

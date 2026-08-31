@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { CATALOGUE_SIZE } from '@/data/catalogue-stats'
 import { motion, useReducedMotion } from 'motion/react'
 import {
   ArrowDown,
@@ -132,7 +133,7 @@ const MOVEMENTS: { file: string; name: string }[] = [
 
 /* Properties of the build, not claims about users. */
 const FACTS: { figure: string; unit?: string; label: string }[] = [
-  { figure: '873', label: 'movements in the library' },
+  { figure: CATALOGUE_SIZE.toLocaleString('en'), label: 'movements in the library' },
   { figure: '0', label: 'accounts needed to train' },
   { figure: '2–6', unit: 'days', label: 'a week, split to fit' },
   { figure: '4th', unit: 'week', label: 'is a deload, every time' },
@@ -158,7 +159,7 @@ const INSIDE: { icon: Icon; title: string; body: string }[] = [
   {
     icon: ListMagnifyingGlass,
     title: 'Movement library',
-    body: '873 movements filtered by muscle and by the equipment you can reach today.',
+    body: `${CATALOGUE_SIZE.toLocaleString('en')} movements filtered by muscle and by the equipment you can reach today.`,
   },
   {
     icon: ChartLineUp,
@@ -457,8 +458,9 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
                 </h1>
                 <Lead>
                   enForma reads your goal, your level and the hours you actually have, then builds a
-                  periodized programme out of 873 public-domain movements. It runs on this device,
-                  and the estimate it gives you is arithmetic you can check.
+                  periodized programme out of {CATALOGUE_SIZE.toLocaleString('en')} freely licensed
+                  movements. It runs on this device, and the estimate it gives you is arithmetic you
+                  can check.
                 </Lead>
               </div>
 
@@ -651,8 +653,9 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
             <Reveal className="order-1 flex flex-col gap-6 lg:order-2">
               <SectionHeading>Calisthenics and the barbell in one planner.</SectionHeading>
               <Lead>
-                873 movements, public domain, filtered by muscle and by the equipment you can
-                actually reach today. Bar at the gym, rings in a doorway, nothing but the floor —
+                {CATALOGUE_SIZE.toLocaleString('en')} movements, freely licensed, filtered by muscle
+                and by the equipment you can actually reach today. Bar at the gym, rings in a
+                doorway, nothing but the floor —
                 the generator picks from what you have and the weekly planner keeps both disciplines
                 on the same page.
               </Lead>
@@ -854,8 +857,9 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
               </span>
             </span>
             <p className="max-w-[52ch] text-sm leading-relaxed text-ink-3">
-              Movement data from the public-domain free-exercise-db. enForma gives training
-              structure, not medical advice — talk to a professional before a large change.
+              Movement data from the public-domain free-exercise-db and by RepDB (repdb.co).
+              enForma gives training structure, not medical advice — talk to a professional
+              before a large change.
             </p>
           </div>
         </footer>

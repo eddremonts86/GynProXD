@@ -89,6 +89,13 @@ export default defineConfig(({ mode }) => {
     rollupOptions: {
       output: {
         manualChunks(id) {
+          // The Spanish text and MET layer is nearly a megabyte and reached only
+          // through a dynamic import. Naming it first keeps the rule below from
+          // folding it into the chunk every page already downloads.
+          if (id.includes('src/data/exercise-details-generated')) return 'exercise-details'
+          // Three numbers the landing page prints. Left to Rollup so quoting the
+          // size of the library does not drag the whole library in behind it.
+          if (id.includes('src/data/catalogue-stats')) return undefined
           // The movement dataset barely changes, so it gets its own long-lived chunk.
           if (id.includes('src/data/')) return 'exercise-data'
           if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('@tanstack') || id.includes('zustand')) return 'vendor'
@@ -141,6 +148,9 @@ export default defineConfig(({ mode }) => {
       },
       injectManifest: {
         globPatterns: ['**/*.{js,css,html,woff2}', 'favicon.svg', 'pwa-*.png', 'apple-touch-icon.png'],
+        /* Nobody should pay a megabyte at install time for text they may never
+           open. It caches at runtime, like the artwork does. */
+        globIgnores: ['**/exercise-details-*.js'],
       },
       // The service worker only earns its keep in a real build; in dev it just
       // fights HMR and floods the console with registration failures.
