@@ -314,7 +314,17 @@ export function SettingsPage() {
               RepDB (repdb.co)
             </a>{' '}
             — 446 further movements, their illustrations, MET values and Spanish text, under its
-            free-tier attribution licence.
+            free-tier attribution licence. Instructions in ten languages from{' '}
+            <a
+              href="https://github.com/hasaneyldrm/exercises-dataset"
+              target="_blank"
+              rel="noreferrer"
+              className="text-brand underline underline-offset-2"
+            >
+              exercises-dataset
+            </a>{' '}
+            (MIT, text only). Demonstration videos belong to their YouTube channels and play in
+            YouTube's own player; nothing loads from Google until you press play.
           </p>
           <p className="max-w-[62ch] text-2xs">
             Recipes, their photos, preparation steps and nutrition numbers come from USDA MyPlate

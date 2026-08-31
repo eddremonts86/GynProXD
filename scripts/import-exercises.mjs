@@ -683,6 +683,26 @@ await writeFile(path.join(ROOT, 'src/data/repdb-images.json'), `${JSON.stringify
 const sortedVideos = Object.fromEntries([...videos].sort(([a], [b]) => a.localeCompare(b)))
 await writeFile(videoPath, `${JSON.stringify(sortedVideos, null, 2)}\n`)
 
+/* Which languages a movement has, without the languages themselves. A few
+   kilobytes against the detail chunk's 620, so the dialog can offer Spanish
+   before deciding whether anyone wants it: the chunk is fetched when a reader
+   picks a language, not when they open a movement. */
+const languageIndex = Object.fromEntries(
+  Object.entries(sortedDetails)
+    .map(([id, detail]) => [
+      id,
+      Object.entries(detail.instructions)
+        .filter(([, steps]) => steps.length > 0)
+        .map(([lang]) => lang)
+        .sort(),
+    ])
+    .filter(([, langs]) => langs.length > 0),
+)
+await writeFile(
+  path.join(ROOT, 'src/data/exercise-languages.json'),
+  `${JSON.stringify(languageIndex, null, 2)}\n`,
+)
+
 /* The landing page states the size of the library. It said 873 for long enough
    to be wrong in six places, so it reads the number from here instead — a few
    bytes, rather than importing a megabyte of catalogue into the signed-out page. */

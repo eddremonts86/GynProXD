@@ -16,6 +16,8 @@
  * some of the languages.
  */
 
+import languageIndex from '../data/exercise-languages.json'
+
 export type ExerciseDifficulty = 'beginner' | 'intermediate' | 'advanced'
 export type ExerciseMechanic = 'compound' | 'isolation'
 export type ExerciseForce = 'push' | 'pull' | 'static' | 'dynamic'
@@ -69,6 +71,18 @@ export interface ExerciseDetail {
   /** RepDB's own anatomical vocabulary (`gluteus_medius`), not the app's muscle groups. */
   secondaryMuscles?: string[]
   unilateral?: boolean
+}
+
+/**
+ * Which languages a movement has, without the text. Fifty kilobytes against the
+ * detail chunk's six hundred, and it is what lets the movement dialog offer
+ * Spanish before anyone has downloaded a word of it.
+ */
+const languages = languageIndex as Record<string, InstructionLanguage[]>
+
+/** Empty for movements no upstream translated. Cheap: no chunk is fetched. */
+export function exerciseLanguages(exerciseId: string): InstructionLanguage[] {
+  return languages[exerciseId] ?? []
 }
 
 let details: Record<string, ExerciseDetail> | null = null

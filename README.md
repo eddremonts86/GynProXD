@@ -25,7 +25,8 @@ pnpm dev        # http://localhost:3015 (strictPort)
 | `pnpm build` | type-check + production build + PWA service worker |
 | `pnpm lint` | oxlint |
 | `pnpm test` | vitest (lib: epley/progression/estimate/generator/parser) |
-| `node scripts/import-exercises.mjs` | rebuild the movement catalogue from free-exercise-db + RepDB (add `--no-media` to skip downloading illustrations) |
+| `node scripts/import-wger.mjs` | rebuild the separate CC-BY-SA wger library (never merged into the catalogue) |
+| `node scripts/import-exercises.mjs` | rebuild the movement catalogue, translations and video map (`--no-media` skips the illustrations, `--no-video-check` skips re-verifying videos, `--youtube` proposes new ones with `YOUTUBE_API_KEY`) |
 | `node scripts/build-image-map.mjs` | rebuild the movement image map from the RepDB files on disk |
 | `node scripts/generate-icons.mjs` | regenerate the favicon and PWA icons from the brand mark |
 
@@ -89,6 +90,20 @@ imagery is freely licensed:
   required by its [free-tier licence](https://repdb.co).
 - Anything with neither gets a typographic muscle tile rendered in CSS. Nothing
   is fabricated to look like an illustration that does not exist.
+- **exercises-dataset** (hasaneyldrm, MIT) adds no movement and no picture —
+  only step-by-step instructions in ten languages for 253 movements already in
+  the catalogue. Its GIFs are © Gym visual and are deliberately not used.
+- **Demonstration videos** are links, not files: 26 movements carry a YouTube
+  id seeded from exercemus and wger. They play in YouTube's embedded player
+  behind a facade, so nothing is requested from Google until somebody presses
+  play, and only the video id is stored — YouTube's policy caps storage of
+  titles and thumbnails at 30 days.
+
+- **wger** (CC-BY-SA 4.0/3.0 and CC0) adds 754 movements in files of their own,
+  with per-row credit rendered beside the description. They are browsable and
+  can be put in the planner, but the plan generator does not draw on them:
+  share-alike attribution has to be legible wherever the text appears, and a
+  generated programme scatters names across a dozen screens.
 
 No GIFs from scraped or unlicensed sources are bundled or hotlinked.
 

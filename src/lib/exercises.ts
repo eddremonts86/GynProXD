@@ -1,11 +1,23 @@
 import { generatedExercises } from '../data/exercises-generated'
+import { wgerExercises } from '../data/exercises-wger-generated'
 import type { Exercise, LoggedExercise, SetEntry, Workout } from './types'
 
 const byIdCache = new Map<string, Exercise>()
 
+/**
+ * Everything a member can browse, search or put in a session: the catalogue,
+ * the CC-BY-SA movements wger contributes, and their own.
+ *
+ * The plan generator deliberately does not use this — it draws from
+ * `generatedExercises` alone. Share-alike attribution has to be rendered
+ * wherever the text is shown, and a generated programme prints movement names
+ * across a dozen screens; keeping wger to the surfaces a person navigates to
+ * on purpose keeps that credit somewhere it can actually be read.
+ */
 export function exerciseLookup(custom: Exercise[]): Map<string, Exercise> {
   const map = new Map<string, Exercise>()
   for (const e of generatedExercises) map.set(e.id, e)
+  for (const e of wgerExercises) map.set(e.id, e)
   for (const e of custom) map.set(e.id, e)
   return map
 }

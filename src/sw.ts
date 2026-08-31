@@ -57,7 +57,11 @@ registerRoute(
 // stay available offline once they have been looked at. (The old direct
 // jsdelivr origin is kept too, for any cache warmed before the proxy landed.)
 registerRoute(
-  ({ url }) => url.pathname.startsWith('/exercise-img/') || url.origin === 'https://cdn.jsdelivr.net',
+  ({ url }) =>
+    url.pathname.startsWith('/exercise-img/') ||
+    url.origin === 'https://cdn.jsdelivr.net' ||
+    /* wger hosts its own illustrations; we link rather than copy them. */
+    url.origin === 'https://wger.de',
   new CacheFirst({
     cacheName: 'movement-photos',
     plugins: [

@@ -3,6 +3,8 @@ import { generatedExercises } from './exercises-generated'
 import details from './exercise-details-generated.json'
 import illustrations from './images-generated.json'
 import videos from './exercise-videos.json'
+import { wgerExercises } from './exercises-wger-generated'
+import wgerText from './exercise-wger-text.json'
 import { exercisePhotoFrames } from '../lib/images'
 
 /** What is actually on disk, resolved by Vite rather than by reading the filesystem. */
@@ -75,6 +77,44 @@ describe('generated exercise catalogue', () => {
       expect(detail.nameEs, id).toBeTruthy()
       expect(detail.met, id).toBeGreaterThan(1)
       expect(detail.met, id).toBeLessThan(20)
+    }
+  })
+
+  it('keeps wger out of the catalogue and credits every row of it', () => {
+    /* The whole point of the separate file: share-alike must not reach the
+       movements RepDB's licence forbids us to let anyone redistribute. */
+    const catalogue = new Set(generatedExercises.map((e) => e.id))
+    for (const exercise of wgerExercises) {
+      expect(catalogue.has(exercise.id), exercise.id).toBe(false)
+      expect(exercise.id.startsWith('wger-'), exercise.id).toBe(true)
+      expect(exercise.licenseAuthor, exercise.id).toBeTruthy()
+      expect(exercise.license, exercise.id).toMatch(/^CC/)
+      expect(exercise.licenseUrl, exercise.id).toMatch(/^https:\/\//)
+    }
+  })
+
+  it('only carries wger text for wger movements', () => {
+    const ids = new Set(wgerExercises.map((e) => e.id))
+    const orphans = Object.keys(wgerText).filter((id) => !ids.has(id))
+    expect(orphans).toEqual([])
+  })
+
+  it('promises no wger language it does not have', () => {
+    const text = wgerText as Record<string, Record<string, string[]>>
+    for (const exercise of wgerExercises) {
+      for (const language of exercise.languages) {
+        expect(text[exercise.id]?.[language]?.length, `${exercise.id} ${language}`).toBeGreaterThan(0)
+      }
+    }
+  })
+
+  it('leaves no markup in the wger descriptions', () => {
+    /* They arrive as HTML from a public wiki. Flattened at import so nothing
+       has to be sanitised at render time. */
+    for (const [id, languages] of Object.entries(wgerText as Record<string, Record<string, string[]>>)) {
+      for (const steps of Object.values(languages)) {
+        for (const step of steps) expect(step, id).not.toMatch(/<[a-z/][^>]*>/i)
+      }
     }
   })
 

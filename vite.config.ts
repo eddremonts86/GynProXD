@@ -93,6 +93,8 @@ export default defineConfig(({ mode }) => {
           // through a dynamic import. Naming it first keeps the rule below from
           // folding it into the chunk every page already downloads.
           if (id.includes('src/data/exercise-details-generated')) return 'exercise-details'
+          // Same deal for wger's descriptions: reached by a dynamic import only.
+          if (id.includes('src/data/exercise-wger-text')) return 'exercise-wger-text'
           // Three numbers the landing page prints. Left to Rollup so quoting the
           // size of the library does not drag the whole library in behind it.
           if (id.includes('src/data/catalogue-stats')) return undefined
@@ -150,7 +152,7 @@ export default defineConfig(({ mode }) => {
         globPatterns: ['**/*.{js,css,html,woff2}', 'favicon.svg', 'pwa-*.png', 'apple-touch-icon.png'],
         /* Nobody should pay a megabyte at install time for text they may never
            open. It caches at runtime, like the artwork does. */
-        globIgnores: ['**/exercise-details-*.js'],
+        globIgnores: ['**/exercise-details-*.js', '**/exercise-wger-text-*.js'],
       },
       // The service worker only earns its keep in a real build; in dev it just
       // fights HMR and floods the console with registration failures.

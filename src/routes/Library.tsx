@@ -11,6 +11,7 @@ import { useSession } from '../store/useSession'
 import { SAMPLE_COLLECTIONS } from '../data/sample-collections'
 import { MovementFrames } from '@/components/movement-frames'
 import { MovementVideo } from '@/components/movement-video'
+import { MovementInstructions } from '@/components/movement-instructions'
 import { Button } from '../ui/Button'
 import { Tag } from '../ui/Tag'
 import { Input } from '../ui/Input'
@@ -426,21 +427,7 @@ function ExerciseDetailDialog({
             <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
               <MovementFrames exercise={exercise} />
               <MovementVideo key={exercise.id} exercise={exercise} />
-
-              {exercise.instructions && exercise.instructions.length > 0 ? (
-                <ol className="flex flex-col gap-2.5">
-                  {exercise.instructions.map((step, i) => (
-                    <li key={i} className="flex gap-3 text-sm leading-relaxed text-ink-2">
-                      <span className="num flex size-5 shrink-0 items-center justify-center rounded-full bg-surface-2 text-2xs font-semibold text-ink-3">
-                        {i + 1}
-                      </span>
-                      {step}
-                    </li>
-                  ))}
-                </ol>
-              ) : (
-                <p className="text-sm text-ink-3">No instructions available for this movement.</p>
-              )}
+              <MovementInstructions key={exercise.id} exercise={exercise} />
             </div>
           </>
         )}

@@ -45,6 +45,22 @@ export interface Exercise {
   instructions?: string[]
 }
 
+/**
+ * A movement from wger, which is CC-BY-SA and therefore cannot live in the same
+ * file as the rest of the catalogue: share-alike would make one derived database
+ * of the whole thing, and would oblige us to allow a redistribution that RepDB's
+ * licence forbids. So it is a separate type, in a separate file, and every row
+ * names the person who wrote it — attribution is per work, not per dataset.
+ */
+export interface WgerExercise extends Exercise {
+  licenseAuthor: string
+  /** Short name as wger states it: `CC-BY-SA 4`, `CC-BY-SA 3`, `CC0`. */
+  license: string
+  licenseUrl: string
+  /** Which languages the description exists in. Empty when it has none. */
+  languages: ('en' | 'es')[]
+}
+
 export interface SetEntry {
   weight: number
   reps: number

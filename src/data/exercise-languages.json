@@ -1,0 +1,4511 @@
+{
+  "3_4_Sit-Up": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "ab-wheel-rollout": [
+    "es"
+  ],
+  "Advanced_Kettlebell_Windmill": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Air_Bike": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Alternate_Heel_Touchers": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Alternating_Kettlebell_Press": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Alternating_Kettlebell_Row": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Ankle_Circles": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "archer-pull-ups": [
+    "es"
+  ],
+  "archer-push-ups": [
+    "es"
+  ],
+  "Arnold_Dumbbell_Press": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "arnold-press": [
+    "es"
+  ],
+  "assisted-dips": [
+    "es"
+  ],
+  "assisted-pull-ups": [
+    "es"
+  ],
+  "back-extension": [
+    "es"
+  ],
+  "back-lever": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Balance_Board": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "ball-leg-curl": [
+    "es"
+  ],
+  "ball-pike": [
+    "es"
+  ],
+  "Band_Assisted_Pull-Up": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Band_Good_Morning": [
+    "es"
+  ],
+  "Band_Pull_Apart": [
+    "es"
+  ],
+  "banded-adductor-stretch": [
+    "es"
+  ],
+  "banded-ankle-stretch": [
+    "es"
+  ],
+  "banded-calf-stretch": [
+    "es"
+  ],
+  "banded-chest-stretch": [
+    "es"
+  ],
+  "banded-clamshell": [
+    "es"
+  ],
+  "banded-figure-4-stretch": [
+    "es"
+  ],
+  "banded-fire-hydrant": [
+    "es"
+  ],
+  "banded-glute-bridge": [
+    "es"
+  ],
+  "banded-hamstring-stretch": [
+    "es"
+  ],
+  "banded-hip-thrust": [
+    "es"
+  ],
+  "banded-it-band-stretch": [
+    "es"
+  ],
+  "banded-kneeling-hip-thrust": [
+    "es"
+  ],
+  "banded-lat-stretch": [
+    "es"
+  ],
+  "banded-lateral-walk": [
+    "es"
+  ],
+  "banded-rear-delt-stretch": [
+    "es"
+  ],
+  "banded-romanian-deadlift": [
+    "es"
+  ],
+  "banded-seated-hip-abduction": [
+    "es"
+  ],
+  "banded-shoulder-stretch": [
+    "es"
+  ],
+  "banded-squat": [
+    "es"
+  ],
+  "banded-standing-curl": [
+    "es"
+  ],
+  "banded-standing-hip-abduction": [
+    "es"
+  ],
+  "banded-standing-hip-adduction": [
+    "es"
+  ],
+  "banded-sumo-walk": [
+    "es"
+  ],
+  "banded-terminal-knee-extension": [
+    "es"
+  ],
+  "banded-triceps-stretch": [
+    "es"
+  ],
+  "Barbell_Ab_Rollout": [
+    "es"
+  ],
+  "Barbell_Bench_Press_-_Medium_Grip": [
+    "es"
+  ],
+  "Barbell_Curl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Barbell_Deadlift": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Barbell_Full_Squat": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Barbell_Glute_Bridge": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Barbell_Guillotine_Bench_Press": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Barbell_Hack_Squat": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Barbell_Hip_Thrust": [
+    "es"
+  ],
+  "Barbell_Incline_Shoulder_Raise": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Barbell_Lunge": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Barbell_Rear_Delt_Row": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Barbell_Seated_Calf_Raise": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Barbell_Shrug": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Barbell_Shrug_Behind_The_Back": [
+    "es"
+  ],
+  "Barbell_Side_Split_Squat": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "barbell-calf-raise": [
+    "es"
+  ],
+  "barbell-front-raise": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "barbell-overhead-extension": [
+    "es"
+  ],
+  "barbell-preacher-curl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "barbell-pullover": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "barbell-reverse-lunge": [
+    "es"
+  ],
+  "barbell-wrist-curl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "battle-rope-double-slam": [
+    "es"
+  ],
+  "Battling_Ropes": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "bear-crawl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Behind_Head_Chest_Stretch": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "behind-the-neck-lat-pulldown": [
+    "es"
+  ],
+  "behind-the-neck-press": [
+    "es"
+  ],
+  "behind-the-neck-pull-ups": [
+    "es"
+  ],
+  "Bench_Dips": [
+    "es"
+  ],
+  "bench-adductor-stretch": [
+    "es"
+  ],
+  "bench-ankle-stretch": [
+    "es"
+  ],
+  "bench-bulgarian-split-stretch": [
+    "es"
+  ],
+  "bench-calf-stretch": [
+    "es"
+  ],
+  "bench-chest-stretch": [
+    "es"
+  ],
+  "bench-childs-pose": [
+    "es"
+  ],
+  "bench-couch-stretch": [
+    "es"
+  ],
+  "bench-figure-4-glute-stretch": [
+    "es"
+  ],
+  "bench-hamstring-stretch": [
+    "es"
+  ],
+  "bench-lat-stretch": [
+    "es"
+  ],
+  "bench-pull": [
+    "es"
+  ],
+  "Bent_Over_Barbell_Row": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Bent_Over_Two-Dumbbell_Row": [
+    "es"
+  ],
+  "Bent-Arm_Barbell_Pullover": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "bent-arm-ez-bar-pullover": [
+    "es"
+  ],
+  "Bent-Knee_Hip_Raise": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "bent-over-ez-bar-row": [
+    "es"
+  ],
+  "bicycle-crunch": [
+    "es"
+  ],
+  "bird-dog": [
+    "es"
+  ],
+  "bird-dog-hold": [
+    "es"
+  ],
+  "boat-pose": [
+    "es"
+  ],
+  "Body-Up": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Bodyweight_Squat": [
+    "es"
+  ],
+  "bodyweight-calf-raise": [
+    "es"
+  ],
+  "bodyweight-good-morning": [
+    "es"
+  ],
+  "bodyweight-lateral-raise": [
+    "es"
+  ],
+  "bodyweight-overhead-press": [
+    "es"
+  ],
+  "bodyweight-reverse-lunge": [
+    "es"
+  ],
+  "Bottoms_Up": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "bow-pose": [
+    "es"
+  ],
+  "Box_Squat": [
+    "es"
+  ],
+  "box-jump": [
+    "es"
+  ],
+  "bulgarian-split-squat": [
+    "es"
+  ],
+  "burpees": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Butt-Ups": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "butterfly-stretch": [
+    "es"
+  ],
+  "Cable_Chest_Press": [
+    "es"
+  ],
+  "Cable_Crunch": [
+    "es"
+  ],
+  "Cable_Deadlifts": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Cable_Hip_Adduction": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Cable_Incline_Pushdown": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Cable_Incline_Triceps_Extension": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Cable_Judo_Flip": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Cable_Preacher_Curl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Cable_Reverse_Crunch": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Cable_Seated_Crunch": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Cable_Shoulder_Press": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Cable_Shrugs": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Cable_Wrist_Curl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "cable-bent-over-row": [
+    "es"
+  ],
+  "cable-curl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "cable-external-rotation": [
+    "es"
+  ],
+  "cable-fly": [
+    "es"
+  ],
+  "cable-hammer-curl": [
+    "es"
+  ],
+  "cable-kickback": [
+    "es"
+  ],
+  "cable-lateral-raise": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "cable-pallof-press": [
+    "es"
+  ],
+  "cable-tricep-kickback": [
+    "es"
+  ],
+  "camel-pose": [
+    "es"
+  ],
+  "captains-chair-knee-raise": [
+    "es"
+  ],
+  "captains-chair-leg-raise": [
+    "es"
+  ],
+  "Cat_Stretch": [
+    "es"
+  ],
+  "cat-cow": [
+    "es"
+  ],
+  "Chair_Leg_Extended_Stretch": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "chair-pose": [
+    "es"
+  ],
+  "cheat-curl": [
+    "es"
+  ],
+  "Chest_And_Front_Of_Shoulder_Stretch": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "chest-supported-db-row": [
+    "es"
+  ],
+  "chest-supported-dumbbell-shrug": [
+    "es"
+  ],
+  "chest-supported-kettlebell-row": [
+    "es"
+  ],
+  "chest-supported-smith-machine-row": [
+    "es"
+  ],
+  "Childs_Pose": [
+    "es"
+  ],
+  "chin-tuck-hold": [
+    "es"
+  ],
+  "Chin-Up": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "clamshells": [
+    "es"
+  ],
+  "clamshells-hold": [
+    "es"
+  ],
+  "clap-push-ups": [
+    "es"
+  ],
+  "Clean": [
+    "es"
+  ],
+  "Clean_and_Jerk": [
+    "es"
+  ],
+  "Clock_Push-Up": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Close-Grip_Barbell_Bench_Press": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Close-Grip_Dumbbell_Press": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Close-Grip_EZ_Bar_Curl": [
+    "es"
+  ],
+  "Close-Grip_Front_Lat_Pulldown": [
+    "es"
+  ],
+  "Close-Grip_Standing_Barbell_Curl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "close-grip-barbell-curl": [
+    "es"
+  ],
+  "close-grip-db-bench-press": [
+    "es"
+  ],
+  "close-grip-ez-bar-bench-press": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "close-grip-incline-bench": [
+    "es"
+  ],
+  "close-grip-pull-ups": [
+    "es"
+  ],
+  "close-grip-push-ups": [
+    "es"
+  ],
+  "close-stance-leg-press": [
+    "es"
+  ],
+  "cobra-stretch": [
+    "es"
+  ],
+  "Cocoons": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Concentration_Curls": [
+    "es"
+  ],
+  "cossack-squat": [
+    "es"
+  ],
+  "cow-face-pose": [
+    "es"
+  ],
+  "crab-dips": [
+    "es"
+  ],
+  "crescent-lunge": [
+    "es"
+  ],
+  "Cross_Body_Hammer_Curl": [
+    "es"
+  ],
+  "Cross-Body_Crunch": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "cross-body-shoulder-stretch": [
+    "es"
+  ],
+  "crow-pose": [
+    "es"
+  ],
+  "Crunch_-_Hands_Overhead": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Crunches": [
+    "es"
+  ],
+  "dancer-pose": [
+    "es"
+  ],
+  "db-kickstand-deadlift": [
+    "es"
+  ],
+  "db-overhead-carry": [
+    "es"
+  ],
+  "db-pullover": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "db-reverse-curl": [
+    "es"
+  ],
+  "db-reverse-wrist-curl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "db-skull-crusher": [
+    "es"
+  ],
+  "db-somersault-squat": [
+    "es"
+  ],
+  "db-sumo-squat": [
+    "es"
+  ],
+  "db-svend-press": [
+    "es"
+  ],
+  "Dead_Bug": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "dead-bug-hold": [
+    "es"
+  ],
+  "dead-hang": [
+    "es"
+  ],
+  "Decline_Barbell_Bench_Press": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Decline_Crunch": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Decline_Dumbbell_Bench_Press": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Decline_Dumbbell_Flyes": [
+    "es"
+  ],
+  "Decline_Dumbbell_Triceps_Extension": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Decline_Push-Up": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "decline-bench-press": [
+    "es"
+  ],
+  "decline-bench-press-ez-bar": [
+    "es"
+  ],
+  "Deficit_Deadlift": [
+    "es"
+  ],
+  "deficit-push-ups": [
+    "es"
+  ],
+  "diamond-push-ups": [
+    "es"
+  ],
+  "dips": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "dolphin-pose": [
+    "es"
+  ],
+  "Donkey_Calf_Raises": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "doorway-chest-stretch": [
+    "es"
+  ],
+  "Double_Kettlebell_Alternating_Hang_Clean": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Double_Kettlebell_Jerk": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Double_Kettlebell_Push_Press": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Double_Kettlebell_Snatch": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Double_Kettlebell_Windmill": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "double-db-kickstand-deadlift": [
+    "es"
+  ],
+  "double-db-overhead-carry": [
+    "es"
+  ],
+  "double-kettlebell-bicep-curl": [
+    "es"
+  ],
+  "double-kettlebell-clean": [
+    "es"
+  ],
+  "double-kettlebell-clean-and-press": [
+    "es"
+  ],
+  "double-kettlebell-dead-clean": [
+    "es"
+  ],
+  "double-kettlebell-dead-split-snatch": [
+    "es"
+  ],
+  "double-kettlebell-overhead-carry": [
+    "es"
+  ],
+  "double-kettlebell-overhead-press": [
+    "es"
+  ],
+  "double-kettlebell-rear-delt-row": [
+    "es"
+  ],
+  "double-kettlebell-row": [
+    "es"
+  ],
+  "double-kettlebell-split-jerk": [
+    "es"
+  ],
+  "double-kettlebell-swing-snatch": [
+    "es"
+  ],
+  "downward-dog": [
+    "es"
+  ],
+  "downward-dog-knee-tuck": [
+    "es"
+  ],
+  "downward-dog-pedal": [
+    "es"
+  ],
+  "downward-dog-to-knee-drive": [
+    "es"
+  ],
+  "downward-dog-to-low-lunge": [
+    "es"
+  ],
+  "downward-dog-to-plank": [
+    "es"
+  ],
+  "downward-dog-to-upward-dog": [
+    "es"
+  ],
+  "Drag_Curl": [
+    "es"
+  ],
+  "dragon-flag": [
+    "es"
+  ],
+  "Dumbbell_Alternate_Bicep_Curl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Dumbbell_Bench_Press": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Dumbbell_Bicep_Curl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Dumbbell_Clean": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Dumbbell_Floor_Press": [
+    "es"
+  ],
+  "Dumbbell_Flyes": [
+    "es"
+  ],
+  "Dumbbell_Incline_Row": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Dumbbell_Incline_Shoulder_Raise": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Dumbbell_Lunges": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Dumbbell_Lying_One-Arm_Rear_Lateral_Raise": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Dumbbell_Lying_Pronation": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Dumbbell_Lying_Rear_Lateral_Raise": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Dumbbell_Lying_Supination": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Dumbbell_One-Arm_Shoulder_Press": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Dumbbell_One-Arm_Upright_Row": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Dumbbell_Prone_Incline_Curl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Dumbbell_Raise": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Dumbbell_Rear_Lunge": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Dumbbell_Seated_One-Leg_Calf_Raise": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Dumbbell_Shoulder_Press": [
+    "es"
+  ],
+  "Dumbbell_Shrug": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Dumbbell_Side_Bend": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Dumbbell_Squat": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "dumbbell-bench-pull": [
+    "es"
+  ],
+  "dumbbell-calf-raise": [
+    "es"
+  ],
+  "dumbbell-deadlift": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "dumbbell-face-pull": [
+    "es"
+  ],
+  "dumbbell-farmers-walk": [
+    "es"
+  ],
+  "dumbbell-front-squat": [
+    "es"
+  ],
+  "dumbbell-hip-thrust": [
+    "es"
+  ],
+  "dumbbell-pistol-squat": [
+    "es"
+  ],
+  "dumbbell-push-press": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "dumbbell-reverse-fly": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "dumbbell-romanian-deadlift": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "dumbbell-snatch": [
+    "es"
+  ],
+  "dumbbell-split-squat": [
+    "es"
+  ],
+  "dumbbell-tricep-extension": [
+    "es"
+  ],
+  "dumbbell-upright-row": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "dumbbell-windmill": [
+    "es"
+  ],
+  "dumbbell-wrist-curl": [
+    "es"
+  ],
+  "eagle-pose": [
+    "es"
+  ],
+  "easy-pose": [
+    "es"
+  ],
+  "Elbow_to_Knee": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Elliptical_Trainer": [
+    "es"
+  ],
+  "extended-side-angle": [
+    "es"
+  ],
+  "EZ-Bar_Curl": [
+    "es"
+  ],
+  "ez-bar-bench-press": [
+    "es"
+  ],
+  "ez-bar-front-raise": [
+    "es"
+  ],
+  "ez-bar-lying-tricep-extension": [
+    "es"
+  ],
+  "ez-bar-overhead-extension": [
+    "es"
+  ],
+  "ez-bar-pullover": [
+    "es"
+  ],
+  "ez-bar-reverse-curl": [
+    "es"
+  ],
+  "ez-bar-reverse-grip-row": [
+    "es"
+  ],
+  "ez-bar-romanian-deadlift": [
+    "es"
+  ],
+  "ez-bar-shrug": [
+    "es"
+  ],
+  "ez-bar-spider-curl": [
+    "es"
+  ],
+  "ez-bar-upright-row": [
+    "es"
+  ],
+  "ez-bar-wrist-curl": [
+    "es"
+  ],
+  "face-pull": [
+    "es"
+  ],
+  "Finger_Curls": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "fish-pose": [
+    "es"
+  ],
+  "Flat_Bench_Leg_Pull-In": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Flat_Bench_Lying_Leg_Raise": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Floor_Press": [
+    "es"
+  ],
+  "floor-ez-bar-press": [
+    "es"
+  ],
+  "floor-kettlebell-pullover": [
+    "es"
+  ],
+  "Flutter_Kicks": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Frankenstein_Squat": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Front_Barbell_Squat": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Front_Cable_Raise": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Front_Dumbbell_Raise": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "front-lever": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "front-squat": [
+    "es"
+  ],
+  "garland-pose": [
+    "es"
+  ],
+  "Gironda_Sternum_Chins": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Glute_Ham_Raise": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Glute_Kickback": [
+    "es"
+  ],
+  "glute-bridge": [
+    "es"
+  ],
+  "glute-bridge-hold": [
+    "es"
+  ],
+  "glute-kickback-hold": [
+    "es"
+  ],
+  "Goblet_Squat": [
+    "es"
+  ],
+  "Good_Morning": [
+    "es"
+  ],
+  "Hack_Squat": [
+    "es"
+  ],
+  "hack-squat-calf-raise": [
+    "es"
+  ],
+  "half-kneeling-hip-flexor-rock": [
+    "es"
+  ],
+  "half-moon-pose": [
+    "es"
+  ],
+  "hammer-curl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Hamstring_Stretch": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Handstand_Push-Ups": [
+    "es"
+  ],
+  "Hang_Clean": [
+    "es"
+  ],
+  "hang-power-clean": [
+    "es"
+  ],
+  "Hanging_Leg_Raise": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Hanging_Pike": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "hanging-knee-raise": [
+    "es"
+  ],
+  "happy-baby": [
+    "es"
+  ],
+  "head-to-knee-pose": [
+    "es"
+  ],
+  "heel-elevated-squat": [
+    "es"
+  ],
+  "heel-to-toe-walk": [
+    "es"
+  ],
+  "hero-pose": [
+    "es"
+  ],
+  "hex-bar-deadlift": [
+    "es"
+  ],
+  "high-foot-leg-press": [
+    "es"
+  ],
+  "high-knees": [
+    "es"
+  ],
+  "high-plank": [
+    "es"
+  ],
+  "hip-abduction": [
+    "es"
+  ],
+  "hip-adduction": [
+    "es"
+  ],
+  "hollow-body-hold": [
+    "es"
+  ],
+  "horizontal-leg-press": [
+    "es"
+  ],
+  "human-flag": [
+    "es"
+  ],
+  "Inchworm": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Incline_Dumbbell_Curl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Incline_Dumbbell_Flyes": [
+    "es"
+  ],
+  "Incline_Dumbbell_Press": [
+    "es"
+  ],
+  "Incline_Hammer_Curls": [
+    "es"
+  ],
+  "Incline_Push-Up": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Incline_Push-Up_Close-Grip": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Incline_Push-Up_Depth_Jump": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Incline_Push-Up_Reverse_Grip": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "incline-bench-ez-bar-press": [
+    "es"
+  ],
+  "incline-bench-press": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "incline-treadmill-walk": [
+    "es"
+  ],
+  "Intermediate_Hip_Flexor_and_Quad_Stretch": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Inverted_Row": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Inverted_Row_with_Straps": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Isometric_Chest_Squeezes": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Isometric_Wipers": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "isometric-neck-side": [
+    "es"
+  ],
+  "Jackknife_Sit-Up": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Janda_Sit-Up": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "jefferson-curl": [
+    "es"
+  ],
+  "jump-rope": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "jump-squat": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "jumping-jacks": [
+    "es"
+  ],
+  "Kettlebell_Arnold_Press": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Kettlebell_Figure_8": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Kettlebell_Halo": [
+    "es"
+  ],
+  "Kettlebell_Hang_Clean": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Kettlebell_Overhead_Triceps_Extension": [
+    "es"
+  ],
+  "Kettlebell_Pistol_Squat": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Kettlebell_Seated_Press": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Kettlebell_Seesaw_Press": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Kettlebell_Sumo_High_Pull": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Kettlebell_Thruster": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Kettlebell_Turkish_Get-Up_Squat_style": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Kettlebell_Windmill": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "kettlebell-bulgarian-split-squat": [
+    "es"
+  ],
+  "kettlebell-close-grip-floor-press": [
+    "es"
+  ],
+  "kettlebell-concentration-curl": [
+    "es"
+  ],
+  "kettlebell-deadlift": [
+    "es"
+  ],
+  "kettlebell-farmers-walk": [
+    "es"
+  ],
+  "kettlebell-floor-press": [
+    "es"
+  ],
+  "kettlebell-goblet-lunge": [
+    "es"
+  ],
+  "kettlebell-hammer-curl": [
+    "es"
+  ],
+  "kettlebell-hip-thrust": [
+    "es"
+  ],
+  "kettlebell-kickstand-deadlift": [
+    "es"
+  ],
+  "kettlebell-lunge-press": [
+    "es"
+  ],
+  "kettlebell-offset-reverse-lunge-and-press": [
+    "es"
+  ],
+  "kettlebell-overhead-carry": [
+    "es"
+  ],
+  "kettlebell-pullover": [
+    "es"
+  ],
+  "kettlebell-reverse-lunge": [
+    "es"
+  ],
+  "kettlebell-reverse-wrist-curl": [
+    "es"
+  ],
+  "kettlebell-rotational-lunge": [
+    "es"
+  ],
+  "kettlebell-russian-twist": [
+    "es"
+  ],
+  "kettlebell-shrug": [
+    "es"
+  ],
+  "kettlebell-single-leg-deadlift": [
+    "es"
+  ],
+  "kettlebell-skull-crusher": [
+    "es"
+  ],
+  "kettlebell-squat": [
+    "es"
+  ],
+  "kettlebell-sumo-deadlift": [
+    "es"
+  ],
+  "kettlebell-svend-press": [
+    "es"
+  ],
+  "kettlebell-swing": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "kettlebell-swing-clean": [
+    "es"
+  ],
+  "kettlebell-turkish-get-ups": [
+    "es"
+  ],
+  "kettlebell-wrist-curl": [
+    "es"
+  ],
+  "Kipping_Muscle_Up": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "knee-push-ups": [
+    "es"
+  ],
+  "knee-to-chest-stretch": [
+    "es"
+  ],
+  "Kneeling_Cable_Triceps_Extension": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Kneeling_Hip_Flexor": [
+    "es"
+  ],
+  "Kneeling_Jump_Squat": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "kneeling-cable-row": [
+    "es"
+  ],
+  "kneeling-wrist-stretch": [
+    "es"
+  ],
+  "l-sit": [
+    "es"
+  ],
+  "landmine-press": [
+    "es"
+  ],
+  "lat-pulldown": [
+    "es"
+  ],
+  "lateral-raise": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Leg_Extensions": [
+    "es"
+  ],
+  "Leg_Press": [
+    "es"
+  ],
+  "Leg-Up_Hamstring_Stretch": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "legs-up-the-wall": [
+    "es"
+  ],
+  "lizard-stretch": [
+    "es"
+  ],
+  "locust-pose": [
+    "es"
+  ],
+  "London_Bridges": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "low-lunge": [
+    "es"
+  ],
+  "low-lunge-to-half-split": [
+    "es"
+  ],
+  "Lower_Back_Curl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "lunge": [
+    "es"
+  ],
+  "Lying_Dumbbell_Tricep_Extension": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Lying_Leg_Curls": [
+    "es"
+  ],
+  "Lying_Supine_Dumbbell_Curl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Lying_Triceps_Press": [
+    "es"
+  ],
+  "lying-leg-raise": [
+    "es"
+  ],
+  "Machine_Bench_Press": [
+    "es"
+  ],
+  "Machine_Bicep_Curl": [
+    "es"
+  ],
+  "Machine_Preacher_Curls": [
+    "es"
+  ],
+  "Machine_Shoulder_Military_Press": [
+    "es"
+  ],
+  "Machine_Triceps_Extension": [
+    "es"
+  ],
+  "machine-back-extension": [
+    "es"
+  ],
+  "machine-calf-raise": [
+    "es"
+  ],
+  "machine-chest-fly": [
+    "es"
+  ],
+  "machine-seated-crunch": [
+    "es"
+  ],
+  "Medicine_Ball_Chest_Pass": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "medicine-ball-slam": [
+    "es"
+  ],
+  "Monster_Walk": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Mountain_Climbers": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "mountain-pose": [
+    "es"
+  ],
+  "Muscle_Snatch": [
+    "es"
+  ],
+  "Muscle_Up": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "negative-pull-ups": [
+    "es"
+  ],
+  "neutral-grip-pull-ups": [
+    "es"
+  ],
+  "nordic-hamstring-curl": [
+    "es"
+  ],
+  "ohp": [
+    "es"
+  ],
+  "One_Arm_Against_Wall": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "One_Arm_Chin-Up": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "One_Arm_Lat_Pulldown": [
+    "es"
+  ],
+  "One_Leg_Barbell_Squat": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "One-Arm_Dumbbell_Row": [
+    "es"
+  ],
+  "One-Arm_Kettlebell_Clean_and_Jerk": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "One-Arm_Kettlebell_Floor_Press": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "One-Arm_Kettlebell_Jerk": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "One-Arm_Kettlebell_Military_Press_To_The_Side": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "One-Arm_Kettlebell_Push_Press": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "One-Arm_Kettlebell_Row": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "One-Arm_Kettlebell_Snatch": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "One-Arm_Kettlebell_Swings": [
+    "es"
+  ],
+  "one-arm-dumbbell-push-press": [
+    "es"
+  ],
+  "one-arm-dumbbell-swing": [
+    "es"
+  ],
+  "one-arm-kettlebell-bicep-curl": [
+    "es"
+  ],
+  "one-arm-kettlebell-bottoms-up-press": [
+    "es"
+  ],
+  "one-arm-kettlebell-floor-glute-bridge-press": [
+    "es"
+  ],
+  "one-arm-kettlebell-front-squat": [
+    "es"
+  ],
+  "one-arm-kettlebell-shoulder-press": [
+    "es"
+  ],
+  "one-arm-kettlebell-tricep-kickback": [
+    "es"
+  ],
+  "one-arm-landmine-press": [
+    "es"
+  ],
+  "one-arm-single-leg-dumbbell-romanian-deadlift": [
+    "es"
+  ],
+  "one-arm-single-leg-kettlebell-romanian-deadlift": [
+    "es"
+  ],
+  "Otis-Up": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Overhead_Cable_Curl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Overhead_Squat": [
+    "es"
+  ],
+  "overhead-tricep-extension": [
+    "es"
+  ],
+  "overhead-triceps-stretch": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Palms-Up_Barbell_Wrist_Curl_Over_A_Bench": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "pause-deadlift": [
+    "es"
+  ],
+  "pause-pull-up": [
+    "es"
+  ],
+  "pause-squat": [
+    "es"
+  ],
+  "paused-bench-press": [
+    "es"
+  ],
+  "paused-incline-bench-press": [
+    "es"
+  ],
+  "paused-ohp": [
+    "es"
+  ],
+  "pec-deck": [
+    "es"
+  ],
+  "Pelvic_Tilt_Into_Bridge": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "pendlay-row": [
+    "es"
+  ],
+  "Peroneals_Stretch": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "pigeon-stretch": [
+    "es"
+  ],
+  "pike-push-ups": [
+    "es"
+  ],
+  "pilates-kneeling-side-kick": [
+    "es"
+  ],
+  "pilates-leg-pull-back": [
+    "es"
+  ],
+  "pilates-leg-pull-front": [
+    "es"
+  ],
+  "pilates-roll-down": [
+    "es"
+  ],
+  "pilates-roll-over": [
+    "es"
+  ],
+  "pilates-saw": [
+    "es"
+  ],
+  "pilates-side-bend": [
+    "es"
+  ],
+  "pilates-spine-stretch-forward": [
+    "es"
+  ],
+  "pilates-spine-twist": [
+    "es"
+  ],
+  "pistol-squat": [
+    "es"
+  ],
+  "planche": [
+    "es"
+  ],
+  "Plank": [
+    "es"
+  ],
+  "Plate_Pinch": [
+    "es"
+  ],
+  "plate-loaded-donkey-calf-raise": [
+    "es"
+  ],
+  "plate-loaded-glute-drive": [
+    "es"
+  ],
+  "plate-loaded-lateral-raise": [
+    "es"
+  ],
+  "plate-loaded-shrug": [
+    "es"
+  ],
+  "plate-pullover": [
+    "es"
+  ],
+  "plow-pose": [
+    "es"
+  ],
+  "Plyo_Kettlebell_Pushups": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Plyo_Push-up": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "plyo-lunge": [
+    "es"
+  ],
+  "Posterior_Tibialis_Stretch": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Power_Clean": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Preacher_Curl": [
+    "es"
+  ],
+  "preacher-hammer-curl": [
+    "es"
+  ],
+  "pseudo-planche-push-ups": [
+    "es"
+  ],
+  "Pullups": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "puppy-pose": [
+    "es"
+  ],
+  "Push_Press": [
+    "es"
+  ],
+  "Push_Up_to_Side_Plank": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "push-jerk": [
+    "es"
+  ],
+  "Pushups": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "pyramid-pose": [
+    "es"
+  ],
+  "Rack_Pulls": [
+    "es"
+  ],
+  "rear-delt-fly": [
+    "es"
+  ],
+  "Reverse_Barbell_Curl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Reverse_Barbell_Preacher_Curls": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Reverse_Cable_Curl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Reverse_Crunch": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Reverse_Grip_Bent-Over_Rows": [
+    "es"
+  ],
+  "reverse-curl": [
+    "es"
+  ],
+  "reverse-grip-lat-pulldown": [
+    "es"
+  ],
+  "reverse-lunge": [
+    "es"
+  ],
+  "reverse-nordic-curl": [
+    "es"
+  ],
+  "reverse-plank": [
+    "es"
+  ],
+  "reverse-plank-dips": [
+    "es"
+  ],
+  "reverse-tabletop-hip-pulses": [
+    "es"
+  ],
+  "reverse-tabletop-hold": [
+    "es"
+  ],
+  "revolved-chair-pose": [
+    "es"
+  ],
+  "revolved-crescent-lunge": [
+    "es"
+  ],
+  "Ring_Dips": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "ring-dead-hang": [
+    "es"
+  ],
+  "ring-face-pull": [
+    "es"
+  ],
+  "ring-muscle-up": [
+    "es"
+  ],
+  "ring-push-up": [
+    "es"
+  ],
+  "ring-row": [
+    "es"
+  ],
+  "rings-inverted-row": [
+    "es"
+  ],
+  "Romanian_Deadlift": [
+    "es"
+  ],
+  "Rope_Climb": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "rowing-machine": [
+    "es"
+  ],
+  "running": [
+    "es"
+  ],
+  "Running_Treadmill": [
+    "es"
+  ],
+  "Russian_Twist": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "savasana": [
+    "es"
+  ],
+  "Scapular_Pull-Up": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Scissor_Kick": [
+    "es"
+  ],
+  "Seated_Barbell_Twist": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Seated_Cable_Rows": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Seated_Calf_Raise": [
+    "es"
+  ],
+  "Seated_Close-Grip_Concentration_Barbell_Curl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Seated_Dumbbell_Curl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Seated_Dumbbell_Inner_Biceps_Curl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Seated_Dumbbell_Palms-Up_Wrist_Curl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Seated_Leg_Curl": [
+    "es"
+  ],
+  "Seated_Side_Lateral_Raise": [
+    "es"
+  ],
+  "seated-barbell-overhead-press": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "seated-db-press": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "seated-dumbbell-tricep-extension": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "seated-forward-fold": [
+    "es"
+  ],
+  "seated-smith-machine-shoulder-press": [
+    "es"
+  ],
+  "seated-spinal-twist": [
+    "es"
+  ],
+  "seated-straddle-stretch": [
+    "es"
+  ],
+  "Side_Neck_Stretch": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Side_To_Side_Chins": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "side-lunge": [
+    "es"
+  ],
+  "Side-Lying_Floor_Stretch": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "side-lying-hip-abduction": [
+    "es"
+  ],
+  "side-lying-hip-abduction-hold": [
+    "es"
+  ],
+  "side-lying-hip-adduction": [
+    "es"
+  ],
+  "side-lying-hip-adduction-hold": [
+    "es"
+  ],
+  "side-lying-lateral-raise": [
+    "es"
+  ],
+  "side-plank": [
+    "es"
+  ],
+  "side-plank-leg-lift": [
+    "es"
+  ],
+  "side-plank-leg-lift-hold": [
+    "es"
+  ],
+  "Single_Leg_Glute_Bridge": [
+    "es"
+  ],
+  "Single-Arm_Push-Up": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "single-arm-chest-supported-dumbbell-row": [
+    "es"
+  ],
+  "single-arm-dumbbell-overhead-tricep-extension": [
+    "es"
+  ],
+  "single-arm-hammer-curl": [
+    "es"
+  ],
+  "single-arm-machine-shoulder-press": [
+    "es"
+  ],
+  "single-arm-plate-loaded-lateral-raise": [
+    "es"
+  ],
+  "single-arm-tricep-pushdown": [
+    "es"
+  ],
+  "single-db-svend-press": [
+    "es"
+  ],
+  "Single-Leg_Leg_Extension": [
+    "es"
+  ],
+  "single-leg-calf-raise": [
+    "es"
+  ],
+  "single-leg-glute-bridge-hold": [
+    "es"
+  ],
+  "single-leg-lying-leg-curl": [
+    "es"
+  ],
+  "single-leg-press": [
+    "es"
+  ],
+  "single-leg-romanian-deadlift": [
+    "es"
+  ],
+  "Sit-Up": [
+    "es"
+  ],
+  "skull-crusher": [
+    "es"
+  ],
+  "Sled_Row": [
+    "es"
+  ],
+  "Smith_Incline_Shoulder_Raise": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Smith_Machine_Bench_Press": [
+    "es"
+  ],
+  "Smith_Machine_Bent_Over_Row": [
+    "es"
+  ],
+  "Smith_Machine_Calf_Raise": [
+    "es"
+  ],
+  "Smith_Machine_Incline_Bench_Press": [
+    "es"
+  ],
+  "Smith_Machine_Squat": [
+    "es"
+  ],
+  "Smith_Machine_Upright_Row": [
+    "es"
+  ],
+  "Smith_Single-Leg_Split_Squat": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "smith-machine-bulgarian-split": [
+    "es"
+  ],
+  "smith-machine-decline-bench-press": [
+    "es"
+  ],
+  "smith-machine-front-squat": [
+    "es"
+  ],
+  "smith-machine-good-morning": [
+    "es"
+  ],
+  "smith-machine-hip-thrust": [
+    "es"
+  ],
+  "smith-machine-rdl": [
+    "es"
+  ],
+  "smith-machine-reverse-grip-bent-over-row": [
+    "es"
+  ],
+  "smith-machine-reverse-lunge": [
+    "es"
+  ],
+  "smith-machine-shoulder-press": [
+    "es"
+  ],
+  "smith-machine-shrug": [
+    "es"
+  ],
+  "smith-machine-split-squat": [
+    "es"
+  ],
+  "Snatch": [
+    "es"
+  ],
+  "Snatch_Pull": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Spell_Caster": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "sphinx-pose": [
+    "es"
+  ],
+  "Spider_Curl": [
+    "es"
+  ],
+  "Split_Jerk": [
+    "es"
+  ],
+  "Split_Squats": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "spoto-press": [
+    "es"
+  ],
+  "Squat_Jerk": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "stability-ball-hip-bridge": [
+    "es"
+  ],
+  "stability-ball-knee-tuck": [
+    "es"
+  ],
+  "stability-ball-push-up": [
+    "es"
+  ],
+  "stability-ball-push-up-hands-on-ball": [
+    "es"
+  ],
+  "stability-ball-wall-squat": [
+    "es"
+  ],
+  "stair-climber": [
+    "es"
+  ],
+  "Standing_Barbell_Calf_Raise": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Standing_Bent-Over_One-Arm_Dumbbell_Triceps_Extension": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Standing_Bent-Over_Two-Arm_Dumbbell_Triceps_Extension": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Standing_Cable_Lift": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Standing_Calf_Raises": [
+    "es"
+  ],
+  "Standing_Dumbbell_Calf_Raise": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Standing_Dumbbell_Reverse_Curl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Standing_Dumbbell_Triceps_Extension": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Standing_Front_Barbell_Raise_Over_Head": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Standing_Lateral_Stretch": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Standing_One-Arm_Dumbbell_Curl_Over_Incline_Bench": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Standing_Overhead_Barbell_Triceps_Extension": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Standing_Palm-In_One-Arm_Dumbbell_Press": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Standing_Palms-In_Dumbbell_Press": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Standing_Pelvic_Tilt": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "standing-calf-stretch": [
+    "es"
+  ],
+  "standing-forward-fold": [
+    "es"
+  ],
+  "standing-forward-fold-to-half-lift": [
+    "es"
+  ],
+  "standing-quad-stretch": [
+    "es"
+  ],
+  "standing-side-bend": [
+    "es"
+  ],
+  "standing-side-bend-flow": [
+    "es"
+  ],
+  "standing-split": [
+    "es"
+  ],
+  "stationary-bike": [
+    "es"
+  ],
+  "step-ups": [
+    "es"
+  ],
+  "Stiff_Leg_Barbell_Good_Morning": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "stiff-leg-deadlift": [
+    "es"
+  ],
+  "Straight-Arm_Dumbbell_Pullover": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Straight-Arm_Pulldown": [
+    "es"
+  ],
+  "straight-bar-cable-front-raise": [
+    "es"
+  ],
+  "straight-bar-dips": [
+    "es"
+  ],
+  "strict-curl": [
+    "es"
+  ],
+  "suitcase-carry": [
+    "es"
+  ],
+  "Sumo_Deadlift": [
+    "es"
+  ],
+  "sumo-squat": [
+    "es"
+  ],
+  "Superman": [
+    "es"
+  ],
+  "supine-spinal-twist": [
+    "es"
+  ],
+  "supine-windshield-wipers": [
+    "es"
+  ],
+  "supported-shoulderstand": [
+    "es"
+  ],
+  "Suspended_Push-Up": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Suspended_Reverse_Crunch": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Suspended_Row": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Suspended_Split_Squat": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Svend_Press": [
+    "es"
+  ],
+  "t-bar-row": [
+    "es"
+  ],
+  "thoracic-bridge": [
+    "es"
+  ],
+  "thread-the-needle": [
+    "es"
+  ],
+  "thread-the-needle-flow": [
+    "es"
+  ],
+  "three-legged-dog": [
+    "es"
+  ],
+  "thruster": [
+    "es"
+  ],
+  "Tire_Flip": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "toes-to-bar": [
+    "es"
+  ],
+  "Trap_Bar_Deadlift": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "tree-pose": [
+    "es"
+  ],
+  "triangle-pose": [
+    "es"
+  ],
+  "Tricep_Dumbbell_Kickback": [
+    "es"
+  ],
+  "Triceps_Pushdown": [
+    "es"
+  ],
+  "Triceps_Stretch": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "trx-bicep-curl": [
+    "es"
+  ],
+  "trx-chest-press": [
+    "es"
+  ],
+  "trx-face-pull": [
+    "es"
+  ],
+  "trx-hamstring-curl": [
+    "es"
+  ],
+  "trx-lunge": [
+    "es"
+  ],
+  "trx-pistol-squat": [
+    "es"
+  ],
+  "trx-plank": [
+    "es"
+  ],
+  "trx-row": [
+    "es"
+  ],
+  "trx-side-plank": [
+    "es"
+  ],
+  "trx-squat": [
+    "es"
+  ],
+  "trx-tricep-extension": [
+    "es"
+  ],
+  "trx-y-fly": [
+    "es"
+  ],
+  "Tuck_Crunch": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Two-Arm_Kettlebell_Clean": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Two-Arm_Kettlebell_Military_Press": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Two-Arm_Kettlebell_Row": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Underhand_Cable_Pulldowns": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Upper_Back_Stretch": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Upright_Barbell_Row": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Upright_Cable_Row": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "upward-dog": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "V-Bar_Pulldown": [
+    "es"
+  ],
+  "v-bar-tricep-pushdown": [
+    "es"
+  ],
+  "v-sit": [
+    "es"
+  ],
+  "v-ups": [
+    "es"
+  ],
+  "walking": [
+    "es"
+  ],
+  "walking-lunge": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "wall-push-ups": [
+    "es"
+  ],
+  "wall-sit": [
+    "es"
+  ],
+  "warrior-one": [
+    "es"
+  ],
+  "warrior-three": [
+    "es"
+  ],
+  "warrior-two": [
+    "es"
+  ],
+  "Weighted_Bench_Dip": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Weighted_Pull_Ups": [
+    "es"
+  ],
+  "Weighted_Sissy_Squat": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Weighted_Squat": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "weighted-dips": [
+    "es"
+  ],
+  "weighted-wall-crunch": [
+    "es"
+  ],
+  "Wide-Grip_Barbell_Bench_Press": [
+    "es"
+  ],
+  "Wide-Grip_Decline_Barbell_Pullover": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Wide-Grip_Rear_Pull-Up": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Wide-Grip_Standing_Barbell_Curl": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "wide-grip-pull-ups": [
+    "es"
+  ],
+  "wide-grip-push-ups": [
+    "es"
+  ],
+  "wide-grip-seated-cable-row": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "wide-legged-forward-fold": [
+    "es"
+  ],
+  "wide-stance-leg-press": [
+    "es"
+  ],
+  "Wind_Sprints": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Wrist_Circles": [
+    "en",
+    "es",
+    "fr",
+    "hi",
+    "it",
+    "ko",
+    "pl",
+    "ru",
+    "tr",
+    "zh"
+  ],
+  "Wrist_Roller": [
+    "es"
+  ],
+  "wrist-curl": [
+    "es"
+  ],
+  "Zottman_Curl": [
+    "es"
+  ]
+}
