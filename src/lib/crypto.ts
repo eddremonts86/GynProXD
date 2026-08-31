@@ -98,6 +98,26 @@ export async function authPassOf(email: string, password: string): Promise<strin
   return deriveBitsBase64(password, salt, KDF_ITERATIONS)
 }
 
+/**
+ * The one-time code that wraps a second copy of the data key.
+ *
+ * Here for the same reason as `authPassOf`: an account is not usable until its
+ * key material exists, so anything that provisions an account from outside the
+ * browser has to mint one of these, and two implementations of a recovery code
+ * is one too many. No ambiguous glyphs — this gets read off a screen and typed
+ * back in by someone who has already lost the password.
+ */
+export function generateRecoveryCode(): string {
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  const bytes = randomBytes(25)
+  let code = ''
+  for (let i = 0; i < bytes.length; i++) {
+    if (i > 0 && i % 5 === 0) code += '-'
+    code += alphabet[bytes[i] & 31]
+  }
+  return code
+}
+
 export async function encryptJson(key: CryptoKey, value: unknown): Promise<CipherBlob> {
   const iv = randomBytes(12)
   const plaintext = new TextEncoder().encode(JSON.stringify(value))
