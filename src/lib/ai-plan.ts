@@ -100,7 +100,54 @@ export function extractJson(text: string): unknown {
       }
     }
   }
-  return null
+
+  /**
+   * Nothing balanced, so the answer was cut off. Close it and try once.
+   *
+   * Measured, not imagined: MiniMax-Text-01 returns `finish_reason: "stop"` and
+   * a body one `]}` short of valid, having spent 1,830 of an allowed 4,000
+   * tokens. It is not hitting a cap and it is not being interrupted — it stops
+   * mid-structure and reports success. A whole programme, three blocks of real
+   * work, was being discarded over two characters.
+   *
+   * Only closers are ever appended, and only in the order the scan says are
+   * open. Nothing is invented: a truncated exercise or a half-written day comes
+   * back as an object with missing fields, which `validateBlocks` then judges on
+   * its merits — a day left under three movements is still refused. This turns
+   * "unparseable" into "parseable and possibly incomplete", and lets the check
+   * that already exists do the deciding.
+   */
+  const closers: string[] = []
+  let depth2 = 0
+  let inStr2 = false
+  let esc2 = false
+  for (let i = start; i < cleaned.length; i++) {
+    const ch = cleaned[i]
+    if (esc2) {
+      esc2 = false
+    } else if (ch === '\\') {
+      esc2 = inStr2
+    } else if (ch === '"') {
+      inStr2 = !inStr2
+    } else if (!inStr2 && (ch === '{' || ch === '[')) {
+      closers.push(ch === '{' ? '}' : ']')
+      depth2 += 1
+    } else if (!inStr2 && (ch === '}' || ch === ']')) {
+      closers.pop()
+      depth2 -= 1
+    }
+  }
+  if (closers.length === 0 || depth2 <= 0) return null
+
+  /* A string left open would swallow the closers as text. Shut it first. */
+  let tail = cleaned.slice(start) + (inStr2 ? '"' : '')
+  /* Trailing comma or a half-written key: drop back to the last complete value. */
+  tail = tail.replace(/[,\s]*$/, '').replace(/,\s*"[^"]*"?\s*:?\s*$/, '')
+  try {
+    return JSON.parse(tail + closers.reverse().join(''))
+  } catch {
+    return null
+  }
 }
 
 /** The em-dash ban applies to model output too. */

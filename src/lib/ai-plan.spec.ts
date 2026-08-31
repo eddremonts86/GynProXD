@@ -30,6 +30,44 @@ describe('extractJson', () => {
   it('returns null with no object', () => {
     expect(extractJson('no json here')).toBeNull()
   })
+
+  /**
+   * The truncated tail, which was throwing away whole programmes.
+   *
+   * MiniMax-Text-01 returns `finish_reason: "stop"` with a body one `]}` short
+   * of valid, having spent 1,830 of an allowed 4,000 tokens — not capped, not
+   * interrupted, just stopping mid-structure and reporting success. The scanner
+   * found no balanced object and gave up, and three blocks of correct work went
+   * in the bin over two characters.
+   */
+  it('closes an answer that was cut off mid-structure', () => {
+    const cut = '{"planName":"x","blocks":[{"days":[{"day":"mon","exercises":[{"exerciseId":"Pushups"}]}]}]'
+    expect(extractJson(cut)).toEqual({
+      planName: 'x',
+      blocks: [{ days: [{ day: 'mon', exercises: [{ exerciseId: 'Pushups' }] }] }],
+    })
+  })
+
+  it('closes a string left hanging open', () => {
+    expect(extractJson('{"planName":"half a nam')).toEqual({ planName: 'half a nam' })
+  })
+
+  it('drops a key that was cut before its value', () => {
+    expect(extractJson('{"planName":"x","coachNo')).toEqual({ planName: 'x' })
+  })
+
+  it('drops a trailing comma left by the cut', () => {
+    expect(extractJson('{"a":1,')).toEqual({ a: 1 })
+  })
+
+  it('invents nothing — a cut with no open container is still null', () => {
+    expect(extractJson('not json, no braces at all')).toBeNull()
+  })
+
+  it('prefers a complete object over repairing', () => {
+    // The balanced scan runs first; repair is only ever the fallback.
+    expect(extractJson('{"a":1} trailing junk {"b":2')).toEqual({ a: 1 })
+  })
 })
 
 describe('validateBlocks', () => {
