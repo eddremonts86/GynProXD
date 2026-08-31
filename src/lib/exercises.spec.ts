@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Exercise, Workout } from './types'
-import { bestE1rm, e1rmSeries, epley1rm, lastPerformance } from './exercises'
+import { bestE1rm, e1rmSeries, epley1rm, lastPerformance, libraryOrder } from './exercises'
 import { isPersonalRecord, suggestNext } from './progression'
 
 const ex: Exercise = { id: 'bench-press', name: 'Bench Press', muscle: 'chest', equipment: 'barbell' }
@@ -113,5 +113,28 @@ describe('e1rmSeries', () => {
       { id: 'x', date: '2026-08-02', exercises: [{ exerciseId: 'bench-press', sets: [] }] } as Workout,
     ]
     expect(e1rmSeries(ws, 'bench-press')).toHaveLength(1)
+  })
+})
+
+describe('libraryOrder', () => {
+  const withPhoto: Exercise = { ...ex, id: 'z-photo', name: 'Zercher Squat', image: 'https://cdn/z.jpg' }
+  const withoutArt: Exercise = { ...ex, id: 'a-bare', name: 'Ab Wheel', image: null }
+  const alsoWithout: Exercise = { ...ex, id: 'b-bare', name: 'Back Lever' }
+  const alsoWithPhoto: Exercise = { ...ex, id: 'y-photo', name: 'Yates Row', image: '/repdb/y.webp' }
+
+  it('sinks movements with no artwork below every movement that has some', () => {
+    const order = libraryOrder([withoutArt, withPhoto, alsoWithout, alsoWithPhoto])
+    expect(order.map((e) => e.id)).toEqual(['y-photo', 'z-photo', 'a-bare', 'b-bare'])
+  })
+
+  it('keeps each half alphabetical', () => {
+    const order = libraryOrder([alsoWithPhoto, withPhoto])
+    expect(order.map((e) => e.name)).toEqual(['Yates Row', 'Zercher Squat'])
+  })
+
+  it('does not mutate what it was given', () => {
+    const input = [withoutArt, withPhoto]
+    libraryOrder(input)
+    expect(input.map((e) => e.id)).toEqual(['a-bare', 'z-photo'])
   })
 })

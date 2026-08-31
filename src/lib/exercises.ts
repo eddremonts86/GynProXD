@@ -1,5 +1,6 @@
 import { generatedExercises } from '../data/exercises-generated'
 import { wgerExercises } from '../data/exercises-wger-generated'
+import { hasArtwork } from './images'
 import type { Exercise, LoggedExercise, SetEntry, Workout } from './types'
 
 const byIdCache = new Map<string, Exercise>()
@@ -20,6 +21,28 @@ export function exerciseLookup(custom: Exercise[]): Map<string, Exercise> {
   for (const e of wgerExercises) map.set(e.id, e)
   for (const e of custom) map.set(e.id, e)
   return map
+}
+
+/**
+ * Browse order for the library: everything with a picture first, alphabetical
+ * within each half.
+ *
+ * A grid of typographic tiles reads as a broken page rather than a catalogue,
+ * and 529 of the movements have no artwork — almost all of them wger's, which
+ * ships text for far more movements than it illustrates. They are still there,
+ * still searchable, still usable; they just stop interrupting the movements
+ * somebody can recognise at a glance.
+ *
+ * Sorted by a decorated copy: `hasArtwork` is cheap but a comparator would ask
+ * it O(n log n) times over two thousand movements.
+ */
+export function libraryOrder(exercises: Exercise[]): Exercise[] {
+  const illustrated = new Set(exercises.filter(hasArtwork).map((e) => e.id))
+  return [...exercises].sort(
+    (a, b) =>
+      Number(illustrated.has(b.id)) - Number(illustrated.has(a.id)) ||
+      a.name.localeCompare(b.name),
+  )
 }
 
 export function populateByIdCache(exercises: Exercise[]) {

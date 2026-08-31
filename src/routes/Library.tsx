@@ -3,7 +3,7 @@ import { CaretRight, MagnifyingGlass, Plus } from '@phosphor-icons/react'
 import { exerciseImageCandidates, exercisePhotoFrames } from '../lib/images'
 import { useInfiniteScroll } from '../lib/use-infinite-scroll'
 import { useGym } from '../store/useGym'
-import { exerciseLookup } from '../lib/exercises'
+import { exerciseLookup, libraryOrder } from '../lib/exercises'
 import { sessionCountsByExercise } from '../lib/stats'
 import { inboxFor } from '../lib/messages'
 import { useMessages } from '../store/useMessages'
@@ -76,10 +76,7 @@ export function LibraryPage() {
   const deferredQuery = useDeferredValue(query)
 
   const exercises = useMemo(
-    () =>
-      Array.from(exerciseLookup(customExercises).values()).sort((a, b) =>
-        a.name.localeCompare(b.name),
-      ),
+    () => libraryOrder(Array.from(exerciseLookup(customExercises).values())),
     [customExercises],
   )
 

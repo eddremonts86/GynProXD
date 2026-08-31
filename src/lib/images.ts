@@ -62,3 +62,13 @@ export function exercisePhotoFrames(
 export function exerciseIllustration(exerciseId: string): string | null {
   return illustrations[exerciseId] ?? null
 }
+
+/**
+ * Whether anything but a typographic tile will render for this movement.
+ *
+ * Cheaper than `exerciseImageCandidates`, which allocates: this answers the
+ * yes/no a sort or a filter needs without building the cascade.
+ */
+export function hasArtwork(exercise: Pick<Exercise, 'id' | 'image'>): boolean {
+  return !!exercise.image || !!illustrations[exercise.id]
+}
