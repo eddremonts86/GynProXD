@@ -7,7 +7,7 @@ import {
   type ProgrammeStructure,
 } from './plan-generator'
 import { GOAL_LABELS, LEVEL_LABELS, SEX_LABELS, TRAINING_PLACE_OPTIONS } from './labels'
-import { serverCapabilities } from './capabilities'
+import { serverCapabilities, type CoachHost } from './capabilities'
 import { activeAuthHeader } from './sync'
 import type {
   BlockPlan,
@@ -31,12 +31,32 @@ import type {
  */
 
 /**
- * The coach exists when the dev proxy carries a key (build flag) or the sync
- * server says it does — the latter only helps a signed-in member, since the
- * server route is auth-gated to keep the key from being burned anonymously.
+ * Whether a coach will be asked, and whose hardware answers.
+ *
+ * One function because the alternative was two, and the two disagreed. The
+ * send decision read the build flag first; the sentence a member reads before
+ * typing read only the sync server. On a build carrying its own key that is a
+ * screen saying "nothing you write here is sent anywhere" above a box whose
+ * contents go to a vendor — the one direction of wrong this app promised not
+ * to be. Now the sentence and the request are the same answer.
+ *
+ * The build flag wins because it is the proxy that actually carries the
+ * request. The sync server's own coach is second, and only for a signed-in
+ * member: that route is auth-gated so the key cannot be burned anonymously.
  */
+export function coachDestination(): { coach: boolean; host: CoachHost } {
+  if (__AI_COACH__) return { coach: true, host: __AI_COACH_HOST__ }
+  const caps = serverCapabilities()
+  if (caps.coach && activeAuthHeader() !== null) {
+    /* A server too old to say where its coach runs is not a server anybody is
+       told is private. */
+    return { coach: true, host: caps.coachHost ?? 'external' }
+  }
+  return { coach: false, host: 'external' }
+}
+
 export function aiCoachEnabled(): boolean {
-  return __AI_COACH__ || (serverCapabilities().coach && activeAuthHeader() !== null)
+  return coachDestination().coach
 }
 
 /**
@@ -72,15 +92,20 @@ interface RawResponse {
 }
 
 /** Drops the reasoning preamble and pulls the first balanced JSON object. */
-export function extractJson(text: string): unknown {
-  const cleaned = text.replace(/<think>[\s\S]*?<\/think>/g, '')
-  const start = cleaned.indexOf('{')
+/**
+ * The first complete object in the text, or null.
+ *
+ * Kept separate so a repair can be tried and then scanned again: a repair that
+ * makes things worse produces null here and nothing downstream ever sees it.
+ */
+function scanForObject(text: string): { value: unknown } | null {
+  const start = text.indexOf('{')
   if (start === -1) return null
   let depth = 0
   let inString = false
   let escaped = false
-  for (let i = start; i < cleaned.length; i++) {
-    const ch = cleaned[i]
+  for (let i = start; i < text.length; i++) {
+    const ch = text[i]
     if (escaped) {
       escaped = false
     } else if (ch === '\\') {
@@ -93,54 +118,120 @@ export function extractJson(text: string): unknown {
       depth -= 1
       if (depth === 0) {
         try {
-          return JSON.parse(cleaned.slice(start, i + 1))
+          return { value: JSON.parse(text.slice(start, i + 1)) }
         } catch {
           return null
         }
       }
     }
   }
+  return null
+}
 
-  /**
-   * Nothing balanced, so the answer was cut off. Close it and try once.
-   *
-   * Measured, not imagined: MiniMax-Text-01 returns `finish_reason: "stop"` and
-   * a body one `]}` short of valid, having spent 1,830 of an allowed 4,000
-   * tokens. It is not hitting a cap and it is not being interrupted — it stops
-   * mid-structure and reports success. A whole programme, three blocks of real
-   * work, was being discarded over two characters.
-   *
-   * Only closers are ever appended, and only in the order the scan says are
-   * open. Nothing is invented: a truncated exercise or a half-written day comes
-   * back as an object with missing fields, which `validateBlocks` then judges on
-   * its merits — a day left under three movements is still refused. This turns
-   * "unparseable" into "parseable and possibly incomplete", and lets the check
-   * that already exists do the deciding.
-   */
+/**
+ * Puts back an object opener the model dropped mid-array.
+ *
+ * Observed live, and not a variation on truncation — this arrives complete and
+ * corrupt in the middle:
+ *
+ *     ..."exercises":[...]},day":"wed","ecNote":...
+ *                        ^^ was  ,{"day":
+ *
+ * Every array element after the first lost its `{"`, in both the days array and
+ * the blocks array, in one response; the next three responses were clean. It is
+ * intermittent, it reports `finish_reason: "stop"`, and it costs a full minute
+ * of somebody's time and a paid call each time it is thrown away.
+ *
+ * Nothing is guessed. Outside a string, after `,` or `[`, a bare word followed
+ * by `":` is not legal JSON under any reading: an element can only begin with
+ * `{`, `"`, `[`, a digit, or true/false/null. The one construction that word
+ * could have belonged to is an object key, so `{"` is the only thing that can
+ * go there. The alternative is not a safer parse, it is no parse at all.
+ *
+ * `response_format: "json_object"` would be the fix at the source and was
+ * measured first: MiniMax-Text-01 rejects it outright, returning an empty body
+ * in under a second.
+ */
+function restoreDroppedOpeners(text: string): string {
+  let out = ''
+  let inString = false
+  let escaped = false
+  let i = 0
+  while (i < text.length) {
+    const ch = text[i]
+    out += ch
+    i += 1
+    if (escaped) {
+      escaped = false
+      continue
+    }
+    if (ch === '\\') {
+      escaped = inString
+      continue
+    }
+    if (ch === '"') {
+      inString = !inString
+      continue
+    }
+    if (inString || (ch !== ',' && ch !== '[')) continue
+
+    let j = i
+    while (j < text.length && /\s/.test(text[j])) j += 1
+    if (!/^[A-Za-z_][A-Za-z0-9_]*"\s*:/.test(text.slice(j, j + 64))) continue
+    out += text.slice(i, j) + '{"'
+    /* The inserted quote opens the key. Without saying so, the quote that
+       closes it reads as an opening one and every string after this point is
+       tracked inside out — which is how the first attempt at this repair
+       produced text that parsed even less well than what it started from. */
+    inString = true
+    i = j
+  }
+  return out
+}
+
+/**
+ * Closes an answer that stopped mid-structure.
+ *
+ * Measured, not imagined: MiniMax-Text-01 returns `finish_reason: "stop"` and
+ * a body one `]}` short of valid, having spent 1,830 of an allowed 4,000
+ * tokens. It is not hitting a cap and it is not being interrupted — it stops
+ * mid-structure and reports success. A whole programme, three blocks of real
+ * work, was being discarded over two characters.
+ *
+ * Only closers are ever appended, and only the ones the scan says are open.
+ * Nothing is invented: a truncated exercise or a half-written day comes back as
+ * an object with missing fields, which `validateBlocks` then judges on its
+ * merits — a day left under three movements is still refused. This turns
+ * "unparseable" into "parseable and possibly incomplete", and lets the check
+ * that already exists do the deciding.
+ */
+function closeTruncated(text: string): unknown {
+  const start = text.indexOf('{')
+  if (start === -1) return null
   const closers: string[] = []
-  let depth2 = 0
-  let inStr2 = false
-  let esc2 = false
-  for (let i = start; i < cleaned.length; i++) {
-    const ch = cleaned[i]
-    if (esc2) {
-      esc2 = false
+  let depth = 0
+  let inString = false
+  let escaped = false
+  for (let i = start; i < text.length; i++) {
+    const ch = text[i]
+    if (escaped) {
+      escaped = false
     } else if (ch === '\\') {
-      esc2 = inStr2
+      escaped = inString
     } else if (ch === '"') {
-      inStr2 = !inStr2
-    } else if (!inStr2 && (ch === '{' || ch === '[')) {
+      inString = !inString
+    } else if (!inString && (ch === '{' || ch === '[')) {
       closers.push(ch === '{' ? '}' : ']')
-      depth2 += 1
-    } else if (!inStr2 && (ch === '}' || ch === ']')) {
+      depth += 1
+    } else if (!inString && (ch === '}' || ch === ']')) {
       closers.pop()
-      depth2 -= 1
+      depth -= 1
     }
   }
-  if (closers.length === 0 || depth2 <= 0) return null
+  if (closers.length === 0 || depth <= 0) return null
 
   /* A string left open would swallow the closers as text. Shut it first. */
-  let tail = cleaned.slice(start) + (inStr2 ? '"' : '')
+  let tail = text.slice(start) + (inString ? '"' : '')
   /* Trailing comma or a half-written key: drop back to the last complete value. */
   tail = tail.replace(/[,\s]*$/, '').replace(/,\s*"[^"]*"?\s*:?\s*$/, '')
   try {
@@ -148,6 +239,34 @@ export function extractJson(text: string): unknown {
   } catch {
     return null
   }
+}
+
+/**
+ * The coach's answer, out of whatever it came wrapped in.
+ *
+ * Three passes, cheapest first, and each one only runs because the one before
+ * it came back empty. A clean answer never reaches a repair, which is why the
+ * repairs cannot quietly change a good programme into a different one.
+ *
+ * Both repairs exist because of measured failures of a model that reports
+ * success while returning something no parser accepts. Neither adds meaning:
+ * one restores the only token that could legally have been there, the other
+ * appends closers the text itself says are open. `validateBlocks` still has the
+ * final word, and still refuses a day that came back short.
+ */
+export function extractJson(text: string): unknown {
+  const cleaned = text.replace(/<think>[\s\S]*?<\/think>/g, '')
+
+  const direct = scanForObject(cleaned)
+  if (direct) return direct.value
+
+  const restored = restoreDroppedOpeners(cleaned)
+  if (restored !== cleaned) {
+    const repaired = scanForObject(restored)
+    if (repaired) return repaired.value
+  }
+
+  return closeTruncated(restored)
 }
 
 /** The em-dash ban applies to model output too. */

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { extractJson, validateBlocks } from './ai-plan'
+import { aiCoachEnabled, coachDestination, extractJson, validateBlocks } from './ai-plan'
+import whereWordsGoSource from '../components/where-words-go.tsx?raw'
 import type { OnboardingInput } from './types'
 
 const input: OnboardingInput = {
@@ -45,6 +46,64 @@ describe('extractJson', () => {
     expect(extractJson(cut)).toEqual({
       planName: 'x',
       blocks: [{ days: [{ day: 'mon', exercises: [{ exerciseId: 'Pushups' }] }] }],
+    })
+  })
+
+  /**
+   * The other way the same model breaks the same answer.
+   *
+   * Not a cut-off tail: a complete response with `{"` missing from the start of
+   * every array element after the first, in both the days array and the blocks
+   * array. Captured from a live call that reported `finish_reason: "stop"`; the
+   * three calls either side of it were clean, which is what makes it expensive
+   * — it costs a minute and a paid request, and then the programme is binned.
+   */
+  it('restores an object opener dropped mid-array', () => {
+    const broken =
+      '{"planName":"x","blocks":[{"label":"Home","days":[' +
+      '{"day":"mon","exercises":[{"exerciseId":"Pushups"}]},' +
+      'day":"wed","exercises":[{"exerciseId":"Plank"}]}]},' +
+      'label":"Gym","days":[{"day":"mon","exercises":[{"exerciseId":"Barbell_Curl"}]}]}]}'
+    expect(extractJson(broken)).toEqual({
+      planName: 'x',
+      blocks: [
+        {
+          label: 'Home',
+          days: [
+            { day: 'mon', exercises: [{ exerciseId: 'Pushups' }] },
+            { day: 'wed', exercises: [{ exerciseId: 'Plank' }] },
+          ],
+        },
+        { label: 'Gym', days: [{ day: 'mon', exercises: [{ exerciseId: 'Barbell_Curl' }] }] },
+      ],
+    })
+  })
+
+  it('restores an opener dropped from the first element too', () => {
+    expect(extractJson('{"blocks":[label":"Home"}]}')).toEqual({ blocks: [{ label: 'Home' }] })
+  })
+
+  it('leaves the same shape alone inside a string', () => {
+    // coachNotes is prose written by the model and can contain anything. A
+    // repair that edited string contents would rewrite what a member reads.
+    const notes = 'blocks are labelled [home, day": one] and repeat'
+    expect(extractJson(JSON.stringify({ coachNotes: notes, blocks: [] }))).toEqual({
+      coachNotes: notes,
+      blocks: [],
+    })
+  })
+
+  it('prefers a clean parse over any repair', () => {
+    // The repairs only ever run on text that already failed to parse. If this
+    // ordering inverts, a good answer starts going through a rewriter.
+    const clean = '{"planName":"x","blocks":[{"label":"a"},{"label":"b"}]}'
+    expect(extractJson(clean)).toEqual({ planName: 'x', blocks: [{ label: 'a' }, { label: 'b' }] })
+  })
+
+  it('survives both failures in one answer', () => {
+    const both = '{"blocks":[{"label":"Home"},label":"Gym","days":[{"day":"mon"'
+    expect(extractJson(both)).toEqual({
+      blocks: [{ label: 'Home' }, { label: 'Gym', days: [{ day: 'mon' }] }],
     })
   })
 
@@ -286,5 +345,37 @@ describe('a generous coach is trimmed, a lazy one is refused', () => {
   it('still refuses a coach that returned fewer days than asked', () => {
     // Nothing to salvage: this half of the check stays as strict as it was.
     expect(validateBlocks({ blocks: [{ days: [dayOf('mon', gym), dayOf('wed', gym)] }] }, threeDay, 3)).toBeNull()
+  })
+})
+
+/**
+ * The sentence a member reads and the request the app makes must come from the
+ * same answer.
+ *
+ * They did not, once: `aiCoachEnabled` consulted the build flag before the
+ * sync server, and the privacy line consulted only the sync server. A dev
+ * build — or any production build handed a key at build time — therefore
+ * displayed "nothing you write here is sent anywhere" directly above a box
+ * whose contents went to a vendor. Nothing failed; the two just answered
+ * differently, and only one of them was on screen.
+ *
+ * So the invariant is structural, and this is what guards it: one function,
+ * and the component reads it rather than re-deriving a second opinion.
+ */
+describe('coachDestination is the single answer', () => {
+  it('is what aiCoachEnabled reports', () => {
+    expect(aiCoachEnabled()).toBe(coachDestination().coach)
+  })
+
+  it('never says self without saying coach', () => {
+    const d = coachDestination()
+    if (d.host === 'self') expect(d.coach).toBe(true)
+  })
+
+  it('is the only source the privacy line reads', () => {
+    // A grep, deliberately: the bug was a second source of truth, not a wrong
+    // branch, and a rendering test would have passed on the day it shipped.
+    expect(whereWordsGoSource).toContain("coachDestination")
+    expect(whereWordsGoSource).not.toContain('serverCapabilities')
   })
 })

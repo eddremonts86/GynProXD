@@ -1,5 +1,5 @@
 import { Cloud, HardDrives, Lock } from '@phosphor-icons/react'
-import { serverCapabilities } from '../lib/capabilities'
+import { coachDestination } from '../lib/ai-plan'
 import { cn } from '@/lib/utils'
 
 /**
@@ -16,12 +16,13 @@ import { cn } from '@/lib/utils'
  * and it names the destination rather than gesturing at it: on a server that
  * calls a third party it says third party, in those words.
  *
- * The wording follows `coachHost`, which the sync server derives from its own
- * configuration — so pointing the base URL at something self-hosted changes what
- * a member is told, without anybody remembering to change a string.
+ * The wording follows `coachDestination`, the same function that decides
+ * whether to send — so pointing the base URL at something self-hosted changes
+ * what a member is told, without anybody remembering to change a string, and
+ * no build can promise privacy while its proxy calls a vendor.
  */
 export function WhereWordsGo({ className }: { className?: string }) {
-  const { coach, coachHost } = serverCapabilities()
+  const { coach, host } = coachDestination()
 
   /* No key on the server: the deterministic designer builds this, and nothing
      leaves. The one case where the front page's promise covers the intake too. */
@@ -34,7 +35,7 @@ export function WhereWordsGo({ className }: { className?: string }) {
     )
   }
 
-  if (coachHost === 'self') {
+  if (host === 'self') {
     return (
       <Line className={className} tone="quiet" icon={<HardDrives size={13} weight="bold" />}>
         What you write is sent to the model on enForma&rsquo;s own server so it can design the

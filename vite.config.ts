@@ -1,4 +1,5 @@
 import path from 'node:path'
+import { readFileSync } from 'node:fs'
 import { defineConfig, loadEnv, type ProxyOptions } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -8,6 +9,26 @@ import { VitePWA } from 'vite-plugin-pwa'
 // agent-managed run can hand us a free port through PORT so parallel sessions
 // do not collide. strictPort stays on: fail loudly rather than drift silently.
 const PORT = Number(process.env.PORT) || 3015
+
+/* The same rule the sync server uses, taken from the file the server loads
+   rather than restated here. A build that carries its own key has to answer
+   "whose hardware is this?" too, and two copies of that answer is how one of
+   them ends up reassuring somebody wrongly.
+
+   Read and evaluated rather than imported: PocketBase's runtime needs that
+   file to be CommonJS, and this package is ESM, so neither `import` nor
+   `createRequire` will load it. Taking the bytes is also the stricter
+   arrangement — a local copy would keep building while the shipped one drifted. */
+const coachHostModule = { exports: {} as { coachHostFor: (base: string) => 'self' | 'external' } }
+new Function(
+  'module',
+  'exports',
+  readFileSync(
+    path.resolve(import.meta.dirname, 'deploy/pocketbase/pb_hooks/utils/coach_host.js'),
+    'utf8',
+  ),
+)(coachHostModule, coachHostModule.exports)
+const { coachHostFor } = coachHostModule.exports
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
@@ -67,6 +88,9 @@ export default defineConfig(({ mode }) => {
   define: {
     __AI_COACH__: JSON.stringify(Boolean(env.MINIMAX_API_KEY)),
     __AI_COACH_MODEL__: JSON.stringify(env.MINIMAX_MODEL || 'MiniMax-Text-01'),
+    __AI_COACH_HOST__: JSON.stringify(
+      coachHostFor(env.MINIMAX_BASE_URL || 'https://api.minimaxi.chat/v1'),
+    ),
   },
   server: {
     port: PORT,
