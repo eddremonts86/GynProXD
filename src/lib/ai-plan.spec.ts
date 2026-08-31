@@ -143,10 +143,12 @@ describe('block place narrows, never widens', () => {
     expect(blocks![0].intensity).toBeUndefined()
   })
 
-  it('refuses a gym block inside a bodyweight programme', () => {
-    /* The intersection of a barbell pool with a bodyweight programme leaves the
-       bodyweight ids the coach actually sent unmatched, so the day falls under
-       three movements and the whole structure is rejected rather than trimmed. */
+  it('still refuses gym movements inside a bodyweight programme', () => {
+    /* The guarantee that survives: the ceiling is the PROGRAMME's pool, built
+       from what the member said. A block labelling itself `barbell` does not
+       widen it — the barbell ids fail the programme pool, the day falls under
+       three, and the structure is refused. What changed is only that a block may
+       no longer NARROW its way into rejecting itself. */
     const gymBlock = {
       days: [
         day('mon', ['Barbell_Bench_Press_-_Medium_Grip', 'Barbell_Full_Squat', 'Dumbbell_Shoulder_Press']),
@@ -154,6 +156,23 @@ describe('block place narrows, never widens', () => {
       ],
     }
     expect(validateBlocks({ blocks: [{ ...gymBlock, place: 'barbell' }] }, home, 3)).toBeNull()
+  })
+
+  it('keeps a home block that mixes bodyweight with the dumbbells the member has', () => {
+    /* The case the live coach produced and the strict filter destroyed: a block
+       labelled `bodyweight` holding what a living room with dumbbells actually
+       contains. The member said `hibrido`, so all of it is authorised. */
+    const realistic = {
+      days: [
+        day('mon', ['Pushups', 'Bodyweight_Squat', 'Bent_Over_Two-Dumbbell_Row']),
+        day('thu', ['Plank', 'Dumbbell_Shoulder_Press', 'Butt_Lift_Bridge']),
+      ],
+    }
+    const blocks = validateBlocks({ blocks: [{ ...realistic, place: 'bodyweight', label: 'Home base' }] }, both, 3)
+    expect(blocks).not.toBeNull()
+    expect(blocks![0].place).toBe('bodyweight')
+    const mon = blocks![0].days.find((d) => d.day === 'mon')!.exercises.map((e) => e.exerciseId)
+    expect(mon).toContain('Bent_Over_Two-Dumbbell_Row')
   })
 
   it('lets two blocks in one programme train in different places', () => {
@@ -180,5 +199,54 @@ describe('block place narrows, never widens', () => {
     const first = blocks![0].days.find((d) => d.day === 'mon')!.exercises.map((e) => e.exerciseId)
     const second = blocks![1].days.find((d) => d.day === 'mon')!.exercises.map((e) => e.exerciseId)
     expect(first.some((id) => second.includes(id))).toBe(false)
+  })
+})
+
+/**
+ * The check that was binning good programmes.
+ *
+ * `rawDays.length !== daysPerWeek` rejected the whole structure over one extra
+ * day. Measured against the real coach on the real prompt: three blocks, right
+ * labels, places phased bodyweight → hibrido → barbell exactly as the member's
+ * sentence asked, zero hallucinated ids — discarded, and the deterministic
+ * template shipped instead, because it had added a light Saturday to a
+ * three-day week.
+ */
+describe('a generous coach is trimmed, a lazy one is refused', () => {
+  const threeDay: OnboardingInput = { ...input, daysPerWeek: 3 }
+
+  const dayOf = (d: 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat', ids: string[]) => day(d, ids)
+  const gym = ['Barbell_Bench_Press_-_Medium_Grip', 'Barbell_Full_Squat', 'Dumbbell_Shoulder_Press']
+
+  it('keeps a programme that offered one day too many', () => {
+    const blocks = validateBlocks(
+      { blocks: [{ days: [dayOf('mon', gym), dayOf('wed', gym), dayOf('fri', gym), dayOf('sat', gym)] }] },
+      threeDay,
+      3,
+    )
+    expect(blocks).not.toBeNull()
+    const withWork = blocks![0].days.filter((d) => d.exercises.length > 0).map((d) => d.day)
+    expect(withWork).toHaveLength(3)
+  })
+
+  it('keeps the days the member named when it has to choose', () => {
+    // Told us mon/wed/fri; the coach also offered tue and sat. Dropping Wednesday
+    // would be a stranger failure than the one this fixes.
+    const blocks = validateBlocks(
+      {
+        blocks: [
+          { days: [dayOf('mon', gym), dayOf('tue', gym), dayOf('wed', gym), dayOf('fri', gym), dayOf('sat', gym)] },
+        ],
+      },
+      { ...threeDay, trainingDays: ['mon', 'wed', 'fri'] },
+      3,
+    )
+    const withWork = blocks![0].days.filter((d) => d.exercises.length > 0).map((d) => d.day)
+    expect(withWork).toEqual(['mon', 'wed', 'fri'])
+  })
+
+  it('still refuses a coach that returned fewer days than asked', () => {
+    // Nothing to salvage: this half of the check stays as strict as it was.
+    expect(validateBlocks({ blocks: [{ days: [dayOf('mon', gym), dayOf('wed', gym)] }] }, threeDay, 3)).toBeNull()
   })
 })

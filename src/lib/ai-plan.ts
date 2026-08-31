@@ -140,9 +140,24 @@ export function validateBlocks(
       typeof rawPlace === 'string' && PLACE_VALUES.includes(rawPlace as OnboardingInput['equipment'])
         ? (rawPlace as OnboardingInput['equipment'])
         : undefined
-    const allowed = place
-      ? new Set([...allowedExerciseIds(place)].filter((id) => programmePool.has(id)))
-      : programmePool
+    /**
+     * The narrowed pool is a preference, not a gate.
+     *
+     * It started as a filter and that was wrong in a way only the live coach
+     * showed: told "the first month at home", it labels block 1 `bodyweight` and
+     * fills it with press-ups, a bodyweight squat and a dumbbell row — which is
+     * what a living room with dumbbells actually looks like, and what the member
+     * authorised when the intake read two places and answered `hibrido`.
+     * Filtering strictly dropped the dumbbell work, took the day under three
+     * movements, and rejected the whole programme. The feature added to make
+     * phasing possible was rejecting the phased answer.
+     *
+     * `place` is metadata now: it names the block on screen and it steers the
+     * coach through the prompt. The guarantee that matters is unchanged and
+     * lives one line up — `programmePool` is built from what the member said,
+     * and nothing reaches past it.
+     */
+    const allowed = programmePool
 
     const rawIntensity = (rawBlock as { intensity?: unknown })?.intensity
     const intensity =
@@ -151,12 +166,42 @@ export function validateBlocks(
         : undefined
     const label = cleanText((rawBlock as { label?: unknown })?.label, 28)
 
+    /**
+     * More days than asked for is trimmed. Fewer is still a rejection.
+     *
+     * This was `!==`, and it was throwing away good programmes whole. Measured
+     * against MiniMax-Text-01 on the real prompt: three blocks, correct labels,
+     * places running bodyweight then hibrido then barbell — the phasing the
+     * member actually asked for — and not one hallucinated movement id. Rejected,
+     * and replaced by the deterministic template, because it had added a light
+     * Saturday to a three-day week.
+     *
+     * A coach that offers a fourth day has understood the brief and been
+     * generous with it. A coach that returns two days for a three-day week has
+     * not, and there is nothing to salvage there, so that half of the check
+     * stays exactly as strict as it was.
+     */
     const rawDays = (rawBlock as { days?: unknown })?.days
-    if (!Array.isArray(rawDays) || rawDays.length !== Math.min(input.daysPerWeek, 7)) return null
+    const wantedDays = Math.min(input.daysPerWeek, 7)
+    if (!Array.isArray(rawDays) || rawDays.length < wantedDays) return null
+
+    /* Which days to keep when there are too many: the ones the member named, if
+       they named any. Dropping Wednesday from someone who told us Monday,
+       Wednesday and Friday would be a stranger failure than the one being fixed. */
+    const preferred = new Set<string>(input.trainingDays ?? [])
+    const chosenDays =
+      rawDays.length === wantedDays
+        ? rawDays
+        : [...(rawDays as RawDay[])]
+            .map((d, i) => ({ d, i, named: preferred.has(String(d?.day)) }))
+            .sort((a, b) => (a.named === b.named ? a.i - b.i : a.named ? -1 : 1))
+            .slice(0, wantedDays)
+            .sort((a, b) => a.i - b.i)
+            .map((x) => x.d)
 
     const byDay = new Map<DayOfWeek, PlannedExercise[]>()
     const notesByDay = new Map<DayOfWeek, string>()
-    for (const rawDay of rawDays as RawDay[]) {
+    for (const rawDay of chosenDays as RawDay[]) {
       const day = rawDay?.day as DayOfWeek
       if (!DAY_VALUES.includes(day) || byDay.has(day)) return null
       if (!Array.isArray(rawDay.exercises)) return null
