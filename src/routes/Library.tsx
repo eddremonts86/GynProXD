@@ -60,6 +60,7 @@ const PAGE = 48
 export function LibraryPage() {
   const customExercises = useGym((s) => s.customExercises)
   const serverExercises = useCatalogue((s) => s.exercises)
+  const hidden = useCatalogue((s) => s.hidden)
   const pullCatalogue = useCatalogue((s) => s.pull)
   const addExercise = useGym((s) => s.addExercise)
   const workouts = useGym((s) => s.workouts)
@@ -85,8 +86,8 @@ export function LibraryPage() {
   }, [pullCatalogue])
 
   const exercises = useMemo(
-    () => libraryOrder(Array.from(exerciseLookup(customExercises, serverExercises).values())),
-    [customExercises, serverExercises],
+    () => libraryOrder(Array.from(exerciseLookup(customExercises, serverExercises, hidden).values())),
+    [customExercises, serverExercises, hidden],
   )
 
   /* Only equipment that actually exists in the catalogue; the import maps

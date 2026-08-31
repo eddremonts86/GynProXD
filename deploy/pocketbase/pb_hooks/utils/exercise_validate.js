@@ -56,14 +56,17 @@ function validateExercise(e) {
 
   /* Instructions arrive as JSON from the panel and as whatever anyone else
      sends. Normalised here so the app can trust `string[]` and render it
-     without checking every element. */
-  let steps = record.get('instructions')
-  if (typeof steps === 'string') {
-    try {
-      steps = JSON.parse(steps)
-    } catch {
-      fail('Instructions must be a list of steps.')
-    }
+     without checking every element.
+
+     Through `toString` rather than straight off `record.get`: a json field
+     comes back from Go as a value whose elements are not JS strings, so the
+     obvious `typeof step === 'string'` rejects a perfectly good list. Same
+     idiom as recipe_validate.js, and for the same reason. */
+  let steps
+  try {
+    steps = JSON.parse(toString(record.get('instructions')) || '[]')
+  } catch {
+    fail('Instructions must be a list of steps.')
   }
   if (steps === null || steps === undefined) steps = []
   if (!Array.isArray(steps)) fail('Instructions must be a list of steps.')

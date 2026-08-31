@@ -10,8 +10,8 @@ const byIdCache = new Map<string, Exercise>()
  * catalogue, the CC-BY-SA movements wger contributes, whatever the platform
  * has written since the last release, and their own.
  *
- * `server` is passed in rather than read from the store so this stays a pure
- * function of its arguments — the specs and the plan generator depend on that.
+ * `server` and `hidden` are passed in rather than read from the store so this
+ * stays a pure function of its arguments — the specs depend on that.
  *
  * The plan generator deliberately does not use this — it draws from
  * `generatedExercises` alone. Share-alike attribution has to be rendered
@@ -19,12 +19,20 @@ const byIdCache = new Map<string, Exercise>()
  * across a dozen screens; keeping wger to the surfaces a person navigates to
  * on purpose keeps that credit somewhere it can actually be read.
  */
-export function exerciseLookup(custom: Exercise[], server: Exercise[] = []): Map<string, Exercise> {
+export function exerciseLookup(
+  custom: Exercise[],
+  server: Exercise[] = [],
+  hidden: readonly string[] = [],
+): Map<string, Exercise> {
   const map = new Map<string, Exercise>()
   for (const e of generatedExercises) map.set(e.id, e)
   for (const e of wgerExercises) map.set(e.id, e)
   for (const e of server) map.set(e.id, e)
   for (const e of custom) map.set(e.id, e)
+  /* Withdrawn last, so an id is gone whichever catalogue put it there — and
+     only from here. `exerciseById` still answers, because a workout logged
+     before the movement was retired should keep its name. */
+  for (const id of hidden) map.delete(id)
   return map
 }
 

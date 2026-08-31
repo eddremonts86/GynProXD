@@ -39,15 +39,16 @@ export function ExercisePicker({
 }: ExercisePickerProps) {
   const customExercises = useGym((s) => s.customExercises)
   const serverExercises = useCatalogue((s) => s.exercises)
+  const hidden = useCatalogue((s) => s.hidden)
   const [query, setQuery] = useState('')
   const deferredQuery = useDeferredValue(query)
 
   const all = useMemo(
     () =>
-      Array.from(exerciseLookup(customExercises, serverExercises).values()).sort((a, b) =>
+      Array.from(exerciseLookup(customExercises, serverExercises, hidden).values()).sort((a, b) =>
         a.name.localeCompare(b.name),
       ),
-    [customExercises, serverExercises],
+    [customExercises, serverExercises, hidden],
   )
 
   const results = useMemo(() => {

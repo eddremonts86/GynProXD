@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Exercise, Workout } from './types'
-import { bestE1rm, e1rmSeries, epley1rm, lastPerformance, libraryOrder } from './exercises'
+import { bestE1rm, e1rmSeries, epley1rm, exerciseLookup, lastPerformance, libraryOrder } from './exercises'
 import { isPersonalRecord, suggestNext } from './progression'
 
 const ex: Exercise = { id: 'bench-press', name: 'Bench Press', muscle: 'chest', equipment: 'barbell' }
@@ -152,5 +152,36 @@ describe('libraryOrder', () => {
     const input = [bare, photo]
     libraryOrder(input)
     expect(input.map((e) => e.id)).toEqual(['a-bare', 'z-photo'])
+  })
+})
+
+describe('exerciseLookup', () => {
+  const own: Exercise = { id: 'custom-1', name: 'My Movement', muscle: 'core', equipment: 'bodyweight' }
+  const fromServer: Exercise = { id: 'srv-1', name: 'Sled Push', muscle: 'quads', equipment: 'other' }
+
+  it('merges the bundled catalogue, the server rows and the member\'s own', () => {
+    const map = exerciseLookup([own], [fromServer])
+    expect(map.get('Barbell_Curl')?.name).toBe('Barbell Curl')
+    expect(map.get('srv-1')).toEqual(fromServer)
+    expect(map.get('custom-1')).toEqual(own)
+  })
+
+  it('withdraws a hidden id whichever catalogue it came from', () => {
+    const map = exerciseLookup([own], [fromServer], ['Barbell_Curl', 'srv-1', 'custom-1'])
+    expect(map.has('Barbell_Curl')).toBe(false)
+    expect(map.has('srv-1')).toBe(false)
+    expect(map.has('custom-1')).toBe(false)
+    /* Everything else is untouched. */
+    expect(map.get('Pullups')?.name).toBe('Pullups')
+  })
+
+  it('hides a wger movement too', () => {
+    expect(exerciseLookup([], [], ['wger-1966']).has('wger-1966')).toBe(false)
+    expect(exerciseLookup([], []).has('wger-1966')).toBe(true)
+  })
+
+  it('ignores a hidden id nothing matches', () => {
+    const before = exerciseLookup([], []).size
+    expect(exerciseLookup([], [], ['does-not-exist']).size).toBe(before)
   })
 })

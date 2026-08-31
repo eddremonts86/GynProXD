@@ -210,6 +210,14 @@ would need to change shape.
   does not empty the library. Write is platform-admin only
   (`pb_migrations/1757400000_exercises_admin.js`), and
   `pb_hooks/exercises_admin.pb.js` validates every field again on arrival.
+  Withdrawing is separate from `published` and covers **every** catalogue:
+  `exercises_hidden` holds ids, and `exerciseLookup` drops them whichever
+  file put them there — free-exercise-db, RepDB, wger or a row written here.
+  It hides rather than deletes, so `exerciseById` still resolves the id and a
+  workout logged before the movement was retired keeps its name; restoring it
+  puts it back exactly where it was. Note the plan generator still draws from
+  the bundled catalogue directly, so a withdrawn movement can still be
+  programmed — the Library and the movement picker are what it covers today.
 - **Recipes**: the same shape for the gym's own dishes, `house` provider.
 
 ## Navigation by role

@@ -21,6 +21,7 @@ import { Tag } from '../ui/Tag'
 import { Input } from '../ui/Input'
 import { FormSelect } from '../ui/FormSelect'
 import { EmptyState } from '../ui/EmptyState'
+import { AdminHiddenExercises } from './admin-hidden-exercises'
 import {
   Dialog,
   DialogContent,
@@ -208,6 +209,8 @@ export function AdminExercises() {
           )}
         </Panel>
       )}
+
+      <AdminHiddenExercises />
 
       <ExerciseForm
         key={formSeq}

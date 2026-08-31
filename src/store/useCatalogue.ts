@@ -18,6 +18,7 @@ import type { Equipment, Exercise, ExerciseCategory, MuscleGroup } from '../lib/
  */
 
 const STORE_KEY = 'forma-server-exercises'
+const HIDDEN_KEY = 'forma-hidden-exercises'
 
 interface ExerciseRecord {
   id: string
@@ -31,12 +32,12 @@ interface ExerciseRecord {
   updated: string
 }
 
-function load(): Exercise[] {
+function loadList<T>(key: string): T[] {
   try {
-    const raw = localStorage.getItem(STORE_KEY)
+    const raw = localStorage.getItem(key)
     if (!raw) return []
     const parsed = JSON.parse(raw) as unknown
-    return Array.isArray(parsed) ? (parsed as Exercise[]) : []
+    return Array.isArray(parsed) ? (parsed as T[]) : []
   } catch {
     return []
   }
@@ -58,6 +59,12 @@ export function toExercise(row: ExerciseRecord, base: string): Exercise {
 
 interface CatalogueState {
   exercises: Exercise[]
+  /**
+   * Ids withdrawn from the library, from any catalogue — bundled, wger or
+   * written here. Hiding is not deleting: `exerciseById` still resolves these,
+   * so a workout logged before the movement was retired keeps its name.
+   */
+  hidden: string[]
   /** Absent until the first pull of the session succeeds or fails. */
   pulledAt: string | null
   pull: () => Promise<void>
@@ -65,7 +72,8 @@ interface CatalogueState {
 }
 
 export const useCatalogue = create<CatalogueState>()((set) => ({
-  exercises: typeof localStorage === 'undefined' ? [] : load(),
+  exercises: typeof localStorage === 'undefined' ? [] : loadList<Exercise>(STORE_KEY),
+  hidden: typeof localStorage === 'undefined' ? [] : loadList<string>(HIDDEN_KEY),
   pulledAt: null,
 
   /**
@@ -80,19 +88,26 @@ export const useCatalogue = create<CatalogueState>()((set) => ({
     if (!auth) return
     const base = activeServer()
     try {
-      const res = await fetch(
-        `${base}/api/collections/exercises/records?perPage=500&sort=name&filter=${encodeURIComponent('published = true')}`,
-        { headers: auth },
-      )
-      if (!res.ok) return
-      const data = (await res.json()) as { items: ExerciseRecord[] }
-      const exercises = data.items.map((row) => toExercise(row, base))
+      const [written, withdrawn] = await Promise.all([
+        fetch(
+          `${base}/api/collections/exercises/records?perPage=500&sort=name&filter=${encodeURIComponent('published = true')}`,
+          { headers: auth },
+        ),
+        fetch(`${base}/api/collections/exercises_hidden/records?perPage=500`, { headers: auth }),
+      ])
+      if (!written.ok || !withdrawn.ok) return
+      const rows = (await written.json()) as { items: ExerciseRecord[] }
+      const hides = (await withdrawn.json()) as { items: { exerciseId: string }[] }
+      const exercises = rows.items.map((row) => toExercise(row, base))
+      const hidden = hides.items.map((row) => row.exerciseId)
       localStorage.setItem(STORE_KEY, JSON.stringify(exercises))
-      set({ exercises, pulledAt: new Date().toISOString() })
+      localStorage.setItem(HIDDEN_KEY, JSON.stringify(hidden))
+      set({ exercises, hidden, pulledAt: new Date().toISOString() })
     } catch {
       /* Offline. The cache is the answer. */
     }
   },
 
-  rehydrate: () => set({ exercises: load() }),
+  rehydrate: () =>
+    set({ exercises: loadList<Exercise>(STORE_KEY), hidden: loadList<string>(HIDDEN_KEY) }),
 }))
