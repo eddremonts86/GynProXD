@@ -1,8 +1,9 @@
-import { useCallback, useDeferredValue, useMemo, useState } from 'react'
+import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
 import { CaretRight, MagnifyingGlass, Plus } from '@phosphor-icons/react'
 import { exerciseImageCandidates, exercisePhotoFrames } from '../lib/images'
 import { useInfiniteScroll } from '../lib/use-infinite-scroll'
 import { useGym } from '../store/useGym'
+import { useCatalogue } from '../store/useCatalogue'
 import { exerciseLookup, libraryOrder } from '../lib/exercises'
 import { sessionCountsByExercise } from '../lib/stats'
 import { inboxFor } from '../lib/messages'
@@ -58,6 +59,8 @@ const PAGE = 48
 
 export function LibraryPage() {
   const customExercises = useGym((s) => s.customExercises)
+  const serverExercises = useCatalogue((s) => s.exercises)
+  const pullCatalogue = useCatalogue((s) => s.pull)
   const addExercise = useGym((s) => s.addExercise)
   const workouts = useGym((s) => s.workouts)
   const messages = useMessages((s) => s.messages)
@@ -75,9 +78,15 @@ export function LibraryPage() {
 
   const deferredQuery = useDeferredValue(query)
 
+  /* Movements written in the admin panel since this build shipped. The cached
+     copy renders immediately; the pull only ever replaces it with a better one. */
+  useEffect(() => {
+    void pullCatalogue()
+  }, [pullCatalogue])
+
   const exercises = useMemo(
-    () => libraryOrder(Array.from(exerciseLookup(customExercises).values())),
-    [customExercises],
+    () => libraryOrder(Array.from(exerciseLookup(customExercises, serverExercises).values())),
+    [customExercises, serverExercises],
   )
 
   /* Only equipment that actually exists in the catalogue; the import maps

@@ -6,8 +6,12 @@ import type { Exercise, LoggedExercise, SetEntry, Workout } from './types'
 const byIdCache = new Map<string, Exercise>()
 
 /**
- * Everything a member can browse, search or put in a session: the catalogue,
- * the CC-BY-SA movements wger contributes, and their own.
+ * Everything a member can browse, search or put in a session: the bundled
+ * catalogue, the CC-BY-SA movements wger contributes, whatever the platform
+ * has written since the last release, and their own.
+ *
+ * `server` is passed in rather than read from the store so this stays a pure
+ * function of its arguments — the specs and the plan generator depend on that.
  *
  * The plan generator deliberately does not use this — it draws from
  * `generatedExercises` alone. Share-alike attribution has to be rendered
@@ -15,10 +19,11 @@ const byIdCache = new Map<string, Exercise>()
  * across a dozen screens; keeping wger to the surfaces a person navigates to
  * on purpose keeps that credit somewhere it can actually be read.
  */
-export function exerciseLookup(custom: Exercise[]): Map<string, Exercise> {
+export function exerciseLookup(custom: Exercise[], server: Exercise[] = []): Map<string, Exercise> {
   const map = new Map<string, Exercise>()
   for (const e of generatedExercises) map.set(e.id, e)
   for (const e of wgerExercises) map.set(e.id, e)
+  for (const e of server) map.set(e.id, e)
   for (const e of custom) map.set(e.id, e)
   return map
 }
