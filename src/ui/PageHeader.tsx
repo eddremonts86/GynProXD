@@ -41,9 +41,17 @@ export function Section({ title, hint, action, children, className }: SectionPro
   return (
     <section className={cn('flex flex-col gap-3', className)}>
       <div className="flex min-h-[2.125rem] items-end justify-between gap-3 border-b border-line pb-2">
+        {/* The hint gives up its width first. It used to be the other way
+            round — the hint was `shrink-0` and the heading truncated — so a
+            long one reduced "Week 9" to "W…" while spelling out the block
+            beside it. The heading names what you are looking at; the hint is
+            the gloss. The heading is capped at the row's own width so a long
+            one still truncates rather than spilling, and a shrink weight was
+            not enough: it left the heading a fraction of a pixel short of its
+            text, which is all an ellipsis needs to appear. */}
         <div className="flex min-w-0 items-baseline gap-2">
-          <h2 className="truncate text-lg text-ink">{title}</h2>
-          {hint && <span className="num shrink-0 text-2xs text-ink-3">{hint}</span>}
+          <h2 className="max-w-full shrink-0 truncate text-lg text-ink">{title}</h2>
+          {hint && <span className="num min-w-0 truncate text-2xs text-ink-3">{hint}</span>}
         </div>
         {action && <div className="flex shrink-0 items-center gap-1.5">{action}</div>}
       </div>
