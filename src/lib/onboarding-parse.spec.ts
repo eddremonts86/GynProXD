@@ -180,3 +180,26 @@ describe('the inputs a programme could not previously be told about', () => {
     expect(parseOnboarding('I train tuesday and saturday').partial.trainingDays).toEqual(['tue', 'sat'])
   })
 })
+
+describe('height said in words', () => {
+  it('reads the verb, not just the unit', () => {
+    expect(parseOnboarding('Tengo 34 anos y mido 178').partial.heightCm).toBe(178)
+    expect(parseOnboarding('mide 1,78 y pesa 92 kilos').partial.heightCm).toBe(178)
+    expect(parseOnboarding("I'm 180 cm").partial.heightCm).toBe(180)
+    expect(parseOnboarding('estatura 165').partial.heightCm).toBe(165)
+  })
+
+  it('marks it quoted, so the review step does not call it a guess', () => {
+    expect(parseOnboarding('mido 178').provenance.heightCm).toBe('quoted')
+  })
+
+  it('leaves a bare number alone', () => {
+    // No verb, no unit. 178 here is a postcode, a weight in pounds, anything.
+    expect(parseOnboarding('entreno en el gimnasio 178 de la calle mayor').partial.heightCm)
+      .toBeUndefined()
+  })
+
+  it('refuses a number that cannot be a height', () => {
+    expect(parseOnboarding('mido 450').partial.heightCm).toBeUndefined()
+  })
+})

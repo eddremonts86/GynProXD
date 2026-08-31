@@ -183,10 +183,23 @@ export function parseOnboarding(text: string): ParseResult {
     t.match(/(?:→|->)\s*(\d{2,3})\s*kg/i)
   if (targetM) set('targetWeightKg', Number(targetM[1]), 'quoted')
 
-  const heightM = t.match(/(\d{2,3})\s*cm/i) ?? t.match(/(\d\.\d{1,2})\s*m\b/i)
+  /* A unit is the easy case. The hard one is "mido 178", which is how the
+     sentence is written when somebody is not filling in a form — and it used
+     to read as nothing, so the review step showed 175 under "you did not
+     mention these" to a person who had just said their height in words.
+     Anchored on the verb rather than on a loose three-digit number, because a
+     bare 178 in prose is as likely to be a weight in pounds or a gym's address.
+     Decimal metres are read too, comma or point: 1,78 is the Spanish keyboard. */
+  const heightM =
+    t.match(/(\d{2,3})\s*cm\b/i) ??
+    t.match(/(\d[.,]\d{1,2})\s*m\b/i) ??
+    t.match(/(?:mido|mide|midiendo|altura|estatura|height|tall)\D{0,12}?(\d{2,3}|\d[.,]\d{1,2})/i)
   if (heightM) {
-    const raw = Number(heightM[1])
-    set('heightCm', raw < 3 ? Math.round(raw * 100) : raw, 'quoted')
+    const raw = Number(heightM[1].replace(',', '.'))
+    const cm = raw < 3 ? Math.round(raw * 100) : raw
+    /* Out of range means it was not a height. Better the default and an honest
+       "you did not mention this" than a confident wrong number. */
+    if (cm >= 120 && cm <= 230) set('heightCm', cm, 'quoted')
   }
 
   for (const [re, v] of GOAL_MAP)
