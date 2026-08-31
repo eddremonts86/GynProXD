@@ -19,8 +19,30 @@ routerAdd('GET', '/api/enforma/capabilities', (e) => {
   } catch {
     /* Collection missing on a pre-migration boot: capability stays false. */
   }
+  /**
+   * Where the coach actually runs, so the app can say so instead of implying.
+   *
+   * The intake sends whatever somebody typed — including the sentence about a
+   * knee — to whichever model designs the programme. Which model that is, is a
+   * property of THIS server's environment, and the browser has no way to know
+   * it. Reporting it is what lets a screen tell the truth without guessing, and
+   * what makes the truth change by itself the day the base URL is repointed at
+   * something we host.
+   *
+   * The classification is in `utils/coach_host.js` because it decides which of
+   * two sentences a member reads, and one of them promises their words did not
+   * leave. That deserves tests, and nothing can test a closure inside a handler.
+   */
+  const coachKey = !!$os.getenv('MINIMAX_API_KEY')
+  const coachHost = coachKey
+    ? require(`${__hooks}/utils/coach_host.js`).coachHostFor(
+        $os.getenv('MINIMAX_BASE_URL') || 'https://api.minimaxi.chat/v1',
+      )
+    : null
+
   return e.json(200, {
-    coach: !!$os.getenv('MINIMAX_API_KEY'),
+    coach: coachKey,
+    coachHost,
     recipes:
       hasCatalogue ||
       !!($os.getenv('FATSECRET_CLIENT_ID') && $os.getenv('FATSECRET_CLIENT_SECRET')),

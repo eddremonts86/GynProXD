@@ -12,6 +12,7 @@ import { WizardRail, type WizardStep } from '@/components/wizard-rail'
 import { IntakeReview, type ReviewField, type Standing } from '@/components/intake-review'
 import { DayPicker } from '@/components/day-picker'
 import { InlineFitnessTest } from '@/components/inline-fitness-test'
+import { WhereWordsGo } from '@/components/where-words-go'
 import { estimatePlan } from '../lib/plan-estimate'
 import { aiCoachEnabled, buildProgramme } from '../lib/ai-plan'
 import { showNotification } from '../lib/notify'
@@ -439,6 +440,11 @@ function StepWords({
         knee to be careful with, the days you can actually make. Whatever the fields below cannot
         hold goes to the coach as you wrote it.
       </p>
+
+      {/* Directly under the box, before anything is typed. Saying this after
+          somebody has already described an injury is not disclosure, it is a
+          receipt. */}
+      <WhereWordsGo />
 
       {text.trim().length > 0 && (
         <div className="flex flex-col gap-3 border-t border-line pt-4">
