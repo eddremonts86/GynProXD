@@ -1,13 +1,6 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from 'vitest'
-import {
-  bodyHtml,
-  htmlToPlain,
-  isEmptyHtml,
-  looksLikeHtml,
-  plainToHtml,
-  sanitizeHtml,
-} from './rich-text'
+import { bodyHtml, htmlToLine, htmlToPlain, isEmptyHtml, looksLikeHtml, plainToHtml, sanitizeHtml } from './rich-text'
 
 /**
  * The gym bus is one account writing and a whole gym rendering. Everything
@@ -167,5 +160,38 @@ describe('the words without the markup', () => {
   it('calls markup with no words empty', () => {
     expect(isEmptyHtml('<p></p><p><br></p>')).toBe(true)
     expect(isEmptyHtml('<p>A word</p>')).toBe(false)
+  })
+})
+
+describe('htmlToLine', () => {
+  it('drops the markup and keeps the words', () => {
+    expect(htmlToLine('<p>The <strong>lifting room</strong> is closed.</p>')).toBe(
+      'The lifting room is closed.',
+    )
+  })
+
+  it('does not run two blocks into one word', () => {
+    // The bug this guards: "closed.Back Monday".
+    expect(htmlToLine('<p>Closed.</p><p>Back Monday.</p>')).toBe('Closed. Back Monday.')
+    expect(htmlToLine('<ul><li>Monday</li><li>Tuesday</li></ul>')).toBe('Monday Tuesday')
+  })
+
+  it('turns the entities a member would otherwise read literally', () => {
+    expect(htmlToLine('Reps &amp; sets &lt;now&gt;')).toBe('Reps & sets <now>')
+    expect(htmlToLine('Sala&nbsp;2')).toBe('Sala 2')
+  })
+
+  it('cannot be tricked into reassembling an entity', () => {
+    // &amp;lt; is a literal "&lt;", not a "<". Unescaping &amp; last is what
+    // keeps it that way.
+    expect(htmlToLine('&amp;lt;script&amp;gt;')).toBe('&lt;script&gt;')
+  })
+
+  it('collapses every kind of whitespace to single spaces', () => {
+    expect(htmlToLine('One\n\n  two\tthree  ')).toBe('One two three')
+  })
+
+  it('is empty for markup with no words in it', () => {
+    expect(htmlToLine('<p></p><ul><li></li></ul>')).toBe('')
   })
 })

@@ -125,6 +125,36 @@ export function htmlToPlain(html: string): string {
     .trim()
 }
 
+/**
+ * One line of the text inside the markup, without touching the DOM.
+ *
+ * `htmlToPlain` sanitises and parses, which is right for a card's opening
+ * paragraph and wrong for a list row: it runs DOMPurify and a `DOMParser` per
+ * message per render, and it needs a document at all — which a pure test
+ * cannot give it, and neither can a service worker.
+ *
+ * Cheaper is also safe here because the result is set as text, never as HTML.
+ * Nothing is being trusted; tags are dropped and the handful of entities that
+ * would otherwise show through as `&amp;` are turned back into characters.
+ */
+export function htmlToLine(html: string): string {
+  return html
+    /* A block boundary is a word boundary. Without this, "closed.</p><p>Back
+       Monday" reads as "closed.Back Monday". */
+    .replace(/<\/?(?:p|li|h[1-6]|blockquote|ul|ol|div|br|hr|tr|td)\b[^>]*>/gi, ' ')
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#0?39;|&apos;/gi, "'")
+    /* Last, so an escaped entity in the source cannot be reassembled into a
+       different one by the replacements above. */
+    .replace(/&amp;/gi, '&')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
 /** True when the body carries no words, however much markup is wrapped round it. */
 export function isEmptyHtml(html: string): boolean {
   return htmlToPlain(html).trim().length === 0

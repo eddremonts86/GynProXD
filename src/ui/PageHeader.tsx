@@ -4,14 +4,19 @@ import { cn } from '@/lib/utils'
 interface PageHeaderProps {
   title: string
   description?: string
+  /** A count or status beside the title. Same vocabulary as `Section`. */
+  hint?: string
   action?: ReactNode
 }
 
-export function PageHeader({ title, description, action }: PageHeaderProps) {
+export function PageHeader({ title, description, hint, action }: PageHeaderProps) {
   return (
     <header className="flex flex-wrap items-end justify-between gap-x-4 gap-y-3">
       <div className="flex min-w-0 flex-col gap-1.5">
-        <h1 className="text-3xl text-ink">{title}</h1>
+        <span className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <h1 className="text-3xl text-ink">{title}</h1>
+          {hint && <span className="num text-2xs text-ink-3">{hint}</span>}
+        </span>
         {description && <p className="max-w-[58ch] text-sm text-ink-3">{description}</p>}
       </div>
       {action && <div className="flex shrink-0 items-center gap-2">{action}</div>}

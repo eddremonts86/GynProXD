@@ -7,6 +7,7 @@
 
 import type { Challenge } from './challenge'
 import type { Collection } from './collection'
+import { htmlToLine } from './rich-text'
 
 /**
  * Who a message is for, beyond the gym it was written in.
@@ -100,6 +101,16 @@ export interface GymMessage {
    */
   respondents?: Record<string, string>
   bannerDismissedBy?: string[]
+  /**
+   * Profiles that removed this from their own inbox.
+   *
+   * Not a deletion. The row belongs to whoever published it and the server
+   * gives `delete` to that gym's operators only, which is right — a member
+   * clearing their inbox must not erase an event forty other people are still
+   * reading. So this hides it for one profile on one device, and the copy the
+   * gym keeps is untouched. Anything the UI says about it has to say that.
+   */
+  deletedBy?: string[]
 }
 
 export const TEMPLATE_LABELS: Record<TemplateKind, string> = {
@@ -126,6 +137,10 @@ export function isAddressedTo(
 ): boolean {
   /* Authors never receive their own broadcasts; their view is the sent list. */
   if (message.authorId === profile.id) return false
+  /* Removed from this profile's inbox. Checked here rather than in `inboxFor`
+     so the badge, the banner and the notification all agree with the list —
+     four places asking the same question is four places to forget one. */
+  if (message.deletedBy?.includes(profile.id)) return false
 
   switch (scopeOf(message)) {
     case 'everyone':
@@ -234,7 +249,7 @@ export function unreadSenders(
   const senders: string[] = []
   for (const message of messages) {
     if (!isAddressedTo(message, profile) || message.readBy.includes(profile.id)) continue
-    const from = scopeOf(message) === 'members' ? message.gym : HOUSE_GYM
+    const from = senderOf(message)
     if (!senders.some((s) => s.toLowerCase() === from.toLowerCase())) senders.push(from)
   }
   return senders
@@ -269,6 +284,55 @@ export function sentBy(messages: GymMessage[], gym: string): GymMessage[] {
   return messages
     .filter((m) => sameGym(m.gym, gym))
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+}
+
+/**
+ * One line of the message, for a list row.
+ *
+ * A body is the obvious source and often absent: most templates are structured
+ * rather than prose, and an offer with no body would have shown an empty row
+ * next to a full one. So each kind falls back to the thing it is actually
+ * about — the discount, the price, the date, what the kitchen is cooking —
+ * which is also the thing somebody scanning the list is looking for.
+ *
+ * Plain text, always, and stripped without a DOM: this runs for every row on
+ * every render, where `htmlToPlain`'s sanitise-and-parse would be both wasteful
+ * and unavailable. Safe because the result is set as text, never as HTML.
+ */
+export function previewOf(message: GymMessage): string {
+  const fromBody = message.body ? htmlToLine(message.body) : ''
+  if (fromBody) return fromBody
+
+  switch (message.kind) {
+    case 'offer':
+      return message.offer?.discount ?? ''
+    case 'product':
+      return [message.product?.name, message.product?.price].filter(Boolean).join(' — ')
+    case 'event':
+      return [message.event?.date, message.event?.time, message.event?.place]
+        .filter(Boolean)
+        .join(' · ')
+    case 'menu':
+      return (message.menu?.courses ?? [])
+        .map((course) => course.dishes.join(', '))
+        .filter(Boolean)
+        .join(' · ')
+    case 'challenge':
+      return message.challenge
+        ? `${message.challenge.days} days, ${message.challenge.start} ${message.challenge.unit} to start`
+        : ''
+    case 'collection':
+      return message.collection
+        ? `${message.collection.exerciseIds.length} movements`
+        : ''
+    default:
+      return ''
+  }
+}
+
+/** Who the message is from, as a member reads it: their gym, or the platform. */
+export function senderOf(message: GymMessage): string {
+  return scopeOf(message) === 'members' ? message.gym : HOUSE_GYM
 }
 
 /** Short, unambiguous redemption code: no 0/O or 1/I lookalikes. */

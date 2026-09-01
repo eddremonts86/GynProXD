@@ -166,7 +166,9 @@ renames and deletes propagate to menus like they do to messages.
 
 Delivered where a serverless app can deliver them:
 
-1. **In-app**: unread badge in the navigation; inbox marks read on view.
+1. **In-app**: unread badge in the navigation; a message is marked read when
+   it is opened, not when the inbox is. See "The inbox" below — the badge used
+   to clear itself as you walked past.
 2. **System notifications** (Notification API): opt-in toggle in Settings.
    Fired when the active profile has unread messages — on unlock, and live
    via the `storage` event if a gym publishes from another tab while the
@@ -296,3 +298,57 @@ just abandoned; getting that wrong delivered to five and reported ten.
 `scripts/audit/house-gym-boundary.mjs` boots a throwaway PocketBase from these
 migrations and hooks and proves the boundary from the receiving side. Run it
 after touching any of it.
+
+## The inbox
+
+A list you scan and a message you read, which is to say an email client.
+
+It was a column of full cards, and that worked while a gym only published
+one-line announcements. It stopped working the moment the same column had to
+hold a menu with four courses and three photographs, an offer with a QR code
+and a closure notice — each sizing itself, so finding anything meant scrolling
+past everything.
+
+- **Rows are a fixed height** whatever the message holds:
+  sender, date, title, kind, and one line of preview. `previewOf` supplies that
+  line — from the body when there is one, and otherwise from what the template
+  is actually about (the discount, the price, the date, what the kitchen is
+  cooking), because most templates are structured rather than prose and every
+  offer would otherwise show an empty row beside a full one.
+- **`htmlToLine`, not `htmlToPlain`**, for that preview. The latter sanitises
+  and parses with a `DOMParser`, which is right for a card's opening paragraph
+  and wrong for a list: it would run per message per render and needs a
+  document at all. Cheap stripping is safe here because the result is set as
+  text, never as HTML.
+- **Read means opened.** The old screen marked every message read on mount, so
+  read/unread carried no information — the badge cleared itself as you walked
+  past. "Mark unread" exists for the correction, and deliberately does not
+  retract the read receipt the gym already has: it changes what this device
+  shows, not what happened.
+- **Selection lives in the URL** (`/inbox?m=<id>`). The back button closes a
+  message instead of leaving the inbox, a reload lands where you were, and a
+  notification can deep-link to the message it is about.
+- **Nothing is auto-selected.** Opening the newest message on arrival would
+  mark it read before anybody looked at it, which is the behaviour this screen
+  was rebuilt to stop.
+- **Remove is per profile and local** (`deletedBy`). A member cannot delete the
+  gym's row — the server gives `delete` to that gym's operators only, and it
+  should, because one member clearing their inbox must not erase an event forty
+  others are still reading. So it hides it for one profile, says so in those
+  words, and offers an undo. `merge` preserves `deletedBy` or the next pull
+  resurrects everything.
+- The removal check lives in `isAddressedTo`, not in `inboxFor`, so the list,
+  the badge, the banner and the notification all agree. Four callers asking the
+  same question separately is four places to forget one.
+
+Layout is a list column and a reading pane above `md`, one or the other below
+it — a reading pane 40 characters wide is not a reading pane. Every grid track
+is `minmax(0, …)`: a column defaults to `auto`, which sizes to max-content, and
+the single mobile column grew to 4708px to fit a preview line that could then
+never truncate, because truncation needs a bound and the bound was the thing
+being computed.
+
+Arrow keys (and `j`/`k`) move through the list, Backspace removes the open
+message. Moving with the arrows opens each message as it goes, and therefore
+marks it read — the same trade Apple Mail makes, and the reason "Mark unread"
+is one click away.
