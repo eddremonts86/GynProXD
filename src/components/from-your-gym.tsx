@@ -27,7 +27,6 @@ import { htmlToPlain } from '../lib/rich-text'
 import { todayIso } from '../lib/dates'
 import { Button } from '../ui/Button'
 import { Panel } from '../ui/Panel'
-import { OVER_AURORA } from '../ui/AuroraTile'
 import { SECTION_ACTION, Section } from '../ui/PageHeader'
 import type { GymMessage } from '../lib/messages'
 import { cn } from '@/lib/utils'
@@ -45,13 +44,19 @@ import { viewerFor } from '@/lib/profiles'
  * session.
  */
 
-/** Controls sitting on the gradient: the palette's inks would vanish on it. */
+/**
+ * Controls sitting on the gradient.
+ *
+ * Tinted from `--aurora-ink` rather than hardcoded white, for the same reason
+ * the type is: on the light theme the material is far too pale to carry white,
+ * and a white-on-white ring is not a control anybody can find.
+ */
 const ON_AURORA =
   'inline-flex h-9 items-center gap-1.5 rounded-full px-3.5 text-xs font-semibold ' +
   'transition-[background-color,transform] duration-150 active:translate-y-px ' +
-  'ring-1 ring-white/30 ring-inset'
-const ON_AURORA_IDLE = 'bg-white/15 text-white hover:bg-white/25'
-const ON_AURORA_ON = 'bg-white text-[#1d1d1a] hover:bg-white'
+  'ring-1 ring-aurora-ink/30 ring-inset'
+const ON_AURORA_IDLE = 'bg-aurora-ink/15 text-aurora-ink hover:bg-aurora-ink/25'
+const ON_AURORA_ON = 'bg-aurora-ink text-aurora-on hover:bg-aurora-ink'
 
 function DismissButton({ label, onDismiss }: { label: string; onDismiss: () => void }) {
   return (
@@ -59,7 +64,7 @@ function DismissButton({ label, onDismiss }: { label: string; onDismiss: () => v
       type="button"
       aria-label={label}
       onClick={onDismiss}
-      className="flex size-7 shrink-0 items-center justify-center rounded-full text-white/70 transition-colors duration-150 hover:bg-white/15 hover:text-white"
+      className="flex size-7 shrink-0 items-center justify-center rounded-full text-aurora-ink/70 transition-colors duration-150 hover:bg-aurora-ink/15 hover:text-aurora-ink"
     >
       <X size={14} weight="bold" />
     </button>
@@ -97,7 +102,7 @@ function NoticeCard({
       )}
     >
       <div className="flex items-start justify-between gap-3">
-        <span className={cn('flex items-center gap-2 text-sm font-medium text-white', OVER_AURORA)}>
+        <span className="flex items-center gap-2 text-sm font-medium text-aurora-ink">
           {eyebrowIcon}
           {eyebrow}
         </span>
@@ -108,7 +113,7 @@ function NoticeCard({
           and the photograph is the gym's, so the card frames the picture
           instead of being replaced by it. */}
       {lead && (
-        <figure className="overflow-hidden rounded-lg bg-white/10 ring-1 ring-white/20">
+        <figure className="overflow-hidden rounded-lg bg-aurora-ink/10 ring-1 ring-aurora-ink/20">
           <img
             src={lead.url}
             alt={lead.alt ?? ''}
@@ -118,12 +123,12 @@ function NoticeCard({
         </figure>
       )}
 
-      <h3 className={cn('max-w-[24ch] text-xl leading-snug font-semibold text-white', OVER_AURORA)}>
+      <h3 className="max-w-[24ch] text-xl leading-snug font-semibold text-aurora-ink">
         {title}
       </h3>
 
       {blurb && (
-        <p className={cn('-mt-1 max-w-[42ch] text-sm leading-relaxed text-white/85', OVER_AURORA)}>
+        <p className="-mt-1 max-w-[42ch] text-sm leading-relaxed text-aurora-ink/85">
           {blurb}
         </p>
       )}
@@ -299,8 +304,7 @@ export function FromYourGym() {
           >
             <span
               className={cn(
-                'flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white',
-                OVER_AURORA,
+                'flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-aurora-ink',
               )}
             >
               <span className="num font-semibold">
@@ -346,9 +350,9 @@ export function FromYourGym() {
             dismissLabel={`Hide ${deal.title}`}
             onDismiss={() => hide(deal)}
           >
-            <span className={cn('flex flex-col gap-1 text-white', OVER_AURORA)}>
+            <span className="flex flex-col gap-1 text-aurora-ink">
               <span className="num text-lg tracking-widest">{deal.offer.code}</span>
-              <span className="num text-xs text-white/85">
+              <span className="num text-xs text-aurora-ink/85">
                 {deal.offer.validUntil
                   ? `Show this at the desk until ${formatShortDate(deal.offer.validUntil)}`
                   : 'Show this at the desk'}
@@ -381,10 +385,10 @@ export function FromYourGym() {
             dismissLabel={`Hide ${deal.title}`}
             onDismiss={() => hide(deal)}
           >
-            <span className={cn('flex items-baseline gap-2 text-white', OVER_AURORA)}>
+            <span className="flex items-baseline gap-2 text-aurora-ink">
               <span className="num text-3xl leading-none font-semibold">{deal.product.price}</span>
               {deal.product.note && (
-                <span className="ml-1 max-w-[28ch] text-xs text-white/85">{deal.product.note}</span>
+                <span className="ml-1 max-w-[28ch] text-xs text-aurora-ink/85">{deal.product.note}</span>
               )}
             </span>
 

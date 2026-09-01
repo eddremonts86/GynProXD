@@ -18,14 +18,18 @@ interface AuroraTileProps {
  * The one place colour lives. A floating gradient tile carrying a single
  * dot-matrix hero figure.
  *
- * White text is verified at 3:1 (large) and 4.5:1 (small) against the
- * gradient's saturated centre — but the label sits in the top-left corner,
- * which is exactly where the soft blob lands, so at the corner alone the
- * material is far too pale to carry white type. A hairline shadow buys back
- * the contrast there without putting a glow on the design: it is invisible
- * over the saturated centre and only does work at the pale edges.
+ * The type is `--aurora-ink`, which is the app's ink on the light theme and
+ * white on the dark one, because neither colour works on both. Measured off the
+ * painted pixels of every surface that carries text
+ * (`scripts/audit/aurora-contrast.mjs`): the light material runs 1.26:1 against
+ * white — unreadable, and not only at the pale corner — while the app's ink
+ * clears 4.5:1 on all of it. On the dark theme it is the other way round.
+ *
+ * This replaces a hairline text-shadow that was there to buy back contrast at
+ * the corner. It was treating a corner: the whole light surface was too pale,
+ * and a shadow cannot be measured into a passing contrast ratio anyway. With
+ * the colours right the shadow has nothing left to do.
  */
-export const OVER_AURORA = '[text-shadow:0_1px_2px_rgb(0_0_0/0.32)]'
 
 export function AuroraTile({ tone, label, value, unit, sub, foot, className }: AuroraTileProps) {
   return (
@@ -36,7 +40,7 @@ export function AuroraTile({ tone, label, value, unit, sub, foot, className }: A
         className,
       )}
     >
-      <span className={cn('text-sm font-medium text-white', OVER_AURORA)}>{label}</span>
+      <span className="text-sm font-medium text-aurora-ink">{label}</span>
       <div className="flex flex-col gap-1">
         {value !== undefined ? (
           <>
@@ -44,15 +48,13 @@ export function AuroraTile({ tone, label, value, unit, sub, foot, className }: A
               value={value}
               unit={unit}
               size="xl"
-              className={OVER_AURORA}
-              unitClassName="text-white"
+              className="text-aurora-ink"
+              unitClassName="text-aurora-ink"
             />
-            {sub && <span className={cn('text-xs text-white', OVER_AURORA)}>{sub}</span>}
+            {sub && <span className="text-xs text-aurora-ink">{sub}</span>}
           </>
         ) : (
-          <span
-            className={cn('max-w-[24ch] text-lg leading-snug font-medium text-white', OVER_AURORA)}
-          >
+          <span className="max-w-[24ch] text-lg leading-snug font-medium text-aurora-ink">
             {sub}
           </span>
         )}

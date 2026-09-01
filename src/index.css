@@ -52,6 +52,40 @@
   --aurora-orange-deep: #cf6f1e;
   --aurora-orange-mid: #eda04f;
   --aurora-orange-soft: #f6ddb8;
+  /**
+   * The type that sits on the aurora material.
+   *
+   * Measured off the painted pixels rather than the stops: in this theme the
+   * material runs 1.26:1 to 3.7:1 against white across every surface that
+   * carries text, so white was unreadable on all of it — not only in the pale
+   * corner the tile's own comment worried about. The app's ink clears 4.5:1 on
+   * every pixel of both tones, so the material keeps its pastel look and the
+   * type flips instead. See scripts/audit/aurora-contrast.mjs.
+   */
+  --aurora-ink: #1d1d1a;
+  /** What sits *on* a filled `--aurora-ink` control. */
+  --aurora-on: #fafaf8;
+
+  /**
+   * The two parties, as colour.
+   *
+   * The landings are both about one relationship — a member whose training is
+   * sealed, and a gym that gets to reach them — so the palette says which side
+   * of it you are looking at. Green is the member: what is theirs, free, kept
+   * and unreadable. Orange is the gym: what gets published, sent and counted.
+   * On /for-gyms orange leads and green marks the member; on / it is the other
+   * way round. Two accents used with a meaning, rather than two accents.
+   *
+   * These are darker than `--chart-1/2` on purpose. The chart colours are fills
+   * seen against a plotted area; as foreground on this page's light surfaces
+   * they measure 3.84:1 and 3.04:1 — and orange on `--surface-2` is 2.47:1,
+   * under the 3:1 that even a graphic needs. Measured, then darkened until the
+   * page's own surfaces cleared 4.5:1.
+   */
+  --accent-member: #2f6b35;
+  --accent-gym: #a8560f;
+  --accent-member-soft: #2f6b3514;
+  --accent-gym-soft: #a8560f14;
 
   --chart-1: #3f8f46;
   --chart-2: #d97722;
@@ -92,11 +126,24 @@
   --over-soft: #eda04f1f;
 
   --aurora-green-deep: #2f6d36;
-  --aurora-green-mid: #55924a;
+  /* The brightest point of the material, and so the one that decides whether
+     white type is legible: at #55924a it capped white at 3.6:1, which carries
+     the dot-matrix figure and not the 13px label beside it. */
+  --aurora-green-mid: #40703a;
   --aurora-green-soft: #33402a;
   --aurora-orange-deep: #a85a19;
-  --aurora-orange-mid: #c77f36;
+  --aurora-orange-mid: #9c6029;
   --aurora-orange-soft: #46341f;
+  --aurora-ink: #ffffff;
+  --aurora-on: #1d1d1a;
+
+  /* Against the dark surfaces these already measure 7.3:1 and up, so the
+     accents are the chart colours themselves — no darkening needed, and the
+     page keeps one green and one orange rather than four. */
+  --accent-member: #6fce7f;
+  --accent-gym: #f0a45c;
+  --accent-member-soft: #6fce7f1f;
+  --accent-gym-soft: #f0a45c1f;
 
   --chart-1: #6fce7f;
   --chart-2: #f0a45c;
@@ -189,6 +236,12 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-aurora-ink: var(--aurora-ink);
+  --color-aurora-on: var(--aurora-on);
+  --color-accent-member: var(--accent-member);
+  --color-accent-gym: var(--accent-gym);
+  --color-accent-member-soft: var(--accent-member-soft);
+  --color-accent-gym-soft: var(--accent-gym-soft);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -411,6 +464,24 @@
  * account column on the landing, the local-only notice on Today. If everything
  * gets it, it marks nothing.
  */
+/**
+ * The slow drift under a landing hero.
+ *
+ * Transform only, so it composites on the GPU and never lays out again; the
+ * element it runs on is absolutely positioned and `pointer-events-none`, so it
+ * cannot cost a scrolling container a repaint. Paired in the markup with
+ * `motion-reduce:animate-none` rather than being switched off here, so the
+ * wash itself still renders for somebody who has asked for less movement.
+ */
+@keyframes aurora-drift {
+  from {
+    transform: translate3d(-3%, -2%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(3%, 2%, 0) scale(1.09);
+  }
+}
+
 @utility aurora-edge {
   position: relative;
 

@@ -248,3 +248,37 @@ export function MobileBar({
     </header>
   )
 }
+
+/**
+ * The colour under a hero.
+ *
+ * The app already owns a two-colour material — `aurora-green` and
+ * `aurora-orange`, each a gradient that carries *both* hues with one of them
+ * leading — and until now it lived only inside the product, on kitchen cards
+ * and tiles. Putting it under the landings ties the pages to the thing they are
+ * selling, and makes the pair read as siblings: the member's page leads green,
+ * the gym's leads orange, and both contain the other.
+ *
+ * Blurred hard and held at low opacity so it reads as light in the room rather
+ * than as a shape. Absolutely positioned and inert, and the drift is a
+ * transform, so nothing here can make the page repaint as it scrolls.
+ */
+export function AuroraWash({
+  tone,
+  className,
+}: {
+  tone: 'green' | 'orange'
+  className?: string
+}) {
+  return (
+    <span
+      aria-hidden="true"
+      className={cn(
+        'pointer-events-none absolute rounded-full opacity-[0.16] blur-[90px] dark:opacity-[0.26]',
+        'animate-[aurora-drift_22s_ease-in-out_infinite_alternate] motion-reduce:animate-none',
+        tone === 'green' ? 'aurora-green' : 'aurora-orange',
+        className,
+      )}
+    />
+  )
+}
