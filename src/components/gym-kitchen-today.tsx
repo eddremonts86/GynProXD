@@ -38,7 +38,6 @@ export function GymKitchenToday({ stacked = false }: { stacked?: boolean }) {
   return (
     <Section
       title={`Today at ${gym}`}
-      className={stacked ? 'h-full self-stretch' : undefined}
       action={
         <Link to="/menu" className={SECTION_ACTION}>
           Full menu
@@ -51,7 +50,7 @@ export function GymKitchenToday({ stacked = false }: { stacked?: boolean }) {
           this one only when there is. */}
       <Panel
         padding="none"
-        className={cn('aurora-edge overflow-hidden', stacked ? 'flex flex-1 flex-col' : undefined)}
+        className={cn('aurora-edge overflow-hidden', stacked ? 'flex flex-col' : undefined)}
       >
         <div className="flex items-center gap-2.5 border-b border-line px-5 py-3.5">
           <Storefront size={18} weight="regular" className="shrink-0 text-ink-3" />
