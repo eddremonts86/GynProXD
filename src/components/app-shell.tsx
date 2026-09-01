@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef } from 'react'
 import {
   Link,
   Outlet,
@@ -22,6 +22,10 @@ import { Wordmark, Mark } from '@/components/brand'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { SessionRailCard, SessionMobileBar } from '@/components/session-indicator'
 import { Landing } from '@/components/landing'
+/* Lazy: a member unlocking never needs this, and it is a page of copy. */
+const GymLanding = lazy(() =>
+  import('@/components/gym-landing').then((m) => ({ default: m.GymLanding })),
+)
 import { GymBanner } from '@/components/gym-banner'
 import { UpdateBanner } from '@/components/update-banner'
 import { RailToggle } from '@/components/rail-toggle'
@@ -358,6 +362,36 @@ export function AppShell() {
 
   if (status === 'boot') {
     return <div className="min-h-[100dvh] bg-bg" aria-busy="true" />
+  }
+
+  /**
+   * The gym landing sits outside the shell, locked or not.
+   *
+   * Two reasons, and the second is why the first was not enough. Locked, the
+   * shell used to render the member landing whatever the URL said, which
+   * swallowed every other route — and /for-gyms has to work with no profile on
+   * the device at all, since that is the whole point of it. Unlocked, it was
+   * rendering *inside* the shell, so a landing page arrived with the app's own
+   * header above its header and the app's tab bar under its footer. A front
+   * door is not a screen of the app.
+   */
+  if (pathname.startsWith('/for-gyms')) {
+    return (
+      <>
+        <UpdateBanner />
+        <Suspense fallback={<div className="min-h-[100dvh] bg-bg" aria-busy="true" />}>
+          <GymLanding
+            onUnlocked={() => {
+              const meta = activeProfile()
+              if (!meta) return
+              /* Deliberately no `landFor`: this page is the destination. */
+              setUnlocked(meta)
+              syncQuietly(meta.id)
+            }}
+          />
+        </Suspense>
+      </>
+    )
   }
 
   if (status === 'locked') {

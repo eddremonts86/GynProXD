@@ -13,6 +13,7 @@
  *   Can a gym address the whole platform?
  *   Can anybody but a platform admin publish as the house?
  *   Can the house take back what it said?
+ *   Can anybody but the applicant read an application, or move it along?
  *
  * Every answer is checked from the receiving side. The sender's intent is not
  * evidence.
@@ -164,6 +165,35 @@ try {
   check("an operator cannot delete the house's", await del(operator, stray.id), 404)
   check('nor can a member', await del(loner, stray.id), 404)
   await del(admin, stray.id)
+
+  console.log('\nwho may apply to be set up')
+  const apply = (who, over, status = 'new') =>
+    api('POST', '/api/collections/gym_applications/records', {
+      owner: over ?? who?.id, gym_name: 'Casa Ronda', contact: 'Tomás Iriarte',
+      email: 'desk@casaronda.es', size: '100 to 300', plan: 'plus', status,
+    }, who?.token).then((r) => r.status)
+  check('anonymous cannot apply', await apply(null, loner.id), 400)
+  check('signed in, for yourself', await apply(loner), 200)
+  check('cannot arrive pre-approved', await apply(member, undefined, 'provisioned'), 400)
+  check('cannot apply as somebody else', await apply(member, loner.id), 400)
+  check('no second open application', await apply(loner), 400)
+  const seen = async (who) =>
+    (await api('GET', '/api/collections/gym_applications/records?perPage=20', undefined, who.token))
+      .json.items?.map((x) => x.gym_name) ?? []
+  check('the applicant sees their own', await seen(loner), ['Casa Ronda'])
+  check('a stranger sees none of it', await seen(operator), [])
+  check('a platform admin sees it', await seen(admin), ['Casa Ronda'])
+  const appRow = (await api('GET', '/api/collections/gym_applications/records?perPage=1',
+    undefined, admin.token)).json.items[0]
+  check('the applicant cannot move it along',
+    (await api('PATCH', `/api/collections/gym_applications/records/${appRow.id}`,
+      { status: 'provisioned' }, loner.token)).status, 404)
+  check('an admin can',
+    (await api('PATCH', `/api/collections/gym_applications/records/${appRow.id}`,
+      { status: 'contacted' }, admin.token)).status, 200)
+  check('applying grants no gym',
+    (await api('GET', `/api/collections/users/records/${loner.id}`, undefined, loner.token)).json.gym || '',
+    '')
 
   console.log('\njoining')
   check('nobody applies to belong to nothing',
