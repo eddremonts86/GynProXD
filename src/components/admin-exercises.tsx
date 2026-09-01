@@ -1,6 +1,14 @@
 import type { ReactNode } from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { MagnifyingGlass, PencilSimple, Plus, Trash, WarningCircle } from '@phosphor-icons/react'
+import {
+  ArrowCounterClockwise,
+  EyeSlash,
+  MagnifyingGlass,
+  PencilSimple,
+  Plus,
+  Trash,
+  WarningCircle,
+} from '@phosphor-icons/react'
 import { activeAuthHeader, activeServer } from '../lib/sync'
 import {
   CATEGORY_KEYS,
@@ -13,15 +21,18 @@ import {
   type ExerciseDraft,
   type ExerciseRecord,
 } from '../lib/exercise-draft'
+import { exerciseLookup } from '../lib/exercises'
 import { EQUIPMENT_LABELS, MUSCLE_LABELS } from '../lib/labels'
-import { useCatalogue } from '../store/useCatalogue'
+import { SERVER_ID_PREFIX, toExercise, useCatalogue } from '../store/useCatalogue'
+import { useGym } from '../store/useGym'
+import type { Exercise } from '../lib/types'
 import { Button, IconButton } from '../ui/Button'
 import { Panel } from '../ui/Panel'
 import { Tag } from '../ui/Tag'
 import { Input } from '../ui/Input'
 import { FormSelect } from '../ui/FormSelect'
 import { EmptyState } from '../ui/EmptyState'
-import { AdminHiddenExercises } from './admin-hidden-exercises'
+import { cn } from '@/lib/utils'
 import {
   Dialog,
   DialogContent,
@@ -31,26 +42,50 @@ import {
 } from '@/components/ui/dialog'
 
 /**
- * Movements the platform writes itself.
+ * The movement catalogue, and what an admin can do to any part of it.
  *
- * The bundled catalogue is generated from upstream datasets and frozen — a
- * script owns those files, because their ids are in everybody's logged
- * workouts. Rows written here are the other half: additive, editable the same
- * afternoon somebody notices a movement is missing, and delivered to every
- * member the way recipes already are. The server validates every field again
- * on the way in; this form's job is to say what is wrong before the round trip.
+ * This screen used to carry two search boxes over two different universes. The
+ * one at the top queried the `exercises` collection — the rows written here,
+ * three of them — and the one below it searched all 2,079 movements. Typing
+ * "90" into the first answered "Nothing by that name" while the second, four
+ * hundred pixels down, found 90/90 Hamstring. The explanatory text under the
+ * empty state was accurate and did not help: a tab called Movements whose
+ * search excludes almost every movement is wrong however well it is captioned.
+ *
+ * So there is one search now, over everything, and each result offers what can
+ * actually be done to it. A row written here can be edited, deleted and
+ * withdrawn. A bundled movement can only be withdrawn — a release is the only
+ * thing that edits those, because their ids are in everybody's logged workouts.
+ *
+ * With no search term the list is what has been written here rather than two
+ * thousand rows nobody asked for: the short set that needs upkeep. The search
+ * is how you reach the rest.
+ *
+ * Counts on this screen are counted, never written down. The copy it replaced
+ * said "2,076 bundled movements" in one place and the catalogue had already
+ * moved on.
  */
 
 interface Row extends ExerciseRecord {
   updated: string
 }
 
+interface HiddenRow {
+  id: string
+  exerciseId: string
+  name: string
+}
+
+/** How many search results to render. Enough to find a movement, not a page. */
+const RESULT_CAP = 24
+
 export function AdminExercises() {
   const [term, setTerm] = useState('')
   const [debounced, setDebounced] = useState('')
   const [rows, setRows] = useState<Row[] | null>(null)
-  const [total, setTotal] = useState(0)
+  const [hidden, setHidden] = useState<HiddenRow[] | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [busy, setBusy] = useState<string | null>(null)
   const [editing, setEditing] = useState<ExerciseDraft | null>(null)
   /* Bumped on every open so the form remounts with the row it was given.
      Cheaper than an effect that copies props into state, and correct for
@@ -59,9 +94,10 @@ export function AdminExercises() {
   const [reload, setReload] = useState(0)
   const requestId = useRef(0)
   const pull = useCatalogue((s) => s.pull)
+  const customExercises = useGym((s) => s.customExercises)
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setDebounced(term.trim()), 250)
+    const timer = window.setTimeout(() => setDebounced(term.trim()), 200)
     return () => window.clearTimeout(timer)
   }, [term])
 
@@ -73,28 +109,45 @@ export function AdminExercises() {
     setFormSeq((n) => n + 1)
   }, [])
 
+  /**
+   * Every row and every withdrawal, once.
+   *
+   * Unfiltered on purpose. The old query passed the search term to the server,
+   * which is why the term could only ever match rows written here; and it asked
+   * for `published = true`, which hid the drafts from the one screen whose job
+   * is editing them. There are a few dozen rows at most — the 2,076 bundled
+   * movements are already in memory — so fetching the lot and searching locally
+   * is both simpler and the only way one box can cover both catalogues.
+   */
   useEffect(() => {
     if (!auth) return undefined
     const id = ++requestId.current
-    const filter = debounced
-      ? `&filter=${encodeURIComponent(`name ~ "${debounced.replace(/"/g, '')}"`)}`
-      : ''
-    void fetch(`${base}/api/collections/exercises/records?perPage=60&sort=name${filter}`, {
-      headers: auth,
-    })
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-      .then((data: { items: Row[]; totalItems: number }) => {
+    void Promise.all([
+      fetch(`${base}/api/collections/exercises/records?perPage=500&sort=name`, { headers: auth }),
+      fetch(`${base}/api/collections/exercises_hidden/records?perPage=500&sort=-created`, {
+        headers: auth,
+      }),
+    ])
+      .then(async ([a, b]) => {
+        if (!a.ok || !b.ok) throw new Error(`${a.status}/${b.status}`)
+        const written = (await a.json()) as { items: Row[] }
+        const withdrawn = (await b.json()) as { items: HiddenRow[] }
+        return { written, withdrawn }
+      })
+      .then(({ written, withdrawn }) => {
         if (id !== requestId.current) return
-        setRows(data.items)
-        setTotal(data.totalItems)
+        setRows(written.items)
+        setHidden(withdrawn.items)
         setError(null)
       })
       .catch(() => {
         if (id !== requestId.current) return
-        setError('The sync server did not answer. Movements written here live there, not on this device.')
+        setError(
+          'The sync server did not answer. Movements written here live there, not on this device.',
+        )
       })
     return undefined
-  }, [base, auth, debounced, reload])
+  }, [base, auth, reload])
 
   /* Every write refreshes the member-facing copy too, so the panel and the
      Library never disagree on the device doing the editing. */
@@ -102,6 +155,77 @@ export function AdminExercises() {
     setReload((n) => n + 1)
     void pull()
   }, [pull])
+
+  /**
+   * Every movement the app knows, withdrawn ones included.
+   *
+   * `exerciseLookup` can drop withdrawn ids and is deliberately not asked to
+   * here: this is the one screen that has to see what it took out in order to
+   * put it back.
+   */
+  const universe = useMemo(() => {
+    const server = (rows ?? []).map((row) => toExercise(row, base))
+    return [...exerciseLookup(customExercises, server).values()]
+  }, [rows, base, customExercises])
+
+  const hiddenIds = useMemo(() => new Set((hidden ?? []).map((h) => h.exerciseId)), [hidden])
+  const hiddenRowFor = useMemo(
+    () => new Map((hidden ?? []).map((h) => [h.exerciseId, h])),
+    [hidden],
+  )
+  /* The prefix is what tells an editable row from a frozen one, and it comes
+     from the module that puts it there rather than being spelled again here. */
+  const writtenRowFor = useMemo(
+    () => new Map((rows ?? []).map((r) => [`${SERVER_ID_PREFIX}${r.id}`, r])),
+    [rows],
+  )
+
+  const results = useMemo(() => {
+    const q = debounced.toLowerCase()
+    if (!q) return null
+    /* Names only. Matching ids too was the first version and it was noise: the
+       wger catalogue numbers its movements `wger-1590`, so "90" returned
+       nineteen results of which one had 90 in its name. Nothing was gained
+       either — the one place an id is on screen is the withdrawn list, which
+       carries its own Restore button and needs no search to reach it. */
+    const hit = universe.filter((e) => e.name.toLowerCase().includes(q))
+    /* Written-here first: those are the ones an admin came to change, and the
+       bundled catalogue would otherwise bury them by sheer weight. */
+    hit.sort(
+      (a, b) =>
+        Number(writtenRowFor.has(b.id)) - Number(writtenRowFor.has(a.id)) ||
+        a.name.localeCompare(b.name),
+    )
+    return { shown: hit.slice(0, RESULT_CAP), total: hit.length }
+  }, [debounced, universe, writtenRowFor])
+
+  const written = useMemo(
+    () => universe.filter((e) => writtenRowFor.has(e.id)).sort((a, b) => a.name.localeCompare(b.name)),
+    [universe, writtenRowFor],
+  )
+
+  const withdraw = useCallback(
+    async (exercise: Exercise) => {
+      if (!auth) return
+      setBusy(exercise.id)
+      const existing = hiddenRowFor.get(exercise.id)
+      await fetch(
+        existing
+          ? `${base}/api/collections/exercises_hidden/records/${existing.id}`
+          : `${base}/api/collections/exercises_hidden/records`,
+        existing
+          ? { method: 'DELETE', headers: auth }
+          : {
+              method: 'POST',
+              headers: { ...auth, 'content-type': 'application/json' },
+              body: JSON.stringify({ exerciseId: exercise.id, name: exercise.name }),
+            },
+      )
+      setBusy(null)
+      refresh()
+    },
+    [auth, base, hiddenRowFor, refresh],
+  )
 
   const remove = useCallback(
     async (row: Row) => {
@@ -125,11 +249,26 @@ export function AdminExercises() {
     )
   }
 
+  const list = results ? results.shown : written
+  const listRow = (exercise: Exercise) => (
+    <MovementRow
+      key={exercise.id}
+      exercise={exercise}
+      base={base}
+      row={writtenRowFor.get(exercise.id)}
+      withdrawn={hiddenIds.has(exercise.id)}
+      busy={busy === exercise.id}
+      onEdit={open}
+      onDelete={remove}
+      onToggleWithdraw={() => void withdraw(exercise)}
+    />
+  )
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <label className="relative min-w-56 flex-1">
-          <span className="sr-only">Search movements</span>
+          <span className="sr-only">Search every movement</span>
           <MagnifyingGlass
             size={16}
             className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-3"
@@ -137,7 +276,7 @@ export function AdminExercises() {
           <Input
             value={term}
             onChange={(e) => setTerm(e.target.value)}
-            placeholder="Search movements"
+            placeholder="Search every movement…"
             className="pl-9"
           />
         </label>
@@ -149,68 +288,49 @@ export function AdminExercises() {
 
       {error && <p className="text-sm text-danger">{error}</p>}
 
-      {rows && rows.length === 0 && !error ? (
+      {rows === null && !error ? (
+        /* Skeleton rows at the height the real ones land at, so the panel does
+           not jump once the server answers. */
+        <Panel padding="lg" className="flex flex-col gap-3">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="flex items-center gap-3 py-3">
+              <span className="size-11 shrink-0 animate-pulse rounded-md bg-surface-2" />
+              <span className="flex flex-1 flex-col gap-1.5">
+                <span className="h-3.5 w-2/5 animate-pulse rounded bg-surface-2" />
+                <span className="h-2.5 w-1/4 animate-pulse rounded bg-surface-2" />
+              </span>
+            </div>
+          ))}
+        </Panel>
+      ) : list.length === 0 ? (
         <EmptyState
           title={debounced ? 'Nothing by that name' : 'No movements written yet'}
           description={
             debounced
-              ? 'The bundled catalogue is searched in the Library; this list is only what has been written here.'
-              : 'The 2,076 bundled movements need no upkeep. This is for the ones they are missing.'
+              ? `This searches all ${universe.length.toLocaleString('en-GB')} movements, bundled ones included. Check the spelling, or try part of the name.`
+              : 'The bundled movements need no upkeep. This is for the ones they are missing — and the search above reaches every one of them.'
           }
         />
       ) : (
         <Panel padding="lg" className="flex flex-col gap-3">
-          <ul className="divide-y divide-line">
-            {(rows ?? []).map((row) => (
-              <li key={row.id} className="flex flex-wrap items-center gap-3 py-3 first:pt-0 last:pb-0">
-                {row.image ? (
-                  <img
-                    src={`${base}/api/files/exercises/${row.id}/${row.image}?thumb=100x100`}
-                    alt=""
-                    aria-hidden="true"
-                    className="size-11 shrink-0 rounded-md object-cover"
-                  />
-                ) : (
-                  <span className="num flex size-11 shrink-0 items-center justify-center rounded-md bg-surface-2 text-2xs text-ink-3">
-                    —
-                  </span>
-                )}
-                <span className="flex min-w-40 flex-1 flex-col gap-1">
-                  <span className="text-sm font-medium text-ink">{row.name}</span>
-                  <span className="flex flex-wrap items-center gap-1.5">
-                    <Tag tone="brand">
-                      {MUSCLE_LABELS[row.muscle as keyof typeof MUSCLE_LABELS] ?? row.muscle}
-                    </Tag>
-                    <Tag tone="outline">
-                      {EQUIPMENT_LABELS[row.equipment as keyof typeof EQUIPMENT_LABELS] ?? row.equipment}
-                    </Tag>
-                    {!row.published && <Tag>Draft</Tag>}
-                  </span>
-                </span>
-                <span className="flex items-center gap-1">
-                  <IconButton
-                    size="xs"
-                    aria-label={`Edit ${row.name}`}
-                    onClick={() => open(draftFromRecord(row))}
-                  >
-                    <PencilSimple size={14} weight="bold" />
-                  </IconButton>
-                  <IconButton size="xs" aria-label={`Delete ${row.name}`} onClick={() => void remove(row)}>
-                    <Trash size={14} weight="bold" />
-                  </IconButton>
-                </span>
-              </li>
-            ))}
-          </ul>
-          {rows && total > rows.length && (
-            <p className="text-2xs text-ink-3">
-              Showing {rows.length} of {total}. Search to narrow it.
-            </p>
-          )}
+          <p className="text-2xs text-ink-3">
+            {results
+              ? results.total > results.shown.length
+                ? `${results.shown.length} of ${results.total} matches. Narrow the search to see the rest.`
+                : `${results.total} ${results.total === 1 ? 'match' : 'matches'}`
+              : 'Written here. Search above to reach the bundled catalogue.'}
+          </p>
+          <ul className="divide-y divide-line">{list.map(listRow)}</ul>
         </Panel>
       )}
 
-      <AdminHiddenExercises />
+      <WithdrawnList
+        rows={hidden}
+        busy={busy}
+        onRestore={(row) =>
+          void withdraw({ id: row.exerciseId, name: row.name } as Exercise)
+        }
+      />
 
       <ExerciseForm
         key={formSeq}
@@ -224,6 +344,155 @@ export function AdminExercises() {
         }}
       />
     </div>
+  )
+}
+
+/**
+ * One movement, whatever catalogue it came from.
+ *
+ * The actions are decided by where it came from rather than offered and then
+ * refused: there is no Edit on a bundled movement, because a release is the
+ * only thing that edits those and a disabled pencil would just be a puzzle.
+ */
+function MovementRow({
+  exercise,
+  base,
+  row,
+  withdrawn,
+  busy,
+  onEdit,
+  onDelete,
+  onToggleWithdraw,
+}: {
+  exercise: Exercise
+  base: string
+  row?: Row
+  withdrawn: boolean
+  busy: boolean
+  onEdit: (draft: ExerciseDraft) => void
+  onDelete: (row: Row) => void
+  onToggleWithdraw: () => void
+}) {
+  const thumb = row?.image
+    ? `${base}/api/files/exercises/${row.id}/${row.image}?thumb=100x100`
+    : exercise.image
+  return (
+    <li className="flex flex-wrap items-center gap-3 py-3 first:pt-0 last:pb-0">
+      {thumb ? (
+        <img
+          src={thumb}
+          alt=""
+          aria-hidden="true"
+          className="size-11 shrink-0 rounded-md object-cover"
+        />
+      ) : (
+        <span className="num flex size-11 shrink-0 items-center justify-center rounded-md bg-surface-2 text-2xs text-ink-3">
+          —
+        </span>
+      )}
+      <span className="flex min-w-40 flex-1 flex-col gap-1">
+        <span
+          className={cn(
+            'text-sm font-medium',
+            withdrawn ? 'text-ink-3 line-through' : 'text-ink',
+          )}
+        >
+          {exercise.name}
+        </span>
+        <span className="flex flex-wrap items-center gap-1.5">
+          <Tag tone="brand">{MUSCLE_LABELS[exercise.muscle] ?? exercise.muscle}</Tag>
+          <Tag tone="outline">{EQUIPMENT_LABELS[exercise.equipment] ?? exercise.equipment}</Tag>
+          {row ? <Tag tone="outline">Written here</Tag> : <Tag tone="outline">Bundled</Tag>}
+          {row && !row.published && <Tag>Draft</Tag>}
+          {withdrawn && <Tag tone="danger">Withdrawn</Tag>}
+        </span>
+      </span>
+      <span className="flex items-center gap-1">
+        <IconButton
+          size="xs"
+          aria-label={`${withdrawn ? 'Restore' : 'Withdraw'} ${exercise.name}`}
+          disabled={busy}
+          onClick={onToggleWithdraw}
+        >
+          {withdrawn ? (
+            <ArrowCounterClockwise size={14} weight="bold" />
+          ) : (
+            <EyeSlash size={14} weight="bold" />
+          )}
+        </IconButton>
+        {row && (
+          <>
+            <IconButton
+              size="xs"
+              aria-label={`Edit ${exercise.name}`}
+              onClick={() => onEdit(draftFromRecord(row))}
+            >
+              <PencilSimple size={14} weight="bold" />
+            </IconButton>
+            <IconButton
+              size="xs"
+              aria-label={`Delete ${exercise.name}`}
+              onClick={() => onDelete(row)}
+            >
+              <Trash size={14} weight="bold" />
+            </IconButton>
+          </>
+        )}
+      </span>
+    </li>
+  )
+}
+
+/**
+ * What has been taken out of the library.
+ *
+ * A list, with no search of its own any more — the one above reaches every
+ * movement and offers Withdraw on each. This answers the question search
+ * cannot: what have I already withdrawn?
+ */
+function WithdrawnList({
+  rows,
+  busy,
+  onRestore,
+}: {
+  rows: HiddenRow[] | null
+  busy: string | null
+  onRestore: (row: HiddenRow) => void
+}) {
+  if (!rows || rows.length === 0) return null
+  return (
+    <Panel padding="lg" className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1">
+        <h3 className="text-sm font-medium text-ink">Withdrawn from the library</h3>
+        <p className="max-w-[62ch] text-2xs text-ink-3">
+          {rows.length === 1 ? 'This movement has' : `These ${rows.length} movements have`} stopped
+          appearing in the library and the movement picker. Nothing is deleted, and anybody who has
+          already trained one keeps it in their history under its own name.
+        </p>
+      </div>
+      <ul className="divide-y divide-line">
+        {rows.map((row) => (
+          <li
+            key={row.id}
+            className="flex flex-wrap items-center gap-3 py-2.5 first:pt-0 last:pb-0"
+          >
+            <span className="flex min-w-40 flex-1 flex-col gap-0.5">
+              <span className="text-sm text-ink">{row.name || row.exerciseId}</span>
+              <span className="num text-2xs text-ink-3">{row.exerciseId}</span>
+            </span>
+            <Button
+              variant="secondary"
+              size="sm"
+              disabled={busy === row.exerciseId}
+              onClick={() => onRestore(row)}
+            >
+              <ArrowCounterClockwise size={14} weight="bold" />
+              Restore
+            </Button>
+          </li>
+        ))}
+      </ul>
+    </Panel>
   )
 }
 
