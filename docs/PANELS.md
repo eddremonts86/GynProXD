@@ -268,6 +268,19 @@ make every "do they have a gym?" check in the app start lying.
 Absent reads as `members`, so every row published before this reaches exactly
 who it reached before.
 
+Deleting follows the same authority, and did not at first. `1757600000` moved
+the right to *publish* from a gym's `operators` list to `platform_admins` and
+left `deleteRule` asking `gym.operators.id ?= @request.auth.id`. The house's
+operators list is empty on purpose, so for a house message the answer was always
+no — for everybody, admins included. **The platform could publish and could
+never unpublish.** `1757700000_house_can_delete.js` adds the matching arm.
+
+Found by using it: a release check published a message to production and the
+delete that should have followed came back **404**, which is what PocketBase
+returns when a rule refuses rather than when a row is missing. It reads as
+"already gone" for a moment. The lesson is smaller than the bug — who may write
+and who may unwrite are one decision, and only half of it was made.
+
 The gating lives in the read rule itself
 (`pb_migrations/1757600000_house_gym.js`), not only in the create hook: the
 wider arms require `gym.kind = 'house'`, so a gym that somehow wrote
@@ -295,9 +308,52 @@ probably meant as the **primary** action. Narrowing there re-derives the
 audience from the scope being sent, never from the memoised list of the scope
 just abandoned; getting that wrong delivered to five and reported ten.
 
-`scripts/audit/house-gym-boundary.mjs` boots a throwaway PocketBase from these
-migrations and hooks and proves the boundary from the receiving side. Run it
-after touching any of it.
+### How the boundary is checked
+
+Two layers, because neither covers the other.
+
+**`scripts/audit/house-gym-boundary.mjs`** boots a throwaway PocketBase from
+these migrations and hooks and asks 17 questions, every one from the receiving
+side — the sender's intent is not evidence. Run it after touching any of this.
+It covers who may publish, who may delete, who actually receives, and that
+nobody applies to belong to nothing. It is load-bearing rather than decorative:
+remove the read rule's `@request.auth.gym = ''` guard and two checks fail;
+remove `1757700000` and "an admin can delete the house's own" fails.
+
+**Production, once, by hand**, because a sandbox proves nothing about the
+migration that ran on the real database. Both accounts in
+`enforma-production-accounts.env` have no gym, so the negative half needed a
+member of one. Rather than touch a real gym, the check builds a disposable gym
+with the PocketBase superuser, gives it a join code, signs one account up and
+walks it through `join-with-code` — the same path a real member walks, not a
+direct write to `users.gym`, which the membership hook refuses anyway:
+
+```
+the house publishes to the unaffiliated   200
+the account with no gym receives it       ['CHECK unaffiliated only']
+the gym member does NOT                   []
+
+the house publishes to everyone           200
+the account with no gym now has both      ['CHECK everyone', 'CHECK unaffiliated only']
+the gym member has only that one          ['CHECK everyone']
+```
+
+The second block matters as much as the first: it shows the gym member is not
+simply blind to everything the house sends. They receive what is addressed to
+everyone, and only that.
+
+Everything it creates is removed in a `finally` — two messages, the account, the
+code and the gym, five `204`s — so production ends where it started: two gyms,
+no messages, no join requests.
+
+Two things worth knowing before repeating it. Getting the superuser pair is not
+a file lookup: `PB_SUPERUSER_EMAIL` and `PB_SUPERUSER_PASSWORD` live only as
+environment variables on the Coolify resource, readable through
+`GET /api/v1/applications/<uuid>/envs` as `real_value`. And an account created
+straight through the API needs `authPassOf(email, password)` as its PocketBase
+password, not the password itself — passing the raw one makes an account that
+exists and cannot be logged into, which is how the first attempt left a stray
+user behind.
 
 ### Rolling it back
 
