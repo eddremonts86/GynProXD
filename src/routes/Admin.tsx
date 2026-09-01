@@ -27,8 +27,11 @@ import { Tabs, TabPanel } from '../ui/Tabs'
 import { AdminRecipes } from '@/components/admin-recipes'
 import { AdminExercises } from '@/components/admin-exercises'
 import { AdminOverview } from '../components/admin-overview'
+import { BroadcastAudience, type BroadcastScope } from '@/components/broadcast-audience'
+import { GymDesk } from './GymPanel'
+import { HOUSE_GYM, splitAudience } from '../lib/messages'
 
-type TabValue = 'overview' | 'users' | 'gyms' | 'exercises' | 'recipes'
+type TabValue = 'overview' | 'broadcast' | 'users' | 'gyms' | 'exercises' | 'recipes'
 
 const ROLE_LABELS: Record<ProfileRole, string> = {
   member: 'Member',
@@ -60,6 +63,9 @@ function AdminDesk({ selfId }: { selfId: string }) {
   const refreshMeta = useSession((s) => s.refreshMeta)
 
   const [tab, setTab] = useState<TabValue>('overview')
+  /* null until an audience has been chosen. There is no default on purpose:
+     the composer does not exist until somebody has said who it is for. */
+  const [broadcastScope, setBroadcastScope] = useState<BroadcastScope | null>(null)
   const [profiles, setProfiles] = useState(listProfiles)
   const [gyms, setGyms] = useState(listGyms)
   const refresh = () => {
@@ -137,6 +143,7 @@ function AdminDesk({ selfId }: { selfId: string }) {
         onValueChange={(v) => setTab(v as TabValue)}
         tabs={[
           { value: 'overview', label: 'Overview' },
+          { value: 'broadcast', label: 'Broadcast' },
           { value: 'users', label: 'Users', count: profiles.length },
           { value: 'gyms', label: 'Gyms', count: gyms.length },
           { value: 'exercises', label: 'Movements' },
@@ -145,6 +152,33 @@ function AdminDesk({ selfId }: { selfId: string }) {
       >
         <TabPanel value="overview">
           <AdminOverview profiles={profiles} gyms={gyms} messages={messages} menus={menus} />
+        </TabPanel>
+
+        {/**
+         * enForma addressing its own members.
+         *
+         * The desk is the gym operator's, unchanged, because the job is the
+         * same job — an event is an event and a menu is a menu, whoever wrote
+         * it. What differs is the audience, and that is asked first, on its own
+         * screen, before there is a draft to lose.
+         */}
+        <TabPanel value="broadcast">
+          {broadcastScope === null ? (
+            <BroadcastAudience
+              split={splitAudience(profiles, selfId)}
+              onPick={setBroadcastScope}
+            />
+          ) : (
+            <GymDesk
+              gym={HOUSE_GYM}
+              profileId={selfId}
+              broadcast={{
+                scope: broadcastScope,
+                setScope: setBroadcastScope,
+                onBack: () => setBroadcastScope(null),
+              }}
+            />
+          )}
         </TabPanel>
 
         <TabPanel value="users">

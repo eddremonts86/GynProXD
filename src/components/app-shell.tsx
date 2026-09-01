@@ -29,7 +29,7 @@ import { useRailHidden } from '@/hooks/use-rail'
 import { useSession } from '@/store/useSession'
 import { useMessages } from '@/store/useMessages'
 import { useGym } from '@/store/useGym'
-import { unreadCount } from '@/lib/messages'
+import { unreadCount, unreadSenders } from '@/lib/messages'
 import { notifyRetestDue, notifyUnread } from '@/lib/notify'
 import { testAgeDays, testIsStale } from '@/lib/fitness-test'
 import { todayIso } from '@/lib/dates'
@@ -96,14 +96,14 @@ function UtilityCluster({ pathname }: { pathname: string }) {
       {role !== 'gym' && (
         <Link
           to="/inbox"
-          aria-label={unread > 0 ? `Inbox, ${unread} unread` : 'Inbox'}
+          aria-label={unread.count > 0 ? `Inbox, ${unread.count} unread` : 'Inbox'}
           aria-current={inboxActive ? 'page' : undefined}
           className={itemClass(inboxActive)}
         >
           <BellSimple size={20} weight={inboxActive ? 'fill' : 'regular'} />
-          {unread > 0 && (
+          {unread.count > 0 && (
             <span className="absolute -top-0.5 -right-0.5">
-              <UnreadBadge count={unread} />
+              <UnreadBadge count={unread.count} />
             </span>
           )}
         </Link>
@@ -120,15 +120,21 @@ function UtilityCluster({ pathname }: { pathname: string }) {
   )
 }
 
-/** Unread gym messages for the unlocked profile. */
-function useUnread(): number {
+/**
+ * Unread messages for the unlocked profile, and who they are from.
+ *
+ * The senders come from the same memo as the count so the notification cannot
+ * describe a different set of messages than the badge is counting.
+ */
+function useUnread(): { count: number; senders: string[] } {
   const profileId = useSession((s) => s.profileId)
   const gym = useSession((s) => s.gym)
   const messages = useMessages((s) => s.messages)
-  return useMemo(
-    () => (profileId ? unreadCount(messages, { id: profileId, gym: gym ?? undefined }) : 0),
-    [messages, profileId, gym],
-  )
+  return useMemo(() => {
+    if (!profileId) return { count: 0, senders: [] }
+    const profile = { id: profileId, gym: gym ?? undefined }
+    return { count: unreadCount(messages, profile), senders: unreadSenders(messages, profile) }
+  }, [messages, profileId, gym])
 }
 
 function UnreadBadge({ count }: { count: number }) {
@@ -290,7 +296,6 @@ export function AppShell() {
   const status = useSession((s) => s.status)
   const setUnlocked = useSession((s) => s.setUnlocked)
   const setLocked = useSession((s) => s.setLocked)
-  const gym = useSession((s) => s.gym)
   const unread = useUnread()
   const navigate = useNavigate()
 
@@ -306,11 +311,11 @@ export function AppShell() {
      publishes from another tab (the storage event rehydrates the bus). */
   const seenUnread = useRef(0)
   useEffect(() => {
-    if (status === 'unlocked' && unread > seenUnread.current) {
-      void notifyUnread(unread, gym ?? 'Your gym')
+    if (status === 'unlocked' && unread.count > seenUnread.current) {
+      void notifyUnread(unread.count, unread.senders)
     }
-    seenUnread.current = unread
-  }, [unread, status, gym])
+    seenUnread.current = unread.count
+  }, [unread, status])
 
   /* Retest nudge, checked when a profile comes up rather than on a timer:
      a local-first app has no scheduler, and the marker in notify.ts keeps

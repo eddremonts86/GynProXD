@@ -85,6 +85,27 @@ const recipeRoute = createRoute({
   ),
 })
 
+/**
+ * The open message lives in the URL rather than in component state.
+ *
+ * Which buys three things for one line: the back button closes a message
+ * instead of leaving the inbox, a reload lands where you were, and a
+ * notification can deep-link to the message it is about.
+ */
+const inboxRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/inbox',
+  validateSearch: (search: Record<string, unknown>): { m?: string } =>
+    typeof search.m === 'string' && search.m.length > 0 && search.m.length <= 64
+      ? { m: search.m }
+      : {},
+  component: () => (
+    <React.Suspense fallback={<RouteFallback />}>
+      <InboxPage />
+    </React.Suspense>
+  ),
+})
+
 export const router = createRouter({
   /* A cross-fade between screens on navigation — the small thing that reads as
      "app", not "web page". The transition is defined in index.css and is a
@@ -99,7 +120,7 @@ export const router = createRouter({
     lazyRoute('/library', LibraryPage),
     lazyRoute('/history', HistoryPage),
     lazyRoute('/settings', SettingsPage),
-    lazyRoute('/inbox', InboxPage),
+    inboxRoute,
     lazyRoute('/menu', MenuPage),
     lazyRoute('/gym', GymPanelPage),
     lazyRoute('/admin', AdminPage),

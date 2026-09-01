@@ -166,7 +166,9 @@ renames and deletes propagate to menus like they do to messages.
 
 Delivered where a serverless app can deliver them:
 
-1. **In-app**: unread badge in the navigation; inbox marks read on view.
+1. **In-app**: unread badge in the navigation; a message is marked read when
+   it is opened, not when the inbox is. See "The inbox" below — the badge used
+   to clear itself as you walked past.
 2. **System notifications** (Notification API): opt-in toggle in Settings.
    Fired when the active profile has unread messages — on unlock, and live
    via the `storage` event if a gym publishes from another tab while the
@@ -232,3 +234,134 @@ Everyone gets Today/Planner/Library/History/Settings plus an Inbox with an
 unread badge (desktop rail item; bell in the mobile header). A gym profile
 adds "Gym panel"; an admin adds "Admin". Panels guard themselves and
 redirect wrong-role visitors home.
+
+## The house gym
+
+Until this existed, a member no gym had claimed received **nothing**. Not less
+— nothing: the read rule matched `gym` against `@request.auth.gym`, and an
+account with no gym never matched a row, so the inbox, the banners, the push
+notifications and the events panel were all built, shipped and silent for them.
+They are the majority of new accounts.
+
+So the platform gets to speak, through one row in `gyms` marked `kind: 'house'`
+and displayed as **enForma**. It is identified by that field and never by its
+name — which is what makes it safe to rename, and makes a device-local gym that
+happens to share the name harmless.
+
+What it deliberately is **not** is a membership. No `users.gym` points at it.
+"Has a gym" stays `gym != ''` everywhere in the app, nothing was rewritten, and
+nobody acquired a membership they did not ask for. Belonging to nothing is a
+real state and it is modelled as one; `gym_join_requests` refuses the house,
+because a request to join it would be both meaningless and, if approved, would
+make every "do they have a gym?" check in the app start lying.
+
+### Two audiences that must not blur
+
+`gym_messages.scope` says who a message is for.
+
+| scope | who receives it | who may send it |
+| --- | --- | --- |
+| `members` (or absent) | the gym's own members, matched by name | any gym operator |
+| `unaffiliated` | accounts with no gym, and who run none | platform admins, as the house |
+| `everyone` | every account | platform admins, as the house |
+
+Absent reads as `members`, so every row published before this reaches exactly
+who it reached before.
+
+The gating lives in the read rule itself
+(`pb_migrations/1757600000_house_gym.js`), not only in the create hook: the
+wider arms require `gym.kind = 'house'`, so a gym that somehow wrote
+`scope: 'everyone'` onto its own row still reaches nobody. A rule that works
+only because a hook ran stops working the day somebody edits the hook.
+
+An operator counts as affiliated even though their own `users.gym` is empty —
+they run a gym, they are not a member of it. Without that clause the server
+would have handed them the "nobody has claimed these people" audience while the
+client's own filter excluded them, which is a disagreement, not a feature.
+
+### Why the composer asks first
+
+The danger is not technical. It is somebody typing an offer while thinking
+about the other group. A radio pair above a composer is one control with two
+outcomes and the dangerous one a mis-click away, so the choice is a door
+instead: `/admin` → Broadcast asks who before there is anything to lose, the
+audience stays on screen the whole time, and going wider is a deliberate trip
+back.
+
+Commercial templates (`offer`, `product`) aimed at `everyone` stop for a
+confirmation that states the number rather than asking whether you are sure —
+"it goes to 10 people, 5 of them train at a gym" — and offers the message you
+probably meant as the **primary** action. Narrowing there re-derives the
+audience from the scope being sent, never from the memoised list of the scope
+just abandoned; getting that wrong delivered to five and reported ten.
+
+`scripts/audit/house-gym-boundary.mjs` boots a throwaway PocketBase from these
+migrations and hooks and proves the boundary from the receiving side. Run it
+after touching any of it.
+
+### Rolling it back
+
+Rehearsed against a database already holding two gyms, five messages and their
+members, because that is what production is and an empty sandbox proves nothing
+about a backfill. Reverting takes `kind` and `scope` off, deletes the house row,
+restores the read rule to the exact string it had, and leaves both gyms holding
+all five of their messages — only the house's own cascade away with it.
+
+The catch: `pocketbase serve` applies pending migrations on start. Reverting
+while the migration file is still on disk reverts it and then the next restart
+puts it straight back. A real rollback is **deploy the previous commit first,
+then `migrate down 1`**.
+
+## The inbox
+
+A list you scan and a message you read, which is to say an email client.
+
+It was a column of full cards, and that worked while a gym only published
+one-line announcements. It stopped working the moment the same column had to
+hold a menu with four courses and three photographs, an offer with a QR code
+and a closure notice — each sizing itself, so finding anything meant scrolling
+past everything.
+
+- **Rows are a fixed height** whatever the message holds:
+  sender, date, title, kind, and one line of preview. `previewOf` supplies that
+  line — from the body when there is one, and otherwise from what the template
+  is actually about (the discount, the price, the date, what the kitchen is
+  cooking), because most templates are structured rather than prose and every
+  offer would otherwise show an empty row beside a full one.
+- **`htmlToLine`, not `htmlToPlain`**, for that preview. The latter sanitises
+  and parses with a `DOMParser`, which is right for a card's opening paragraph
+  and wrong for a list: it would run per message per render and needs a
+  document at all. Cheap stripping is safe here because the result is set as
+  text, never as HTML.
+- **Read means opened.** The old screen marked every message read on mount, so
+  read/unread carried no information — the badge cleared itself as you walked
+  past. "Mark unread" exists for the correction, and deliberately does not
+  retract the read receipt the gym already has: it changes what this device
+  shows, not what happened.
+- **Selection lives in the URL** (`/inbox?m=<id>`). The back button closes a
+  message instead of leaving the inbox, a reload lands where you were, and a
+  notification can deep-link to the message it is about.
+- **Nothing is auto-selected.** Opening the newest message on arrival would
+  mark it read before anybody looked at it, which is the behaviour this screen
+  was rebuilt to stop.
+- **Remove is per profile and local** (`deletedBy`). A member cannot delete the
+  gym's row — the server gives `delete` to that gym's operators only, and it
+  should, because one member clearing their inbox must not erase an event forty
+  others are still reading. So it hides it for one profile, says so in those
+  words, and offers an undo. `merge` preserves `deletedBy` or the next pull
+  resurrects everything.
+- The removal check lives in `isAddressedTo`, not in `inboxFor`, so the list,
+  the badge, the banner and the notification all agree. Four callers asking the
+  same question separately is four places to forget one.
+
+Layout is a list column and a reading pane above `md`, one or the other below
+it — a reading pane 40 characters wide is not a reading pane. Every grid track
+is `minmax(0, …)`: a column defaults to `auto`, which sizes to max-content, and
+the single mobile column grew to 4708px to fit a preview line that could then
+never truncate, because truncation needs a bound and the bound was the thing
+being computed.
+
+Arrow keys (and `j`/`k`) move through the list, Backspace removes the open
+message. Moving with the arrows opens each message as it goes, and therefore
+marks it read — the same trade Apple Mail makes, and the reason "Mark unread"
+is one click away.

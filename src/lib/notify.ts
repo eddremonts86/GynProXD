@@ -99,12 +99,27 @@ export async function showNotification(
   }
 }
 
-/** One notification summarising unread gym messages, if any. */
-export async function notifyUnread(count: number, gym: string): Promise<void> {
+/**
+ * One notification summarising unread messages, if any.
+ *
+ * `senders` is who they are actually from — a gym, enForma, or both. Named
+ * only when there is exactly one, because with two the old wording ("from your
+ * gym") was wrong whichever way it guessed, and a count with no sender is
+ * still useful where a wrong sender is not.
+ */
+export async function notifyUnread(count: number, senders: string[]): Promise<void> {
   if (count <= 0) return
+  const from = senders.length === 1 ? senders[0] : ''
+  const title = from || 'enForma'
   await showNotification(
-    gym,
-    count === 1 ? 'You have a new message from your gym.' : `You have ${count} new messages from your gym.`,
+    title,
+    count === 1
+      ? from
+        ? `You have a new message from ${from}.`
+        : 'You have a new message.'
+      : from
+        ? `You have ${count} new messages from ${from}.`
+        : `You have ${count} new messages.`,
   )
 }
 

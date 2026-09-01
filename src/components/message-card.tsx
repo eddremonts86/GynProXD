@@ -33,6 +33,7 @@ export function MessageCard({
   onToggleSave,
   onToggleJoin,
   unread,
+  chrome = 'panel',
 }: {
   message: GymMessage
   viewer?: string
@@ -40,13 +41,20 @@ export function MessageCard({
   onToggleSave?: () => void
   onToggleJoin?: () => void
   unread?: boolean
+  /**
+   * `bare` drops the card's own surface for a container that already has one —
+   * the inbox reading pane. Nesting a panel inside a panel puts two borders
+   * and two paddings around the same words.
+   */
+  chrome?: 'panel' | 'bare'
 }) {
   const myRsvp = viewer ? message.rsvp[viewer] : undefined
   const savedByMe = viewer ? message.saved.includes(viewer) : false
   const joinedByMe = viewer ? (message.joined ?? []).includes(viewer) : false
 
+  const Shell = chrome === 'bare' ? BareShell : PanelShell
   return (
-    <Panel padding="lg" className={cn('flex flex-col gap-3', unread && 'ring-1 ring-brand/40')}>
+    <Shell unread={unread}>
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 flex-col gap-1">
           <span className="flex items-center gap-2">
@@ -224,6 +232,18 @@ export function MessageCard({
           </div>
         </div>
       )}
+    </Shell>
+  )
+}
+
+function PanelShell({ children, unread }: { children: React.ReactNode; unread?: boolean }) {
+  return (
+    <Panel padding="lg" className={cn('flex flex-col gap-3', unread && 'ring-1 ring-brand/40')}>
+      {children}
     </Panel>
   )
+}
+
+function BareShell({ children }: { children: React.ReactNode; unread?: boolean }) {
+  return <div className="flex flex-col gap-3">{children}</div>
 }
