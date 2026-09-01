@@ -70,7 +70,10 @@ await page
   .catch(() => fail('generated calendar missing'))
 console.log('ok: programme generated at', page.url())
 
-await page.getByRole('button', { name: 'Copy to planner' }).first().click()
+/* "Edit a copy" since the two ways to change a programme were made findable;
+   it was "Copy to planner", and it does the same thing — saves the generated
+   programme as an editable plan and opens the planner on it. */
+await page.getByRole('button', { name: 'Edit a copy' }).first().click()
 await page.waitForURL(/\/planner$/, { timeout: 5000 })
 await page
   .getByRole('button', { name: /^Monday \d{4}-\d{2}-\d{2}.*movements?$/ })

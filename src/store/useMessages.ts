@@ -51,6 +51,8 @@ export interface PublishInput {
   challenge?: Challenge
   collection?: Collection
   programme?: GymProgramme
+  /** ISO. Absent publishes on arrival; see `GymMessage.publishAt`. */
+  publishAt?: string
   banner?: { minutes: number }
   link?: 'menu'
   /** Already uploaded; the picker holds the files until the server names them. */
