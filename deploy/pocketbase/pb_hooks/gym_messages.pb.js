@@ -23,6 +23,30 @@ onRecordCreateRequest((e) => {
   const authId = e.auth ? e.auth.id : ''
   const scope = String(e.record.get('scope') || '')
 
+  /**
+   * The schedule, checked for everybody — the house included, which is why it
+   * sits above the branch. The rule that actually withholds the message is in
+   * the collection's read rule; this is only the part a rule cannot say.
+   */
+  const { refuseSchedule } = require(`${__hooks}/utils/scheduling.js`)
+  /**
+   * Read off the request, not off the record.
+   *
+   * A `date` field coerces anything it cannot parse to empty, so by the time
+   * the record has it, "next tuesday-ish" and "publish now" are the same value
+   * — and the message a gym meant for Monday goes out on Sunday with nobody
+   * told. The audit caught it. What was asked for is in the body.
+   */
+  const body = e.requestInfo().body || {}
+  const lateness = refuseSchedule(
+    e.record.get('publish_at'),
+    String(gym.get('plan') || ''),
+    gym.get('kind') === 'house',
+    Date.now(),
+    Object.prototype.hasOwnProperty.call(body, 'publish_at'),
+  )
+  if (lateness) throw new BadRequestError(lateness)
+
   if (isHouseGym(gym)) {
     if (!isPlatformAdmin(e.app, authId)) {
       throw new ForbiddenError('Only a platform admin can publish from enForma.')

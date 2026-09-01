@@ -1,6 +1,6 @@
 /**
  * The planner's selected plan, session-scoped. A tiny shared handoff so that
- * "Copy to planner" on a programme page can land the planner on the copy.
+ * "Edit a copy" on a programme page can land the planner on the copy.
  */
 const KEY = 'forma-planner-plan'
 

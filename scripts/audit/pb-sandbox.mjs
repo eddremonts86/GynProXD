@@ -15,6 +15,7 @@
  * is where the local dev setup already puts it.
  */
 import { spawn } from 'node:child_process'
+import { createServer } from 'node:net'
 import { chmod, cp, mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
@@ -30,7 +31,29 @@ const run = (cmd, args) =>
     p.on('error', reject)
   })
 
-export async function startSandbox({ port = Number(process.env.PB_PROBE_PORT ?? 8792) } = {}) {
+/**
+ * A port nobody is using.
+ *
+ * The default used to be a fixed 8792, which is fine for one walk and a trap
+ * for a sweep: five of them boot a sandbox now, and running them back to back
+ * had one starting before the last one's port was free. It came out as
+ * ECONNREFUSED from a server that never bound — a failure that says nothing
+ * about the thing being tested and costs somebody an afternoon to place.
+ */
+function freePort() {
+  return new Promise((resolve, reject) => {
+    const probe = createServer()
+    probe.once('error', reject)
+    probe.listen(0, '127.0.0.1', () => {
+      const { port } = probe.address()
+      probe.close(() => resolve(port))
+    })
+  })
+}
+
+export async function startSandbox({ port } = {}) {
+  const pinned = Number(process.env.PB_PROBE_PORT ?? 0)
+  port = port ?? (pinned > 0 ? pinned : await freePort())
   const base = `http://127.0.0.1:${port}`
   const dir = await mkdtemp(path.join(tmpdir(), 'enforma-pb-'))
   const binary = path.join(dir, 'pocketbase')

@@ -4,6 +4,7 @@ import {
   audienceWithin,
   HOUSE_GYM,
   isMessageScope,
+  isQueued,
   MESSAGE_SCOPES,
   previewOf,
   senderOf,
@@ -524,5 +525,49 @@ describe('scopes on the wire', () => {
     expect([...MESSAGE_SCOPES].sort()).toEqual(
       ['everyone', 'members', 'open-door', 'unaffiliated'],
     )
+  })
+})
+
+/**
+ * Write it now, publish it later.
+ *
+ * The server is what actually withholds a queued message — `@now` in the
+ * collection's read rule, proven by `scripts/audit/scheduled-boundary.mjs`.
+ * What is left here is the copy a device holds of what it published itself,
+ * which the server never gets a chance to withhold.
+ */
+describe('a message with a time on it', () => {
+  const sunday = '2026-09-06T19:00:00.000Z'
+  const monday = '2026-09-07T08:00:00.000Z'
+  const menu = msg({ title: "Monday's menu", publishAt: monday })
+  const ana = { id: 'p-ana', gym: 'Forge & Flow' }
+
+  it('reaches nobody before its time', () => {
+    expect(isAddressedTo(menu, ana, sunday)).toBe(false)
+  })
+
+  it('reaches them once it passes', () => {
+    expect(isAddressedTo(menu, ana, '2026-09-07T08:00:01.000Z')).toBe(true)
+  })
+
+  it('is not counted as unread while it waits', () => {
+    // Otherwise the badge announces a number that opens nothing.
+    expect(unreadCount([menu], ana, sunday)).toBe(0)
+    expect(unreadCount([menu], ana, '2026-09-07T09:00:00.000Z')).toBe(1)
+  })
+
+  it('is out of the inbox entirely, not merely unread', () => {
+    expect(inboxFor([menu], ana, sunday)).toEqual([])
+  })
+
+  it('leaves everything without a time exactly as it was', () => {
+    const plain = msg({ title: 'Now' })
+    expect(isAddressedTo(plain, ana, sunday)).toBe(true)
+    expect(isQueued(plain, sunday)).toBe(false)
+  })
+
+  it('tells the gym it is still queued, so Sent can say when', () => {
+    expect(isQueued(menu, sunday)).toBe(true)
+    expect(isQueued(menu, '2026-09-07T08:00:01.000Z')).toBe(false)
   })
 })
