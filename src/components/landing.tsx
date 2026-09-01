@@ -24,6 +24,7 @@ import { Mark } from '@/components/brand'
 import { RailToggle } from '@/components/rail-toggle'
 import { useRailHidden } from '@/hooks/use-rail'
 import {
+  AuroraWash,
   Body,
   Label,
   LandingRail,
@@ -329,6 +330,7 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
       <main className={railHidden ? undefined : 'lg:pl-60'}>
         {/* -------------------------------------------------------------- Hero */}
         <section id="top" className="relative overflow-hidden scroll-mt-4">
+          <AuroraWash tone="green" className="-top-[28%] -left-[18%] size-[52vw] max-w-[860px]" />
           <ScaleGround className="top-32 -right-[14%] hidden w-[40vw] 2xl:flex" />
 
           <div
@@ -463,7 +465,7 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
                     key={item.title}
                     className="flex flex-col gap-2.5 rounded-xl bg-bg p-6 shadow-[var(--shadow-panel)]"
                   >
-                    <item.icon size={22} weight="regular" className="text-ink-3" />
+                    <item.icon size={22} weight="regular" className="text-accent-member" />
                     <span className="text-lg font-semibold text-ink">{item.title}</span>
                     <Body>{item.body}</Body>
                   </div>
@@ -495,7 +497,7 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
                     key={item.title}
                     className="flex flex-col gap-3 border-t border-line py-7 md:py-8"
                   >
-                    <item.icon size={22} weight="regular" className="text-ink-3" />
+                    <item.icon size={22} weight="regular" className="text-accent-member" />
                     <span className="text-lg font-semibold text-ink">{item.title}</span>
                     <Body>{item.body}</Body>
                   </li>
@@ -598,7 +600,7 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
                     <item.icon
                       size={24}
                       weight="regular"
-                      className="mt-0.5 shrink-0 text-ink-3"
+                      className="mt-0.5 shrink-0 text-accent-member"
                     />
                     <span className="flex flex-col gap-1.5">
                       <span className="text-lg font-semibold text-ink">{item.title}</span>
@@ -661,10 +663,15 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
                 <div
                   key={col.eyebrow}
                   className={cn(
-                    'flex flex-col gap-5 rounded-xl bg-bg p-6 md:p-8',
+                    /* The clearest place on this page for the two colours: the
+                       left column is what is yours alone, the right is the one
+                       where a gym can reach you. Carried on a rule rather than
+                       on the eyebrow text, which is 11px and would not clear
+                       contrast in either accent on the light theme. */
+                    'flex flex-col gap-5 rounded-xl border-t-2 bg-bg p-6 md:p-8',
                     col.loud
-                      ? 'aurora-edge shadow-[var(--shadow-tile)]'
-                      : 'shadow-[var(--shadow-panel)]',
+                      ? 'aurora-edge border-accent-gym shadow-[var(--shadow-tile)]'
+                      : 'border-accent-member shadow-[var(--shadow-panel)]',
                   )}
                 >
                   <div className="flex flex-col gap-1.5">
@@ -687,6 +694,9 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
 
         {/* ----------------------------------------------------- Second way in */}
         <section id="start" className="relative scroll-mt-4 overflow-hidden">
+          {/* Orange at the closing panel: this is the point where an account —
+              and the gym that can then reach you — enters the argument. */}
+          <AuroraWash tone="orange" className="-right-[16%] -bottom-[30%] size-[44vw] max-w-[720px]" />
           <ScaleGround className="-bottom-[8%] -left-[10%] hidden w-[34vw] 2xl:flex" />
 
           <div

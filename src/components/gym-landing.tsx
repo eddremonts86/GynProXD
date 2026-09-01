@@ -28,9 +28,11 @@ import { isBuilt, type PlusFeature } from '@/lib/gym-plan'
 import { activeAuthHeader, activeServer, readSyncLink } from '@/lib/sync'
 import { activeProfile } from '@/lib/profiles'
 import { AuthPanel } from '@/components/auth-panel'
+import { GymHeroProof } from '@/components/gym-hero-proof'
 import { RailToggle } from '@/components/rail-toggle'
 import { useRailHidden } from '@/hooks/use-rail'
 import {
+  AuroraWash,
   Body,
   Label,
   LandingRail,
@@ -90,13 +92,6 @@ const BASE_TEMPLATE_COUNT = TEMPLATE_COUNT - 1
 const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
 const spell = (n: number) => WORDS[n] ?? String(n)
 
-const FACTS: { figure: string; unit?: string; label: string }[] = [
-  { figure: LIBRARY_SIZE, label: 'movements they train from, free' },
-  { figure: String(TEMPLATE_COUNT), label: 'kinds of message you can publish' },
-  { figure: String(REACH_WINDOW_DAYS), unit: 'days', label: 'of reach, counted not estimated' },
-  { figure: '0', label: 'of their training you or we can read' },
-]
-
 /** Why the attention exists before anybody sells access to it. */
 const WHY: { icon: Icon; title: string; body: string }[] = [
   {
@@ -155,6 +150,7 @@ const BASE: Feature[] = [
 const PLUS: Feature[] = [
   { id: 'kitchen', icon: ForkKnife, title: 'The kitchen', body: 'The daily menu and your standing kitchen card, on Today and on its own page. The one surface here that leads where money changes hands.' },
   { id: 'programmes', icon: Barbell, title: 'Programmes signed by your gym', body: 'Publish a programme your members adopt in one tap, with your name on it, instead of the one the app would have built. Each one gets their own dated copy, and what they do with it stays on their phone.' },
+  { id: 'open-door', icon: Storefront, title: 'Reach people with no gym', body: 'The one thing here that wins you somebody you have not already got: an offer to everyone on enForma who has not joined a gym. One a month. You are never told who they are, and there is no location filter — we hold no location for anybody, and we would rather say so than imply a segmentation that does not exist.' },
   { id: 'scheduling', icon: Clock, title: 'Write it now, publish it later', body: 'Monday’s menu on Sunday evening. A week of posts in one sitting.' },
   { id: 'reach-window', icon: ChartLineUp, title: 'Reach with no window, exported', body: `Past the ${REACH_WINDOW_DAYS} days, and out as a file you can put next to your own numbers.` },
   { id: 'operators', icon: Buildings, title: 'Operators and second rooms', body: 'Staff who can publish, and more than one location under the same account.' },
@@ -179,20 +175,6 @@ function readable(features: Feature[]): string {
 
 const SIZES = ['Under 100', '100 to 300', '300 to 800', 'More than 800'] as const
 
-function Figure({ figure, unit, label }: { figure: string; unit?: string; label: string }) {
-  return (
-    <div className="flex flex-col gap-1">
-      <span className="flex items-baseline gap-1.5">
-        <span className="num text-4xl leading-none tracking-tight text-ink md:text-5xl">
-          {figure}
-        </span>
-        {unit && <span className="text-xs text-ink-3">{unit}</span>}
-      </span>
-      <Label className="max-w-[22ch] leading-relaxed">{label}</Label>
-    </div>
-  )
-}
-
 function FeatureRow({ feature }: { feature: Feature }) {
   const coming = feature.id !== undefined && !isBuilt(feature.id)
   return (
@@ -200,7 +182,7 @@ function FeatureRow({ feature }: { feature: Feature }) {
       <feature.icon
         size={18}
         weight="regular"
-        className={cn('mt-0.5 shrink-0', coming ? 'text-ink-3' : 'text-brand')}
+        className={cn('mt-0.5 shrink-0', coming ? 'text-ink-3' : 'text-accent-gym')}
       />
       <span className="flex min-w-0 flex-col gap-1">
         <span className="flex flex-wrap items-center gap-2">
@@ -266,13 +248,16 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
 
       <main className={railHidden ? undefined : 'lg:pl-60'}>
         {/* ------------------------------------------------------------- Hero */}
-        <section id="top" className="scroll-mt-4">
+        <section id="top" className="relative overflow-hidden scroll-mt-4">
+          {/* Orange leads here, as green leads the member landing — the same
+              material, turned round. */}
+          <AuroraWash tone="orange" className="-top-[26%] -right-[14%] size-[48vw] max-w-[820px]" />
           {/* Two columns at `xl`, not `lg`. With the 240px rail beside it, 1024px
               left the headline about 420px to work in and it broke into six
               lines — "Your / members / keep this / app. You get / to be the /
               gym in it." The measurement, not the taste: the split only earns
               its keep once there is room for both halves. */}
-          <div className={cn(SHELL, 'grid gap-10 py-14 md:py-20 xl:grid-cols-[1.35fr_1fr] xl:gap-16')}>
+          <div className={cn(SHELL, 'relative grid gap-10 py-14 md:py-20 xl:grid-cols-[1.35fr_1fr] xl:gap-16')}>
             <div className="flex flex-col gap-6">
               <Label>For gyms</Label>
               <h1 className="max-w-[19ch] text-4xl leading-[1.05] tracking-tight text-ink md:text-5xl xl:text-6xl">
@@ -299,11 +284,7 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
             </div>
 
             <Reveal className="flex xl:items-end">
-              <Panel padding="lg" className="flex w-full flex-col gap-7">
-                {FACTS.map((fact) => (
-                  <Figure key={fact.label} {...fact} />
-                ))}
-              </Panel>
+              <GymHeroProof libraryFigure={LIBRARY_SIZE} />
             </Reveal>
           </div>
         </section>
@@ -330,7 +311,9 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
                       i % 2 === 1 && 'md:pl-[12%]',
                     )}
                   >
-                    <item.icon size={26} weight="regular" className="text-brand" />
+                    {/* Green: this whole section is the member's half of the
+                        relationship — why they keep the app at all. */}
+                    <item.icon size={26} weight="regular" className="text-accent-member" />
                     <div className="flex flex-col gap-2.5">
                       <h3 className="max-w-[24ch] text-xl leading-snug text-ink">{item.title}</h3>
                       <Body className="max-w-[58ch]">{item.body}</Body>
@@ -378,7 +361,7 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
                 {['Published', 'Members reached', 'Going', 'Offers saved', 'Items reserved', 'Challenges joined'].map(
                   (metric) => (
                     <li key={metric} className="flex items-center gap-2.5 text-sm text-ink-2">
-                      <Check size={14} weight="bold" className="shrink-0 text-brand" />
+                      <Check size={14} weight="bold" className="shrink-0 text-accent-gym" />
                       {metric}
                     </li>
                   ),
