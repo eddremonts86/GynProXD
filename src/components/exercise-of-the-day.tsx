@@ -23,24 +23,30 @@ export function ExerciseOfTheDay({ stacked = false }: { stacked?: boolean }) {
   const [override, setOverride] = useState<Exercise | null>(null)
   const exercise = override ?? exerciseOfTheDay(todayIso())
 
-  return (
-    <Section
-      title="Movement of the day"
-      className={stacked ? 'h-full self-stretch' : undefined}
-      action={
-        <button
-          type="button"
-          className={SECTION_ACTION}
-          onClick={() => setOverride(surpriseExercise())}
-        >
-          <ArrowsClockwise size={13} weight="bold" />
-          Surprise me
-        </button>
-      }
+  const surprise = (
+    <button
+      type="button"
+      className={SECTION_ACTION}
+      onClick={() => setOverride(surpriseExercise())}
     >
+      <ArrowsClockwise size={13} weight="bold" />
+      Surprise me
+    </button>
+  )
+
+  return (
+    /**
+     * In a shared row the action moves into the card, beside the movement it
+     * changes. In the header it needed 81px of a 244px column, leaving 163 for
+     * a title whose one line is 155 plus a 12px gap — four pixels short, so
+     * "Movement of the day" wrapped to two lines and pushed this card's picture
+     * below its neighbours'. Measured, not guessed at: the fix is not a smaller
+     * gap, it is that a control for the movement belongs next to the movement.
+     */
+    <Section title="Movement of the day" action={stacked ? undefined : surprise}>
       <Panel
         padding="none"
-        className={cn('overflow-hidden', stacked ? 'flex flex-1 flex-col' : 'sm:flex')}
+        className={cn('overflow-hidden', stacked ? 'flex flex-col' : 'sm:flex')}
       >
         <div className={stacked ? undefined : 'sm:w-64 sm:shrink-0'}>
           <ExerciseThumb
@@ -51,9 +57,10 @@ export function ExerciseOfTheDay({ stacked = false }: { stacked?: boolean }) {
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-2.5 p-5">
           <h3 className="text-xl text-ink">{exercise.name}</h3>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap items-center gap-1.5">
             <Tag tone="brand">{MUSCLE_LABELS[exercise.muscle]}</Tag>
             <Tag tone="outline">{EQUIPMENT_LABELS[exercise.equipment]}</Tag>
+            {stacked && <span className="ml-auto">{surprise}</span>}
           </div>
           {exercise.instructions?.[0] && (
             <p className="max-w-[52ch] text-sm leading-relaxed text-ink-3">

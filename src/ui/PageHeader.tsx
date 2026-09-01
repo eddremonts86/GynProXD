@@ -53,9 +53,19 @@ export function Section({ title, hint, action, children, className }: SectionPro
             the gloss. The heading is capped at the row's own width so a long
             one still truncates rather than spilling, and a shrink weight was
             not enough: it left the heading a fraction of a pixel short of its
-            text, which is all an ellipsis needs to appear. */}
+            text, which is all an ellipsis needs to appear.
+
+            It wraps rather than truncating. In a narrow column beside an
+            action — "Movement of the day" next to "Surprise me" — there is no
+            width at which the whole heading fits on one line, and truncating
+            it to "Movement of the d…" throws the name away to save a line
+            break. `shrink-0` keeps the earlier fix: the heading still takes
+            what it needs before the hint gives up any, and only wraps once it
+            alone is wider than the row. */}
         <div className="flex min-w-0 items-baseline gap-2">
-          <h2 className="max-w-full shrink-0 truncate text-lg text-ink">{title}</h2>
+          <h2 className="max-w-full shrink-0 text-lg leading-snug text-balance break-words text-ink">
+            {title}
+          </h2>
           {hint && <span className="num min-w-0 truncate text-2xs text-ink-3">{hint}</span>}
         </div>
         {action && <div className="flex shrink-0 items-center gap-1.5">{action}</div>}
