@@ -20,6 +20,7 @@ import { Input } from '../ui/Input'
 import { Panel } from '../ui/Panel'
 import { PageHeader, Section } from '../ui/PageHeader'
 import { Tabs, TabPanel } from '../ui/Tabs'
+import { cn } from '@/lib/utils'
 import { Collapse } from '../ui/Collapse'
 import { InstallAppButton } from '@/components/install-app-button'
 import { SyncSection } from '@/components/sync-section'
@@ -33,12 +34,14 @@ import {
   needsHomeScreenForPush,
   notificationPermission,
   notificationsSupported,
+  notificationsMuted,
   notificationsWanted,
   pushEnabled,
   pushSupported,
   pushWanted,
   requestNotificationPermission,
   setNotificationPref,
+  setNotificationsMuted,
   type NotifyChannel,
 } from '../lib/notify'
 import { readSyncLink } from '../lib/sync'
@@ -485,25 +488,47 @@ function NotificationsSection() {
   /* One permission grant serves every channel, so the section owns it and the
      push toggle reacts to it — allowing once switches the whole panel on. */
   const [permission, setPermission] = useState<NotificationPermission>(() => notificationPermission())
+  const [muted, setMuted] = useState(() => notificationsMuted())
   if (!supported) return null
+
+  const mute = (next: boolean) => {
+    setMuted(next)
+    setNotificationsMuted(next)
+    /* Push is delivered by the server and shown by the service worker with the
+       app closed, so the local preference alone would not silence it. Muting
+       unsubscribes this device; unmuting leaves the push toggle's own
+       auto-subscribe to put it back. */
+    const profileId = activeProfile()?.id
+    if (next && profileId) void disablePush(profileId)
+  }
 
   return (
     <Section title="Notifications">
       <Panel padding="none" className="divide-y divide-line">
-        <NotificationPermissionRow
+        <NotificationMasterRow
           permission={permission}
-          onChange={() => setPermission(notificationPermission())}
+          muted={muted}
+          onMutedChange={mute}
+          onPermissionChange={() => setPermission(notificationPermission())}
         />
+        {/* Kept on screen while silenced rather than hidden, so what you chose
+            is still visible — but disabled, one prop at a time. A `fieldset`
+            was the first attempt and it dimmed them without disabling
+            anything: the switch primitive renders a `span role="switch"`, and
+            `fieldset[disabled]` reaches form controls only. Three rows that
+            looked dead and still toggled is worse than not dimming them. */}
         <NotificationToggle
           channel="gym"
           title="Gym messages"
           description="A system notification when your gym sends something new, shown while enForma is open on this device."
+          disabled={muted}
         />
-        <PushToggle permission={permission} />
+        <PushToggle permission={permission} disabled={muted} />
         <NotificationToggle
           channel="training"
           title="Training nudges"
           description="A reminder when your fitness test is eight weeks old, checked when you unlock this profile."
+          disabled={muted}
         />
       </Panel>
     </Section>
@@ -511,39 +536,80 @@ function NotificationsSection() {
 }
 
 /**
- * Browser permission is the one thing an app cannot switch on for you. The
- * channels below default to on, so this asks for the grant that lets them
- * actually deliver — once, without an unprompted popup. It disappears the
- * moment permission is granted.
+ * The one switch that is always here, and always does something.
+ *
+ * It used to be a row about browser permission, which meant it had nothing to
+ * offer in two of the three states it can be in: granted made it disappear
+ * entirely, so there was nowhere left to turn notifications off, and denied
+ * left a paragraph of prose with no control at all. Both are the same mistake —
+ * presenting the browser's decision as if it were this app's setting.
+ *
+ * The browser's grant is genuinely not ours to move. `requestPermission()`
+ * resolves `denied` without showing anything once somebody has blocked us, and
+ * no API has ever revoked a grant. So this switch is the thing the app does
+ * own: whether enForma sends anything to this device. It works in every state,
+ * including blocked — the preference is real even while the browser refuses to
+ * deliver it, and it is what will apply the moment that changes.
+ *
+ * What the browser has decided is still said, plainly, underneath. With
+ * `default` the switch asks for the grant on the way on. With `denied` there is
+ * a Check again, because permission changes in site settings and this screen
+ * would otherwise keep claiming "blocked" until a reload — a dead end somebody
+ * would reasonably read as the app being broken.
  */
-function NotificationPermissionRow({
+function NotificationMasterRow({
   permission,
-  onChange,
+  muted,
+  onMutedChange,
+  onPermissionChange,
 }: {
   permission: NotificationPermission
-  onChange: () => void
+  muted: boolean
+  onMutedChange: (muted: boolean) => void
+  onPermissionChange: () => void
 }) {
-  if (permission === 'granted') return null
+  const [asking, setAsking] = useState(false)
+
+  const note =
+    permission === 'denied'
+      ? 'Your browser is blocking delivery for enForma. This switch still records what you want; allow the site in your browser settings and it takes effect.'
+      : permission === 'default'
+        ? 'Your browser has not been asked yet. Turning this on asks it.'
+        : 'Everything below is sent while this is on. Turn it off to silence enForma on this device without touching your browser settings.'
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 p-5">
-      <div className="flex min-w-0 flex-col gap-0.5">
+      <div className="flex min-w-0 flex-col gap-1">
         <span className="text-sm font-semibold text-ink">Allow notifications</span>
-        <span className="max-w-[52ch] text-2xs text-ink-3">
-          {permission === 'denied'
-            ? 'Your browser has blocked notifications for enForma. Allow them in the site settings to receive the reminders below.'
-            : 'The reminders below are on by default — let your browser deliver them.'}
-        </span>
+        <span className="max-w-[56ch] text-2xs leading-relaxed text-ink-3">{note}</span>
+        {permission === 'denied' && (
+          <button
+            type="button"
+            onClick={onPermissionChange}
+            className="mt-1 self-start text-2xs font-medium text-brand underline-offset-2 hover:underline"
+          >
+            Check again
+          </button>
+        )}
       </div>
-      {permission === 'default' && (
-        <Button
-          size="sm"
-          variant="secondary"
-          onClick={() => void requestNotificationPermission().then(onChange)}
-        >
-          Allow
-        </Button>
-      )}
+      <Switch
+        aria-label="Allow notifications from enForma on this device"
+        checked={!muted}
+        disabled={asking}
+        onCheckedChange={(on) => {
+          onMutedChange(!on)
+          /* Asked on the way on, and only from `default`: from `denied` the
+             browser answers instantly with the same no and shows nothing, so
+             calling it would look like a control that does nothing. */
+          if (on && permission === 'default') {
+            setAsking(true)
+            void requestNotificationPermission().finally(() => {
+              setAsking(false)
+              onPermissionChange()
+            })
+          }
+        }}
+      />
     </div>
   )
 }
@@ -553,7 +619,13 @@ function NotificationPermissionRow({
  * Shown only when it can actually work — a linked profile in a browser that
  * has a push manager — and honest about the iOS install requirement.
  */
-function PushToggle({ permission }: { permission: NotificationPermission }) {
+function PushToggle({
+  permission,
+  disabled = false,
+}: {
+  permission: NotificationPermission
+  disabled?: boolean
+}) {
   const profileId = activeProfile()?.id ?? null
   /* On by default: the toggle carries the opt-out preference, subscription
      happens for real behind it. */
@@ -565,7 +637,7 @@ function PushToggle({ permission }: { permission: NotificationPermission }) {
      making the user hunt for the toggle. Skipped where it cannot work (iOS
      before install) or where it is already done or has been turned off. */
   useEffect(() => {
-    if (permission !== 'granted' || !profileId) return
+    if (permission !== 'granted' || !profileId || disabled) return
     if (!pushSupported() || !readSyncLink(profileId) || needsHomeScreenForPush()) return
     if (!pushWanted(profileId) || pushEnabled(profileId)) return
     let cancelled = false
@@ -577,14 +649,19 @@ function PushToggle({ permission }: { permission: NotificationPermission }) {
     return () => {
       cancelled = true
     }
-  }, [permission, profileId])
+  }, [permission, profileId, disabled])
 
   if (!profileId || !pushSupported() || !readSyncLink(profileId)) return null
   const iosHint = needsHomeScreenForPush()
   const awaitingPermission = enabled && permission !== 'granted'
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 p-5">
+    <div
+      className={cn(
+        'flex flex-wrap items-center justify-between gap-3 p-5 transition-opacity',
+        disabled && 'opacity-45',
+      )}
+    >
       <div className="flex min-w-0 flex-col gap-0.5">
         <span className="text-sm font-semibold text-ink">Gym messages while the app is closed</span>
         <span className="max-w-[52ch] text-2xs text-ink-3">
@@ -599,7 +676,7 @@ function PushToggle({ permission }: { permission: NotificationPermission }) {
       <Switch
         aria-label="Push gym messages to this device"
         checked={enabled}
-        disabled={busy}
+        disabled={busy || disabled}
         onCheckedChange={(on) => {
           setNote(null)
           if (!on) {
@@ -626,17 +703,24 @@ function NotificationToggle({
   channel,
   title,
   description,
+  disabled = false,
 }: {
   channel: NotifyChannel
   title: string
   description: string
+  disabled?: boolean
 }) {
   /* The toggle is the preference (opt-out, on by default); browser permission
      is the separate concern the row above handles. */
   const [enabled, setEnabled] = useState(() => notificationsWanted(channel))
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 p-5">
+    <div
+      className={cn(
+        'flex flex-wrap items-center justify-between gap-3 p-5 transition-opacity',
+        disabled && 'opacity-45',
+      )}
+    >
       <div className="flex min-w-0 flex-col gap-0.5">
         <span className="text-sm font-semibold text-ink">{title}</span>
         <span className="max-w-[52ch] text-2xs text-ink-3">{description}</span>
@@ -644,6 +728,7 @@ function NotificationToggle({
       <Switch
         aria-label={`Notify about ${title.toLowerCase()}`}
         checked={enabled}
+        disabled={disabled}
         onCheckedChange={(on) => {
           setEnabled(on)
           setNotificationPref(channel, on)
