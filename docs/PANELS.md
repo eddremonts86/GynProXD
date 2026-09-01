@@ -299,6 +299,19 @@ just abandoned; getting that wrong delivered to five and reported ten.
 migrations and hooks and proves the boundary from the receiving side. Run it
 after touching any of it.
 
+### Rolling it back
+
+Rehearsed against a database already holding two gyms, five messages and their
+members, because that is what production is and an empty sandbox proves nothing
+about a backfill. Reverting takes `kind` and `scope` off, deletes the house row,
+restores the read rule to the exact string it had, and leaves both gyms holding
+all five of their messages — only the house's own cascade away with it.
+
+The catch: `pocketbase serve` applies pending migrations on start. Reverting
+while the migration file is still on disk reverts it and then the next restart
+puts it straight back. A real rollback is **deploy the previous commit first,
+then `migrate down 1`**.
+
 ## The inbox
 
 A list you scan and a message you read, which is to say an email client.

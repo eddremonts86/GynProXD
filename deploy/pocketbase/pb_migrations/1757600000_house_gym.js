@@ -95,6 +95,19 @@ migrate(
       }
     }
   },
+  /**
+   * The way out, rehearsed rather than assumed.
+   *
+   * Verified against a database already holding two gyms, five messages and
+   * their members: `kind` and `scope` come off, the house row goes, the read
+   * rule is restored to the exact string it had, and both gyms keep all five
+   * messages — only the house's own cascade away with it.
+   *
+   * One operational catch, learned the confusing way. `pocketbase serve`
+   * applies pending migrations on start, so reverting while this file is still
+   * on disk reverts it and then the next restart puts it straight back. A real
+   * rollback is: deploy the previous commit first, then `migrate down 1`.
+   */
   (app) => {
     const messages = app.findCollectionByNameOrId('gym_messages')
     const readRule =
