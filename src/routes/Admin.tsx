@@ -25,9 +25,10 @@ import { PageHeader } from '../ui/PageHeader'
 import { Tag } from '../ui/Tag'
 import { Tabs, TabPanel } from '../ui/Tabs'
 import { AdminRecipes } from '@/components/admin-recipes'
+import { AdminExercises } from '@/components/admin-exercises'
 import { AdminOverview } from '../components/admin-overview'
 
-type TabValue = 'overview' | 'users' | 'gyms' | 'recipes'
+type TabValue = 'overview' | 'users' | 'gyms' | 'exercises' | 'recipes'
 
 const ROLE_LABELS: Record<ProfileRole, string> = {
   member: 'Member',
@@ -138,6 +139,7 @@ function AdminDesk({ selfId }: { selfId: string }) {
           { value: 'overview', label: 'Overview' },
           { value: 'users', label: 'Users', count: profiles.length },
           { value: 'gyms', label: 'Gyms', count: gyms.length },
+          { value: 'exercises', label: 'Movements' },
           { value: 'recipes', label: 'Recipes' },
         ]}
       >
@@ -264,6 +266,10 @@ function AdminDesk({ selfId }: { selfId: string }) {
             accident. Deleting a profile erases its encrypted data permanently.
           </p>
           </Panel>
+        </TabPanel>
+
+        <TabPanel value="exercises">
+          <AdminExercises />
         </TabPanel>
 
         <TabPanel value="recipes">

@@ -13,6 +13,7 @@ import { ExerciseThumb } from '@/ui/ExerciseThumb'
 import { exerciseLookup } from '@/lib/exercises'
 import { MUSCLE_LABELS, EQUIPMENT_LABELS } from '@/lib/labels'
 import { useGym } from '@/store/useGym'
+import { useCatalogue } from '@/store/useCatalogue'
 import type { Exercise } from '@/lib/types'
 
 interface ExercisePickerProps {
@@ -37,15 +38,17 @@ export function ExercisePicker({
   excludeIds = [],
 }: ExercisePickerProps) {
   const customExercises = useGym((s) => s.customExercises)
+  const serverExercises = useCatalogue((s) => s.exercises)
+  const hidden = useCatalogue((s) => s.hidden)
   const [query, setQuery] = useState('')
   const deferredQuery = useDeferredValue(query)
 
   const all = useMemo(
     () =>
-      Array.from(exerciseLookup(customExercises).values()).sort((a, b) =>
+      Array.from(exerciseLookup(customExercises, serverExercises, hidden).values()).sort((a, b) =>
         a.name.localeCompare(b.name),
       ),
-    [customExercises],
+    [customExercises, serverExercises, hidden],
   )
 
   const results = useMemo(() => {

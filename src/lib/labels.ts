@@ -57,9 +57,15 @@ export const EQUIPMENT_LABELS: Record<Equipment | 'hibrido', string> = {
 }
 
 /** The onboarding "where do you train" question, which is coarser than Equipment. */
+/**
+ * Four, because three could not say "a living room with a pair of dumbbells" —
+ * and that is the most common home setup there is. Somebody who owns dumbbells
+ * and picked "Home, bodyweight" was handed press-ups they did not need.
+ */
 export const TRAINING_PLACE_OPTIONS: { value: string; label: string }[] = [
   { value: 'hibrido', label: 'Gym and home' },
   { value: 'barbell', label: 'Full gym' },
+  { value: 'dumbbell', label: 'Home, with dumbbells' },
   { value: 'bodyweight', label: 'Home, bodyweight' },
 ]
 

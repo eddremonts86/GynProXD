@@ -7,14 +7,15 @@ import {
   type ProgrammeStructure,
 } from './plan-generator'
 import { GOAL_LABELS, LEVEL_LABELS, SEX_LABELS, TRAINING_PLACE_OPTIONS } from './labels'
-import { serverCapabilities } from './capabilities'
+import { serverCapabilities, type CoachHost } from './capabilities'
 import { activeAuthHeader } from './sync'
 import type {
+  BlockPlan,
   DayOfWeek,
   DurationKey,
   GeneratedPlan,
+  Intensity,
   OnboardingInput,
-  PlannedDay,
   PlannedExercise,
   ProgressionRule,
 } from './types'
@@ -30,12 +31,32 @@ import type {
  */
 
 /**
- * The coach exists when the dev proxy carries a key (build flag) or the sync
- * server says it does — the latter only helps a signed-in member, since the
- * server route is auth-gated to keep the key from being burned anonymously.
+ * Whether a coach will be asked, and whose hardware answers.
+ *
+ * One function because the alternative was two, and the two disagreed. The
+ * send decision read the build flag first; the sentence a member reads before
+ * typing read only the sync server. On a build carrying its own key that is a
+ * screen saying "nothing you write here is sent anywhere" above a box whose
+ * contents go to a vendor — the one direction of wrong this app promised not
+ * to be. Now the sentence and the request are the same answer.
+ *
+ * The build flag wins because it is the proxy that actually carries the
+ * request. The sync server's own coach is second, and only for a signed-in
+ * member: that route is auth-gated so the key cannot be burned anonymously.
  */
+export function coachDestination(): { coach: boolean; host: CoachHost } {
+  if (__AI_COACH__) return { coach: true, host: __AI_COACH_HOST__ }
+  const caps = serverCapabilities()
+  if (caps.coach && activeAuthHeader() !== null) {
+    /* A server too old to say where its coach runs is not a server anybody is
+       told is private. */
+    return { coach: true, host: caps.coachHost ?? 'external' }
+  }
+  return { coach: false, host: 'external' }
+}
+
 export function aiCoachEnabled(): boolean {
-  return __AI_COACH__ || (serverCapabilities().coach && activeAuthHeader() !== null)
+  return coachDestination().coach
 }
 
 /**
@@ -46,6 +67,9 @@ export function aiCoachEnabled(): boolean {
 const REQUEST_TIMEOUT_MS = 180_000
 const DAY_VALUES: DayOfWeek[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
 const PROGRESSIONS: ProgressionRule[] = ['none', 'linear', 'double']
+/* The three the intake offers. A block may name one of these and no other, so a
+   hallucinated place cannot conjure a pool the programme never authorised. */
+const PLACE_VALUES: OnboardingInput['equipment'][] = ['hibrido', 'barbell', 'bodyweight']
 
 interface RawExercise {
   exerciseId?: unknown
@@ -68,15 +92,20 @@ interface RawResponse {
 }
 
 /** Drops the reasoning preamble and pulls the first balanced JSON object. */
-export function extractJson(text: string): unknown {
-  const cleaned = text.replace(/<think>[\s\S]*?<\/think>/g, '')
-  const start = cleaned.indexOf('{')
+/**
+ * The first complete object in the text, or null.
+ *
+ * Kept separate so a repair can be tried and then scanned again: a repair that
+ * makes things worse produces null here and nothing downstream ever sees it.
+ */
+function scanForObject(text: string): { value: unknown } | null {
+  const start = text.indexOf('{')
   if (start === -1) return null
   let depth = 0
   let inString = false
   let escaped = false
-  for (let i = start; i < cleaned.length; i++) {
-    const ch = cleaned[i]
+  for (let i = start; i < text.length; i++) {
+    const ch = text[i]
     if (escaped) {
       escaped = false
     } else if (ch === '\\') {
@@ -89,7 +118,7 @@ export function extractJson(text: string): unknown {
       depth -= 1
       if (depth === 0) {
         try {
-          return JSON.parse(cleaned.slice(start, i + 1))
+          return { value: JSON.parse(text.slice(start, i + 1)) }
         } catch {
           return null
         }
@@ -97,6 +126,147 @@ export function extractJson(text: string): unknown {
     }
   }
   return null
+}
+
+/**
+ * Puts back an object opener the model dropped mid-array.
+ *
+ * Observed live, and not a variation on truncation — this arrives complete and
+ * corrupt in the middle:
+ *
+ *     ..."exercises":[...]},day":"wed","ecNote":...
+ *                        ^^ was  ,{"day":
+ *
+ * Every array element after the first lost its `{"`, in both the days array and
+ * the blocks array, in one response; the next three responses were clean. It is
+ * intermittent, it reports `finish_reason: "stop"`, and it costs a full minute
+ * of somebody's time and a paid call each time it is thrown away.
+ *
+ * Nothing is guessed. Outside a string, after `,` or `[`, a bare word followed
+ * by `":` is not legal JSON under any reading: an element can only begin with
+ * `{`, `"`, `[`, a digit, or true/false/null. The one construction that word
+ * could have belonged to is an object key, so `{"` is the only thing that can
+ * go there. The alternative is not a safer parse, it is no parse at all.
+ *
+ * `response_format: "json_object"` would be the fix at the source and was
+ * measured first: MiniMax-Text-01 rejects it outright, returning an empty body
+ * in under a second.
+ */
+function restoreDroppedOpeners(text: string): string {
+  let out = ''
+  let inString = false
+  let escaped = false
+  let i = 0
+  while (i < text.length) {
+    const ch = text[i]
+    out += ch
+    i += 1
+    if (escaped) {
+      escaped = false
+      continue
+    }
+    if (ch === '\\') {
+      escaped = inString
+      continue
+    }
+    if (ch === '"') {
+      inString = !inString
+      continue
+    }
+    if (inString || (ch !== ',' && ch !== '[')) continue
+
+    let j = i
+    while (j < text.length && /\s/.test(text[j])) j += 1
+    if (!/^[A-Za-z_][A-Za-z0-9_]*"\s*:/.test(text.slice(j, j + 64))) continue
+    out += text.slice(i, j) + '{"'
+    /* The inserted quote opens the key. Without saying so, the quote that
+       closes it reads as an opening one and every string after this point is
+       tracked inside out — which is how the first attempt at this repair
+       produced text that parsed even less well than what it started from. */
+    inString = true
+    i = j
+  }
+  return out
+}
+
+/**
+ * Closes an answer that stopped mid-structure.
+ *
+ * Measured, not imagined: MiniMax-Text-01 returns `finish_reason: "stop"` and
+ * a body one `]}` short of valid, having spent 1,830 of an allowed 4,000
+ * tokens. It is not hitting a cap and it is not being interrupted — it stops
+ * mid-structure and reports success. A whole programme, three blocks of real
+ * work, was being discarded over two characters.
+ *
+ * Only closers are ever appended, and only the ones the scan says are open.
+ * Nothing is invented: a truncated exercise or a half-written day comes back as
+ * an object with missing fields, which `validateBlocks` then judges on its
+ * merits — a day left under three movements is still refused. This turns
+ * "unparseable" into "parseable and possibly incomplete", and lets the check
+ * that already exists do the deciding.
+ */
+function closeTruncated(text: string): unknown {
+  const start = text.indexOf('{')
+  if (start === -1) return null
+  const closers: string[] = []
+  let depth = 0
+  let inString = false
+  let escaped = false
+  for (let i = start; i < text.length; i++) {
+    const ch = text[i]
+    if (escaped) {
+      escaped = false
+    } else if (ch === '\\') {
+      escaped = inString
+    } else if (ch === '"') {
+      inString = !inString
+    } else if (!inString && (ch === '{' || ch === '[')) {
+      closers.push(ch === '{' ? '}' : ']')
+      depth += 1
+    } else if (!inString && (ch === '}' || ch === ']')) {
+      closers.pop()
+      depth -= 1
+    }
+  }
+  if (closers.length === 0 || depth <= 0) return null
+
+  /* A string left open would swallow the closers as text. Shut it first. */
+  let tail = text.slice(start) + (inString ? '"' : '')
+  /* Trailing comma or a half-written key: drop back to the last complete value. */
+  tail = tail.replace(/[,\s]*$/, '').replace(/,\s*"[^"]*"?\s*:?\s*$/, '')
+  try {
+    return JSON.parse(tail + closers.reverse().join(''))
+  } catch {
+    return null
+  }
+}
+
+/**
+ * The coach's answer, out of whatever it came wrapped in.
+ *
+ * Three passes, cheapest first, and each one only runs because the one before
+ * it came back empty. A clean answer never reaches a repair, which is why the
+ * repairs cannot quietly change a good programme into a different one.
+ *
+ * Both repairs exist because of measured failures of a model that reports
+ * success while returning something no parser accepts. Neither adds meaning:
+ * one restores the only token that could legally have been there, the other
+ * appends closers the text itself says are open. `validateBlocks` still has the
+ * final word, and still refuses a day that came back short.
+ */
+export function extractJson(text: string): unknown {
+  const cleaned = text.replace(/<think>[\s\S]*?<\/think>/g, '')
+
+  const direct = scanForObject(cleaned)
+  if (direct) return direct.value
+
+  const restored = restoreDroppedOpeners(cleaned)
+  if (restored !== cleaned) {
+    const repaired = scanForObject(restored)
+    if (repaired) return repaired.value
+  }
+
+  return closeTruncated(restored)
 }
 
 /** The em-dash ban applies to model output too. */
@@ -115,19 +285,89 @@ export function validateBlocks(
   raw: unknown,
   input: OnboardingInput,
   maxBlocks: number,
-): PlannedDay[][] | null {
+): BlockPlan[] | null {
   const response = raw as RawResponse
   if (!response || !Array.isArray(response.blocks) || response.blocks.length === 0) return null
-  const allowed = allowedExerciseIds(input.equipment)
+  /**
+   * The programme's own pool, and the ceiling for every block.
+   *
+   * A block may say it trains somewhere narrower — that is the point of letting
+   * one differ from the next — but it may never reach past this. Intersecting
+   * rather than replacing is what stops a coach handing barbells to a member who
+   * said they train in a living room. Widening happens once, upstream: the intake
+   * reads two places in one sentence and answers `hibrido`, whose pool holds both.
+   */
+  const programmePool = allowedExerciseIds(input.equipment)
 
-  const blocks: PlannedDay[][] = []
+  const blocks: BlockPlan[] = []
   for (const rawBlock of response.blocks.slice(0, maxBlocks)) {
+    const rawPlace = (rawBlock as { place?: unknown })?.place
+    const place =
+      typeof rawPlace === 'string' && PLACE_VALUES.includes(rawPlace as OnboardingInput['equipment'])
+        ? (rawPlace as OnboardingInput['equipment'])
+        : undefined
+    /**
+     * The narrowed pool is a preference, not a gate.
+     *
+     * It started as a filter and that was wrong in a way only the live coach
+     * showed: told "the first month at home", it labels block 1 `bodyweight` and
+     * fills it with press-ups, a bodyweight squat and a dumbbell row — which is
+     * what a living room with dumbbells actually looks like, and what the member
+     * authorised when the intake read two places and answered `hibrido`.
+     * Filtering strictly dropped the dumbbell work, took the day under three
+     * movements, and rejected the whole programme. The feature added to make
+     * phasing possible was rejecting the phased answer.
+     *
+     * `place` is metadata now: it names the block on screen and it steers the
+     * coach through the prompt. The guarantee that matters is unchanged and
+     * lives one line up — `programmePool` is built from what the member said,
+     * and nothing reaches past it.
+     */
+    const allowed = programmePool
+
+    const rawIntensity = (rawBlock as { intensity?: unknown })?.intensity
+    const intensity =
+      typeof rawIntensity === 'string' && ['I', 'II', 'III'].includes(rawIntensity)
+        ? (rawIntensity as Intensity)
+        : undefined
+    const label = cleanText((rawBlock as { label?: unknown })?.label, 28)
+
+    /**
+     * More days than asked for is trimmed. Fewer is still a rejection.
+     *
+     * This was `!==`, and it was throwing away good programmes whole. Measured
+     * against MiniMax-Text-01 on the real prompt: three blocks, correct labels,
+     * places running bodyweight then hibrido then barbell — the phasing the
+     * member actually asked for — and not one hallucinated movement id. Rejected,
+     * and replaced by the deterministic template, because it had added a light
+     * Saturday to a three-day week.
+     *
+     * A coach that offers a fourth day has understood the brief and been
+     * generous with it. A coach that returns two days for a three-day week has
+     * not, and there is nothing to salvage there, so that half of the check
+     * stays exactly as strict as it was.
+     */
     const rawDays = (rawBlock as { days?: unknown })?.days
-    if (!Array.isArray(rawDays) || rawDays.length !== Math.min(input.daysPerWeek, 7)) return null
+    const wantedDays = Math.min(input.daysPerWeek, 7)
+    if (!Array.isArray(rawDays) || rawDays.length < wantedDays) return null
+
+    /* Which days to keep when there are too many: the ones the member named, if
+       they named any. Dropping Wednesday from someone who told us Monday,
+       Wednesday and Friday would be a stranger failure than the one being fixed. */
+    const preferred = new Set<string>(input.trainingDays ?? [])
+    const chosenDays =
+      rawDays.length === wantedDays
+        ? rawDays
+        : [...(rawDays as RawDay[])]
+            .map((d, i) => ({ d, i, named: preferred.has(String(d?.day)) }))
+            .sort((a, b) => (a.named === b.named ? a.i - b.i : a.named ? -1 : 1))
+            .slice(0, wantedDays)
+            .sort((a, b) => a.i - b.i)
+            .map((x) => x.d)
 
     const byDay = new Map<DayOfWeek, PlannedExercise[]>()
     const notesByDay = new Map<DayOfWeek, string>()
-    for (const rawDay of rawDays as RawDay[]) {
+    for (const rawDay of chosenDays as RawDay[]) {
       const day = rawDay?.day as DayOfWeek
       if (!DAY_VALUES.includes(day) || byDay.has(day)) return null
       if (!Array.isArray(rawDay.exercises)) return null
@@ -160,13 +400,16 @@ export function validateBlocks(
       if (note) notesByDay.set(day, note)
     }
 
-    blocks.push(
-      DAY_VALUES.map((d) => ({
+    blocks.push({
+      days: DAY_VALUES.map((d) => ({
         day: d,
         exercises: byDay.get(d) ?? [],
         ecNote: notesByDay.get(d),
       })),
-    )
+      label: label || undefined,
+      place,
+      intensity,
+    })
   }
   return blocks.length > 0 ? blocks : null
 }
@@ -186,12 +429,30 @@ Athlete:
 - ${input.age} years old, ${SEX_LABELS[input.sex].toLowerCase()}, ${input.weightKg} kg${input.targetWeightKg ? `, target ${input.targetWeightKg} kg` : ''}${input.heightCm ? `, ${input.heightCm} cm` : ''}
 - Goal: ${GOAL_LABELS[input.goal]}. Experience: ${LEVEL_LABELS[input.level]}.
 - Trains ${input.daysPerWeek} days a week, ${input.minsPerSession} minutes per session. Training at: ${place}.
+${input.trainingDays?.length ? `- The days are fixed: ${input.trainingDays.join(', ')}. Use exactly these and space the work to suit them — two in a row is a different programme from every other day.` : ''}
+${input.limitations ? `- TRAIN AROUND THIS, in their words: "${input.limitations}". Leave out anything that loads it. Do not substitute a lighter version of the same movement, and do not mention it back to them as advice.` : ''}
+${input.avoid ? `- They do not want: ${input.avoid}. Honour it even where a replacement is worse on paper; a programme nobody follows trains nobody.` : ''}
 ${rate > 0 ? `- Weight pace is fixed at ${rate} kg/week by a separate calculation. Do not mention or change it.` : ''}
+${
+  input.constraints
+    ? `
+In their own words, between the markers. Read it for everything the fields above cannot hold, and let it win where it plainly disagrees with them:
+--- BEGIN
+${input.constraints}
+--- END
+- Injuries, pain and movements to avoid live here and nowhere else. Honour them by leaving the movement out, not by working around it half way.
+- If those words describe a plan that CHANGES OVER TIME, build the change into the blocks. A block is four weeks. "The first month at home and then the gym" means block 1 uses only what a home has and later blocks use the rest. "Start moderate then go hard" means difficulty and volume climb between blocks instead of staying level.
+- Typos and loose phrasing are theirs to make and yours to read past.`
+    : ''
+}
 
 Requirements:
 - Design exactly ${blockCount} four-week training block(s). Blocks repeat in rotation. Each block after the first MUST swap at least half of the movements on every day for different ids from the list; changing only reps does not count.
+- Give every block a "label" of at most 28 characters naming what it is for, e.g. "Home base" or "Gym, heavier".
+- Give every block a "place": "bodyweight" for a room and a floor, "barbell" for a full gym, "hibrido" for both. It may only be NARROWER than the athlete's own setting above, never wider — a block cannot reach equipment they do not have. When their words describe moving from one place to another, that move belongs here.
+- Give every block an "intensity": "I" fewer sets, "II" normal, "III" more. Use it to make the blocks differ in volume as well as in movements, and follow their words about how hard they mean to go.
 - Each block is one training week: exactly ${input.daysPerWeek} days, values from mon,tue,wed,thu,fri,sat,sun, sensibly spaced, no duplicates.
-- ${perDay} movements per day, compounds first.
+- About ${perDay} movements per day, compounds first. Vary it with the block's intensity: a "I" block runs one fewer, a "III" block one more. Never fewer than three.
 - Use ONLY these movement ids, spelled verbatim:
 ${catalogue}
 - progression per movement: "linear" (add 2.5 kg each session), "double" (build reps to the top of the range, then add weight), or "none" (stretches, easy accessories). Beginners: mostly linear on compounds.
@@ -200,7 +461,7 @@ ${catalogue}
 - ecNote per day: ONE short optional line for anyone who finishes the day with something left, at most 120 characters. Concrete and additive, e.g. "Add a fourth set on the first movement" or "Finish with a 90 second plank". Never required, never medical advice.
 
 Reply with ONE minified JSON object on a single line, nothing else, exactly this shape:
-{"planName":"...","coachNotes":"...","blocks":[{"days":[{"day":"mon","ecNote":"...","exercises":[{"exerciseId":"...","progression":"linear","supersetGroup":null,"timed":false,"unilateral":false}]}]}]}
+{"planName":"...","coachNotes":"...","blocks":[{"label":"...","place":"hibrido","intensity":"II","days":[{"day":"mon","ecNote":"...","exercises":[{"exerciseId":"...","progression":"linear","supersetGroup":null,"timed":false,"unilateral":false}]}]}]}
 planName: at most 40 characters, no dates. coachNotes: 2 or 3 plain sentences on how the programme is built and why the blocks differ. No medical claims, no hyphens used as dashes.`
 }
 

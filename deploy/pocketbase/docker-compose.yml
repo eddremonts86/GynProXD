@@ -9,6 +9,14 @@ services:
     # so the raw API is never exposed on a public interface.
     environment:
       # Phase 7 shared fetches + the push public key served by /api/enforma/capabilities.
+      #
+      # COACH_* is the vendor-neutral trio and wins where set; MINIMAX_* stays so
+      # a server that has not been reconfigured keeps answering. COACH_MODEL is
+      # the one that used to be impossible: the model name was baked into the
+      # browser bundle at build time, so trying another one cost a deploy.
+      COACH_API_KEY: ${COACH_API_KEY:-}
+      COACH_BASE_URL: ${COACH_BASE_URL:-}
+      COACH_MODEL: ${COACH_MODEL:-}
       MINIMAX_API_KEY: ${MINIMAX_API_KEY:-}
       MINIMAX_BASE_URL: ${MINIMAX_BASE_URL:-}
       FATSECRET_CLIENT_ID: ${FATSECRET_CLIENT_ID:-}

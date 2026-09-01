@@ -208,8 +208,29 @@ function TodayOverview({
   const fitnessTest = useGym((s) => s.fitnessTest)
 
   const [weighInOpen, setWeighInOpen] = useState(false)
-  const [intensity, setIntensity] = useState<Intensity>('II')
   const day = todayDayOfWeek()
+
+  /**
+   * The volume this block asked for, if today falls inside a programme that
+   * phases.
+   *
+   * `II` used to be the flat default for every session of every programme, so a
+   * block designed as a lighter month at home and the heavy gym block after it
+   * both opened on the same number of sets — the phasing was visible in the
+   * movements and nowhere else. The picker is still a picker; this only decides
+   * what it starts on, which is the difference between a suggestion and a rule.
+   */
+  const blockIntensity = useGym((s) => {
+    const today = todayIso()
+    for (const plan of s.generatedPlans) {
+      const week = plan.weeks.find((w) => w.days.some((d) => d.date === today))
+      if (!week || week.blockIndex === undefined) continue
+      const found = plan.blocks?.[week.blockIndex]?.intensity
+      if (found) return found
+    }
+    return null
+  })
+  const [intensity, setIntensity] = useState<Intensity>(blockIntensity ?? 'II')
 
   const scheduled = useMemo(
     () =>

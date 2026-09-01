@@ -45,7 +45,9 @@ registerRoute(
   new CacheFirst({
     cacheName: 'movement-artwork',
     plugins: [
-      new ExpirationPlugin({ maxEntries: 500, maxAgeSeconds: 60 * 60 * 24 * 180 }),
+      /* One entry per illustration file, and RepDB ships 1,056 of them —
+         a cap below that quietly evicts artwork somebody has already seen. */
+      new ExpirationPlugin({ maxEntries: 1200, maxAgeSeconds: 60 * 60 * 24 * 180 }),
       new CacheableResponsePlugin({ statuses: [0, 200] }),
     ],
   }),
@@ -55,7 +57,11 @@ registerRoute(
 // stay available offline once they have been looked at. (The old direct
 // jsdelivr origin is kept too, for any cache warmed before the proxy landed.)
 registerRoute(
-  ({ url }) => url.pathname.startsWith('/exercise-img/') || url.origin === 'https://cdn.jsdelivr.net',
+  ({ url }) =>
+    url.pathname.startsWith('/exercise-img/') ||
+    url.origin === 'https://cdn.jsdelivr.net' ||
+    /* wger hosts its own illustrations; we link rather than copy them. */
+    url.origin === 'https://wger.de',
   new CacheFirst({
     cacheName: 'movement-photos',
     plugins: [

@@ -166,7 +166,12 @@ export function RecipesPage() {
         }
       />
 
-      <div className="flex flex-col gap-3">
+      {/* Sticky, and the same shape Library uses: controls stay, results scroll.
+          `top-14` clears the fixed header on a phone; the wide layout puts its
+          chrome elsewhere, so `lg:top-0`. The negative margins let the blur run
+          to the edges of the page rather than stopping at the content column,
+          which is what makes it read as a bar instead of a floating card. */}
+      <div className="sticky top-14 z-10 -mx-4 flex flex-col gap-3 bg-bg/90 px-4 py-3 backdrop-blur-md md:-mx-8 md:px-8 lg:top-0">
         <label className="relative block">
           <span className="sr-only">Search recipes by name</span>
           <MagnifyingGlass
@@ -214,26 +219,30 @@ export function RecipesPage() {
           ))}
         </div>
 
-        <p className="flex items-center gap-2 text-2xs text-ink-3">
-          {state === 'ready' && (
-            <>
-              <span className="num">{items.length}</span>
-              {hasMore ? ' shown' : filtered ? ' found' : ' recipes'}
-              {!filtered && total !== null && (
-                <>
-                  {' of '}
-                  <span className="num">{total}</span>
-                </>
-              )}
-            </>
-          )}
-          {filtered && state === 'ready' && (
-            <button type="button" onClick={clearAll} className="underline underline-offset-2">
-              Clear filters
-            </button>
-          )}
-        </p>
       </div>
+
+      {/* Outside the sticky bar on purpose. It describes the list below rather
+          than controlling it, and a count that never leaves the screen spends
+          height that the recipes want. */}
+      <p className="flex items-center gap-2 text-2xs text-ink-3">
+        {state === 'ready' && (
+          <>
+            <span className="num">{items.length}</span>
+            {hasMore ? ' shown' : filtered ? ' found' : ' recipes'}
+            {!filtered && total !== null && (
+              <>
+                {' of '}
+                <span className="num">{total}</span>
+              </>
+            )}
+          </>
+        )}
+        {filtered && state === 'ready' && (
+          <button type="button" onClick={clearAll} className="underline underline-offset-2">
+            Clear filters
+          </button>
+        )}
+      </p>
 
       {state === 'failed' ? (
         <EmptyState

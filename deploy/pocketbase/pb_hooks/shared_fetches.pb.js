@@ -19,8 +19,32 @@ routerAdd('GET', '/api/enforma/capabilities', (e) => {
   } catch {
     /* Collection missing on a pre-migration boot: capability stays false. */
   }
+  /**
+   * Where the coach actually runs, so the app can say so instead of implying.
+   *
+   * The intake sends whatever somebody typed — including the sentence about a
+   * knee — to whichever model designs the programme. Which model that is, is a
+   * property of THIS server's environment, and the browser has no way to know
+   * it. Reporting it is what lets a screen tell the truth without guessing, and
+   * what makes the truth change by itself the day the base URL is repointed at
+   * something we host.
+   *
+   * The classification is in `utils/coach_host.js` because it decides which of
+   * two sentences a member reads, and one of them promises their words did not
+   * leave. That deserves tests, and nothing can test a closure inside a handler.
+   */
+  const coachKey = !!($os.getenv('COACH_API_KEY') || $os.getenv('MINIMAX_API_KEY'))
+  const coachHost = coachKey
+    ? require(`${__hooks}/utils/coach_host.js`).coachHostFor(
+        $os.getenv('COACH_BASE_URL') ||
+          $os.getenv('MINIMAX_BASE_URL') ||
+          'https://api.minimaxi.chat/v1',
+      )
+    : null
+
   return e.json(200, {
-    coach: !!$os.getenv('MINIMAX_API_KEY'),
+    coach: coachKey,
+    coachHost,
     recipes:
       hasCatalogue ||
       !!($os.getenv('FATSECRET_CLIENT_ID') && $os.getenv('FATSECRET_CLIENT_SECRET')),
@@ -28,17 +52,94 @@ routerAdd('GET', '/api/enforma/capabilities', (e) => {
   })
 })
 
+/**
+ * The coach, whoever is answering today.
+ *
+ * The path still says `minimax` because the browser bundle calls it that and a
+ * renamed route is a deploy where old tabs get a 404 for no gain. The vendor
+ * behind it is configuration: `COACH_*` if set, the old `MINIMAX_*` otherwise,
+ * so a server that has not been reconfigured keeps working unchanged.
+ *
+ * Two things this stopped being a plain passthrough for.
+ *
+ * The model name used to be baked into the browser bundle at build time while
+ * the key was read here at runtime — so rotating a key was a variable and trying
+ * a different model was a deploy. `COACH_MODEL` overrides what the client asked
+ * for, and the asymmetry is gone.
+ *
+ * And nothing counted. "Is the flat rate we pay cheap?" had no answer because
+ * no one knew how many designs happen or what they spend. Every call now leaves
+ * a row in `coach_usage` — tokens, latency, and whether it worked — which is
+ * what turns that question into arithmetic.
+ */
 routerAdd('POST', '/api/minimax/chat/completions', (e) => {
   if (!e.auth) return e.json(401, { message: 'Sign in to use the coach.' })
-  const key = $os.getenv('MINIMAX_API_KEY')
+
+  const key = $os.getenv('COACH_API_KEY') || $os.getenv('MINIMAX_API_KEY')
   if (!key) return e.json(503, { message: 'No coach on this server.' })
-  const base = $os.getenv('MINIMAX_BASE_URL') || 'https://api.minimaxi.chat/v1'
-  const res = $http.send({
-    url: base + '/chat/completions',
-    method: 'POST',
-    body: readerToString(e.request.body),
-    headers: { 'content-type': 'application/json', authorization: 'Bearer ' + key },
-    timeout: 180,
-  })
+  const base =
+    $os.getenv('COACH_BASE_URL') || $os.getenv('MINIMAX_BASE_URL') || 'https://api.minimaxi.chat/v1'
+  const model = $os.getenv('COACH_MODEL') || ''
+
+  let body = readerToString(e.request.body)
+  /* Substituted rather than appended: the client sends a model name from its own
+     build, and two `model` keys in one object is a coin toss over which the
+     vendor honours. Parsing can fail on a body this route did not build, and a
+     failure here should cost the override, not the request. */
+  if (model) {
+    try {
+      const parsed = JSON.parse(body)
+      parsed.model = model
+      body = JSON.stringify(parsed)
+    } catch {
+      /* Left as sent. */
+    }
+  }
+
+  const startedAt = Date.now()
+  let res = null
+  let failure = null
+  try {
+    res = $http.send({
+      url: base + '/chat/completions',
+      method: 'POST',
+      body: body,
+      headers: { 'content-type': 'application/json', authorization: 'Bearer ' + key },
+      timeout: 180,
+    })
+  } catch (err) {
+    failure = err
+  }
+  const ms = Date.now() - startedAt
+
+  /**
+   * The meter, which must never be the reason a programme fails.
+   *
+   * Wrapped whole: a broken collection, a missing migration or a field renamed
+   * out from under it would otherwise turn "we cannot measure this" into "the
+   * coach is down". Measurement is worth having and it is not worth that.
+   */
+  try {
+    const json = res && res.json ? res.json : null
+    const usage = (json && json.usage) || {}
+    const record = new Record(e.app.findCollectionByNameOrId('coach_usage'))
+    record.set('owner', e.auth ? e.auth.id : '')
+    /* What the provider says it used, not what was asked for. They differ when a
+       vendor substitutes silently, and the substitution is the interesting part. */
+    record.set('model', (json && json.model) || model || '')
+    record.set('host', String(base).replace(/^[a-z]+:\/\//i, '').split('/')[0])
+    /* OpenAI names them prompt/completion; the Anthropic dialect names them
+       input/output. Reading both means the meter survives a change of dialect. */
+    record.set('input_tokens', usage.prompt_tokens || usage.input_tokens || 0)
+    record.set('output_tokens', usage.completion_tokens || usage.output_tokens || 0)
+    record.set('ms', ms)
+    record.set('status', res ? res.statusCode : 0)
+    record.set('ok', !!res && res.statusCode >= 200 && res.statusCode < 300)
+    e.app.save(record)
+  } catch {
+    /* Unmeasured, and still answered. */
+  }
+
+  if (failure) return e.json(502, { message: 'The coach could not be reached.' })
   return e.json(res.statusCode, res.json)
 })

@@ -4,7 +4,7 @@ import type { Exercise } from './types'
  * What a movement is like, inferred from the catalogue instead of asked of
  * the member. A barbell squat has no left and right side; a plank is not
  * counted in reps; a treadmill is neither. Making people flag that by hand
- * on 873 movements is a chore nobody will do, and the cost of not doing it
+ * on 1,322 movements is a chore nobody will do, and the cost of not doing it
  * is a session that asks nonsense questions.
  *
  * The plan can still force either flag on — someone may want a timed set of

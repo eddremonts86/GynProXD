@@ -1,15 +1,18 @@
-import { useCallback, useDeferredValue, useMemo, useState } from 'react'
+import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react'
 import { CaretRight, MagnifyingGlass, Plus } from '@phosphor-icons/react'
 import { exerciseImageCandidates, exercisePhotoFrames } from '../lib/images'
 import { useInfiniteScroll } from '../lib/use-infinite-scroll'
 import { useGym } from '../store/useGym'
-import { exerciseLookup } from '../lib/exercises'
+import { useCatalogue } from '../store/useCatalogue'
+import { exerciseLookup, libraryOrder } from '../lib/exercises'
 import { sessionCountsByExercise } from '../lib/stats'
 import { inboxFor } from '../lib/messages'
 import { useMessages } from '../store/useMessages'
 import { useSession } from '../store/useSession'
 import { SAMPLE_COLLECTIONS } from '../data/sample-collections'
 import { MovementFrames } from '@/components/movement-frames'
+import { MovementVideo } from '@/components/movement-video'
+import { MovementInstructions } from '@/components/movement-instructions'
 import { Button } from '../ui/Button'
 import { Tag } from '../ui/Tag'
 import { Input } from '../ui/Input'
@@ -56,6 +59,9 @@ const PAGE = 48
 
 export function LibraryPage() {
   const customExercises = useGym((s) => s.customExercises)
+  const serverExercises = useCatalogue((s) => s.exercises)
+  const hidden = useCatalogue((s) => s.hidden)
+  const pullCatalogue = useCatalogue((s) => s.pull)
   const addExercise = useGym((s) => s.addExercise)
   const workouts = useGym((s) => s.workouts)
   const messages = useMessages((s) => s.messages)
@@ -73,12 +79,15 @@ export function LibraryPage() {
 
   const deferredQuery = useDeferredValue(query)
 
+  /* Movements written in the admin panel since this build shipped. The cached
+     copy renders immediately; the pull only ever replaces it with a better one. */
+  useEffect(() => {
+    void pullCatalogue()
+  }, [pullCatalogue])
+
   const exercises = useMemo(
-    () =>
-      Array.from(exerciseLookup(customExercises).values()).sort((a, b) =>
-        a.name.localeCompare(b.name),
-      ),
-    [customExercises],
+    () => libraryOrder(Array.from(exerciseLookup(customExercises, serverExercises, hidden).values())),
+    [customExercises, serverExercises, hidden],
   )
 
   /* Only equipment that actually exists in the catalogue; the import maps
@@ -424,21 +433,8 @@ function ExerciseDetailDialog({
 
             <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
               <MovementFrames exercise={exercise} />
-
-              {exercise.instructions && exercise.instructions.length > 0 ? (
-                <ol className="flex flex-col gap-2.5">
-                  {exercise.instructions.map((step, i) => (
-                    <li key={i} className="flex gap-3 text-sm leading-relaxed text-ink-2">
-                      <span className="num flex size-5 shrink-0 items-center justify-center rounded-full bg-surface-2 text-2xs font-semibold text-ink-3">
-                        {i + 1}
-                      </span>
-                      {step}
-                    </li>
-                  ))}
-                </ol>
-              ) : (
-                <p className="text-sm text-ink-3">No instructions available for this movement.</p>
-              )}
+              <MovementVideo key={exercise.id} exercise={exercise} />
+              <MovementInstructions key={exercise.id} exercise={exercise} />
             </div>
           </>
         )}

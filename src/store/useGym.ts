@@ -13,6 +13,7 @@ import type {
 } from '../lib/types'
 import { generatedExercises } from '../data/exercises-generated'
 import { populateByIdCache } from '../lib/exercises'
+import { wgerExercises } from '../data/exercises-wger-generated'
 import { INTENSITY_SETS } from '../lib/intensity'
 import { todayIso } from '../lib/dates'
 import { withRecordIds } from '../lib/records'
@@ -95,7 +96,7 @@ interface GymState {
 
 const today = todayIso
 
-populateByIdCache(generatedExercises)
+populateByIdCache([...generatedExercises, ...wgerExercises])
 
 /**
  * The store is memory-only. Persistence lives in lib/profiles: each profile's
@@ -499,7 +500,7 @@ export const useGym = create<GymState>()((set, get) => ({
       },
 }))
 
-populateByIdCache(generatedExercises)
+populateByIdCache([...generatedExercises, ...wgerExercises])
 
 /** The persisted slice of the store: user data, nothing derived. */
 export interface GymSnapshot {
@@ -557,6 +558,6 @@ export function hydrateGym(snapshot: Partial<GymSnapshot> | null | undefined): v
     fitnessTest: snapshot?.fitnessTest ?? null,
     story: snapshot?.story ?? null,
   }
-  populateByIdCache([...generatedExercises, ...next.customExercises])
+  populateByIdCache([...generatedExercises, ...wgerExercises, ...next.customExercises])
   useGym.setState(next)
 }
