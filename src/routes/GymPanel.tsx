@@ -17,11 +17,18 @@ import {
   TEMPLATE_LABELS,
   makeOfferCode,
   sentBy,
+  audienceWithin,
+  splitAudience,
   type GymMessage,
   type TemplateKind,
 } from '../lib/messages'
 import { listProfiles } from '../lib/profiles'
 import { publishToServer, readSyncLink } from '../lib/sync'
+import {
+  AudienceStrip,
+  CommercialConfirm,
+  type BroadcastScope,
+} from '@/components/broadcast-audience'
 import { GymJoinCode, GymRequests } from '@/components/gym-operator-tools'
 import { formatShortDate, pluralize } from '../lib/labels'
 import { todayIso } from '../lib/dates'
@@ -144,7 +151,29 @@ function GuestList({ message }: { message: GymMessage }) {
   )
 }
 
-function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
+/**
+ * Publishing as the platform rather than as a gym.
+ *
+ * The house reuses this desk instead of getting a second composer of its own.
+ * A parallel one would drift — a new template, a fixed validation, an added
+ * field would land on one and not the other — and the surface that must never
+ * mis-address anybody is the worst possible place for a stale copy.
+ */
+export interface BroadcastControls {
+  scope: BroadcastScope
+  setScope: (scope: BroadcastScope) => void
+  onBack: () => void
+}
+
+export function GymDesk({
+  gym,
+  profileId,
+  broadcast,
+}: {
+  gym: string
+  profileId: string
+  broadcast?: BroadcastControls
+}) {
   const messages = useMessages((s) => s.messages)
   const publish = useMessages((s) => s.publish)
   const remove = useMessages((s) => s.remove)
@@ -152,13 +181,24 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
   const savedMenu = menuFor(menus, gym)
   const [tab, setTab] = useState('compose')
 
-  const members = useMemo(
-    () =>
-      listProfiles().filter(
-        (p) => p.id !== profileId && p.gym?.trim().toLowerCase() === gym.trim().toLowerCase(),
-      ),
-    [profileId, gym],
-  )
+  /**
+   * Who this desk can address. A gym's own members, or — for the house — the
+   * people no gym has claimed, or everybody.
+   *
+   * Derived from the same directory the confirmation counts, so the number in
+   * the warning and the list you can pick from can never disagree.
+   */
+  const scope = broadcast?.scope
+  const { members, split } = useMemo(() => {
+    /* One read of the directory for both. The list you can pick from and the
+       number the warning quotes come from the same array, so they cannot
+       disagree about who is out there. */
+    const directory = listProfiles()
+    return {
+      members: audienceWithin(directory, gym, scope, profileId),
+      split: splitAudience(directory, profileId),
+    }
+  }, [profileId, gym, scope])
   const sent = sentBy(messages, gym)
 
   /* Composer state. One draft at a time; publishing resets it. */
@@ -189,6 +229,10 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
   const [error, setError] = useState<string | null>(null)
   const [published, setPublished] = useState<string | null>(null)
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
+  /* Set when a commercial template is aimed at everyone; cleared by any of the
+     three ways out. Holding it here rather than in a modal means the draft is
+     still on screen behind the decision. */
+  const [confirmWide, setConfirmWide] = useState(false)
   const [images, setImages] = useState<PendingImage[]>([])
 
   /* Files need somewhere to live that is not this browser's storage quota, so
@@ -291,7 +335,22 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
     return common
   }, [gym, profileId, kind, title, body, images, eventDate, eventTime, eventPlace, courses, discount, validUntil, code, productName, productPrice, productNote, chExerciseName, chDays, chStart, chDelta, chUnit, collectionPicks])
 
-  const doPublish = () => {
+  /** The templates that sell something. The only ones the warning is about. */
+  const COMMERCIAL: TemplateKind[] = ['offer', 'product']
+
+  const doPublish = (opts?: { asScope?: BroadcastScope; force?: boolean }) => {
+    const sendScope = opts?.asScope ?? broadcast?.scope
+    if (
+      sendScope === 'everyone' &&
+      COMMERCIAL.includes(kind) &&
+      !opts?.force &&
+      split.affiliated > 0
+    ) {
+      setConfirmWide(true)
+      setError(null)
+      return
+    }
+    setConfirmWide(false)
     if (!draft) {
       setError(
         kind === 'event'
@@ -310,17 +369,34 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
       )
       return
     }
-    if (!everyone && picked.length === 0) {
-      setError('Pick at least one member, or send to everyone.')
+    /**
+     * The audience for the scope being sent, not the one the memo was built
+     * for. When the confirmation narrows an offer, this call and the publish
+     * happen in the same tick — the memo is still holding the wider list, and
+     * reading the count from it reported ten deliveries for five.
+     */
+    const sendTo = audienceWithin(listProfiles(), gym, sendScope, profileId)
+    /* Somebody picked under the wider scope may not be in the narrower one.
+       They would never have received it — `isAddressedTo` checks the scope
+       first — but leaving their id on the message inflates every count that
+       looks at it afterwards. */
+    const sendPicked = picked.filter((id) => sendTo.some((p) => p.id === id))
+    if (!everyone && sendPicked.length === 0) {
+      setError(
+        broadcast
+          ? 'Pick at least one person, or send to all of them.'
+          : 'Pick at least one member, or send to everyone.',
+      )
       return
     }
     const input = {
       gym,
       authorId: profileId,
+      ...(sendScope ? { scope: sendScope } : {}),
       kind,
       title: draft.title,
       body: draft.body,
-      audience: (everyone ? 'all' : picked) as 'all' | string[],
+      audience: (everyone ? 'all' : sendPicked) as 'all' | string[],
       event: draft.event,
       menu: draft.menu,
       offer: draft.offer,
@@ -339,14 +415,21 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
     const files = images.map((i) => ({ file: i.file, alt: i.alt }))
     void publishToServer(profileId, input, files).then((sent) => {
       publish(sent ? { ...input, id: sent.id, images: sent.images } : input)
-      const reachCount = everyone ? members.length : picked.length
+      const reachCount = everyone ? sendTo.length : sendPicked.length
       const withPictures = images.length > 0 ? ` ${pluralize(images.length, 'picture')} attached.` : ''
+      const who = broadcast
+        ? sendScope === 'everyone'
+          ? 'every member of enForma'
+          : 'everyone with no gym'
+        : gym
       setPublished(
         sent
-          ? `Published to ${gym} on every device.${withPictures} It is now under Sent.`
+          ? `Published to ${who} on every device.${withPictures} It is now under Sent.`
           : reachCount === 0
-            ? 'Published. No members on this device yet — it sits under Sent and delivers as they join.'
-            : `Published to ${pluralize(reachCount, 'member')} on this device. It is now under Sent.`,
+            ? broadcast
+              ? 'Published. Nobody in this audience on this device yet — it sits under Sent and delivers as they arrive.'
+              : 'Published. No members on this device yet — it sits under Sent and delivers as they join.'
+            : `Published to ${pluralize(reachCount, broadcast ? 'person' : 'member', broadcast ? 'people' : 'members')} on this device. It is now under Sent.`,
       )
       for (const image of images) URL.revokeObjectURL(image.preview)
       setImages([])
@@ -384,20 +467,48 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
 
   return (
     <div className="flex flex-col gap-8">
-      <PageHeader
-        title="Gym panel"
-        description={`${gym} — reach your members with events, menus, offers and challenges.`}
-      />
+      {broadcast ? (
+        <PageHeader
+          title="Broadcast"
+          description="enForma writes to its own members the same way a gym writes to theirs. The only difference is who is listening, and that is a decision, not a setting."
+        />
+      ) : (
+        <PageHeader
+          title="Gym panel"
+          description={`${gym} — reach your members with events, menus, offers and challenges.`}
+        />
+      )}
+
+      {broadcast && (
+        <AudienceStrip
+          scope={broadcast.scope}
+          split={split}
+          onChange={() => {
+            setConfirmWide(false)
+            broadcast.onBack()
+          }}
+        />
+      )}
 
       <Tabs
         value={tab}
         onValueChange={setTab}
+        /* The house runs no kitchen and nobody applies to join it, so those two
+           are absent rather than present and empty. An empty tab reads as a
+           feature that is broken; a missing one reads as a feature that does
+           not apply, which is the truth. */
         tabs={[
           { value: 'compose', label: 'Compose' },
           { value: 'sent', label: 'Sent', count: sent.length },
-          { value: 'menu', label: 'Menu', count: savedMenu ? countItems(savedMenu) : 0 },
-          { value: 'members', label: 'Members', count: members.length },
-          { value: 'requests', label: 'Requests' },
+          ...(broadcast
+            ? []
+            : [{ value: 'menu', label: 'Menu', count: savedMenu ? countItems(savedMenu) : 0 }]),
+          {
+            value: 'members',
+            label: broadcast?.scope === 'everyone' ? 'Everyone' : 'Members',
+            count: members.length,
+          },
+          ...(broadcast ? [] : [{ value: 'requests', label: 'Requests' }]),
         ]}
       >
         <TabPanel value="compose" className="flex flex-col gap-6">
@@ -733,7 +844,12 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
                     )}
                   >
                     <UsersThree size={15} />
-                    Everyone ({members.length})
+                    {/* "Everyone" here means everyone in the chosen audience,
+                        which is a different everyone from the scope's. Two
+                        controls one above the other using the same word for
+                        different sets is how somebody ends up sure they
+                        narrowed something they did not. */}
+                    {broadcast ? 'All of them' : 'Everyone'} ({members.length})
                   </button>
                   {members.map((m) => {
                     const on = !everyone && picked.includes(m.id)
@@ -783,18 +899,31 @@ function GymDesk({ gym, profileId }: { gym: string; profileId: string }) {
                 )}
               </div>
 
-              <div className="flex flex-wrap items-center gap-3">
-                <Button variant="primary" onClick={doPublish}>
-                  <PaperPlaneTilt size={16} />
-                  Publish
-                </Button>
-                {error && <span className="text-2xs text-danger">{error}</span>}
-                {published && (
-                  <span role="status" className="text-2xs text-good">
-                    {published}
-                  </span>
-                )}
-              </div>
+                      {confirmWide && broadcast ? (
+                <CommercialConfirm
+                  split={split}
+                  kindLabel={TEMPLATE_LABELS[kind]}
+                  onNarrow={() => {
+                    broadcast.setScope('unaffiliated')
+                    doPublish({ asScope: 'unaffiliated' })
+                  }}
+                  onSendAnyway={() => doPublish({ force: true })}
+                  onCancel={() => setConfirmWide(false)}
+                />
+              ) : (
+                <div className="flex flex-wrap items-center gap-3">
+                  <Button variant="primary" onClick={() => doPublish()}>
+                    <PaperPlaneTilt size={16} />
+                    Publish
+                  </Button>
+                  {error && <span className="text-2xs text-danger">{error}</span>}
+                  {published && (
+                    <span role="status" className="text-2xs text-good">
+                      {published}
+                    </span>
+                  )}
+                </div>
+              )}
           </Panel>
 
           {draft && (

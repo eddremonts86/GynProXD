@@ -1,5 +1,11 @@
 import { create } from 'zustand'
-import type { GymMessage, MessageImage, TemplateKind, MenuCourse } from '../lib/messages'
+import type {
+  GymMessage,
+  MenuCourse,
+  MessageImage,
+  MessageScope,
+  TemplateKind,
+} from '../lib/messages'
 import { applyResponses, markResponseDirty, type ResponseRow } from '../lib/gym-responses'
 import type { Challenge } from '../lib/challenge'
 import type { Collection } from '../lib/collection'
@@ -35,6 +41,8 @@ export interface PublishInput {
   title: string
   body?: string
   audience: 'all' | string[]
+  /** Only the house sets this; a gym's messages carry none. See MessageScope. */
+  scope?: MessageScope
   event?: { date: string; time?: string; place?: string }
   menu?: { courses: MenuCourse[] }
   offer?: { discount: string; validUntil?: string; code: string }

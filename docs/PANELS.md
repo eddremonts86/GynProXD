@@ -232,3 +232,67 @@ Everyone gets Today/Planner/Library/History/Settings plus an Inbox with an
 unread badge (desktop rail item; bell in the mobile header). A gym profile
 adds "Gym panel"; an admin adds "Admin". Panels guard themselves and
 redirect wrong-role visitors home.
+
+## The house gym
+
+Until this existed, a member no gym had claimed received **nothing**. Not less
+— nothing: the read rule matched `gym` against `@request.auth.gym`, and an
+account with no gym never matched a row, so the inbox, the banners, the push
+notifications and the events panel were all built, shipped and silent for them.
+They are the majority of new accounts.
+
+So the platform gets to speak, through one row in `gyms` marked `kind: 'house'`
+and displayed as **enForma**. It is identified by that field and never by its
+name — which is what makes it safe to rename, and makes a device-local gym that
+happens to share the name harmless.
+
+What it deliberately is **not** is a membership. No `users.gym` points at it.
+"Has a gym" stays `gym != ''` everywhere in the app, nothing was rewritten, and
+nobody acquired a membership they did not ask for. Belonging to nothing is a
+real state and it is modelled as one; `gym_join_requests` refuses the house,
+because a request to join it would be both meaningless and, if approved, would
+make every "do they have a gym?" check in the app start lying.
+
+### Two audiences that must not blur
+
+`gym_messages.scope` says who a message is for.
+
+| scope | who receives it | who may send it |
+| --- | --- | --- |
+| `members` (or absent) | the gym's own members, matched by name | any gym operator |
+| `unaffiliated` | accounts with no gym, and who run none | platform admins, as the house |
+| `everyone` | every account | platform admins, as the house |
+
+Absent reads as `members`, so every row published before this reaches exactly
+who it reached before.
+
+The gating lives in the read rule itself
+(`pb_migrations/1757600000_house_gym.js`), not only in the create hook: the
+wider arms require `gym.kind = 'house'`, so a gym that somehow wrote
+`scope: 'everyone'` onto its own row still reaches nobody. A rule that works
+only because a hook ran stops working the day somebody edits the hook.
+
+An operator counts as affiliated even though their own `users.gym` is empty —
+they run a gym, they are not a member of it. Without that clause the server
+would have handed them the "nobody has claimed these people" audience while the
+client's own filter excluded them, which is a disagreement, not a feature.
+
+### Why the composer asks first
+
+The danger is not technical. It is somebody typing an offer while thinking
+about the other group. A radio pair above a composer is one control with two
+outcomes and the dangerous one a mis-click away, so the choice is a door
+instead: `/admin` → Broadcast asks who before there is anything to lose, the
+audience stays on screen the whole time, and going wider is a deliberate trip
+back.
+
+Commercial templates (`offer`, `product`) aimed at `everyone` stop for a
+confirmation that states the number rather than asking whether you are sure —
+"it goes to 10 people, 5 of them train at a gym" — and offers the message you
+probably meant as the **primary** action. Narrowing there re-derives the
+audience from the scope being sent, never from the memoised list of the scope
+just abandoned; getting that wrong delivered to five and reported ten.
+
+`scripts/audit/house-gym-boundary.mjs` boots a throwaway PocketBase from these
+migrations and hooks and proves the boundary from the receiving side. Run it
+after touching any of it.

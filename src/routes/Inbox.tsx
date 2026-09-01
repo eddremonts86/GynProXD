@@ -4,7 +4,7 @@ import { BellSimpleSlash, ForkKnife, Storefront } from '@phosphor-icons/react'
 import { useSession } from '../store/useSession'
 import { useMessages } from '../store/useMessages'
 import { useGym } from '../store/useGym'
-import { inboxFor } from '../lib/messages'
+import { HOUSE_GYM, inboxFor } from '../lib/messages'
 import { notificationsEnabled, notificationsSupported } from '../lib/notify'
 import { useMenus } from '../store/useMenus'
 import { menuFor } from '../lib/menu'
@@ -47,10 +47,14 @@ export function InboxPage() {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Inbox"
+        /* Both halves were wrong the moment the platform could write here. The
+           first named one sender for an inbox that now has two; the second
+           promised a gym to somebody who has none, on the very screen where
+           messages had started arriving without one. */
         description={
           gym
-            ? `Events, menus, offers and challenges from ${gym}.`
-            : 'Messages from your gym land here.'
+            ? `Events, menus, offers and challenges from ${gym}, and from ${HOUSE_GYM}.`
+            : `Events, offers and challenges from ${HOUSE_GYM}. Join a gym and theirs land here too.`
         }
         action={
           gymMenu ? (

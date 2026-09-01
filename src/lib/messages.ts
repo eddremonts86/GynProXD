@@ -8,6 +8,26 @@
 import type { Challenge } from './challenge'
 import type { Collection } from './collection'
 
+/**
+ * Who a message is for, beyond the gym it was written in.
+ *
+ * A gym only ever writes to its own members and never sees this. It exists for
+ * the one sender that is not a gym: the platform, which has two audiences that
+ * must never be confused. `unaffiliated` reaches the people no gym has claimed
+ * — the ones who, before this, received nothing at all. `everyone` reaches
+ * them and every gym's members too, which is a different and more dangerous
+ * thing: those people already pay somebody else.
+ *
+ * Identification is by scope, never by the sender's name. That is what makes a
+ * device-local gym that happens to be called the same thing as the house
+ * harmless rather than a leak — its messages are `members`, and `members` is
+ * checked against the gym name, which is exactly the old behaviour.
+ */
+export type MessageScope = 'members' | 'unaffiliated' | 'everyone'
+
+/** What a member sees above a platform message. Display only — see MessageScope. */
+export const HOUSE_GYM = 'enForma'
+
 export type TemplateKind =
   | 'announcement'
   | 'event'
@@ -43,6 +63,12 @@ export interface GymMessage {
   body?: string
   /** 'all' reaches every member of the gym; otherwise explicit profile ids. */
   audience: 'all' | string[]
+  /**
+   * Absent on every message written before this existed, and on every message
+   * a gym will ever write. Absent reads as `members`, which is the rule this
+   * app shipped with — so nothing already sent changes who it reaches.
+   */
+  scope?: MessageScope
   event?: { date: string; time?: string; place?: string }
   menu?: { courses: MenuCourse[] }
   offer?: { discount: string; validUntil?: string; code: string }
@@ -89,14 +115,86 @@ export const TEMPLATE_LABELS: Record<TemplateKind, string> = {
 const sameGym = (a: string | undefined, b: string | undefined): boolean =>
   !!a && !!b && a.trim().toLowerCase() === b.trim().toLowerCase()
 
+/** Absent means `members`: the rule this app shipped with, applied unchanged. */
+export function scopeOf(message: GymMessage): MessageScope {
+  return message.scope ?? 'members'
+}
+
 export function isAddressedTo(
   message: GymMessage,
   profile: { id: string; gym?: string },
 ): boolean {
   /* Authors never receive their own broadcasts; their view is the sent list. */
   if (message.authorId === profile.id) return false
-  if (!sameGym(message.gym, profile.gym)) return false
+
+  switch (scopeOf(message)) {
+    case 'everyone':
+      break
+    case 'unaffiliated':
+      /* The whole point of the scope. Somebody who joined a gym this morning
+         stops being in this audience this morning, with no list to maintain
+         and nothing to un-send. */
+      if (profile.gym?.trim()) return false
+      break
+    default:
+      if (!sameGym(message.gym, profile.gym)) return false
+  }
+
   return message.audience === 'all' || message.audience.includes(profile.id)
+}
+
+/**
+ * Who a desk can address, given the scope it is writing under.
+ *
+ * Extracted so the composer's pickable list, the count in the confirmation and
+ * the count in the success line all come from one function. They did not, for
+ * about ten minutes: narrowing an offer from everyone to the unaffiliated
+ * delivered it correctly to five people and then reported ten, because the
+ * number came from a list memoised under the scope that had just been
+ * abandoned. Delivering right and reporting wrong is worse than either.
+ */
+export function audienceWithin<T extends { id: string; gym?: string }>(
+  profiles: T[],
+  gym: string,
+  scope: MessageScope | undefined,
+  authorId: string,
+): T[] {
+  const others = profiles.filter((p) => p.id !== authorId)
+  if (scope === 'everyone') return others
+  if (scope === 'unaffiliated') return others.filter((p) => !p.gym?.trim())
+  const key = gym.trim().toLowerCase()
+  return others.filter((p) => p.gym?.trim().toLowerCase() === key)
+}
+
+export interface AudienceSplit {
+  /** Everyone this device knows about, minus the author. */
+  total: number
+  /** No gym has claimed them. */
+  unaffiliated: number
+  /** They already train somewhere, and somebody is already selling to them. */
+  affiliated: number
+}
+
+/**
+ * Who a broadcast is about to land on, counted rather than described.
+ *
+ * This exists to be read out loud in a confirmation. "Are you sure?" is a
+ * question nobody has ever answered no to; "890 of these people train at a
+ * gym" is a fact that makes the sender stop. So the numbers are counted from
+ * the directory at the moment of asking, never cached and never estimated.
+ */
+export function splitAudience(
+  profiles: { id: string; gym?: string }[],
+  authorId: string,
+): AudienceSplit {
+  let unaffiliated = 0
+  let affiliated = 0
+  for (const profile of profiles) {
+    if (profile.id === authorId) continue
+    if (profile.gym?.trim()) affiliated += 1
+    else unaffiliated += 1
+  }
+  return { total: unaffiliated + affiliated, unaffiliated, affiliated }
 }
 
 export function inboxFor(

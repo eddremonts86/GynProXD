@@ -1,10 +1,17 @@
 /// <reference path="../pb_data/types.d.ts" />
 /**
  * Publishing to a gym is an operator's act. The collection rule already pins
- * the author to the signed-in account; this hook enforces the part a create
- * rule cannot express — that the author actually operates the target gym.
+ * the author to the signed-in account; these hooks enforce the parts a create
+ * rule cannot express — that the author actually operates the target gym, and
+ * that only the house may address anybody beyond its own members.
+ *
+ * The shared predicates come from utils/house_gym.js because each handler runs
+ * in its own VM and cannot see a function declared beside it here.
  */
+
 onRecordCreateRequest((e) => {
+  const { isHouseGym, isPlatformAdmin, HOUSE_SCOPES } = require(`${__hooks}/utils/house_gym.js`)
+
   const gymId = e.record.get('gym')
   let gym
   try {
@@ -12,10 +19,54 @@ onRecordCreateRequest((e) => {
   } catch {
     throw new BadRequestError('That gym does not exist.')
   }
-  const operators = gym.get('operators') || []
   const authId = e.auth ? e.auth.id : ''
+  const scope = String(e.record.get('scope') || '')
+
+  if (isHouseGym(gym)) {
+    if (!isPlatformAdmin(e.app, authId)) {
+      throw new ForbiddenError('Only a platform admin can publish from enForma.')
+    }
+    if (HOUSE_SCOPES.indexOf(scope) === -1) {
+      throw new BadRequestError('Choose who this is for: unaffiliated, or everyone.')
+    }
+    return e.next()
+  }
+
+  const operators = gym.get('operators') || []
   if (!authId || !operators.includes(authId)) {
     throw new ForbiddenError("Only this gym's operators can publish to it.")
   }
+  /**
+   * A gym reaches its own members and nobody else's. Rejected rather than
+   * silently narrowed: a gym that tried to address the platform has
+   * misunderstood something, and quietly rewriting it would leave them
+   * believing it worked.
+   */
+  if (scope && scope !== 'members') {
+    throw new ForbiddenError('A gym can only publish to its own members.')
+  }
   e.next()
 }, 'gym_messages')
+
+/**
+ * Nobody applies to belong to nothing.
+ *
+ * The house is where an account already is before it chooses, so a request to
+ * join it is meaningless — and were one ever approved, `users.gym` would point
+ * at the house and every "do they have a gym?" check in the app, all of which
+ * read `gym != ''`, would start answering yes for somebody who has none.
+ */
+onRecordCreateRequest((e) => {
+  const { isHouseGym } = require(`${__hooks}/utils/house_gym.js`)
+
+  let gym = null
+  try {
+    gym = e.app.findRecordById('gyms', e.record.get('gym'))
+  } catch {
+    /* A missing gym is the create rule's problem, not this hook's. */
+  }
+  if (isHouseGym(gym)) {
+    throw new BadRequestError('enForma is where you already are. Pick a real gym.')
+  }
+  e.next()
+}, 'gym_join_requests')
