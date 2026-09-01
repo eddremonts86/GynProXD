@@ -758,7 +758,7 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
                     ['The library, the planner, the session', 'Free, and it stays free.'],
                     ['Forget the passphrase and it is gone', 'No reset exists. Nobody can open it, us included.'],
                     ['One browser, one device', 'Clear the site data and the training goes with it.'],
-                    ['No gym can reach you', 'Membership is granted server-side, so it needs an account.'],
+                    ['Nobody can reach you', 'Gym news and enForma&rsquo;s own both need an account.'],
                   ],
                 },
                 {
