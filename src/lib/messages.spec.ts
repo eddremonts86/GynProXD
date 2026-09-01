@@ -3,6 +3,8 @@ import {
   activeBanners,
   audienceWithin,
   HOUSE_GYM,
+  isMessageScope,
+  MESSAGE_SCOPES,
   previewOf,
   senderOf,
   inboxFor,
@@ -423,5 +425,104 @@ describe('senderOf', () => {
     expect(senderOf({ ...base, gym: HOUSE_GYM, scope: 'everyone' })).toBe(HOUSE_GYM)
     // Even if the row's gym field says otherwise: the scope is the identity.
     expect(senderOf({ ...base, scope: 'unaffiliated' })).toBe(HOUSE_GYM)
+  })
+})
+
+/**
+ * The open door: a gym reaching people who belong to no gym.
+ *
+ * Every other message here travels inside a relationship somebody chose. This
+ * one does not, so the questions worth asking are about who it must NOT reach
+ * — the gym's rivals' members, and anybody who said no — and about whose name
+ * a member sees above it.
+ */
+describe('the open door', () => {
+  const offer = msg({
+    gym: 'Hierro Viejo',
+    scope: 'open-door',
+    kind: 'offer',
+    title: 'First month on us',
+    offer: { discount: 'First month free', code: 'ABCD-1234' },
+  })
+
+  const loose = { id: 'p-loose' }
+  const looseNo = { id: 'p-no', openToGyms: false }
+  const theirs = { id: 'p-theirs', gym: 'Hierro Viejo' }
+  const rival = { id: 'p-rival', gym: 'Casa Ronda' }
+
+  it('reaches somebody with no gym', () => {
+    expect(isAddressedTo(offer, loose)).toBe(true)
+  })
+
+  it('never reaches somebody who already pays another gym', () => {
+    // The reason the whole scope split exists: this is the person we must not
+    // accidentally sell to.
+    expect(isAddressedTo(offer, rival)).toBe(false)
+  })
+
+  it('does not reach the gym’s own members either', () => {
+    // They are already inside; recruiting them is noise, and the gym has six
+    // other templates for talking to them.
+    expect(isAddressedTo(offer, theirs)).toBe(false)
+  })
+
+  it('respects somebody who turned it off', () => {
+    expect(isAddressedTo(offer, looseNo)).toBe(false)
+  })
+
+  it('treats an absent answer as yes, the way the server’s backfill did', () => {
+    // Two places decide this — the migration and this line — and they have to
+    // agree, or a profile written before the switch existed would receive
+    // messages the server does not think it is sending, or the reverse.
+    expect(isAddressedTo(offer, { id: 'p-old' })).toBe(true)
+    expect(isAddressedTo(offer, { id: 'p-old', openToGyms: undefined })).toBe(true)
+  })
+
+  it('arrives over the gym’s own name, never the platform’s', () => {
+    // A stranger's offer wearing "enForma" would be untrue, and would lend the
+    // platform's credibility to whoever bought the tier.
+    expect(senderOf(offer)).toBe('Hierro Viejo')
+    expect(senderOf(offer)).not.toBe(HOUSE_GYM)
+  })
+
+  it('still lets the house be the house', () => {
+    expect(senderOf(msg({ scope: 'unaffiliated' }))).toBe(HOUSE_GYM)
+    expect(senderOf(msg({ scope: 'everyone' }))).toBe(HOUSE_GYM)
+  })
+
+  it('picks the same audience the rule does, minus the refusals', () => {
+    const directory = [
+      { id: 'gym-1', gym: 'Hierro Viejo' },
+      loose,
+      looseNo,
+      theirs,
+      rival,
+    ]
+    const reached = audienceWithin(directory, 'Hierro Viejo', 'open-door', 'gym-1')
+    expect(reached.map((p) => p.id)).toEqual(['p-loose'])
+  })
+
+  it('is not the same audience as the house’s unaffiliated', () => {
+    // The house reaches somebody who turned gyms off: they did not opt out of
+    // the platform they are using, only out of being recruited by strangers.
+    expect(isAddressedTo(msg({ scope: 'unaffiliated' }), looseNo)).toBe(true)
+  })
+})
+
+describe('scopes on the wire', () => {
+  it('recognises every scope this build has, and nothing else', () => {
+    // The guard exists because `messageFromWire` used to carry a literal list
+    // of two, so the fourth scope arrived stripped and its audience never saw
+    // it. Walked, so a fifth cannot be added without this failing.
+    for (const scope of MESSAGE_SCOPES) expect(isMessageScope(scope)).toBe(true)
+    expect(isMessageScope('open door')).toBe(false)
+    expect(isMessageScope('')).toBe(false)
+    expect(isMessageScope(undefined)).toBe(false)
+  })
+
+  it('names all four, so the list cannot quietly shrink', () => {
+    expect([...MESSAGE_SCOPES].sort()).toEqual(
+      ['everyone', 'members', 'open-door', 'unaffiliated'],
+    )
   })
 })
