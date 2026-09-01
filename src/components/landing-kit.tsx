@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
-import type { Icon } from '@phosphor-icons/react'
+import { ArrowRight, type Icon } from '@phosphor-icons/react'
 import { Wordmark } from '@/components/brand'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { RailToggle } from '@/components/rail-toggle'
@@ -171,20 +171,33 @@ export function LandingRail({
         })}
       </nav>
 
-      <div className="flex flex-col gap-3 p-3">
+      <div className="flex flex-col gap-2 p-3">
         <Button variant="secondary" onClick={() => onJump(cta.target)} className="w-full">
           {cta.label}
           {cta.icon}
         </Button>
-        {/* The other door. A plain link rather than a button: it is a change of
-            audience, not the thing this page is asking for. */}
+
+        {/* The other door: a destination, so it is shaped like the section rows
+            above it rather than a bare underline. It used to be one, floating
+            between a solid button and a line of metadata with equal gaps on
+            both sides, so it grouped with neither — and its text sat at the
+            rail's 28px while the note below sat at 12, which is what made the
+            whole corner look crooked. The arrow waits for a pointer: it is a
+            second choice, not a second call to action. */}
         <a
           href={crossLink.href}
-          className="px-4 text-xs text-ink-3 underline-offset-2 hover:text-ink hover:underline"
+          className="group flex h-10 items-center justify-between gap-2 rounded-full px-4 text-sm font-medium text-ink-3 transition-colors duration-150 hover:bg-surface hover:text-ink"
         >
           {crossLink.label}
+          <ArrowRight
+            size={14}
+            weight="bold"
+            className="shrink-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100"
+          />
         </a>
-        <div className="flex items-center justify-between gap-2 pt-1">
+
+        {/* Metadata, and it says so by sitting under a rule. */}
+        <div className="mt-1 flex items-center justify-between gap-2 border-t border-line px-4 pt-3">
           <Label>{note}</Label>
           <ThemeToggle />
         </div>

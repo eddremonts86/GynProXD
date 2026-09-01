@@ -244,10 +244,15 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
       <main className={railHidden ? undefined : 'lg:pl-60'}>
         {/* ------------------------------------------------------------- Hero */}
         <section id="top" className="scroll-mt-4">
-          <div className={cn(SHELL, 'grid gap-10 py-14 md:py-20 lg:grid-cols-[1.35fr_1fr] lg:gap-16')}>
+          {/* Two columns at `xl`, not `lg`. With the 240px rail beside it, 1024px
+              left the headline about 420px to work in and it broke into six
+              lines — "Your / members / keep this / app. You get / to be the /
+              gym in it." The measurement, not the taste: the split only earns
+              its keep once there is room for both halves. */}
+          <div className={cn(SHELL, 'grid gap-10 py-14 md:py-20 xl:grid-cols-[1.35fr_1fr] xl:gap-16')}>
             <div className="flex flex-col gap-6">
               <Label>For gyms</Label>
-              <h1 className="max-w-[19ch] text-4xl leading-[1.05] tracking-tight text-ink md:text-6xl">
+              <h1 className="max-w-[19ch] text-4xl leading-[1.05] tracking-tight text-ink md:text-5xl xl:text-6xl">
                 Your members keep this app. You get to be the gym in it.
               </h1>
               <Lead>
@@ -270,7 +275,7 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
               </p>
             </div>
 
-            <Reveal className="flex items-end">
+            <Reveal className="flex xl:items-end">
               <Panel padding="lg" className="flex w-full flex-col gap-7">
                 {FACTS.map((fact) => (
                   <Figure key={fact.label} {...fact} />
