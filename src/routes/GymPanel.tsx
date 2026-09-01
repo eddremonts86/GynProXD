@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Navigate } from '@tanstack/react-router'
 import {
   ArrowsClockwise,
@@ -58,7 +58,17 @@ import { Panel } from '../ui/Panel'
 import { PageHeader } from '../ui/PageHeader'
 import { Tag } from '../ui/Tag'
 import { Stat } from '../ui/Stat'
-import { REACH_WINDOW_DAYS, summariseReach, windowStart } from '../lib/gym-reach'
+import {
+  REACH_WINDOWS,
+  REACH_WINDOW_DAYS,
+  reachCsv,
+  summariseReach,
+  windowDays,
+  windowLabel,
+  windowStart,
+  type ReachWindowKey,
+} from '../lib/gym-reach'
+import { planAllows, planOf, type GymPlan } from '../lib/gym-plan'
 import { guestList } from '../lib/gym-responses'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
@@ -234,10 +244,52 @@ export function GymDesk({
      still on screen behind the decision. */
   const [confirmWide, setConfirmWide] = useState(false)
   const [images, setImages] = useState<PendingImage[]>([])
+  /**
+   * Which plan this gym is on, read from its own row rather than cached on the
+   * profile. A plan can change between one visit and the next — somebody
+   * upgrades, somebody stops paying — and a stale copy would either refuse a
+   * feature that is now paid for or hand over one that is not.
+   */
+  const [plan, setPlan] = useState<GymPlan>('base')
+  const [reachWindow, setReachWindow] = useState<ReachWindowKey>('d30')
 
   /* Files need somewhere to live that is not this browser's storage quota, so
      the picker is only offered to an operator whose account can reach one. */
   const canUpload = !!readSyncLink(profileId)?.token
+
+  useEffect(() => {
+    const link = readSyncLink(profileId)
+    if (!link?.token || broadcast) return
+    const filter = encodeURIComponent(`name = "${gym.replace(/"/g, '')}"`)
+    void fetch(`${link.server}/api/collections/gyms/records?perPage=1&filter=${filter}`, {
+      headers: { authorization: link.token },
+    })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((data: { items: { plan?: string }[] }) => setPlan(planOf(data.items[0]?.plan)))
+      /* A server that will not say stays on the cheaper answer: refusing a paid
+         feature is a complaint, handing over an unpaid one is a habit. */
+      .catch(() => setPlan('base'))
+  }, [profileId, gym, broadcast])
+
+  const canPickWindow = planAllows(plan, 'reach-window')
+  /* The kitchen is what Plus buys today. It was on for every gym, including the
+     ones the page charges the lower price, which made the pricing page wrong in
+     the expensive direction from the moment somebody paid it. */
+  const canKitchen = planAllows(plan, 'kitchen')
+  const windowedDays = windowDays(reachWindow)
+  const since = windowedDays === null ? null : windowStart(todayIso(), windowedDays)
+
+  const exportReach = () => {
+    const csv = reachCsv(messages, gym, since)
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${gym.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-reach-${todayIso()}.csv`
+    a.click()
+    /* Revoked on the next tick rather than immediately: Safari has not started
+       reading the blob when `click()` returns. */
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+  }
 
   const togglePicked = (id: string) => {
     setEveryone(false)
@@ -500,7 +552,7 @@ export function GymDesk({
         tabs={[
           { value: 'compose', label: 'Compose' },
           { value: 'sent', label: 'Sent', count: sent.length },
-          ...(broadcast
+          ...(broadcast || !canKitchen
             ? []
             : [{ value: 'menu', label: 'Menu', count: savedMenu ? countItems(savedMenu) : 0 }]),
           {
@@ -518,7 +570,7 @@ export function GymDesk({
                     here — its Menu tab is absent for the same reason, and a
                     template you can fill in while the thing behind it does not
                     exist is worse than one that is simply not there. */}
-                {KINDS.filter((k) => !(broadcast && k === 'menu')).map((k) => (
+                {KINDS.filter((k) => k !== 'menu' || (!broadcast && canKitchen)).map((k) => (
                   <button
                     key={k}
                     type="button"
@@ -534,6 +586,16 @@ export function GymDesk({
                   </button>
                 ))}
               </div>
+
+              {!broadcast && !canKitchen && (
+                /* Named rather than silently absent. A gym that has heard about
+                   the daily menu and cannot find it will ask us; one that reads
+                   this either upgrades or stops looking. */
+                <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-2xs text-ink-3">
+                  <Tag tone="outline">Plus</Tag>
+                  The daily menu and your standing kitchen card come with Plus.
+                </p>
+              )}
 
               <Input
                 label="Title"
@@ -945,7 +1007,8 @@ export function GymDesk({
           {sent.length > 0 && (
             <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-6">
               {(() => {
-                const reach = summariseReach(messages, gym, windowStart(todayIso()))
+                const reach = summariseReach(messages, gym, since)
+                const hint = windowLabel(reachWindow)
                 return (
                   [
                     { label: 'Published', value: reach.published },
@@ -957,14 +1020,45 @@ export function GymDesk({
                   ] as const
                 ).map((item) => (
                   <Panel key={item.label} padding="md">
-                    <Stat
-                      label={item.label}
-                      value={item.value}
-                      hint={`Last ${REACH_WINDOW_DAYS} days`}
-                    />
+                    <Stat label={item.label} value={item.value} hint={hint} />
                   </Panel>
                 ))
               })()}
+            </div>
+          )}
+
+          {sent.length > 0 && (
+            <div className="mb-6 flex flex-wrap items-center gap-3">
+              {canPickWindow ? (
+                <>
+                  <FormSelect
+                    ariaLabel="Reach window"
+                    size="sm"
+                    value={reachWindow}
+                    onValueChange={(v) =>
+                      /* Read back off the same list that rendered the options,
+                         so a value the type does not know about cannot arrive
+                         through a cast. */
+                      setReachWindow(REACH_WINDOWS.find((w) => w.key === v)?.key ?? 'd30')
+                    }
+                    options={REACH_WINDOWS.map((w) => ({ value: w.key, label: w.label }))}
+                    className="w-44"
+                  />
+                  <Button variant="secondary" size="sm" onClick={exportReach}>
+                    <DownloadSimple size={15} />
+                    Export as CSV
+                  </Button>
+                </>
+              ) : (
+                /* Named, not hidden. A gym on Base should know the longer view
+                   exists and what it costs, rather than wondering why the
+                   figures only ever cover a month. */
+                <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-2xs text-ink-3">
+                  <Tag tone="outline">Plus</Tag>
+                  Any window and a CSV export come with Plus. These figures cover the last{' '}
+                  {REACH_WINDOW_DAYS} days.
+                </p>
+              )}
             </div>
           )}
 

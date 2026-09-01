@@ -24,6 +24,7 @@ import { CATALOGUE_SIZE } from '@/data/catalogue-stats'
 import { WGER_SIZE } from '@/data/wger-stats'
 import { REACH_WINDOW_DAYS } from '@/lib/gym-reach'
 import { TEMPLATE_LABELS } from '@/lib/messages'
+import { isBuilt, type PlusFeature } from '@/lib/gym-plan'
 import { activeAuthHeader, activeServer, readSyncLink } from '@/lib/sync'
 import { activeProfile } from '@/lib/profiles'
 import { AuthPanel } from '@/components/auth-panel'
@@ -119,8 +120,13 @@ interface Feature {
   icon: Icon
   title: string
   body: string
-  /** Not built. Said out loud rather than implied by a tense. */
-  coming?: boolean
+  /**
+   * A Plus feature, which is how the page knows whether to mark it `Coming`.
+   * Read from `isBuilt` rather than written here: a hand-maintained flag would
+   * eventually advertise something the panel's gate still refuses, and that is
+   * a page charging for a feature that does not answer.
+   */
+  id?: PlusFeature
 }
 
 const SAY: Feature[] = [
@@ -147,13 +153,29 @@ const BASE: Feature[] = [
 ]
 
 const PLUS: Feature[] = [
-  { icon: ForkKnife, title: 'The kitchen', body: 'The daily menu and your standing kitchen card, on Today and on its own page. The one surface here that leads where money changes hands.' },
-  { icon: Barbell, title: 'Programmes signed by your gym', body: 'Publish a programme your members adopt in one tap, with your name on it, instead of the one the app would have built.', coming: true },
-  { icon: Clock, title: 'Write it now, publish it later', body: 'Monday’s menu on Sunday evening. A week of posts in one sitting.', coming: true },
-  { icon: ChartLineUp, title: 'Reach with no window, exported', body: `Past the ${REACH_WINDOW_DAYS} days, and out as a file you can put next to your own numbers.`, coming: true },
-  { icon: Buildings, title: 'Operators and second rooms', body: 'Staff who can publish, and more than one location under the same account.', coming: true },
-  { icon: Sparkle, title: 'Your name and colour in their app', body: 'The shell your members see, wearing your gym rather than ours.', coming: true },
+  { id: 'kitchen', icon: ForkKnife, title: 'The kitchen', body: 'The daily menu and your standing kitchen card, on Today and on its own page. The one surface here that leads where money changes hands.' },
+  { id: 'programmes', icon: Barbell, title: 'Programmes signed by your gym', body: 'Publish a programme your members adopt in one tap, with your name on it, instead of the one the app would have built.' },
+  { id: 'scheduling', icon: Clock, title: 'Write it now, publish it later', body: 'Monday’s menu on Sunday evening. A week of posts in one sitting.' },
+  { id: 'reach-window', icon: ChartLineUp, title: 'Reach with no window, exported', body: `Past the ${REACH_WINDOW_DAYS} days, and out as a file you can put next to your own numbers.` },
+  { id: 'operators', icon: Buildings, title: 'Operators and second rooms', body: 'Staff who can publish, and more than one location under the same account.' },
+  { id: 'branding', icon: Sparkle, title: 'Your name and colour in their app', body: 'The shell your members see, wearing your gym rather than ours.' },
 ]
+
+const BUILT_PLUS = PLUS.filter((f) => f.id && isBuilt(f.id))
+const COMING_PLUS = PLUS.filter((f) => f.id && !isBuilt(f.id))
+
+/**
+ * "the kitchen", "the kitchen and the reach window", "a, b and c".
+ *
+ * Lower-cased from the feature titles rather than written a second time, so the
+ * sentence and the list above it cannot describe different things.
+ */
+function readable(features: Feature[]): string {
+  const names = features.map((f) => f.title.replace(/^The /, 'the ').replace(/^([A-Z])/, (c) => c.toLowerCase()))
+  if (names.length === 0) return 'nothing yet'
+  if (names.length === 1) return names[0]
+  return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`
+}
 
 const SIZES = ['Under 100', '100 to 300', '300 to 800', 'More than 800'] as const
 
@@ -172,17 +194,18 @@ function Figure({ figure, unit, label }: { figure: string; unit?: string; label:
 }
 
 function FeatureRow({ feature }: { feature: Feature }) {
+  const coming = feature.id !== undefined && !isBuilt(feature.id)
   return (
     <li className="flex items-start gap-3.5 py-3.5">
       <feature.icon
         size={18}
         weight="regular"
-        className={cn('mt-0.5 shrink-0', feature.coming ? 'text-ink-3' : 'text-brand')}
+        className={cn('mt-0.5 shrink-0', coming ? 'text-ink-3' : 'text-brand')}
       />
       <span className="flex min-w-0 flex-col gap-1">
         <span className="flex flex-wrap items-center gap-2">
           <span className="text-sm font-medium text-ink">{feature.title}</span>
-          {feature.coming && <Tag tone="outline">Coming</Tag>}
+          {coming && <Tag tone="outline">Coming</Tag>}
         </span>
         <span className="max-w-[46ch] text-2xs leading-relaxed text-ink-3">{feature.body}</span>
       </span>
@@ -438,11 +461,20 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
                   ))}
                 </ul>
                 {/* The line a gym owner deserves before they are asked for
-                    another hundred euros a month. */}
+                    another hundred euros a month — and counted, so it cannot go
+                    stale the way "the five marked Coming" did the moment a
+                    sixth was built. */}
                 <p className="max-w-[52ch] rounded-lg border border-dashed border-line px-3 py-2.5 text-2xs leading-relaxed text-ink-2">
-                  Today, Plus buys you the kitchen. The five marked <strong className="font-medium text-ink">Coming</strong> are
-                  not built yet &mdash; they are what Plus becomes, they carry no date, and they do
-                  not change what you pay now.
+                  Today, Plus buys you {readable(BUILT_PLUS)}.
+                  {COMING_PLUS.length > 0 && (
+                    <>
+                      {' '}
+                      The {spell(COMING_PLUS.length)} marked{' '}
+                      <strong className="font-medium text-ink">Coming</strong> are not built yet
+                      &mdash; they are what Plus becomes, they carry no date, and they do not change
+                      what you pay now.
+                    </>
+                  )}
                 </p>
               </Panel>
             </div>
