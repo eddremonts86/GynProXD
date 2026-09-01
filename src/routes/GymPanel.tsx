@@ -514,7 +514,11 @@ export function GymDesk({
         <TabPanel value="compose" className="flex flex-col gap-6">
           <Panel padding="lg" className="flex flex-col gap-4">
               <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Template">
-                {KINDS.map((k) => (
+                {/* The house runs no kitchen, so the daily menu is not on offer
+                    here — its Menu tab is absent for the same reason, and a
+                    template you can fill in while the thing behind it does not
+                    exist is worse than one that is simply not there. */}
+                {KINDS.filter((k) => !(broadcast && k === 'menu')).map((k) => (
                   <button
                     key={k}
                     type="button"

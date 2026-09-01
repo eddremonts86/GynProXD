@@ -214,6 +214,32 @@ export function unreadCount(
     .length
 }
 
+/**
+ * Who the unread messages are actually from.
+ *
+ * The notification used to name `gym ?? 'Your gym'` and say "from your gym",
+ * which was a guess that had always been right because there was only ever one
+ * sender. There are two now, and it was wrong in both directions at once: it
+ * told somebody with no gym that they had a message from a gym they do not
+ * have, and told a gym's member that a message from enForma came from theirs.
+ *
+ * Returning the senders rather than a formatted string keeps the wording where
+ * the wording belongs and lets the caller say nothing when it cannot say
+ * something true.
+ */
+export function unreadSenders(
+  messages: GymMessage[],
+  profile: { id: string; gym?: string },
+): string[] {
+  const senders: string[] = []
+  for (const message of messages) {
+    if (!isAddressedTo(message, profile) || message.readBy.includes(profile.id)) continue
+    const from = scopeOf(message) === 'members' ? message.gym : HOUSE_GYM
+    if (!senders.some((s) => s.toLowerCase() === from.toLowerCase())) senders.push(from)
+  }
+  return senders
+}
+
 /** Banners still inside their window, addressed to and not dismissed by the viewer. */
 export function activeBanners(
   messages: GymMessage[],

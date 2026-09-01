@@ -5,6 +5,7 @@ import {
   inboxFor,
   isAddressedTo,
   splitAudience,
+  unreadSenders,
   makeOfferCode,
   offerPayload,
   sentBy,
@@ -260,5 +261,50 @@ describe('audienceWithin', () => {
     const split = splitAudience(directory, 'me')
     expect(ids('unaffiliated').length).toBe(split.unaffiliated)
     expect(ids('everyone').length).toBe(split.total)
+  })
+})
+
+describe('unreadSenders', () => {
+  const base = {
+    authorId: 'op-1',
+    createdAt: '2026-09-01T08:00:00.000Z',
+    kind: 'announcement' as const,
+    audience: 'all' as const,
+    rsvp: {},
+    saved: [],
+  }
+  const member = { id: 'p1', gym: 'Hierro Viejo' }
+
+  it('names the gym for a gym message and the house for a platform one', () => {
+    const messages = [
+      { ...base, id: 'a', gym: 'Hierro Viejo', title: 'Closed Monday', readBy: [] },
+      { ...base, id: 'b', gym: HOUSE_GYM, scope: 'everyone' as const, title: 'Sync moving', readBy: [] },
+    ]
+    expect(unreadSenders(messages, member)).toEqual(['Hierro Viejo', HOUSE_GYM])
+  })
+
+  it('ignores what has been read', () => {
+    const messages = [
+      { ...base, id: 'a', gym: 'Hierro Viejo', title: 'Closed', readBy: ['p1'] },
+      { ...base, id: 'b', gym: HOUSE_GYM, scope: 'everyone' as const, title: 'Sync', readBy: [] },
+    ]
+    expect(unreadSenders(messages, member)).toEqual([HOUSE_GYM])
+  })
+
+  it('says the house, not a gym, to somebody who has none', () => {
+    // The wording this replaces told them they had "a message from your gym".
+    const messages = [
+      { ...base, id: 'a', gym: 'Hierro Viejo', title: 'Not for them', readBy: [] },
+      { ...base, id: 'b', gym: HOUSE_GYM, scope: 'unaffiliated' as const, title: 'For them', readBy: [] },
+    ]
+    expect(unreadSenders(messages, { id: 'p2' })).toEqual([HOUSE_GYM])
+  })
+
+  it('does not repeat a sender', () => {
+    const messages = [
+      { ...base, id: 'a', gym: 'hierro viejo', title: 'One', readBy: [] },
+      { ...base, id: 'b', gym: 'Hierro Viejo', title: 'Two', readBy: [] },
+    ]
+    expect(unreadSenders(messages, member)).toEqual(['hierro viejo'])
   })
 })
