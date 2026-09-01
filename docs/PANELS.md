@@ -465,12 +465,19 @@ with a comment on it.
 Base at €200, Plus at €300, per gym per month. The split is deliberately not
 "talking vs selling" — a €200 gym that cannot run an offer would feel gouged,
 and the offer is the best hook we have. Base is **everything the gym says**;
-Plus adds **surface in the member's day**: the kitchen now, and the programme
-next.
+Plus adds **surface in the member's day**: the kitchen and signed programmes
+today.
+
+`gyms.plan` was rehearsed against a populated database before it shipped, both
+ways: two existing gyms and the house, then up — both gyms grandfathered onto
+`plus`, the house left blank, a gym created afterwards starting blank and so
+reading as Base — then down, with every gym intact and the field gone from the
+schema. Rolling back needs the order the house-gym section names: deploy the
+previous commit first, then `migrate down 1`. Doing it the other way round
+reverts the field and `serve` puts it back on the next restart.
 
 Anything not built carries a `Coming` tag, no date, and the panel says in words
-that Plus buys the kitchen today and that the marked items do not change what
-you pay. There is no Stripe: the page says we invoice, because a checkout that
+what Plus buys today and that the marked items do not change what you pay. There is no Stripe: the page says we invoice, because a checkout that
 does not exist is the one thing a pricing page must not imply.
 
 ### Applying
@@ -497,3 +504,102 @@ filling in.
 `/admin` → Applications reads the queue, because a form whose rows nobody can
 see is a form that throws applications away. The only control there is the
 status: the panel records what a person did, it does not do it.
+
+## Programmes signed by your gym
+
+Plus. `PLUS_FEATURES` calls it `programmes`; the composer offers the template
+only when `planAllows(plan, 'programmes')`, and the landing drops its `Coming`
+tag from the same set, so the page cannot advertise it while the gate refuses it.
+
+A gym designs a programme the way a member does — the planner, the intake, the
+blocks — so there was no second designer to build. What this adds is signing one
+and handing it over. `/gym` → Compose → Programme lists the operator's own
+`generatedPlans`; publishing sends `kind: 'programme'` with a `programme`
+payload, and the member's inbox card offers **Put it on my calendar**.
+
+### What travels, and what must not
+
+The obvious implementation publishes the operator's `GeneratedPlan`, and it is a
+data leak. A `GeneratedPlan` carries its `input`: age, sex, weight, target
+weight, height, and `limitations` — the field an injury is written in.
+Publishing one would broadcast the operator's body and their bad knee to every
+member of the gym. This app tells members their training never leaves their
+device; the first feature that quietly published a person's training would make
+that a lie told to the people who trusted it most.
+
+So what is published is the **structure** plus the shape it was designed around,
+which is training information rather than personal information:
+
+| Travels | Stays on the operator's device |
+| --- | --- |
+| blocks of days, movement ids, per-day notes | age, sex, weight, target weight, height |
+| days a week, minutes a session, equipment, level | goal, limitations, avoid, constraints |
+| the duration, the gym's name for it, the gym's own blurb | training days, effort, milestones, every date |
+| | the coach's notes on the designer's own plan |
+
+`programmeFromPlan` (`src/lib/gym-programme.ts`) is the only place that decides,
+and it reads five fields off `plan.input` by name rather than spreading it — a
+spread would have carried the next field somebody adds to the intake. The blocks
+are recovered from `plan.weeks` by `blockIndex`, one week per block, because
+`GeneratedPlan` keeps its days on the calendar and its blocks as metadata.
+
+`PERSONAL_INPUT_KEYS` names the other half of that line so a test can walk it,
+and so adding a field to the intake makes somebody decide which side it falls on.
+
+**`goal` does not travel either**, and it took a screenshot to see why. It was
+published as a training fact and rendered as a tag, so a member who came to build
+muscle was shown "Lose fat" — one person's aim for their own body, presented as a
+property of the programme. No test caught it because nothing was leaking by the
+rules as written; the rule was wrong. The gym says what a programme is for in
+`blurb`, in its own words.
+
+**`coachNotes` does not travel, and that was not obvious.** The field carries
+nothing personal by its shape, so both the allowlist and the first version of the
+unit test passed it — while the prose inside it, written to the designer about
+the plan built for *their* body, said "ACL precautions are strictly followed".
+The audit caught it on a member's screen. What members read instead is `blurb`:
+the message body, which the operator wrote to them on purpose. A field being
+harmless is not the same as its contents being harmless, and only a check that
+reads rendered output can tell the difference.
+
+### The member's own copy
+
+`adoptProgramme` hands the structure to the same `assemblePlan` the member's own
+designer uses, with the member's `input`, and puts the gym's `blurb` where a
+plan's coach notes go — so the member's plan page says what their gym says. Their dates, their length, their
+milestones. Two members adopting the same programme get two different calendars,
+and the gym supplied the training and nothing else — which is also the better
+product: the gym is the coach, not the calendar.
+
+The member's numbers come from their newest plan's `input`, because there is no
+separate store of somebody's intake. Somebody who has never used the planner has
+told us nothing, so the card says so and the button sends them to the planner
+rather than dating a programme from defaults.
+
+The copy's id is `gen-adopted-<message id>`, derived rather than random: the
+inbox asks "is it already on my calendar" by looking for it, so pressing the
+button twice cannot leave somebody with two copies of the same twelve weeks. The
+gym is told `adopted N` and nothing else — not which members, not what they did
+with it.
+
+`programmeMismatch` warns a member whose equipment does not cover the movements,
+naming what it was written for. `assemblePlan` does not filter, so this has to be
+said on the card rather than fixed underneath: silently handing barbell work to
+somebody with no barbell is worse than telling them.
+
+### How it is checked
+
+`src/lib/gym-programme.spec.ts` walks `PERSONAL_INPUT_KEYS` over
+`JSON.stringify(programmeFromPlan(...))` and asserts neither the keys nor the
+values reach it — walked rather than spot-checked, so a new intake field cannot
+slip through.
+
+`node scripts/audit/gym-programme-boundary.mjs` runs the whole thing against a
+real PocketBase booted from this repo's migrations: a Plus gym, an operator whose
+own plan says 47, 91kg, heading for 78 and a reconstructed ACL, the app's own
+composer. It then reads the row the server stored and asks whether any of that is
+in it, and reads the member's screen and their adopted copy and asks again. The
+sender's intention is not evidence.
+
+The largest payload this can produce was measured before it shipped: an annual
+six-day programme is about 21KB against `gym_messages.payload`'s 100KB cap.

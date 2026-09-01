@@ -54,10 +54,19 @@ for (const vp of viewports) {
   // test interactions: onboarding generate flow
   console.log('-> testing onboarding generate flow')
   await page.goto(`${BASE}/onboarding`, { waitUntil: 'networkidle' })
-  const ta = page.locator('textarea')
+  const ta = page.locator('textarea').first()
   await ta.fill('male 30 years old 80kg target 75kg 4 times a week 60min effort 3')
-  await page.getByRole('button', { name: 'Design my programme' }).click()
-  await page.waitForURL(/\/generated\/.+/, { timeout: 5000 }).catch(() => console.log('  no nav to generated (maybe still on onboarding)'))
+  /* Five steps to walk, not one button to press: the intake became a wizard and
+     this sweep sat waiting for a button that only exists on the last screen. */
+  await page.getByRole('button', { name: 'Use this and check it' }).click()
+  await page.waitForTimeout(300)
+  const finish = page.getByRole('button', { name: /Design my programme/ })
+  for (let step = 0; step < 10 && (await finish.count()) === 0; step++) {
+    await page.getByRole('button', { name: /^(Continue|Skip and fill it in)/ }).click()
+    await page.waitForTimeout(250)
+  }
+  await finish.click()
+  await page.waitForURL(/\/generated\/.+/, { timeout: 30000 }).catch(() => console.log('  no nav to generated (maybe still on onboarding)'))
   console.log('  onboarding flow ok, url:', page.url())
   // test library search
   await page.goto(`${BASE}/library`, { waitUntil: 'networkidle' })
