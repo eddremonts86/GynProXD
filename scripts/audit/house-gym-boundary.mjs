@@ -12,6 +12,7 @@
  *   Can somebody who pays a gym see an offer written for people with no gym?
  *   Can a gym address the whole platform?
  *   Can anybody but a platform admin publish as the house?
+ *   Can the house take back what it said?
  *
  * Every answer is checked from the receiving side. The sender's intent is not
  * evidence.
@@ -149,6 +150,20 @@ try {
     await inbox(member.token), ['For everyone', 'Gym news'])
   check('an operator is affiliated too, by running a gym',
     await inbox(operator.token), ['For everyone', 'Gym news'])
+
+  console.log('\ntaking it back')
+  const houseMsg = (await publish(admin, house.id, 'unaffiliated', 'Published then withdrawn')).json
+  const gymMsg = (await publish(operator, gym.id, 'members', 'Gym said then unsaid')).json
+  const del = (who, id) =>
+    api('DELETE', `/api/collections/gym_messages/records/${id}`, undefined, who.token).then(
+      (r) => r.status,
+    )
+  check('a gym operator can delete their own', await del(operator, gymMsg.id), 204)
+  check('an admin can delete the house\'s own', await del(admin, houseMsg.id), 204)
+  const stray = (await publish(admin, house.id, 'everyone', 'Not the operator\'s to remove')).json
+  check("an operator cannot delete the house's", await del(operator, stray.id), 404)
+  check('nor can a member', await del(loner, stray.id), 404)
+  await del(admin, stray.id)
 
   console.log('\njoining')
   check('nobody applies to belong to nothing',
