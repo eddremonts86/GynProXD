@@ -9,6 +9,7 @@ import type {
 import { applyResponses, markResponseDirty, type ResponseRow } from '../lib/gym-responses'
 import type { Challenge } from '../lib/challenge'
 import type { Collection } from '../lib/collection'
+import type { GymProgramme } from '../lib/gym-programme'
 
 /**
  * The device message bus. Plaintext by design (see docs/PANELS.md): gym
@@ -49,6 +50,7 @@ export interface PublishInput {
   product?: { name: string; price: string; note?: string }
   challenge?: Challenge
   collection?: Collection
+  programme?: GymProgramme
   banner?: { minutes: number }
   link?: 'menu'
   /** Already uploaded; the picker holds the files until the server names them. */

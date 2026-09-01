@@ -12,7 +12,8 @@ import {
 import { useSession } from '../store/useSession'
 import { useMessages } from '../store/useMessages'
 import { useGym } from '../store/useGym'
-import { HOUSE_GYM, inboxFor, senderOf } from '../lib/messages'
+import { HOUSE_GYM, inboxFor, senderOf, type GymMessage } from '../lib/messages'
+import { adoptedPlanId, adoptProgramme, programmeMismatch } from '../lib/gym-programme'
 import { notificationsEnabled, notificationsSupported } from '../lib/notify'
 import { useMenus } from '../store/useMenus'
 import { menuFor } from '../lib/menu'
@@ -50,6 +51,8 @@ export function InboxPage() {
   const toggleSaved = useMessages((s) => s.toggleSaved)
   const toggleJoined = useMessages((s) => s.toggleJoined)
   const startChallenge = useGym((s) => s.startChallenge)
+  const myPlans = useGym((s) => s.generatedPlans)
+  const addGeneratedPlan = useGym((s) => s.addGeneratedPlan)
   const menus = useMenus((s) => s.menus)
   const navigate = useNavigate()
   const { m: openId } = useSearch({ from: '/inbox' })
@@ -97,6 +100,46 @@ export function InboxPage() {
     if (!me || !undoId) return
     setRemoved(undoId, me.id, false)
     setUndoId(null)
+  }
+
+  /**
+   * What a member's own numbers are, for a programme their gym signed.
+   *
+   * There is no separate store of somebody's intake — it lives inside each plan
+   * they have made, so the newest plan's `input` is the most recent thing they
+   * said about themselves. Somebody who has never used the planner has told us
+   * nothing, and a programme dated from defaults would be a guess wearing their
+   * gym's name.
+   */
+  const myInput = myPlans[0]?.input ?? null
+
+  /**
+   * Take the gym's training and put it on this member's calendar.
+   *
+   * The plan is built here rather than sent: `adoptProgramme` recomputes the
+   * dates, the length and the milestones from `myInput`, so two members who
+   * adopt the same programme get two different calendars — theirs. Nothing
+   * about the copy goes back to the gym; the only thing that travels is that
+   * somebody took it, which is what `toggleJoined` reports.
+   */
+  const adopt = (message: GymMessage) => {
+    if (!me || !message.programme) return
+    const id = adoptedPlanId(message.id)
+    const mine = myPlans.find((p) => p.id === id)
+    /* Already theirs? The button is a doorway, not an undo — same as a
+       challenge, and for the same reason: a second copy of twelve weeks is
+       somebody's problem to reconcile, not a feature. */
+    if (mine) {
+      void navigate({ to: '/generated/$id', params: { id } })
+      return
+    }
+    if (!myInput) {
+      void navigate({ to: '/onboarding' })
+      return
+    }
+    addGeneratedPlan(adoptProgramme(message.programme, myInput, new Date(), id))
+    if (!(message.joined ?? []).includes(me.id)) toggleJoined(message.id, me.id)
+    void navigate({ to: '/generated/$id', params: { id } })
   }
 
   const quiet = notificationsSupported() && !notificationsEnabled()
@@ -238,6 +281,14 @@ export function InboxPage() {
                   startChallenge(open.challenge)
                   toggleJoined(open.id, me.id)
                 }}
+                onAdopt={() => adopt(open)}
+                programmeWarning={
+                  open.programme
+                    ? myInput
+                      ? programmeMismatch(open.programme, myInput)
+                      : 'Answer the planner’s questions first and this becomes your own twelve weeks — dated from your numbers, not the gym’s.'
+                    : null
+                }
               />
             </Panel>
           ) : (
