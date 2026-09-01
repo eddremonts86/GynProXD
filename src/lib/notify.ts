@@ -16,6 +16,22 @@ import { refreshCapabilities, serverCapabilities } from './capabilities'
 const PREF_KEY = 'forma-notify'
 const TRAINING_PREF_KEY = 'forma-notify-training'
 
+/**
+ * One switch for everything enForma sends this device.
+ *
+ * It exists because the browser's own permission is not ours to flip. Once
+ * somebody has blocked notifications, `requestPermission()` resolves `denied`
+ * without showing anything, and there has never been an API to revoke a grant.
+ * So the row that used to be titled "Allow notifications" was, in that state, a
+ * paragraph of text with no control — and in the granted state it disappeared
+ * altogether, leaving nowhere at all to turn the things off.
+ *
+ * This is the part the app does own: whether it sends anything, regardless of
+ * what the browser has decided. Opt-out, so nobody's existing notifications go
+ * quiet on upgrade.
+ */
+const MUTE_KEY = 'forma-notify-muted'
+
 export type NotifyChannel = 'gym' | 'training'
 
 const keyFor = (channel: NotifyChannel) => (channel === 'gym' ? PREF_KEY : TRAINING_PREF_KEY)
@@ -33,9 +49,36 @@ export function notificationsSupported(): boolean {
 export function notificationsEnabled(channel: NotifyChannel = 'gym'): boolean {
   return (
     notificationsSupported() &&
+    !notificationsMuted() &&
     Notification.permission === 'granted' &&
     localStorage.getItem(keyFor(channel)) !== 'off'
   )
+}
+
+/** Whether this device has been silenced outright. Off unless switched on. */
+export function notificationsMuted(): boolean {
+  try {
+    return localStorage.getItem(MUTE_KEY) === 'on'
+  } catch {
+    /* Private mode: nothing stored means nothing silenced. */
+    return false
+  }
+}
+
+/**
+ * Silences or unsilences this device.
+ *
+ * Only records the intent. Web Push is delivered by the server and shown by the
+ * service worker with the app closed, so muting has to unsubscribe that too or
+ * it would be a switch that claims more than it does — which the caller does,
+ * because unsubscribing needs the profile this one does not have.
+ */
+export function setNotificationsMuted(muted: boolean): void {
+  try {
+    localStorage.setItem(MUTE_KEY, muted ? 'on' : 'off')
+  } catch {
+    /* Private mode: the preference lasts the session and no further. */
+  }
 }
 
 /** The opt-out preference alone (on unless turned off), ignoring permission. */

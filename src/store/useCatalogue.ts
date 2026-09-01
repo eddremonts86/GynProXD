@@ -52,9 +52,20 @@ function bootWithdrawn(): string[] {
   return hidden
 }
 
+/**
+ * What marks a library id as a row written in the admin panel rather than a
+ * bundled movement.
+ *
+ * Exported because the panel reads it back: that prefix is the only thing that
+ * tells an editable movement from a frozen one, and a copy of the literal in
+ * the other file would take Edit and Delete off every row the day somebody
+ * changed it here, silently and with no error to notice.
+ */
+export const SERVER_ID_PREFIX = 'srv-'
+
 export function toExercise(row: ExerciseRecord, base: string): Exercise {
   return {
-    id: `srv-${row.id}`,
+    id: `${SERVER_ID_PREFIX}${row.id}`,
     name: row.name,
     muscle: row.muscle as MuscleGroup,
     equipment: row.equipment as Equipment,
