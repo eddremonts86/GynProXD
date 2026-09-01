@@ -215,9 +215,15 @@ would need to change shape.
   file put them there — free-exercise-db, RepDB, wger or a row written here.
   It hides rather than deletes, so `exerciseById` still resolves the id and a
   workout logged before the movement was retired keeps its name; restoring it
-  puts it back exactly where it was. Note the plan generator still draws from
-  the bundled catalogue directly, so a withdrawn movement can still be
-  programmed — the Library and the movement picker are what it covers today.
+  puts it back exactly where it was.
+
+  It reaches the programme too. `lib/withdrawn.ts` is a device-wide registry
+  the store writes and `plan-generator.allowedPool` reads — the one chokepoint
+  the deterministic generator, the coach's grounding list and the validator
+  that accepts the coach's answer all run through, so a withdrawn movement
+  stops being programmed in one place rather than three that would drift.
+  Primed from the localStorage cache at construction, so a cold start with no
+  signal generates the same programme an online one would.
 - **Recipes**: the same shape for the gym's own dishes, `house` provider.
 
 ## Navigation by role

@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { activeAuthHeader, activeServer } from '../lib/sync'
 import { stepsOf } from '../lib/exercise-draft'
+import { setWithdrawn } from '../lib/withdrawn'
 import type { Equipment, Exercise, ExerciseCategory, MuscleGroup } from '../lib/types'
 
 /**
@@ -43,6 +44,14 @@ function loadList<T>(key: string): T[] {
   }
 }
 
+/** Reads the cache and primes the registry with it, so a cold start on a gym
+    floor generates the same programme an online one would. */
+function bootWithdrawn(): string[] {
+  const hidden = loadList<string>(HIDDEN_KEY)
+  setWithdrawn(hidden)
+  return hidden
+}
+
 export function toExercise(row: ExerciseRecord, base: string): Exercise {
   return {
     id: `srv-${row.id}`,
@@ -73,7 +82,7 @@ interface CatalogueState {
 
 export const useCatalogue = create<CatalogueState>()((set) => ({
   exercises: typeof localStorage === 'undefined' ? [] : loadList<Exercise>(STORE_KEY),
-  hidden: typeof localStorage === 'undefined' ? [] : loadList<string>(HIDDEN_KEY),
+  hidden: typeof localStorage === 'undefined' ? [] : bootWithdrawn(),
   pulledAt: null,
 
   /**
@@ -102,12 +111,14 @@ export const useCatalogue = create<CatalogueState>()((set) => ({
       const hidden = hides.items.map((row) => row.exerciseId)
       localStorage.setItem(STORE_KEY, JSON.stringify(exercises))
       localStorage.setItem(HIDDEN_KEY, JSON.stringify(hidden))
+      /* The plan generator reads the registry, not this store: it is called
+         from pure code that has no store to subscribe to. */
+      setWithdrawn(hidden)
       set({ exercises, hidden, pulledAt: new Date().toISOString() })
     } catch {
       /* Offline. The cache is the answer. */
     }
   },
 
-  rehydrate: () =>
-    set({ exercises: loadList<Exercise>(STORE_KEY), hidden: loadList<string>(HIDDEN_KEY) }),
+  rehydrate: () => set({ exercises: loadList<Exercise>(STORE_KEY), hidden: bootWithdrawn() }),
 }))

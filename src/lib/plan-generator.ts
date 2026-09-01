@@ -1,4 +1,5 @@
 import { generatedExercises } from '../data/exercises-generated'
+import { isWithdrawn } from './withdrawn'
 import { estimatePlan, DURATION_WEEKS } from './plan-estimate'
 import { toLocalIso } from './dates'
 import { DURATION_LABELS } from './labels'
@@ -78,8 +79,17 @@ const STAPLES: Record<string, string[]> = {
  */
 const TRAINABLE = new Set(['strength', 'plyometrics', 'strongman', 'olympic'])
 
+/**
+ * Every movement the athlete's equipment allows — and the one chokepoint the
+ * whole programme runs through. `pickExercise` draws from it, the coach's
+ * grounding list is built from it, and the validator that accepts or rejects
+ * the coach's answer checks against it. So a movement withdrawn in the admin
+ * panel stops being programmed here, once, rather than in three places that
+ * would drift apart.
+ */
 function allowedPool(equipment: OnboardingInput['equipment']) {
   return generatedExercises.filter((e) => {
+    if (isWithdrawn(e.id)) return false
     if (e.category && !TRAINABLE.has(e.category)) return false
     if (equipment === 'hibrido') return true
     if (equipment === 'bodyweight') return e.equipment === 'bodyweight'
@@ -109,7 +119,8 @@ function pickExercise(
   const candidates = [...staples, ...rest]
   if (candidates.length === 0) {
     const fallback = pool.filter((e) => e.muscle !== 'other').sort((a, b) => a.name.localeCompare(b.name))
-    return fallback[0]?.id ?? generatedExercises[0].id
+    /* The last resort still has to be a movement somebody is allowed to see. */
+    return fallback[0]?.id ?? pool[0]?.id ?? generatedExercises.find((e) => !isWithdrawn(e.id))!.id
   }
   const levelOffset = level === 'principiante' ? 0 : level === 'intermedio' ? 1 : 2
   return candidates[(levelOffset + block) % candidates.length]
