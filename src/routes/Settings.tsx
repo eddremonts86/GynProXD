@@ -469,8 +469,8 @@ function ProfileIdentityPanel() {
       <div className="flex flex-col gap-1.5 border-t border-line pt-4">
         {!gym.trim() && (
           <p className="text-2xs text-ink-3">
-            You are not linked to a gym, so no announcements, menus or challenges reach you. Pick
-            one above to start receiving them.
+            You are not linked to a gym, so nothing from one reaches you — enForma&rsquo;s own
+            events and offers still do. Pick a gym above and theirs arrive too.
           </p>
         )}
         <p className="text-2xs text-ink-3">

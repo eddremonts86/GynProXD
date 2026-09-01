@@ -169,7 +169,7 @@ const LOCAL_RISKS = [
   },
   {
     icon: Storefront,
-    text: 'No gym can reach you. Joining one needs an account, and with it come their events, offers and daily menu.',
+    text: 'Nobody can reach you, gym or enForma. Both need an account, and with one come events, offers and the daily menu.',
   },
 ]
 
@@ -202,10 +202,14 @@ function SetupPrompt({ profileId, synced }: { profileId: string; synced: boolean
           {synced ? (
             <div className="flex items-start gap-4">
               <Storefront size={22} weight="regular" className="mt-0.5 shrink-0 text-ink-3" />
+              {/* "instead of nowhere" stopped being true the day enForma
+                  started writing to the people no gym had claimed. This is the
+                  synced-but-unaffiliated member — the exact audience it writes
+                  to — so the offer is a second sender, not a first one. */}
               <p className="max-w-[62ch] text-sm text-ink-2">
-                Add the gym you train at and its events, offers and daily menu arrive here instead
-                of nowhere. They see your name on their member list; your training stays encrypted
-                and never leaves this device.
+                enForma already writes to you here. Add the gym you train at and its events, offers
+                and daily menu land beside ours. They see your name on their member list; your
+                training stays encrypted and never leaves this device.
               </p>
             </div>
           ) : (
