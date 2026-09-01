@@ -51,6 +51,9 @@ interface GateError {
   text: string
 }
 
+/** Rows the gate shows before it collapses the rest. */
+const PROFILE_PREVIEW = 2
+
 const ROLE_TAGS: Partial<Record<ProfileRole, string>> = { gym: 'Gym', admin: 'Admin' }
 
 function RevealToggle({ shown, onToggle }: { shown: boolean; onToggle: () => void }) {
@@ -89,7 +92,16 @@ export function AuthPanel({
   accent = false,
   className,
 }: AuthPanelProps) {
-  const [profiles] = useState(listProfiles)
+  /**
+   * Last used first, so the one somebody is about to unlock is the one they can
+   * see without opening anything.
+   */
+  const [profiles] = useState(() => {
+    const all = listProfiles()
+    const last = lastActiveProfileId()
+    const first = all.findIndex((p) => p.id === last)
+    return first > 0 ? [all[first], ...all.filter((_, i) => i !== first)] : all
+  })
   const [mode, setMode] = useState<Mode>(
     initialMode ?? (profiles.length > 0 ? 'unlock' : 'create'),
   )
@@ -111,6 +123,15 @@ export function AuthPanel({
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState<GateError | null>(null)
   const [showPass, setShowPass] = useState(false)
+  /**
+   * How many profiles the gate shows before it stops being a door.
+   *
+   * Seven of them turned the panel into a wall of near-identical rows with the
+   * passphrase field pushed off the bottom. Two is enough to say "pick one" and
+   * to hold the one you last used, which is first in the list — so the
+   * selection is always visible without expanding anything.
+   */
+  const [showAllProfiles, setShowAllProfiles] = useState(false)
   const [busy, setBusy] = useState(false)
 
   const fid = (suffix: string) => `${idPrefix}-${suffix}`
@@ -295,8 +316,16 @@ export function AuthPanel({
             <p className="text-2xs text-ink-3">Each profile is encrypted with its own passphrase.</p>
           </div>
 
-          <div className="flex flex-col gap-2">
-            {profiles.map((p) => (
+          <div
+            className={cn(
+              'flex flex-col gap-2',
+              /* Expanded, it scrolls rather than growing without limit: twelve
+                 profiles would put the passphrase field below the fold again,
+                 which is the problem this is here to solve. */
+              showAllProfiles && profiles.length > 4 && 'max-h-64 overflow-y-auto pr-1',
+            )}
+          >
+            {(showAllProfiles ? profiles : profiles.slice(0, PROFILE_PREVIEW)).map((p) => (
               <button
                 key={p.id}
                 type="button"
@@ -330,6 +359,18 @@ export function AuthPanel({
               </button>
             ))}
           </div>
+
+          {profiles.length > PROFILE_PREVIEW && (
+            <button
+              type="button"
+              onClick={() => setShowAllProfiles((v) => !v)}
+              className="-mt-1 self-start text-2xs font-medium text-brand underline-offset-2 hover:underline"
+            >
+              {showAllProfiles
+                ? 'Show fewer'
+                : `${profiles.length - PROFILE_PREVIEW} more on this device`}
+            </button>
+          )}
 
           <Input
             id={fid('passphrase')}

@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { CATALOGUE_SIZE } from '@/data/catalogue-stats'
 import { WGER_SIZE } from '@/data/wger-stats'
-import { motion, useReducedMotion } from 'motion/react'
+import { useReducedMotion } from 'motion/react'
 import {
   ArrowDown,
   ArrowRight,
@@ -20,12 +20,22 @@ import {
 import type { Icon } from '@phosphor-icons/react'
 import { AuthPanel } from '@/components/auth-panel'
 import { AuroraTile } from '@/ui/AuroraTile'
-import { Mark, Wordmark } from '@/components/brand'
-import { ThemeToggle } from '@/components/theme-toggle'
+import { Mark } from '@/components/brand'
 import { RailToggle } from '@/components/rail-toggle'
 import { useRailHidden } from '@/hooks/use-rail'
+import {
+  Body,
+  Label,
+  LandingRail,
+  Lead,
+  MobileBar,
+  READ,
+  Reveal,
+  SectionHeading,
+  SHELL,
+  type LandingSection,
+} from '@/components/landing-kit'
 import { Button } from '@/ui/Button'
-import { Tag } from '@/ui/Tag'
 import { cn } from '@/lib/utils'
 
 /**
@@ -60,11 +70,7 @@ import { cn } from '@/lib/utils'
    can hold; `READ` pulls in further for the sections you read rather than
    scan. Below roughly 1500px they resolve to the same thing and the difference
    never arises. */
-const GUTTER = 'px-4 sm:px-6 md:px-8 lg:px-10'
-const SHELL = `mx-auto w-full max-w-[90rem] ${GUTTER}`
-const READ = `mx-auto w-full max-w-[82rem] ${GUTTER}`
-
-const SECTIONS: { id: string; label: string; icon: Icon }[] = [
+const SECTIONS: LandingSection[] = [
   { id: 'top', label: 'Overview', icon: Gauge },
   { id: 'estimate', label: 'How it plans', icon: CalendarBlank },
   { id: 'inside', label: "What's inside", icon: ListMagnifyingGlass },
@@ -72,31 +78,6 @@ const SECTIONS: { id: string; label: string; icon: Icon }[] = [
   { id: 'session', label: 'In the gym', icon: Timer },
   { id: 'privacy', label: 'Local or synced', icon: LockKey },
 ]
-
-/** A section that rises into place once, and not at all under reduced motion. */
-function Reveal({
-  children,
-  className,
-  delay = 0,
-}: {
-  children: ReactNode
-  className?: string
-  delay?: number
-}) {
-  const reduceMotion = useReducedMotion()
-  if (reduceMotion) return <div className={className}>{children}</div>
-  return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-80px' }}
-      transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] }}
-    >
-      {children}
-    </motion.div>
-  )
-}
 
 /**
  * The mark blown up to architectural scale: four rules of decreasing length,
@@ -210,37 +191,6 @@ const MILESTONES: { week: string; weight: string; note: string }[] = [
  * label. The app's `text-2xs` is a label size and is never body text here — a
  * 48px headline falling straight to 11px has nothing in between.
  */
-function SectionHeading({ children, className }: { children: ReactNode; className?: string }) {
-  return (
-    <h2
-      className={cn(
-        'max-w-[17ch] text-3xl leading-[1.08] tracking-tight text-ink md:text-4xl',
-        className,
-      )}
-    >
-      {children}
-    </h2>
-  )
-}
-
-function Lead({ children, className }: { children: ReactNode; className?: string }) {
-  return (
-    <p className={cn('max-w-[46ch] text-xl leading-[1.6] text-ink-2', className)}>{children}</p>
-  )
-}
-
-/** Supporting copy inside cards and index rows. */
-function Body({ children, className }: { children: ReactNode; className?: string }) {
-  return (
-    <p className={cn('max-w-[40ch] text-base leading-relaxed text-ink-3', className)}>{children}</p>
-  )
-}
-
-/** A quiet label above or beside a figure. */
-function Label({ children, className }: { children: ReactNode; className?: string }) {
-  return <span className={cn('text-xs text-ink-3', className)}>{children}</span>
-}
-
 /**
  * The page's one moment of colour, and it is earned: the aurora material is
  * reserved by the design system for hero data tiles, and this is the hero's
@@ -312,84 +262,6 @@ function MilestoneLadder({ className }: { className?: string }) {
  * The app's own rail, on the public page. Same width, same pill items, so the
  * left edge of the content sits exactly where it sits once you are signed in.
  */
-function LandingRail({ active, onJump }: { active: string; onJump: (id: string) => void }) {
-  if (useRailHidden()) return null
-  return (
-    <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col lg:flex">
-      {/* Where the rail ends and the content begins. */}
-      <span
-        aria-hidden="true"
-        className="rail-edge pointer-events-none absolute inset-y-0 right-0 w-px opacity-70"
-      />
-
-      <div className="flex items-center gap-2 px-5 py-5">
-        <button type="button" onClick={() => onJump('top')} aria-label="enForma, back to the top">
-          <Wordmark />
-        </button>
-        <Tag tone="outline">Beta</Tag>
-        <RailToggle />
-      </div>
-
-      <nav aria-label="Page sections" className="flex flex-1 flex-col gap-0.5 px-3">
-        {SECTIONS.map((item) => {
-          const isCurrent = active === item.id
-          return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => onJump(item.id)}
-              aria-current={isCurrent ? 'true' : undefined}
-              className={cn(
-                'flex h-11 items-center gap-2.5 rounded-full px-4 text-sm font-medium',
-                'transition-colors duration-150',
-                isCurrent
-                  ? 'bg-brand text-brand-ink shadow-[var(--shadow-panel)]'
-                  : 'text-ink-3 hover:bg-surface hover:text-ink',
-              )}
-            >
-              <item.icon size={18} weight={isCurrent ? 'fill' : 'regular'} />
-              <span className="flex-1 text-left">{item.label}</span>
-            </button>
-          )
-        })}
-      </nav>
-
-      <div className="flex flex-col gap-3 p-3">
-        {/* Also a jump, not a conversion: on a desktop the panel it scrolls to
-            is already on screen. The one solid button on this page is that
-            panel's own submit. */}
-        <Button variant="secondary" onClick={() => onJump('join')} className="w-full">
-          Open my training
-          <ArrowRight size={16} weight="bold" />
-        </Button>
-        <div className="flex items-center justify-between gap-2 pt-1">
-          <Label>No account needed</Label>
-          <ThemeToggle />
-        </div>
-      </div>
-    </aside>
-  )
-}
-
-function MobileBar({ onJump }: { onJump: (id: string) => void }) {
-  return (
-    <header className="sticky top-0 z-30 bg-bg/85 backdrop-blur-md lg:hidden">
-      <div className="flex h-16 items-center justify-between gap-4 px-4 md:px-8">
-        <span className="flex items-center gap-2">
-          <Wordmark />
-          <Tag tone="outline">Beta</Tag>
-        </span>
-        <span className="flex items-center gap-1">
-          <ThemeToggle />
-          <Button variant="primary" size="sm" onClick={() => onJump('join')}>
-            Open my training
-          </Button>
-        </span>
-      </div>
-    </header>
-  )
-}
-
 export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
   const reduceMotion = useReducedMotion()
   const railHidden = useRailHidden()
@@ -439,9 +311,20 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
 
   return (
     <div className="select-text min-h-[100dvh] bg-bg">
-      <LandingRail active={active} onJump={jump} />
+      <LandingRail
+        sections={SECTIONS}
+        active={active}
+        onJump={jump}
+        cta={{ label: 'Open my training', target: 'join', icon: <ArrowRight size={16} weight="bold" /> }}
+        note="No account needed"
+        crossLink={{ label: 'I run a gym', short: 'For gyms', href: '/for-gyms' }}
+      />
       <RailToggle floating />
-      <MobileBar onJump={jump} />
+      <MobileBar
+        onJump={jump}
+        cta={{ label: 'Open my training', target: 'join' }}
+        crossLink={{ label: 'I run a gym', short: 'For gyms', href: '/for-gyms' }}
+      />
 
       <main className={railHidden ? undefined : 'lg:pl-60'}>
         {/* -------------------------------------------------------------- Hero */}

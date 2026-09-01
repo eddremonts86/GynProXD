@@ -28,10 +28,11 @@ import { AdminRecipes } from '@/components/admin-recipes'
 import { AdminExercises } from '@/components/admin-exercises'
 import { AdminOverview } from '../components/admin-overview'
 import { BroadcastAudience, type BroadcastScope } from '@/components/broadcast-audience'
+import { AdminApplications } from '@/components/admin-applications'
 import { GymDesk } from './GymPanel'
 import { HOUSE_GYM, splitAudience } from '../lib/messages'
 
-type TabValue = 'overview' | 'broadcast' | 'users' | 'gyms' | 'exercises' | 'recipes'
+type TabValue = 'overview' | 'broadcast' | 'applications' | 'users' | 'gyms' | 'exercises' | 'recipes'
 
 const ROLE_LABELS: Record<ProfileRole, string> = {
   member: 'Member',
@@ -144,6 +145,7 @@ function AdminDesk({ selfId }: { selfId: string }) {
         tabs={[
           { value: 'overview', label: 'Overview' },
           { value: 'broadcast', label: 'Broadcast' },
+          { value: 'applications', label: 'Applications' },
           { value: 'users', label: 'Users', count: profiles.length },
           { value: 'gyms', label: 'Gyms', count: gyms.length },
           { value: 'exercises', label: 'Movements' },
@@ -179,6 +181,10 @@ function AdminDesk({ selfId }: { selfId: string }) {
               }}
             />
           )}
+        </TabPanel>
+
+        <TabPanel value="applications">
+          <AdminApplications />
         </TabPanel>
 
         <TabPanel value="users">
