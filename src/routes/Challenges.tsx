@@ -15,6 +15,7 @@ import { Panel } from '../ui/Panel'
 import { Tag } from '../ui/Tag'
 import { PageHeader, Section } from '../ui/PageHeader'
 import { EmptyState } from '../ui/EmptyState'
+import { viewerFor } from '../lib/profiles'
 
 /**
  * One movement, thirty days, a number per day. Progress is private to the
@@ -34,7 +35,7 @@ export function ChallengesPage() {
 
   const gymChallenges = useMemo(() => {
     if (!profileId) return []
-    return inboxFor(messages, { id: profileId, gym: gym ?? undefined })
+    return inboxFor(messages, viewerFor(profileId, gym))
       .filter((m) => m.kind === 'challenge' && m.challenge)
       .map((m) => ({ challenge: m.challenge!, from: m.gym }))
   }, [messages, profileId, gym])

@@ -19,6 +19,7 @@ export type GymPlan = 'base' | 'plus'
 export const PLUS_FEATURES = [
   'kitchen',
   'programmes',
+  'open-door',
   'scheduling',
   'reach-window',
   'operators',
@@ -31,7 +32,7 @@ export type PlusFeature = (typeof PLUS_FEATURES)[number]
  * What is actually built. Everything else is `Coming` on the page and absent
  * from the product, which are the same statement said twice.
  */
-const BUILT = new Set<PlusFeature>(['kitchen', 'programmes', 'reach-window'])
+const BUILT = new Set<PlusFeature>(['kitchen', 'programmes', 'open-door', 'reach-window'])
 
 export function isBuilt(feature: PlusFeature): boolean {
   return BUILT.has(feature)

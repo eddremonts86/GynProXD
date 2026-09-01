@@ -20,6 +20,7 @@ import {
   audienceWithin,
   splitAudience,
   type GymMessage,
+  type MessageScope,
   type TemplateKind,
 } from '../lib/messages'
 import { listProfiles } from '../lib/profiles'
@@ -203,7 +204,16 @@ export function GymDesk({
    * Derived from the same directory the confirmation counts, so the number in
    * the warning and the list you can pick from can never disagree.
    */
-  const scope = broadcast?.scope
+  /**
+   * Whether this message goes past the gym's own roster.
+   *
+   * Declared here rather than with the rest of the composer state because the
+   * audience below is derived from it: the list of people you may pick from has
+   * to be the audience you are actually sending to, or the count in the warning
+   * and the names on screen describe different sets.
+   */
+  const [openDoor, setOpenDoor] = useState(false)
+  const scope: MessageScope | undefined = broadcast?.scope ?? (openDoor ? 'open-door' : undefined)
   const { members, split } = useMemo(() => {
     /* One read of the directory for both. The list you can pick from and the
        number the warning quotes come from the same array, so they cannot
@@ -294,6 +304,10 @@ export function GymDesk({
      the expensive direction from the moment somebody paid it. */
   const canKitchen = planAllows(plan, 'kitchen')
   const canProgrammes = planAllows(plan, 'programmes')
+  /* The one thing on this tier that wins a gym somebody it did not have. */
+  const canOpenDoor = planAllows(plan, 'open-door')
+  /* The open door is never a list, so it never narrows to picked names. */
+  const sendingWide = canOpenDoor && openDoor && !broadcast
   const windowedDays = windowDays(reachWindow)
   const since = windowedDays === null ? null : windowStart(todayIso(), windowedDays)
 
@@ -417,7 +431,7 @@ export function GymDesk({
   const COMMERCIAL: TemplateKind[] = ['offer', 'product']
 
   const doPublish = (opts?: { asScope?: BroadcastScope; force?: boolean }) => {
-    const sendScope = opts?.asScope ?? broadcast?.scope
+    const sendScope = opts?.asScope ?? scope
     if (
       sendScope === 'everyone' &&
       COMMERCIAL.includes(kind) &&
@@ -1001,6 +1015,49 @@ export function GymDesk({
                 </div>
               )}
 
+              {canOpenDoor && (
+                <div className="flex flex-col gap-2 border-t border-line pt-4">
+                  <span className="text-2xs font-medium text-ink-3">How far it goes</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      { on: false, label: 'My members', hint: `${split.affiliated >= 0 ? '' : ''}` },
+                      { on: true, label: 'People with no gym', hint: '' },
+                    ].map((choice) => (
+                      <button
+                        key={String(choice.on)}
+                        type="button"
+                        role="radio"
+                        aria-checked={openDoor === choice.on}
+                        onClick={() => {
+                          touch(setOpenDoor)(choice.on)
+                          /* The open door has no list, so any names picked
+                             under the narrower audience are dropped rather than
+                             carried into a send that cannot honour them. */
+                          setEveryone(true)
+                          setPicked([])
+                        }}
+                        className={cn(
+                          'rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors duration-150',
+                          openDoor === choice.on
+                            ? 'bg-brand text-brand-ink'
+                            : 'bg-surface-2 text-ink-3 hover:text-ink',
+                        )}
+                      >
+                        {choice.label}
+                      </button>
+                    ))}
+                  </div>
+                  {openDoor && (
+                    <p className="max-w-[64ch] text-2xs leading-relaxed text-ink-3">
+                      Everybody on enForma who has not joined a gym and has not turned this off.
+                      One a month, and you cannot choose who — you are never told who they are,
+                      and we are not going to tell you. There is no location filter because we
+                      hold no location for anybody.
+                    </p>
+                  )}
+                </div>
+              )}
+
               <div className="flex flex-col gap-2 border-t border-line pt-4">
                 <span className="text-2xs font-medium text-ink-3">Send to</span>
                 <div className="flex flex-wrap gap-1.5">
@@ -1022,9 +1079,14 @@ export function GymDesk({
                         controls one above the other using the same word for
                         different sets is how somebody ends up sure they
                         narrowed something they did not. */}
-                    {broadcast ? 'All of them' : 'Everyone'} ({members.length})
+                    {broadcast ? 'All of them' : sendingWide ? 'All of them' : 'Everyone'} (
+                    {members.length})
                   </button>
-                  {members.map((m) => {
+                  {/* No names on the open door. The audience is a scope the
+                      server evaluates, so this gym is never told who is in it —
+                      and a picker that could not honour a pick would be a
+                      promise the send cannot keep. */}
+                  {!sendingWide && members.map((m) => {
                     const on = !everyone && picked.includes(m.id)
                     return (
                       <button

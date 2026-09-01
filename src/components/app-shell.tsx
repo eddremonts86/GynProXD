@@ -37,7 +37,7 @@ import { unreadCount, unreadSenders } from '@/lib/messages'
 import { notifyRetestDue, notifyUnread } from '@/lib/notify'
 import { testAgeDays, testIsStale } from '@/lib/fitness-test'
 import { todayIso } from '@/lib/dates'
-import { activeProfile, lockProfile, resumeSession, type ProfileRole } from '@/lib/profiles'
+import { activeProfile, lockProfile, resumeSession, type ProfileRole, viewerFor } from '@/lib/profiles'
 import { readSyncLink, syncNow } from '@/lib/sync'
 import { refreshCapabilities } from '@/lib/capabilities'
 import { SignOut } from '@phosphor-icons/react'
@@ -136,7 +136,7 @@ function useUnread(): { count: number; senders: string[] } {
   const messages = useMessages((s) => s.messages)
   return useMemo(() => {
     if (!profileId) return { count: 0, senders: [] }
-    const profile = { id: profileId, gym: gym ?? undefined }
+    const profile = viewerFor(profileId, gym)
     return { count: unreadCount(messages, profile), senders: unreadSenders(messages, profile) }
   }, [messages, profileId, gym])
 }
