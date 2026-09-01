@@ -149,7 +149,7 @@ export function InboxPage() {
       )}
 
       {inbox.length === 0 ? (
-        <EmptyInbox gym={gym} role={role} />
+        <EmptyInbox gym={gym} />
       ) : (
         /* Unequal on purpose: the list is for recognising a message, the pane is
            for reading one. On a narrow screen only one of the two is shown,
@@ -262,23 +262,22 @@ export function InboxPage() {
   )
 }
 
-function EmptyInbox({ gym, role }: { gym: string | null; role: string }) {
+function EmptyInbox({ gym }: { gym: string | null }) {
   return (
     <Panel padding="lg" className="flex flex-col items-start gap-3">
       <Storefront size={22} className="text-ink-3" />
       {gym ? (
         <p className="max-w-[52ch] text-sm text-ink-3">
-          Nothing from {gym} yet. When they publish an event, a menu or an offer, it shows up here.
+          Nothing from {gym} or {HOUSE_GYM} yet. When either publishes an event, a menu or an offer,
+          it shows up here.
         </p>
       ) : (
         <p className="max-w-[52ch] text-sm text-ink-3">
-          {role === 'admin'
-            ? 'This profile has no gym set. Pick one under '
-            : 'You train independently, so there is no gym to hear from. Pick one under '}
+          {`Nothing from ${HOUSE_GYM} yet, and no gym to hear from either. Pick one under `}
           <Link to="/settings" className="text-brand underline underline-offset-2">
             Settings
           </Link>{' '}
-          and its messages will land here.
+          and its messages land here beside ours.
         </p>
       )}
     </Panel>
