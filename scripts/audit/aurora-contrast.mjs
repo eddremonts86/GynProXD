@@ -66,7 +66,14 @@ const PROBE = () => {
       }
       return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b)
     }
-    const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16))
+    /* Six digits or three: a production build minifies `#ffffff` to `#fff`, and
+       the first version of this only understood the long form — so it measured
+       the deployed site as NaN and called it a failure. */
+    const hex = (h) => {
+      const v = h.replace('#', '')
+      const full = v.length === 3 ? v.split('').map((c) => c + c).join('') : v
+      return [0, 2, 4].map((i) => parseInt(full.slice(i, i + 2), 16))
+    }
     const ratio = (a, b) => {
       const [hi, lo] = a > b ? [a, b] : [b, a]
       return (hi + 0.05) / (lo + 0.05)
@@ -75,7 +82,7 @@ const PROBE = () => {
     /* The colour the theme actually puts on this material. Checking white in
        both themes was checking a colour the light theme no longer uses. */
     const typeHex = css.getPropertyValue('--aurora-ink').trim()
-    const type = typeHex === '#ffffff' ? 1.0 : lum(hex(typeHex))
+    const type = lum(hex(typeHex))
 
     /* Only surfaces that carry type. The decorative wash on the landings uses
        the same material and is painted at 16% opacity behind everything, so
