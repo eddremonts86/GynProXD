@@ -524,8 +524,14 @@ function TodayOverview({
       */}
       {/*
         Three columns that read left to right as what to do, what to move and
-        what to eat. Items sit to the top and take the height they need; the two
-        spotlights opt back into stretching so they match each other.
+        what to eat. Every one of them ends where its own content ends.
+
+        The two spotlights used to opt back into stretching so they matched each
+        other, and matching was the wrong goal: this row's height is set by the
+        left column, which carries two sections, so a card holding two lines of
+        text grew a third of a screen of empty panel below its last word to
+        reach the same baseline. Cards in a row are not a table; they do not owe
+        each other a shared bottom edge.
       */}
       <div className="grid items-start gap-4 lg:grid-cols-3 lg:gap-6 2xl:gap-8">
         {/* The member's own column: what to do next, and where they stand.

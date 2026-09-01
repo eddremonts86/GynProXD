@@ -28,7 +28,7 @@ function shapeOf(dish: RecipeSuggestion): string {
   return parts.join(' · ')
 }
 
-/** `stacked` shares a row: picture over text, and the card stretches to match. */
+/** `stacked` shares a row: picture over text, and the card ends where its content does. */
 export function DishOfTheDay({
   stacked = false,
   showMenuLink = false,
@@ -51,7 +51,6 @@ export function DishOfTheDay({
     <Section
       title="Dish of the day"
       hint={daily?.dish.category}
-      className={stacked ? 'h-full self-stretch' : undefined}
       /* The gym's kitchen card had no standing way in: it was reachable only
          from a broadcast banner or a button buried in the inbox. Food lives
          here, so the door goes here. */
@@ -70,7 +69,7 @@ export function DishOfTheDay({
       ) : (
         <Panel
           padding="none"
-          className={cn('overflow-hidden', stacked ? 'flex flex-1 flex-col' : 'sm:flex')}
+          className={cn('overflow-hidden', stacked ? 'flex flex-col' : 'sm:flex')}
         >
           <img
             src={daily.dish.imageUrl}
