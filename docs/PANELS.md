@@ -421,3 +421,79 @@ Arrow keys (and `j`/`k`) move through the list, Backspace removes the open
 message. Moving with the arrows opens each message as it goes, and therefore
 marks it read — the same trade Apple Mail makes, and the reason "Mark unread"
 is one click away.
+
+## The two front doors
+
+`/` sells a free product to somebody who wants to train. `/for-gyms` sells a
+paid one to the business that wants to reach them, and they are not the same
+argument turned around: the gym is buying access to attention that the member's
+own product earned. So the gym page spends its first section on why a member
+keeps the app at all, and only then on what the gym can put in front of them. A
+reach figure is worth nothing if the app is deleted in a fortnight.
+
+Both doors carry a link to the other, and both live outside the app shell:
+`app-shell` returns the gym landing before it decides anything else, locked or
+not. Locked, because a gym owner arriving has no profile on the device — which
+is the whole point of the page. Unlocked, because rendering it inside the shell
+gave a landing page the app's own header above its header and the app's tab bar
+under its footer.
+
+`landing-kit.tsx` holds the measure, the heading scale, the rail and the narrow
+bar. Only the shape: every word stays in the page that says it. Two copies would
+have looked identical the day they were written and drifted by the second
+change, and the drift would show — the point is that the two pages are the same
+building seen from different doors.
+
+### What the gym page may claim
+
+Two hard boundaries, and they shape the whole pitch.
+
+**Training data is unreadable, to the gym and to us.** Sets, weights, history
+and measurements are encrypted with a key derived from the member's passphrase;
+the server holds rows it cannot open. So no feature that would need to read them
+can ever be priced here. The page sells this as a limit rather than hiding it,
+because a gym that has been offered somebody's training data before knows what
+it is worth that we cannot.
+
+**Counts are counted.** `TEMPLATE_COUNT` comes off `TEMPLATE_LABELS` and the
+reach window off `REACH_WINDOW_DAYS`. The first draft had a comment reading
+"counted, never typed" directly above a hardcoded `7`, which is the same lie
+with a comment on it.
+
+### The plans
+
+Base at €200, Plus at €300, per gym per month. The split is deliberately not
+"talking vs selling" — a €200 gym that cannot run an offer would feel gouged,
+and the offer is the best hook we have. Base is **everything the gym says**;
+Plus adds **surface in the member's day**: the kitchen now, and the programme
+next.
+
+Anything not built carries a `Coming` tag, no date, and the panel says in words
+that Plus buys the kitchen today and that the marked items do not change what
+you pay. There is no Stripe: the page says we invoice, because a checkout that
+does not exist is the one thing a pricing page must not imply.
+
+### Applying
+
+`gyms.createRule` is null and stays null — a gym is a paying account with a
+member roster, not something a form conjures, and the provisioning script is
+unchanged. So the call to action collects a `gym_applications` row and nothing
+else happens on its own. A row grants no gym, no operator and no reach; the
+audit checks that.
+
+`owner` is required, which is what enforces "a gym is a sync account": applying
+needs an account, so there is no anonymous write to spam, and the account is the
+one we will need anyway since it becomes the operator. The unique partial index
+allows one open application per account — a double-click is not two rows for
+somebody to reconcile, and re-applying after a decline is a new row because the
+old one is no longer `new`.
+
+Unlocking a profile from the apply panel tells the session store but
+deliberately does not navigate. The member landing's handler calls `landFor`,
+and on a fresh device the first profile becomes the device admin — so reusing it
+would have sent an applicant straight to `/admin`, off the form they were
+filling in.
+
+`/admin` → Applications reads the queue, because a form whose rows nobody can
+see is a form that throws applications away. The only control there is the
+status: the panel records what a person did, it does not do it.

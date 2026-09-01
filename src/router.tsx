@@ -22,6 +22,9 @@ const OnboardingPage = React.lazy(() =>
 const GeneratedPlanPage = React.lazy(() =>
   import('./routes/GeneratedPlan').then((m) => ({ default: m.GeneratedPlanPage })),
 )
+const GymLandingPage = React.lazy(() =>
+  import('./components/gym-landing').then((m) => ({ default: m.GymLanding })),
+)
 const InboxPage = React.lazy(() => import('./routes/Inbox').then((m) => ({ default: m.InboxPage })))
 const GymPanelPage = React.lazy(() =>
   import('./routes/GymPanel').then((m) => ({ default: m.GymPanelPage })),
@@ -121,6 +124,7 @@ export const router = createRouter({
     lazyRoute('/history', HistoryPage),
     lazyRoute('/settings', SettingsPage),
     inboxRoute,
+    lazyRoute('/for-gyms', GymLandingPage),
     lazyRoute('/menu', MenuPage),
     lazyRoute('/gym', GymPanelPage),
     lazyRoute('/admin', AdminPage),
