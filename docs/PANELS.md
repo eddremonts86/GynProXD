@@ -603,3 +603,83 @@ sender's intention is not evidence.
 
 The largest payload this can produce was measured before it shipped: an annual
 six-day programme is about 21KB against `gym_messages.payload`'s 100KB cap.
+
+## The open door
+
+Plus. `PLUS_FEATURES` calls it `open-door`, and it is the only thing on either
+tier that wins a gym somebody it did not already have — everything else is
+retention. `/gym` → Compose grows a **How far it goes** choice for a Plus gym:
+its own members, or people with no gym.
+
+It is also the first message in enForma that travels outside a relationship
+somebody chose, so it carries more rules than the rest put together.
+
+### A scope of its own
+
+`open-door`, not the house's `unaffiliated`. `senderOf` attributes everything
+that is not `members` to the platform, so a gym borrowing that scope would have
+its offer arrive over the name **enForma** — untrue, and a way to buy the
+platform's credibility along with the tier. An open-door message is named as the
+gym, because it is the gym.
+
+`MESSAGE_SCOPES` exists because of this: `messageFromWire` used to carry a
+literal list of two scopes, so the fourth arrived off the wire stripped, was
+judged as `members`, matched against the gym's name and became invisible to
+exactly the people it was written for. The list is now in one place and a test
+walks it.
+
+### Who may open it, and how often
+
+Both halves are checked in the hook rather than the collection rule, because
+both need a query the rule language cannot make:
+
+- **Plus only.** A Base gym is refused in words rather than silently narrowed.
+- **One a month, per gym**, counted from the rows themselves. A tally on the gym
+  would be a second copy of a fact, and the day it disagreed with the rows it is
+  the tally that would be believed.
+
+There is deliberately **no per-inbox cap**. A display limit would hide mail that
+was really sent, which fails worse than the problem it solves — somebody never
+sees a message addressed to them, and the gym is told it was delivered. If the
+pool of gyms grows enough that one a month each is too many, the lever is a
+platform-wide monthly quota enforced at publish, not a filter at display.
+
+### Who receives it
+
+Everybody with no gym who has not said no. The audience is a scope the server
+evaluates, never a list — a gym is never told who is in it, and the composer
+offers no names to pick from, because a picker that could not honour a pick
+would be a promise the send cannot keep. There is no location filter either: we
+hold no location for anybody, and the landing page says so rather than implying
+a segmentation that does not exist.
+
+`users.closed_to_gyms` is phrased as the refusal on purpose. The setting
+defaults to on, and the first version was `open_to_gyms` backfilled to `true` —
+which is a default only for the accounts that existed when it ran. Every signup
+afterwards arrived `false` and was silently opted out, so the feature would have
+reached a shrinking set of early users and nobody else. The audit caught it by
+asking a freshly created account. Phrased as the refusal, a PocketBase `bool`'s
+absent-is-false gives the right answer with nothing running.
+
+The switch is written to the server as well as the device. Local-only, a refusal
+would be honoured by the inbox and ignored by the read rule: the row would
+arrive, be filtered out on the way to the screen, and still be counted as
+somebody reached — a gym paying for delivery to a person who said no.
+
+`viewerFor` in `profiles.ts` exists for the same class of reason. Six screens
+were each assembling `{ id, gym }` by hand, and the day a third field decided
+who a message reaches, five of them carried on asking the old question.
+
+### How it is checked
+
+- `node scripts/audit/open-door-boundary.mjs` — every rule from the receiving
+  side against a real PocketBase: Base refused, Plus allowed once and not twice,
+  and the inbox of a rival's member, a rival's operator, somebody who said no
+  and somebody with no gym each fetched separately. It also asks, as the gym,
+  whether the audience can be listed or filtered.
+- `node scripts/audit/test-open-door.mjs` — the two screens: the reach picker
+  offering no names, and the switch actually emptying the inbox.
+- The migration was rehearsed on a populated database both ways: up leaves every
+  account open and every existing message untouched; down removes the field,
+  keeps the ordinary messages and takes the open-door rows with the rule that
+  made them readable.

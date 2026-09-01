@@ -31,6 +31,7 @@ import { OVER_AURORA } from '../ui/AuroraTile'
 import { SECTION_ACTION, Section } from '../ui/PageHeader'
 import type { GymMessage } from '../lib/messages'
 import { cn } from '@/lib/utils'
+import { viewerFor } from '@/lib/profiles'
 
 /**
  * What the gym is selling or running, on the home screen instead of behind the
@@ -262,7 +263,7 @@ export function FromYourGym() {
   if (!profileId) return null
   if (!gym) return <SetupPrompt profileId={profileId} synced={readSyncLink(profileId) !== null} />
 
-  const picked = noticesForToday(messages, { id: profileId, gym }, todayIso())
+  const picked = noticesForToday(messages, viewerFor(profileId, gym), todayIso())
   const event = picked.event && !hidden.includes(picked.event.id) ? picked.event : undefined
   const deal = picked.deal && !hidden.includes(picked.deal.id) ? picked.deal : undefined
   if (!event && !deal) return null

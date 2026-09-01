@@ -25,8 +25,37 @@ import { htmlToLine } from './rich-text'
  * device-local gym that happens to be called the same thing as the house
  * harmless rather than a leak — its messages are `members`, and `members` is
  * checked against the gym name, which is exactly the old behaviour.
+ *
+ * `open-door` is the fourth, and the only one a gym may use to reach past its
+ * own roster: people with no gym, who have not turned it off. It is a scope of
+ * its own rather than a gym borrowing `unaffiliated`, because `senderOf`
+ * attributes everything that is not `members` to the platform — a gym's offer
+ * arriving over the name enForma would be both untrue and a way to borrow
+ * credibility that is not for sale.
  */
-export type MessageScope = 'members' | 'unaffiliated' | 'everyone'
+export type MessageScope = 'members' | 'unaffiliated' | 'everyone' | 'open-door'
+
+/**
+ * The same list at runtime, because the wire needs to recognise one.
+ *
+ * A message that arrives without its scope is judged as `members` and matched
+ * against the gym's name, so it becomes invisible to exactly the people it was
+ * written for. `messageFromWire` therefore has to know which values are real —
+ * and when that knowledge was a literal list inside it, adding a fourth scope
+ * meant remembering to edit a file three directories away. It was not
+ * remembered. This array is the one place to add the fifth.
+ */
+export const MESSAGE_SCOPES: readonly MessageScope[] = [
+  'members',
+  'unaffiliated',
+  'everyone',
+  'open-door',
+]
+
+/** Whether a value off the wire is a scope this build understands. */
+export function isMessageScope(value: unknown): value is MessageScope {
+  return typeof value === 'string' && (MESSAGE_SCOPES as readonly string[]).includes(value)
+}
 
 /** What a member sees above a platform message. Display only — see MessageScope. */
 export const HOUSE_GYM = 'enForma'
@@ -146,7 +175,7 @@ export function scopeOf(message: GymMessage): MessageScope {
 
 export function isAddressedTo(
   message: GymMessage,
-  profile: { id: string; gym?: string },
+  profile: { id: string; gym?: string; openToGyms?: boolean },
 ): boolean {
   /* Authors never receive their own broadcasts; their view is the sent list. */
   if (message.authorId === profile.id) return false
@@ -163,6 +192,14 @@ export function isAddressedTo(
          stops being in this audience this morning, with no list to maintain
          and nothing to un-send. */
       if (profile.gym?.trim()) return false
+      break
+    case 'open-door':
+      /* Same audience as above, and one more condition: they have not said no.
+         Absent reads as yes, matching the server's backfill — a profile written
+         before this existed is opted in, which is the decision the migration
+         made out loud rather than one this line makes by omission. */
+      if (profile.gym?.trim()) return false
+      if (profile.openToGyms === false) return false
       break
     default:
       if (!sameGym(message.gym, profile.gym)) return false
@@ -190,6 +227,9 @@ export function audienceWithin<T extends { id: string; gym?: string }>(
   const others = profiles.filter((p) => p.id !== authorId)
   if (scope === 'everyone') return others
   if (scope === 'unaffiliated') return others.filter((p) => !p.gym?.trim())
+  if (scope === 'open-door') {
+    return others.filter((p) => !p.gym?.trim() && (p as { openToGyms?: boolean }).openToGyms !== false)
+  }
   const key = gym.trim().toLowerCase()
   return others.filter((p) => p.gym?.trim().toLowerCase() === key)
 }
@@ -348,9 +388,17 @@ export function previewOf(message: GymMessage): string {
   }
 }
 
-/** Who the message is from, as a member reads it: their gym, or the platform. */
+/**
+ * Who the message is from, as a member reads it.
+ *
+ * Their own gym, the platform, or — for the open door — the gym that paid to
+ * reach them, named as itself. A stranger's offer must never arrive over the
+ * platform's name: that would be untrue, and it would lend our credibility to
+ * whoever bought the tier.
+ */
 export function senderOf(message: GymMessage): string {
-  return scopeOf(message) === 'members' ? message.gym : HOUSE_GYM
+  const scope = scopeOf(message)
+  return scope === 'members' || scope === 'open-door' ? message.gym : HOUSE_GYM
 }
 
 /** Short, unambiguous redemption code: no 0/O or 1/I lookalikes. */

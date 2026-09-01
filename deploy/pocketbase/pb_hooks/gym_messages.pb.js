@@ -5,8 +5,9 @@
  * rule cannot express — that the author actually operates the target gym, and
  * that only the house may address anybody beyond its own members.
  *
- * The shared predicates come from utils/house_gym.js because each handler runs
- * in its own VM and cannot see a function declared beside it here.
+ * The shared predicates come from utils/house_gym.js and utils/open_door.js
+ * because each handler runs in its own VM and cannot see a function declared
+ * beside it here.
  */
 
 onRecordCreateRequest((e) => {
@@ -36,9 +37,24 @@ onRecordCreateRequest((e) => {
   if (!authId || !operators.includes(authId)) {
     throw new ForbiddenError("Only this gym's operators can publish to it.")
   }
+
+  const { OPEN_DOOR, refuseOpenDoor } = require(`${__hooks}/utils/open_door.js`)
+
   /**
-   * A gym reaches its own members and nobody else's. Rejected rather than
-   * silently narrowed: a gym that tried to address the platform has
+   * The open door is the one scope a gym may use beyond its own roster, and it
+   * is checked here rather than in the collection rule because both halves of
+   * the answer — the plan, and how many the gym has already sent this month —
+   * need a query the rule language cannot make.
+   */
+  if (scope === OPEN_DOOR) {
+    const refusal = refuseOpenDoor(e.app, gym, new Date())
+    if (refusal) throw new ForbiddenError(refusal)
+    return e.next()
+  }
+
+  /**
+   * Otherwise a gym reaches its own members and nobody else's. Rejected rather
+   * than silently narrowed: a gym that tried to address the platform has
    * misunderstood something, and quietly rewriting it would leave them
    * believing it worked.
    */

@@ -40,6 +40,18 @@ export interface ProfileMeta {
   gym?: string
   /** Panel access. Gates navigation, never cryptography. Absent = member. */
   role?: ProfileRole
+  /**
+   * Whether gyms this person does not belong to may reach them.
+   *
+   * Absent reads as yes, matching the server, where the column is phrased as
+   * the refusal (`closed_to_gyms`) precisely so that the default needs nothing
+   * to be running. It is a decision rather than an oversight: nothing about
+   * this person travels to a gym — the audience is a scope, so no gym ever
+   * learns that any particular account has no gym — and the switch governs
+   * whether unsolicited messages arrive at all. Turning it off is one tap, and
+   * every such message says where the tap is.
+   */
+  openToGyms?: boolean
   createdAt: string
   kdf: { salt: string; iterations: number }
   /** A small encrypted sentinel, used to verify a passphrase on unlock. */
@@ -95,15 +107,18 @@ export interface ProfileSummary {
   gym?: string
   role: ProfileRole
   createdAt: string
+  /** Absent reads as yes; see `ProfileMeta.openToGyms`. */
+  openToGyms?: boolean
 }
 
 export function listProfiles(): ProfileSummary[] {
-  return readRegistry().profiles.map(({ id, name, gym, role, createdAt }) => ({
+  return readRegistry().profiles.map(({ id, name, gym, role, createdAt, openToGyms }) => ({
     id,
     name,
     gym,
     role: role ?? 'member',
     createdAt,
+    openToGyms,
   }))
 }
 
@@ -136,12 +151,45 @@ export function activeProfile(): {
   name: string
   gym?: string
   role: ProfileRole
+  /** Absent reads as yes; see `ProfileMeta.openToGyms`. */
+  openToGyms?: boolean
 } | null {
   if (!activeId) return null
   const meta = readRegistry().profiles.find((p) => p.id === activeId)
   return meta
-    ? { id: meta.id, name: meta.name, gym: meta.gym, role: meta.role ?? 'member' }
+    ? {
+        id: meta.id,
+        name: meta.name,
+        gym: meta.gym,
+        role: meta.role ?? 'member',
+        openToGyms: meta.openToGyms,
+      }
     : null
+}
+
+/**
+ * The shape every audience check wants, built in one place.
+ *
+ * Six screens were each assembling `{ id, gym }` by hand — the badge, the
+ * banner, the inbox, Today's notices, the challenges list and the library — and
+ * the day a third field decided who a message reaches, five of them carried on
+ * asking the old question and quietly disagreed with the sixth. The code
+ * already said as much about four of them; it was right, and there were six.
+ *
+ * `gym` is taken from the caller when given, because the session store is what
+ * re-renders when somebody joins or leaves; everything else comes from the
+ * registry, which is where it is written.
+ */
+export function viewerFor(
+  profileId: string,
+  gym?: string | null,
+): { id: string; gym?: string; openToGyms?: boolean } {
+  const meta = readRegistry().profiles.find((p) => p.id === profileId)
+  return {
+    id: profileId,
+    gym: gym ?? meta?.gym,
+    openToGyms: meta?.openToGyms,
+  }
 }
 
 /** The active profile's role, straight from the registry. */
@@ -200,7 +248,7 @@ export function adoptServerRole(id: string, role: ProfileRole): boolean {
  */
 export function updateProfileMeta(
   id: string,
-  patch: { name?: string; gym?: string; role?: ProfileRole },
+  patch: { name?: string; gym?: string; role?: ProfileRole; openToGyms?: boolean },
 ): boolean {
   const isAdmin = activeRole() === 'admin'
   const isSelf = id === activeId
@@ -226,6 +274,12 @@ export function updateProfileMeta(
   if (patch.role !== undefined) {
     if (patch.role === 'member') delete meta.role
     else meta.role = patch.role
+  }
+  if (patch.openToGyms !== undefined) {
+    /* Stored only when off. Absent is the yes, so an opted-in profile carries
+       nothing and the two ways of saying yes cannot drift apart. */
+    if (patch.openToGyms) delete meta.openToGyms
+    else meta.openToGyms = false
   }
   writeRegistry(registry)
   return true

@@ -38,6 +38,7 @@ import {
   type ResponseRow,
 } from './gym-responses'
 import type { MenuSection } from './menu'
+import { isMessageScope } from './messages'
 import type { GymMessage, MessageImage, TemplateKind } from './messages'
 
 /**
@@ -708,6 +709,34 @@ export async function leaveGym(profileId: string): Promise<void> {
   await syncNow(profileId)
 }
 
+/**
+ * Tell the server whether gyms may reach this account.
+ *
+ * The switch lives in the local registry, which is enough for what this device
+ * shows — but not for what the server sends. Left local, a refusal would be
+ * honoured by the inbox and ignored by the read rule: the row would arrive,
+ * be filtered out on the way to the screen, and still be counted as somebody
+ * reached. A gym would be paying for delivery to a person who said no.
+ *
+ * Best-effort by design. A profile with no account has nothing to tell, and a
+ * server that will not answer must not stop somebody from setting a preference
+ * on their own device — the local answer is the one the inbox obeys either way.
+ */
+export async function setOpenToGyms(profileId: string, open: boolean): Promise<void> {
+  const l = readSyncLink(profileId)
+  if (!l?.token) return
+  try {
+    await request(l.server, `/api/collections/users/records/${l.userId}`, {
+      method: 'PATCH',
+      token: l.token,
+      /* Phrased as the refusal, the way the column is: see the migration. */
+      body: { closed_to_gyms: !open },
+    })
+  } catch {
+    /* Said on this device regardless. */
+  }
+}
+
 /* ---- operator side ---- */
 
 /** Pending requests for the gyms this account operates, with member identity. */
@@ -905,12 +934,13 @@ function messageFromWire(wire: WireMessage, gymName: string, server: string): Gy
     createdAt: new Date(wire.created.replace(' ', 'T')).toISOString(),
     kind: wire.kind as TemplateKind,
     title: wire.title,
-    /* Carried through, not defaulted. A house message that arrived without its
-       scope would be judged as `members` — matched against the gym name — and
-       become invisible to exactly the people it was written for. */
-    ...(wire.scope === 'unaffiliated' || wire.scope === 'everyone'
-      ? { scope: wire.scope }
-      : {}),
+    /* Carried through, not defaulted. A message that arrived without its scope
+       would be judged as `members` — matched against the gym name — and become
+       invisible to exactly the people it was written for. Asked of the list in
+       messages.ts rather than a literal here: the literal was `unaffiliated` or
+       `everyone`, and the day a fourth scope was added this line silently
+       dropped it. */
+    ...(isMessageScope(wire.scope) && wire.scope !== 'members' ? { scope: wire.scope } : {}),
     ...(wire.body ? { body: wire.body } : {}),
     ...(images.length > 0 ? { images } : {}),
     readBy: [],

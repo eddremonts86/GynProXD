@@ -29,6 +29,7 @@ import {
 import { EQUIPMENT_LABELS, MUSCLE_LABELS, MUSCLE_SHORT } from '../lib/labels'
 import { cn } from '@/lib/utils'
 import type { Equipment, Exercise, MuscleGroup } from '../lib/types'
+import { viewerFor } from '@/lib/profiles'
 
 const MUSCLES: MuscleGroup[] = [
   'chest',
@@ -104,7 +105,7 @@ export function LibraryPage() {
      situations, not muscle groups — members know their circumstances. */
   const collections = useMemo(() => {
     const fromGym = profileId
-      ? inboxFor(messages, { id: profileId, gym: gym ?? undefined })
+      ? inboxFor(messages, viewerFor(profileId, gym))
           .filter((m) => m.kind === 'collection' && m.collection)
           .map((m) => m.collection!)
       : []

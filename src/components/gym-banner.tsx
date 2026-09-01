@@ -4,6 +4,7 @@ import { Megaphone, X } from '@phosphor-icons/react'
 import { useSession } from '@/store/useSession'
 import { useMessages } from '@/store/useMessages'
 import { activeBanners } from '@/lib/messages'
+import { viewerFor } from '@/lib/profiles'
 
 /**
  * The announcement strip under the top bar. Only messages published with a
@@ -24,7 +25,7 @@ export function GymBanner() {
   }, [])
 
   if (!profileId) return null
-  const banners = activeBanners(messages, { id: profileId, gym: gym ?? undefined }, now)
+  const banners = activeBanners(messages, viewerFor(profileId, gym), now)
   const top = banners[0]
   if (!top) return null
 

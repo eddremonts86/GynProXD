@@ -14,6 +14,7 @@ import { useMessages } from '../store/useMessages'
 import { useGym } from '../store/useGym'
 import { HOUSE_GYM, inboxFor, senderOf, type GymMessage } from '../lib/messages'
 import { adoptedPlanId, adoptProgramme, programmeMismatch } from '../lib/gym-programme'
+import { viewerFor } from '../lib/profiles'
 import { notificationsEnabled, notificationsSupported } from '../lib/notify'
 import { useMenus } from '../store/useMenus'
 import { menuFor } from '../lib/menu'
@@ -66,7 +67,7 @@ export function InboxPage() {
 
   useEffect(() => () => window.clearTimeout(undoTimer.current), [])
 
-  const me = profileId ? { id: profileId, gym: gym ?? undefined } : null
+  const me = profileId ? viewerFor(profileId, gym) : null
   const inbox = me ? inboxFor(messages, me) : []
   const open = openId ? inbox.find((message) => message.id === openId) : undefined
   const unreadTotal = me ? inbox.filter((x) => !x.readBy.includes(me.id)).length : 0
