@@ -1210,6 +1210,9 @@ export async function publishToServer(
       product: input.product ?? null,
       challenge: input.challenge ?? null,
       collection: input.collection ?? null,
+      /* Measured before it was shipped: the largest thing this can be is an
+         annual, six-day programme at ~21KB, against the row's 100KB cap. */
+      programme: input.programme ?? null,
       banner: input.banner ?? null,
       link: input.link ?? null,
       /* Index-aligned with the files below, which is the only ordering both

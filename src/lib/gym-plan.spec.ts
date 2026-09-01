@@ -29,13 +29,17 @@ describe('planAllows', () => {
   it('gives a built feature to Plus and not to Base', () => {
     expect(planAllows('plus', 'kitchen')).toBe(true)
     expect(planAllows('base', 'kitchen')).toBe(false)
+    expect(planAllows('plus', 'programmes')).toBe(true)
+    expect(planAllows('base', 'programmes')).toBe(false)
   })
 
   it('refuses an unbuilt feature to everybody', () => {
     // A half-finished feature must not leak out through a Plus account before
     // it is done, which is why the gate asks whether it exists first.
-    expect(planAllows('plus', 'programmes')).toBe(false)
-    expect(planAllows('base', 'programmes')).toBe(false)
+    // `scheduling` is the example because it is not built; when it ships, this
+    // moves up to the case above rather than being deleted.
+    expect(planAllows('plus', 'scheduling')).toBe(false)
+    expect(planAllows('base', 'scheduling')).toBe(false)
   })
 
   it('agrees with isBuilt for every feature the page lists', () => {

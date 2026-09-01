@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Navigate } from '@tanstack/react-router'
+import { Navigate, useNavigate } from '@tanstack/react-router'
 import {
   ArrowsClockwise,
   Check,
@@ -30,9 +30,11 @@ import {
   type BroadcastScope,
 } from '@/components/broadcast-audience'
 import { GymJoinCode, GymRequests } from '@/components/gym-operator-tools'
-import { formatShortDate, pluralize } from '../lib/labels'
+import { DURATION_LABELS, formatShortDate, pluralize } from '../lib/labels'
 import { todayIso } from '../lib/dates'
 import { generatedExercises } from '../data/exercises-generated'
+import { useGym } from '../store/useGym'
+import { programmeFromPlan } from '../lib/gym-programme'
 import { Combobox } from '../ui/Combobox'
 import { renderChallengeCard, shareOrDownloadPng } from '../lib/session-card'
 import { validCollectionIds } from '../lib/collection'
@@ -87,6 +89,7 @@ const KINDS: TemplateKind[] = [
   'menu',
   'challenge',
   'collection',
+  'programme',
   'announcement',
 ]
 
@@ -135,6 +138,8 @@ const BODY_PLACEHOLDER: Record<TemplateKind, string> = {
     'Why this movement, how to scale it on a bad day, and what a good month looks like.',
   collection:
     'What these movements have in common and when to reach for them.',
+  programme:
+    'The only description members get. Who it is for, what the blocks build towards, and what somebody should already be able to do.',
   announcement:
     'The change, when it starts, and what members should do differently.',
 }
@@ -232,6 +237,7 @@ export function GymDesk({
   const [chUnit, setChUnit] = useState<'reps' | 'seconds'>('reps')
   const [collectionPicks, setCollectionPicks] = useState<string[]>([])
   const [collectionSearch, setCollectionSearch] = useState('')
+  const [programmeSource, setProgrammeSource] = useState('')
   const [everyone, setEveryone] = useState(true)
   const [picked, setPicked] = useState<string[]>([])
   const [bannerOn, setBannerOn] = useState(false)
@@ -271,11 +277,23 @@ export function GymDesk({
       .catch(() => setPlan('base'))
   }, [profileId, gym, broadcast])
 
+  /**
+   * The operator's own designed plans, which is what there is to publish.
+   *
+   * A gym designs a programme the same way a member does — the planner, the
+   * coach, the intake — so there is no second designer to build. What this
+   * screen adds is the act of signing one and handing it over, and
+   * `programmeFromPlan` is what decides which half of it travels.
+   */
+  const designs = useGym((s) => s.generatedPlans)
+  const navigate = useNavigate()
+
   const canPickWindow = planAllows(plan, 'reach-window')
   /* The kitchen is what Plus buys today. It was on for every gym, including the
      ones the page charges the lower price, which made the pricing page wrong in
      the expensive direction from the moment somebody paid it. */
   const canKitchen = planAllows(plan, 'kitchen')
+  const canProgrammes = planAllows(plan, 'programmes')
   const windowedDays = windowDays(reachWindow)
   const since = windowedDays === null ? null : windowStart(todayIso(), windowedDays)
 
@@ -384,8 +402,16 @@ export function GymDesk({
         },
       }
     }
+    if (kind === 'programme') {
+      const source = designs.find((d) => d.id === programmeSource)
+      if (!source) return null
+      return {
+        ...common,
+        programme: programmeFromPlan(source, gym, common.title, common.body, 'preview'),
+      }
+    }
     return common
-  }, [gym, profileId, kind, title, body, images, eventDate, eventTime, eventPlace, courses, discount, validUntil, code, productName, productPrice, productNote, chExerciseName, chDays, chStart, chDelta, chUnit, collectionPicks])
+  }, [gym, profileId, kind, title, body, images, eventDate, eventTime, eventPlace, courses, discount, validUntil, code, productName, productPrice, productNote, chExerciseName, chDays, chStart, chDelta, chUnit, collectionPicks, programmeSource, designs])
 
   /** The templates that sell something. The only ones the warning is about. */
   const COMMERCIAL: TemplateKind[] = ['offer', 'product']
@@ -417,7 +443,9 @@ export function GymDesk({
                 ? 'A challenge needs a title, a movement from the library, and sane numbers (7-120 days, positive start).'
                 : kind === 'collection'
                   ? 'A collection needs a title and at least two movements.'
-                  : 'Give the message a title.',
+                  : kind === 'programme'
+                    ? 'A programme needs a title and one of your own designs to sign.'
+                    : 'Give the message a title.',
       )
       return
     }
@@ -458,6 +486,9 @@ export function GymDesk({
         : undefined,
       collection: draft.collection
         ? { ...draft.collection, id: `coll-${gym.trim().toLowerCase()}-${Date.now()}` }
+        : undefined,
+      programme: draft.programme
+        ? { ...draft.programme, id: `gp-${gym.trim().toLowerCase()}-${Date.now()}` }
         : undefined,
       banner: bannerOn ? { minutes: Number(bannerMinutes) } : undefined,
     }
@@ -570,7 +601,13 @@ export function GymDesk({
                     here — its Menu tab is absent for the same reason, and a
                     template you can fill in while the thing behind it does not
                     exist is worse than one that is simply not there. */}
-                {KINDS.filter((k) => k !== 'menu' || (!broadcast && canKitchen)).map((k) => (
+                {KINDS.filter(
+                  (k) =>
+                    (k !== 'menu' || (!broadcast && canKitchen)) &&
+                    /* Plus, and a gym's own — the house has no designs and no
+                       plan to check one against. */
+                    (k !== 'programme' || (!broadcast && canProgrammes)),
+                ).map((k) => (
                   <button
                     key={k}
                     type="button"
@@ -612,7 +649,9 @@ export function GymDesk({
                           ? 'September squat countdown'
                           : kind === 'collection'
                             ? 'For desk workers'
-                            : 'New opening hours'
+                            : kind === 'programme'
+                              ? 'Winter strength, twelve weeks'
+                              : 'New opening hours'
                 }
               />
 
@@ -831,6 +870,74 @@ export function GymDesk({
                       setCollectionSearch('')
                     }}
                   />
+                </div>
+              )}
+
+              {kind === 'programme' && (
+                <div className="flex flex-col gap-3">
+                  {designs.length === 0 ? (
+                    /* There is nothing to sign yet, and the way to get one is
+                       the same planner a member uses — so say that rather than
+                       showing an empty picker. */
+                    <Panel tone="inset" padding="md" className="flex flex-col gap-2">
+                      <span className="text-sm font-medium text-ink">
+                        Design one first, then sign it
+                      </span>
+                      <span className="max-w-[56ch] text-2xs leading-relaxed text-ink-3">
+                        A programme is one of your own plans, published. Build it in the planner —
+                        the coach, the intake, the blocks — and it will appear here to hand over.
+                      </span>
+                      <span>
+                        <Button variant="secondary" size="sm" onClick={() => navigate({ to: '/onboarding' })}>
+                          Open the planner
+                        </Button>
+                      </span>
+                    </Panel>
+                  ) : (
+                    <>
+                      <div className="flex flex-col gap-1.5">
+                        <span className="text-2xs font-medium text-ink-3">Which of your plans</span>
+                        <ul className="flex flex-col gap-1.5">
+                          {designs.map((d) => {
+                            const picked = programmeSource === d.id
+                            return (
+                              <li key={d.id}>
+                                <button
+                                  type="button"
+                                  role="radio"
+                                  aria-checked={picked}
+                                  onClick={() => touch(setProgrammeSource)(d.id)}
+                                  className={cn(
+                                    'flex w-full items-baseline gap-3 rounded-md px-3 py-2 text-left transition-colors duration-150',
+                                    picked
+                                      ? 'bg-brand/10 ring-1 ring-brand'
+                                      : 'bg-surface-2 hover:bg-surface-2/70',
+                                  )}
+                                >
+                                  <span className="min-w-0 flex-1 truncate text-sm text-ink">
+                                    {d.weeklyTemplate.name}
+                                  </span>
+                                  <span className="num shrink-0 text-2xs text-ink-3">
+                                    {DURATION_LABELS[d.approvedDuration]} ·{' '}
+                                    {d.input.daysPerWeek}/wk
+                                  </span>
+                                </button>
+                              </li>
+                            )
+                          })}
+                        </ul>
+                      </div>
+                      {/* The promise this feature has to keep, said where the
+                          operator is deciding rather than in a changelog. */}
+                      <p className="max-w-[62ch] rounded-lg bg-surface-2 px-3 py-2 text-2xs leading-relaxed text-ink-2">
+                        Only the training travels: the blocks, the movements and the shape you built
+                        it for. Your age, weight, targets, anything you wrote about injuries and the
+                        coach’s notes on your own plan all stay on this device — what members read
+                        is the message body above. Each one gets their own dated copy from their own
+                        answers.
+                      </p>
+                    </>
+                  )}
                 </div>
               )}
 
@@ -1099,6 +1206,9 @@ export function GymDesk({
                               : ''}
                             {m.kind === 'offer' && m.offer ? ` · code ${m.offer.code}` : ''}
                             {m.kind === 'challenge' ? ` · joined ${m.joined?.length ?? 0}` : ''}
+                            {m.kind === 'programme' && m.programme
+                              ? ` · ${pluralize(m.programme.blocks.length, 'block')} · adopted ${m.joined?.length ?? 0}`
+                              : ''}
                             {m.kind === 'collection' && m.collection
                               ? ` · ${pluralize(m.collection.exerciseIds.length, 'movement')}`
                               : ''}

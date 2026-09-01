@@ -7,6 +7,8 @@
 
 import type { Challenge } from './challenge'
 import type { Collection } from './collection'
+import type { GymProgramme } from './gym-programme'
+import { DURATION_LABELS } from './labels'
 import { htmlToLine } from './rich-text'
 
 /**
@@ -37,6 +39,7 @@ export type TemplateKind =
   | 'challenge'
   | 'collection'
   | 'product'
+  | 'programme'
 
 export interface MenuCourse {
   name: string
@@ -84,6 +87,15 @@ export interface GymMessage {
   product?: { name: string; price: string; note?: string }
   challenge?: Challenge
   collection?: Collection
+  /**
+   * A programme the gym designed, as structure only.
+   *
+   * Deliberately not a `GeneratedPlan`: that object carries the `input` of
+   * whoever designed it — their age, weight and the field their injuries are
+   * written in. See `gym-programme.ts` for what is stripped and why. The
+   * member's own numbers re-enter when they adopt it.
+   */
+  programme?: GymProgramme
   /** Also surface as a strip under the top bar, for this many minutes. */
   banner?: { minutes: number }
   /** Where the banner's View action goes; default is the inbox. */
@@ -121,6 +133,7 @@ export const TEMPLATE_LABELS: Record<TemplateKind, string> = {
   challenge: 'Challenge',
   collection: 'Collection',
   product: 'In the shop',
+  programme: 'Programme',
 }
 
 const sameGym = (a: string | undefined, b: string | undefined): boolean =>
@@ -324,6 +337,11 @@ export function previewOf(message: GymMessage): string {
     case 'collection':
       return message.collection
         ? `${message.collection.exerciseIds.length} movements`
+        : ''
+    case 'programme':
+      /* What a member weighing it up wants: how long, and how often. */
+      return message.programme
+        ? `${DURATION_LABELS[message.programme.duration]}, ${message.programme.daysPerWeek} days a week`
         : ''
     default:
       return ''

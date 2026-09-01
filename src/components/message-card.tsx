@@ -1,8 +1,16 @@
-import { Check, MapPin, X } from '@phosphor-icons/react'
+import { Barbell, Check, MapPin, WarningCircle, X } from '@phosphor-icons/react'
 import { TEMPLATE_LABELS, offerPayload, type GymMessage } from '@/lib/messages'
 import { repsForDay, totalReps } from '@/lib/challenge'
 import { exerciseById } from '@/lib/exercises'
-import { MUSCLE_LABELS, formatShortDate } from '@/lib/labels'
+import {
+  DAY_FULL_LABELS,
+  DURATION_LABELS,
+  EQUIPMENT_LABELS,
+  LEVEL_LABELS,
+  MUSCLE_LABELS,
+  formatShortDate,
+  pluralize,
+} from '@/lib/labels'
 import { ExerciseThumb } from '@/ui/ExerciseThumb'
 import { Panel } from '@/ui/Panel'
 import { Tag } from '@/ui/Tag'
@@ -19,6 +27,7 @@ const KIND_TONE = {
   challenge: 'brand',
   collection: 'good',
   product: 'brand',
+  programme: 'brand',
 } as const
 
 /**
@@ -32,6 +41,8 @@ export function MessageCard({
   onRsvp,
   onToggleSave,
   onToggleJoin,
+  onAdopt,
+  programmeWarning,
   unread,
   chrome = 'panel',
 }: {
@@ -40,6 +51,15 @@ export function MessageCard({
   onRsvp?: (answer: 'yes' | 'no') => void
   onToggleSave?: () => void
   onToggleJoin?: () => void
+  /** Put the gym's programme on this member's calendar. Inbox only. */
+  onAdopt?: () => void
+  /**
+   * Why it may not suit them, worked out from their own answers by whoever
+   * knows them — the card never sees a member's input. The composer passes
+   * nothing, so an operator previewing their own draft is not warned about
+   * equipment they were the one to choose.
+   */
+  programmeWarning?: string | null
   unread?: boolean
   /**
    * `bare` drops the card's own surface for a container that already has one —
@@ -182,6 +202,72 @@ export function MessageCard({
             )
           })}
         </ul>
+      )}
+
+      {message.kind === 'programme' && message.programme && (
+        <div className="flex flex-col gap-3 border-t border-line pt-3">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <Tag tone="outline">{DURATION_LABELS[message.programme.duration]}</Tag>
+            <Tag tone="outline">
+              {message.programme.daysPerWeek} days a week
+            </Tag>
+            <Tag tone="outline">{message.programme.minsPerSession} min</Tag>
+            <Tag tone="outline">{EQUIPMENT_LABELS[message.programme.equipment]}</Tag>
+            {/* Level, not goal: how hard the movements are is a property of the
+                structure; what somebody wants for their body is not. */}
+            <Tag tone="outline">{LEVEL_LABELS[message.programme.level]}</Tag>
+          </div>
+
+          {/* The first block, in full. A year is thirteen of these and listing
+              them all would be a document rather than a card; what somebody
+              deciding wants to see is what the first four weeks ask of them. */}
+          {message.programme.blocks[0] && message.programme.blocks[0].days.length > 0 && (
+            <div className="flex flex-col gap-1.5">
+              <span className="text-2xs font-medium tracking-wide text-ink-3 uppercase">
+                First four weeks
+                {message.programme.blocks.length > 1
+                  ? ` · ${pluralize(message.programme.blocks.length, 'block')} in all`
+                  : ''}
+              </span>
+              <ul className="flex flex-col gap-1">
+                {message.programme.blocks[0].days.map((day, i) => (
+                  <li key={`${day.day}-${i}`} className="flex items-baseline gap-2 text-sm">
+                    <span className="w-24 shrink-0 text-ink-3">{DAY_FULL_LABELS[day.day]}</span>
+                    <span className="min-w-0 flex-1 text-ink-2">
+                      {day.exercises
+                        .map((e) => exerciseById(e.exerciseId)?.name ?? e.exerciseId)
+                        .join(' · ') || 'Rest'}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {programmeWarning && (
+            <p className="flex items-start gap-2 rounded-lg bg-surface-2 px-3 py-2 text-2xs leading-relaxed text-ink-2">
+              <WarningCircle size={14} className="mt-px shrink-0 text-danger" />
+              {programmeWarning}
+            </p>
+          )}
+
+          {viewer && onAdopt && (
+            <div className="flex flex-wrap items-center gap-3">
+              <Button size="sm" variant={joinedByMe ? 'secondary' : 'primary'} onClick={onAdopt}>
+                <Barbell size={14} />
+                {joinedByMe ? 'Open your copy' : 'Put it on my calendar'}
+              </Button>
+              {/* What they are actually getting, said before they press it
+                  rather than discovered afterwards: the gym wrote the training,
+                  the dates come from their own answers. */}
+              <span className="max-w-[44ch] text-2xs leading-relaxed text-ink-3">
+                {joinedByMe
+                  ? 'Yours to change. The gym is not told what you do with it.'
+                  : 'Your own copy, dated from your answers. Nothing you do to it goes back.'}
+              </span>
+            </div>
+          )}
+        </div>
       )}
 
       {message.kind === 'product' && message.product && (

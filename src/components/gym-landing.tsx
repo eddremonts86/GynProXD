@@ -154,7 +154,7 @@ const BASE: Feature[] = [
 
 const PLUS: Feature[] = [
   { id: 'kitchen', icon: ForkKnife, title: 'The kitchen', body: 'The daily menu and your standing kitchen card, on Today and on its own page. The one surface here that leads where money changes hands.' },
-  { id: 'programmes', icon: Barbell, title: 'Programmes signed by your gym', body: 'Publish a programme your members adopt in one tap, with your name on it, instead of the one the app would have built.' },
+  { id: 'programmes', icon: Barbell, title: 'Programmes signed by your gym', body: 'Publish a programme your members adopt in one tap, with your name on it, instead of the one the app would have built. Each one gets their own dated copy, and what they do with it stays on their phone.' },
   { id: 'scheduling', icon: Clock, title: 'Write it now, publish it later', body: 'Monday’s menu on Sunday evening. A week of posts in one sitting.' },
   { id: 'reach-window', icon: ChartLineUp, title: 'Reach with no window, exported', body: `Past the ${REACH_WINDOW_DAYS} days, and out as a file you can put next to your own numbers.` },
   { id: 'operators', icon: Buildings, title: 'Operators and second rooms', body: 'Staff who can publish, and more than one location under the same account.' },
