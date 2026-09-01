@@ -683,3 +683,75 @@ who a message reaches, five of them carried on asking the old question.
   account open and every existing message untouched; down removes the field,
   keeps the ordinary messages and takes the open-door rows with the rule that
   made them readable.
+
+## Write it now, publish it later
+
+Plus. `PLUS_FEATURES` calls it `scheduling`. The composer grows a **When it goes
+out** field for a Plus gym; empty publishes on arrival, exactly as before.
+
+### It is one field, and that was worth checking
+
+The design started out as a second collection plus a cron to move rows across at
+the appointed time. The reasoning was that `publish_at` on the row itself hides
+nothing — the record exists from the moment it is written, and anybody with an
+account can fetch the collection and read tomorrow's offer today.
+
+That reasoning was wrong, and a spike against a real server settled it in a
+minute: **PocketBase evaluates `@now` inside a collection rule.** So the row can
+simply be unreadable until its time, and the whole second collection, the cron,
+the moving of rows and the window in which a message exists in neither place all
+disappear. The arms of the read rule that serve members carry
+`(publish_at = '' || publish_at <= @now)`; the operators' arm does not, because a
+gym must be able to see its own queue and cancel it.
+
+`scripts/audit/scheduled-boundary.mjs` asks the API rather than the app: a
+member cannot list a queued message, cannot find it by filtering for its title,
+and finds it seconds later once the clock passes — with nothing having moved it.
+
+### The doorbell needed the work instead
+
+Web push polls `gym_messages` on `updated`, and for a message written on Sunday
+and published on Monday that is Sunday. Left alone, a gym scheduling Monday's
+menu would have woken every member on Sunday evening to announce something none
+of them could open.
+
+So the poller keeps two cursors. Messages with no time on them ride `updated`,
+exactly as before. Messages with one ride a second cursor over `publish_at` and
+are announced when their time arrives. The audit runs both queries against the
+same rows and checks, among other things, that no message is on both paths —
+otherwise a member is told twice about the same thing.
+
+A message given an explicit time is a scheduled message even when that time is a
+minute ago, and it rides the second cursor. That is what keeps the two paths
+from claiming the same row.
+
+### A date nobody can read
+
+`publish_at: 'next tuesday-ish'` was accepted and published immediately, which
+is the one outcome the feature must never produce: a gym meant Monday, got
+Sunday evening, and was told it had scheduled something.
+
+PocketBase parses a request into typed values before any hook runs, so by the
+time the record has it, an unparseable date and no date at all are the same
+empty value. The only signal left is whether the caller put the field in the
+request at all — so a field that was **sent** and arrived empty is a date that
+did not survive the trip, and is refused in words. The client therefore omits
+the field entirely rather than sending an empty one to mean now.
+
+Also refused: a time more than five minutes in the past (less than that is
+forgiven, because the time comes off the operator's own phone and a clock a
+minute behind would otherwise have every "publish now" rejected), and anything
+more than ninety days ahead, where a date is far more likely a mistyped year
+than a plan.
+
+### What the gym is told
+
+A queued message has reached nobody, so the composer says **Queued for Monday,
+8 September at 08:00** rather than reporting a delivery, and Sent shows **goes
+out Mon 8 Sep 08:00** in place of the read and answer tallies. `read 0` on a
+message nobody could open reads as a failure rather than as a queue.
+
+Rolling back deletes anything still queued. A row whose `publish_at` nothing
+reads any more is a message that publishes itself the instant the field goes,
+which is the one thing a rollback must not do; rows already past their time are
+kept, because they are published messages whose schedule is now only history.

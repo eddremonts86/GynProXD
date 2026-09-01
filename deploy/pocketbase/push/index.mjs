@@ -10,7 +10,15 @@ import webpush from 'web-push'
  *
  * Poll-based on purpose: the data volume is a gym's announcements, not a
  * firehose, and a 10-second loop is simpler to keep alive than a realtime
- * subscription. State is one cursor in a file.
+ * subscription. State is two cursors in a file.
+ *
+ * Two, because a scheduled message becomes news at a moment when nothing about
+ * its row changes. The doorbell used to ring on `updated`, which for a message
+ * written on Sunday and published on Monday is Sunday — so a gym scheduling
+ * Monday's menu would have woken every member on Sunday evening to announce
+ * something none of them could open. The immediate messages still ride the
+ * `updated` cursor, exactly as before; the queued ones ride a second cursor
+ * over `publish_at`, and are told about when their time arrives.
  */
 
 const PB = (process.env.PB_URL ?? 'http://pocketbase:8090').replace(/\/+$/, '')
@@ -57,20 +65,34 @@ async function login() {
   token = (await res.json()).token
 }
 
-async function readCursor() {
+/**
+ * Both cursors, from one file.
+ *
+ * The file held a single line before this, so a deploy that lands mid-life
+ * reads that line as the `updated` cursor and starts the `publish_at` one at
+ * now — which is right: anything already due was already announced under the
+ * old scheme, and starting the new cursor in the past would replay it.
+ */
+async function readCursors() {
   try {
-    return (await readFile(STATE_FILE, 'utf8')).trim()
+    const raw = (await readFile(STATE_FILE, 'utf8')).trim()
+    const [updated, due] = raw.split('\n')
+    return { updated: updated.trim(), due: (due ?? '').trim() || nowStamp() }
   } catch {
     /* First boot: start from now so a fresh deploy does not replay history. */
-    const now = new Date().toISOString().replace('T', ' ')
-    await writeCursor(now)
-    return now
+    const now = nowStamp()
+    await writeCursors({ updated: now, due: now })
+    return { updated: now, due: now }
   }
 }
 
-async function writeCursor(cursor) {
+function nowStamp() {
+  return new Date().toISOString().replace('T', ' ')
+}
+
+async function writeCursors({ updated, due }) {
   await mkdir(STATE_FILE.split('/').slice(0, -1).join('/') || '/', { recursive: true })
-  await writeFile(STATE_FILE, cursor)
+  await writeFile(STATE_FILE, `${updated}\n${due}`)
 }
 
 async function subsFor(userIds) {
@@ -125,24 +147,53 @@ async function deliver(message, gymName) {
   return { sent, dropped }
 }
 
+async function ring(message) {
+  const gym = await api(`/api/collections/gyms/records/${message.gym}`)
+  const { sent, dropped } = await deliver(message, gym?.name ?? 'Your gym')
+  console.log(
+    `push: "${message.title}" -> ${sent} sent${dropped ? `, ${dropped} dead subs dropped` : ''}`,
+  )
+}
+
 async function tick() {
   if (!token) await login()
-  const cursor = await readCursor()
-  const list = await api(
+  const cursor = await readCursors()
+  const now = nowStamp()
+
+  /* Published on arrival: unchanged, except that it now leaves the queued ones
+     alone rather than announcing them the moment they are written. */
+  const immediate = await api(
     `/api/collections/gym_messages/records?perPage=100&sort=updated&filter=${encodeURIComponent(
-      `updated > "${cursor}"`,
+      `updated > "${cursor.updated}" && publish_at = ""`,
     )}`,
   )
-  let next = cursor
-  for (const message of list?.items ?? []) {
-    const gym = await api(`/api/collections/gyms/records/${message.gym}`)
-    const { sent, dropped } = await deliver(message, gym?.name ?? 'Your gym')
-    console.log(
-      `push: "${message.title}" -> ${sent} sent${dropped ? `, ${dropped} dead subs dropped` : ''}`,
-    )
-    if (message.updated > next) next = message.updated
+  let nextUpdated = cursor.updated
+  for (const message of immediate?.items ?? []) {
+    await ring(message)
+    if (message.updated > nextUpdated) nextUpdated = message.updated
   }
-  if (next !== cursor) await writeCursor(next)
+
+  /**
+   * Queued, and now due.
+   *
+   * Ordered and cursored by `publish_at` rather than `updated`, because that is
+   * the moment this is about. A message deleted before its time simply never
+   * appears here, which is what cancelling one should mean.
+   */
+  const due = await api(
+    `/api/collections/gym_messages/records?perPage=100&sort=publish_at&filter=${encodeURIComponent(
+      `publish_at != "" && publish_at > "${cursor.due}" && publish_at <= "${now}"`,
+    )}`,
+  )
+  let nextDue = cursor.due
+  for (const message of due?.items ?? []) {
+    await ring(message)
+    if (message.publish_at > nextDue) nextDue = message.publish_at
+  }
+
+  if (nextUpdated !== cursor.updated || nextDue !== cursor.due) {
+    await writeCursors({ updated: nextUpdated, due: nextDue })
+  }
 }
 
 console.log(`push: watching ${PB} every ${POLL_MS}ms`)

@@ -20,6 +20,7 @@ import {
   audienceWithin,
   splitAudience,
   type GymMessage,
+  isQueued,
   type MessageScope,
   type TemplateKind,
 } from '../lib/messages'
@@ -213,6 +214,11 @@ export function GymDesk({
    * and the names on screen describe different sets.
    */
   const [openDoor, setOpenDoor] = useState(false)
+  /**
+   * When this should go out, as `<input type="datetime-local">` gives it:
+   * "YYYY-MM-DDTHH:MM", in the operator's own timezone. Empty is now.
+   */
+  const [publishAt, setPublishAt] = useState('')
   const scope: MessageScope | undefined = broadcast?.scope ?? (openDoor ? 'open-door' : undefined)
   const { members, split } = useMemo(() => {
     /* One read of the directory for both. The list you can pick from and the
@@ -306,6 +312,8 @@ export function GymDesk({
   const canProgrammes = planAllows(plan, 'programmes')
   /* The one thing on this tier that wins a gym somebody it did not have. */
   const canOpenDoor = planAllows(plan, 'open-door')
+  /* Write it now, publish it later. */
+  const canSchedule = planAllows(plan, 'scheduling')
   /* The open door is never a list, so it never narrows to picked names. */
   const sendingWide = canOpenDoor && openDoor && !broadcast
   const windowedDays = windowDays(reachWindow)
@@ -504,6 +512,10 @@ export function GymDesk({
       programme: draft.programme
         ? { ...draft.programme, id: `gp-${gym.trim().toLowerCase()}-${Date.now()}` }
         : undefined,
+      /* Only when asked for. The server reads a field that was sent and arrived
+         empty as a date it could not parse — which is what catches a schedule
+         that did not survive the trip — so an unscheduled message sends none. */
+      ...(canSchedule && publishAt ? { publishAt: new Date(publishAt).toISOString() } : {}),
       banner: bannerOn ? { minutes: Number(bannerMinutes) } : undefined,
     }
     /* Server bus first when this operator account can reach it: the same id
@@ -519,8 +531,13 @@ export function GymDesk({
           ? 'every member of enForma'
           : 'everyone with no gym'
         : gym
+      /* A queued message has reached nobody, so it must not be reported as
+         having. What it has is a time, and that is what the line says. */
+      const queuedFor = canSchedule && publishAt ? new Date(publishAt) : null
       setPublished(
-        sent
+        queuedFor
+          ? `Queued for ${queuedFor.toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}.${withPictures} Nobody can read it until then. Cancel it under Sent.`
+          : sent
           ? `Published to ${who} on every device.${withPictures} It is now under Sent.`
           : reachCount === 0
             ? broadcast
@@ -1107,6 +1124,38 @@ export function GymDesk({
                 </div>
               </div>
 
+              {canSchedule && (
+                <div className="flex flex-col gap-2 border-t border-line pt-4">
+                  <span className="text-2xs font-medium text-ink-3">When it goes out</span>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <input
+                      type="datetime-local"
+                      aria-label="Publish at"
+                      value={publishAt}
+                      onChange={(e) => touch(setPublishAt)(e.target.value)}
+                      className="h-10 rounded-md border border-line bg-surface px-3 text-sm text-ink transition-colors duration-150 focus:border-brand focus:outline-none hover:border-line-strong"
+                    />
+                    {publishAt ? (
+                      <Button variant="ghost" size="sm" onClick={() => touch(setPublishAt)('')}>
+                        Send now instead
+                      </Button>
+                    ) : (
+                      <span className="text-2xs text-ink-3">Leave it empty to publish now.</span>
+                    )}
+                  </div>
+                  {publishAt && (
+                    /* Said plainly, because the whole feature is a promise about
+                       when: nobody can fetch it before then, not merely nobody
+                       is shown it. */
+                    <p className="max-w-[62ch] text-2xs leading-relaxed text-ink-3">
+                      Nobody can read it until then — the server will not hand it over, not even
+                      to somebody asking for it directly. It sits under Sent, and you can cancel
+                      it any time before it goes.
+                    </p>
+                  )}
+                </div>
+              )}
+
               <div className="flex flex-wrap items-center gap-3 border-t border-line pt-4">
                 <label className="flex items-center gap-2 text-sm text-ink-2">
                   <Switch
@@ -1255,11 +1304,27 @@ export function GymDesk({
                             </span>
                           </span>
                           <span className="num text-2xs font-normal text-ink-3">
-                            {formatShortDate(m.createdAt.slice(0, 10))} ·{' '}
-                            {m.audience === 'all'
-                              ? 'everyone'
-                              : pluralize(m.audience.length, 'member')}{' '}
-                            · read {m.readBy.length}
+                            {isQueued(m) ? (
+                              /* Not sent yet, so no tallies: "read 0" on a
+                                 message nobody could open reads as a failure
+                                 rather than as a queue. */
+                              <span className="text-brand">
+                                goes out{' '}
+                                {new Date(m.publishAt!).toLocaleString('en-GB', {
+                                  weekday: 'short',
+                                  day: 'numeric',
+                                  month: 'short',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                })}
+                              </span>
+                            ) : (
+                              <>
+                                {formatShortDate(m.createdAt.slice(0, 10))} ·{' '}
+                                {m.audience === 'all'
+                                  ? 'everyone'
+                                  : pluralize(m.audience.length, 'member')}{' '}
+                                · read {m.readBy.length}
                             {m.kind === 'event' ? ` · going ${going} · declined ${declined}` : ''}
                             {m.kind === 'offer' ? ` · saved ${m.saved.length}` : ''}
                             {m.kind === 'product' ? ` · reserved ${m.saved.length}` : ''}
@@ -1274,6 +1339,8 @@ export function GymDesk({
                             {m.kind === 'collection' && m.collection
                               ? ` · ${pluralize(m.collection.exerciseIds.length, 'movement')}`
                               : ''}
+                              </>
+                            )}
                           </span>
                         </span>
                       }

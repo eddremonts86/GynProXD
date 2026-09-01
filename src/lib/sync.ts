@@ -889,6 +889,8 @@ interface WireMessage {
   body: string
   /** Absent on rows written before the house existed; reads as 'members'. */
   scope?: string
+  /** Empty on everything published on arrival. */
+  publish_at?: string
   payload: (Partial<GymMessage> & { alts?: string[] }) | null
   /** File names on the row; the URL is built from the collection and id. */
   images?: string[]
@@ -942,6 +944,9 @@ function messageFromWire(wire: WireMessage, gymName: string, server: string): Gy
        dropped it. */
     ...(isMessageScope(wire.scope) && wire.scope !== 'members' ? { scope: wire.scope } : {}),
     ...(wire.body ? { body: wire.body } : {}),
+    /* Only when there is one: absent means published on arrival, and a row
+       carrying an empty string would make every message look scheduled. */
+    ...(wire.publish_at ? { publishAt: new Date(wire.publish_at.replace(' ', 'T')).toISOString() } : {}),
     ...(images.length > 0 ? { images } : {}),
     readBy: [],
     rsvp: {},
@@ -1258,6 +1263,11 @@ export async function publishToServer(
        means a row's audience is never merely implied. */
     form.set('scope', input.scope ?? 'members')
     form.set('title', input.title)
+    /* Set only when asked for. The server treats a field that was sent and
+       arrived empty as a date it could not read, which is what catches a
+       schedule that did not survive the trip — so an unscheduled message must
+       not send the field at all. */
+    if (input.publishAt) form.set('publish_at', input.publishAt)
     form.set('body', input.body ?? '')
     form.set('payload', JSON.stringify(payload))
     for (const { file } of images) form.append('images', file)

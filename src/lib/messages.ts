@@ -125,6 +125,16 @@ export interface GymMessage {
    * member's own numbers re-enter when they adopt it.
    */
   programme?: GymProgramme
+  /**
+   * When this becomes readable. Absent means the moment it was written.
+   *
+   * The server withholds it until then — `@now` in the collection's read rule —
+   * so a queued message is genuinely unfetchable rather than merely unrendered.
+   * This copy exists because the gym's own device holds what it published
+   * before the server ever answers, and the operator's Sent list needs to say
+   * "Monday, 08:00" rather than showing it as gone out.
+   */
+  publishAt?: string
   /** Also surface as a strip under the top bar, for this many minutes. */
   banner?: { minutes: number }
   /** Where the banner's View action goes; default is the inbox. */
@@ -176,9 +186,15 @@ export function scopeOf(message: GymMessage): MessageScope {
 export function isAddressedTo(
   message: GymMessage,
   profile: { id: string; gym?: string; openToGyms?: boolean },
+  now: string = new Date().toISOString(),
 ): boolean {
   /* Authors never receive their own broadcasts; their view is the sent list. */
   if (message.authorId === profile.id) return false
+  /* Not yet. The server will not hand a queued message to anybody but its own
+     gym, so this only matters for the copy a device published locally — but it
+     has to matter there too, or a gym testing its own schedule on one device
+     would watch it arrive immediately. */
+  if (message.publishAt && message.publishAt > now) return false
   /* Removed from this profile's inbox. Checked here rather than in `inboxFor`
      so the badge, the banner and the notification all agree with the list —
      four places asking the same question is four places to forget one. */
@@ -268,18 +284,28 @@ export function splitAudience(
 export function inboxFor(
   messages: GymMessage[],
   profile: { id: string; gym?: string },
+  now: string = new Date().toISOString(),
 ): GymMessage[] {
   return messages
-    .filter((m) => isAddressedTo(m, profile))
+    .filter((m) => isAddressedTo(m, profile, now))
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
 }
 
 export function unreadCount(
   messages: GymMessage[],
   profile: { id: string; gym?: string },
+  now: string = new Date().toISOString(),
 ): number {
-  return messages.filter((m) => isAddressedTo(m, profile) && !m.readBy.includes(profile.id))
+  return messages.filter((m) => isAddressedTo(m, profile, now) && !m.readBy.includes(profile.id))
     .length
+}
+
+/** Still waiting for its moment. The gym's own view of what it has queued. */
+export function isQueued(
+  message: GymMessage,
+  now: string = new Date().toISOString(),
+): boolean {
+  return !!message.publishAt && message.publishAt > now
 }
 
 /**
