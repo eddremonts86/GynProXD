@@ -4,15 +4,22 @@
 # its own — five merges once sat undeployed for two hours behind that. The
 # trigger therefore lives here, where it is versioned and reviewable.
 #
-# Secret names follow the house convention (`coolify-deploy`), which is also
-# what the values are called in `ai-os/dev-env/env-config/.env`:
+# The talking-to-Coolify part lives in ai-os, not here. Those forty lines were
+# written four times across this fleet and got three different things wrong in
+# three different places — the response shape, the deployment states, and
+# whether a queued build counts as a finished one. Pinned to a tag rather than
+# @main so a change over there is a deliberate bump here, not a surprise that
+# arrives mid-deploy.
+#
+# Secrets, named as the rest of the fleet names them:
 #
 #   COOLIFY_API_URL    the Coolify instance
 #   COOLIFY_API_TOKEN  Keys & Tokens → API tokens, with deploy permission
 #   COOLIFY_APP_UUID   the web resource's UUID — resolve it by NAME from
 #                      GET /api/v1/applications, never from a stored value:
 #                      one server hosts many apps and a stale UUID deploys to
-#                      somebody else's production without complaining
+#                      somebody else's production without complaining. The one
+#                      already in env-config points at ai-os-landing.
 #   COOLIFY_SYNC_UUID  the PocketBase resource's UUID — optional; unset means
 #                      this workflow never touches the sync server
 #
@@ -40,10 +47,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    name: Deploy to Coolify
+  what:
+    name: Work out what needs deploying
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    outputs:
+      sync: ${{ steps.decide.outputs.sync }}
 
     steps:
       - uses: actions/checkout@v4
@@ -53,23 +61,8 @@ jobs:
           # last. Getting this wrong means the sync server silently misses one.
           fetch-depth: 0
 
-      - name: Check the secrets are set
-        env:
-          COOLIFY_API_URL: ${{ secrets.COOLIFY_API_URL }}
-          COOLIFY_API_TOKEN: ${{ secrets.COOLIFY_API_TOKEN }}
-          COOLIFY_APP_UUID: ${{ secrets.COOLIFY_APP_UUID }}
-        run: |
-          missing=""
-          [ -n "$COOLIFY_API_URL" ] || missing="$missing COOLIFY_API_URL"
-          [ -n "$COOLIFY_API_TOKEN" ] || missing="$missing COOLIFY_API_TOKEN"
-          [ -n "$COOLIFY_APP_UUID" ] || missing="$missing COOLIFY_APP_UUID"
-          if [ -n "$missing" ]; then
-            echo "::error::Missing repository secrets:$missing — add them under Settings → Secrets and variables → Actions."
-            exit 1
-          fi
-
-      - name: Work out what needs deploying
-        id: what
+      - name: Decide
+        id: decide
         env:
           SYNC_UUID: ${{ secrets.COOLIFY_SYNC_UUID }}
           FORCE_SYNC: ${{ github.event_name == 'workflow_dispatch' && inputs.sync_server }}
@@ -121,85 +114,26 @@ jobs:
           fi
           echo "sync=$sync" >> "$GITHUB_OUTPUT"
 
-      - name: Deploy, and wait for the result
-        env:
-          COOLIFY_API_URL: ${{ secrets.COOLIFY_API_URL }}
-          COOLIFY_API_TOKEN: ${{ secrets.COOLIFY_API_TOKEN }}
-          APP_UUID: ${{ secrets.COOLIFY_APP_UUID }}
-          SYNC_UUID: ${{ secrets.COOLIFY_SYNC_UUID }}
-          DEPLOY_SYNC: ${{ steps.what.outputs.sync }}
-        run: |
-          set -euo pipefail
-          base="${COOLIFY_API_URL%/}"
-          auth="Authorization: Bearer $COOLIFY_API_TOKEN"
+  web:
+    uses: eddremonts86/ai-os/.github/workflows/reusable-coolify-deploy.yml@coolify-deploy-v1
+    with:
+      app: enforma
+      # This repo wants to be told, not skipped. Its deploy is meant to work,
+      # and a missing secret here is a green tick that deployed nothing —
+      # exactly the failure this workflow exists to end.
+      require_secrets: true
+    secrets:
+      coolify_api_url: ${{ secrets.COOLIFY_API_URL }}
+      coolify_api_token: ${{ secrets.COOLIFY_API_TOKEN }}
+      app_uuid: ${{ secrets.COOLIFY_APP_UUID }}
 
-          # `/api/v1/deploy?uuid=` is what the rest of the fleet uses — all three
-          # ai-os workflows call it — and `/api/v1/applications/<uuid>/start`
-          # exists too. This one, for one shape across every repo. That claim was
-          # made backwards here once; it is a `grep` away and worth making.
-          start() {
-            curl -sS -o /tmp/start.json -w '%{http_code}' -H "$auth" \
-              -H 'Accept: application/json' --max-time 60 \
-              "$base/api/v1/deploy?uuid=$1&force=false"
-          }
-
-          # A queued deploy is not a finished deploy. Without this the job goes
-          # green while production breaks, which is the whole failure mode.
-          #
-          # The states are Coolify's own, from app/Enums/ApplicationDeploymentStatus:
-          # queued, in_progress, finished, failed, cancelled-by-user. Note the
-          # hyphen — an earlier version here waited on `cancelled`, `error` and
-          # `success`, none of which Coolify ever emits, so a cancelled deploy
-          # would have polled for ten minutes and then blamed a timeout.
-          wait_for() {
-            name="$1"
-            id="$2"
-            for i in $(seq 1 60); do
-              sleep 10
-              status=$(curl -fsS -H "$auth" --max-time 30 \
-                "$base/api/v1/deployments/$id" | jq -r '.status // "?"')
-              echo "  poll $i: $status"
-              case "$status" in
-                finished) echo "  $name is live"; return 0 ;;
-                failed|cancelled-by-user)
-                  echo "::error::$name deployment $status — see the Coolify deployment log"
-                  return 1 ;;
-              esac
-            done
-            echo "::error::$name deployment did not finish within 10 minutes"
-            return 1
-          }
-
-          deploy() {
-            name="$1"
-            uuid="$2"
-            echo "→ $name"
-            code=$(start "$uuid")
-            cat /tmp/start.json; echo
-
-            if [ "$code" = "429" ]; then
-              echo "::error::$name: Coolify is rate-limiting deploys — re-run this workflow in a minute"
-              return 1
-            fi
-            case "$code" in 2*) ;; *)
-              echo "::error::$name: Coolify answered HTTP $code"
-              return 1 ;;
-            esac
-
-            # The response is {"deployments":[{message, resource_uuid,
-            # deployment_uuid?}]} — and `deployment_uuid` is genuinely optional:
-            # DeployController pushes the entry without it when nothing was
-            # queued. No id means nothing to wait on, and a job that cannot see
-            # the result must not claim one.
-            id=$(jq -r '.deployments[0].deployment_uuid // empty' /tmp/start.json)
-            if [ -z "$id" ]; then
-              echo "::error::$name: Coolify queued no deployment — its message above says why"
-              return 1
-            fi
-            wait_for "$name" "$id"
-          }
-
-          deploy "web app" "$APP_UUID"
-          if [ "$DEPLOY_SYNC" = "true" ]; then
-            deploy "sync server" "$SYNC_UUID"
-          fi
+  sync:
+    needs: what
+    if: needs.what.outputs.sync == 'true'
+    uses: eddremonts86/ai-os/.github/workflows/reusable-coolify-deploy.yml@coolify-deploy-v1
+    with:
+      app: enforma-pocketbase
+    secrets:
+      coolify_api_url: ${{ secrets.COOLIFY_API_URL }}
+      coolify_api_token: ${{ secrets.COOLIFY_API_TOKEN }}
+      app_uuid: ${{ secrets.COOLIFY_SYNC_UUID }}
