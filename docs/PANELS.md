@@ -468,6 +468,14 @@ and the offer is the best hook we have. Base is **everything the gym says**;
 Plus adds **surface in the member's day**: the kitchen and signed programmes
 today.
 
+`gyms.plan` was rehearsed against a populated database before it shipped, both
+ways: two existing gyms and the house, then up — both gyms grandfathered onto
+`plus`, the house left blank, a gym created afterwards starting blank and so
+reading as Base — then down, with every gym intact and the field gone from the
+schema. Rolling back needs the order the house-gym section names: deploy the
+previous commit first, then `migrate down 1`. Doing it the other way round
+reverts the field and `serve` puts it back on the next restart.
+
 Anything not built carries a `Coming` tag, no date, and the panel says in words
 what Plus buys today and that the marked items do not change what you pay. There is no Stripe: the page says we invoice, because a checkout that
 does not exist is the one thing a pricing page must not imply.
