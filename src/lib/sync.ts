@@ -847,6 +847,8 @@ interface GymRow {
   id: string
   name: string
   operators: string[]
+  /** 'house' on the one row the platform speaks through; absent on old servers. */
+  kind?: string
 }
 
 interface WireMessage {
@@ -856,6 +858,8 @@ interface WireMessage {
   kind: string
   title: string
   body: string
+  /** Absent on rows written before the house existed; reads as 'members'. */
+  scope?: string
   payload: (Partial<GymMessage> & { alts?: string[] }) | null
   /** File names on the row; the URL is built from the collection and id. */
   images?: string[]
@@ -901,6 +905,12 @@ function messageFromWire(wire: WireMessage, gymName: string, server: string): Gy
     createdAt: new Date(wire.created.replace(' ', 'T')).toISOString(),
     kind: wire.kind as TemplateKind,
     title: wire.title,
+    /* Carried through, not defaulted. A house message that arrived without its
+       scope would be judged as `members` — matched against the gym name — and
+       become invisible to exactly the people it was written for. */
+    ...(wire.scope === 'unaffiliated' || wire.scope === 'everyone'
+      ? { scope: wire.scope }
+      : {}),
     ...(wire.body ? { body: wire.body } : {}),
     ...(images.length > 0 ? { images } : {}),
     readBy: [],
@@ -1181,9 +1191,16 @@ export async function publishToServer(
   if (!link?.token) return null
   try {
     const gyms = await fetchGyms(link)
-    const gym = gyms.find(
-      (g) => g.operators?.includes(link.userId) && sameName(g.name, input.gym),
-    )
+    /**
+     * The house is addressed by kind and authorised by being a platform admin,
+     * so it is looked up differently: its operators list is deliberately empty
+     * and matching on the name would break the day it is renamed. The server
+     * re-checks both — this only decides which row to aim at.
+     */
+    const house = input.scope === 'unaffiliated' || input.scope === 'everyone'
+    const gym = house
+      ? gyms.find((g) => g.kind === 'house')
+      : gyms.find((g) => g.operators?.includes(link.userId) && sameName(g.name, input.gym))
     if (!gym) return null
     const payload = {
       audience: input.audience,
@@ -1203,6 +1220,10 @@ export async function publishToServer(
     form.set('gym', gym.id)
     form.set('author', link.userId)
     form.set('kind', input.kind)
+    /* A gym's message carries `members` explicitly rather than nothing: the
+       server refuses a house publish with no scope, and an explicit value
+       means a row's audience is never merely implied. */
+    form.set('scope', input.scope ?? 'members')
     form.set('title', input.title)
     form.set('body', input.body ?? '')
     form.set('payload', JSON.stringify(payload))

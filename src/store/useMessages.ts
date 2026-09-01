@@ -1,5 +1,11 @@
 import { create } from 'zustand'
-import type { GymMessage, MessageImage, TemplateKind, MenuCourse } from '../lib/messages'
+import type {
+  GymMessage,
+  MenuCourse,
+  MessageImage,
+  MessageScope,
+  TemplateKind,
+} from '../lib/messages'
 import { applyResponses, markResponseDirty, type ResponseRow } from '../lib/gym-responses'
 import type { Challenge } from '../lib/challenge'
 import type { Collection } from '../lib/collection'
@@ -35,6 +41,8 @@ export interface PublishInput {
   title: string
   body?: string
   audience: 'all' | string[]
+  /** Only the house sets this; a gym's messages carry none. See MessageScope. */
+  scope?: MessageScope
   event?: { date: string; time?: string; place?: string }
   menu?: { courses: MenuCourse[] }
   offer?: { discount: string; validUntil?: string; code: string }
@@ -64,6 +72,23 @@ interface MessagesState {
   removeByGym: (gym: string) => void
   renameGym: (from: string, to: string) => void
   markRead: (ids: string[], profileId: string) => void
+  /**
+   * Removes a message from one profile's inbox, or puts it back.
+   *
+   * Deliberately not `remove`, which deletes the row for everybody on this
+   * device and is the gym's own action from its sent list. A member clearing
+   * their inbox must not erase an event other profiles are still reading.
+   */
+  setRemoved: (id: string, profileId: string, removed: boolean) => void
+  /**
+   * Puts a message back in the unread state for one profile.
+   *
+   * Deliberately does not mark the response dirty. The gym was already told it
+   * was opened and that remains true — this is somebody saying "I have not
+   * dealt with this yet", not a retraction of what happened. Claiming to
+   * un-tell the gym would be a promise this cannot keep.
+   */
+  setUnread: (id: string, profileId: string) => void
   respond: (id: string, profileId: string, answer: 'yes' | 'no') => void
   dismissBanner: (id: string, profileId: string) => void
   toggleSaved: (id: string, profileId: string) => void
@@ -107,6 +132,11 @@ export const useMessages = create<MessagesState>()((set, get) => ({
           joined: existing.joined,
           respondents: existing.respondents,
           bannerDismissedBy: existing.bannerDismissedBy,
+          /* Without this line the next pull hands back a row with no
+             `deletedBy` and everything a member cleared reappears. The server
+             is not told what somebody removed from their own inbox, so it
+             cannot be the one to remember it. */
+          deletedBy: existing.deletedBy,
         })
       } else {
         byId.set(message.id, message)
@@ -152,6 +182,28 @@ export const useMessages = create<MessagesState>()((set, get) => ({
     })
     if (!changed) return
     markResponseDirty(profileId, ids)
+    persist(messages)
+    set({ messages })
+  },
+
+  setUnread: (id, profileId) => {
+    const messages = get().messages.map((m) =>
+      m.id === id ? { ...m, readBy: m.readBy.filter((p) => p !== profileId) } : m,
+    )
+    persist(messages)
+    set({ messages })
+  },
+
+  setRemoved: (id, profileId, removed) => {
+    const messages = get().messages.map((m) => {
+      if (m.id !== id) return m
+      const list = m.deletedBy ?? []
+      if (removed === list.includes(profileId)) return m
+      return {
+        ...m,
+        deletedBy: removed ? [...list, profileId] : list.filter((p) => p !== profileId),
+      }
+    })
     persist(messages)
     set({ messages })
   },
