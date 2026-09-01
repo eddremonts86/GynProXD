@@ -37,11 +37,21 @@ const weight = await page.getByLabel('Weight', { exact: true }).inputValue()
 if (!(Number(weight) > 0)) fail(`weight did not prefill or step (got "${weight}")`)
 
 await page.getByRole('button', { name: 'Log set' }).click()
-if (!(await page.textContent('body'))?.includes('1 set')) fail('logged set not reflected')
+/* The logged row itself, rather than the header tally. That tally reads "1 set"
+   to a person and "1sets" to `textContent`, because the number and its label are
+   separate nodes — so the old check searched the page for a string the DOM has
+   never contained, and failed on a set that was logged correctly. */
+await page
+  .getByText(/^Set 1$/)
+  .first()
+  .waitFor({ timeout: 5000 })
+  .catch(() => fail('logged set not reflected'))
 
 // Rest countdown appears after a straight set.
-if (!(await page.getByRole('progressbar', { name: 'Rest remaining' }).isVisible()))
-  fail('rest countdown missing')
+await page
+  .getByRole('progressbar', { name: 'Rest remaining' })
+  .waitFor({ timeout: 5000 })
+  .catch(() => fail('rest countdown missing'))
 console.log('ok: set logged with rest running')
 
 await page.getByRole('button', { name: 'Finish' }).click()
