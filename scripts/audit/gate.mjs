@@ -83,11 +83,24 @@ export function door(page, base) {
     /* Past two profiles the list collapses, which is the point of it. */
     const more = w.getByRole('button', { name: /more on this device$/ })
     if ((await more.count()) > 0) await more.click()
-    await w.getByRole('button', { name }).first().click()
+    await card(name).click()
     await w.getByLabel('Passphrase', { exact: true }).fill(pass)
     await w.getByRole('button', { name: 'Unlock' }).click()
     await inApp(page)
   }
+
+  /**
+   * A profile's card on the unlock list. The button's accessible name is the
+   * whole row — "Sol · since 2 Sep" — so matching on the name alone would take
+   * "Sol" to "Sol Desk" as readily as to Sol. The name sits in its own span,
+   * and an exact text match on that span is the one thing only Sol's card has.
+   */
+  const card = (name) =>
+    panelOf(page)
+      .first()
+      .getByRole('button')
+      .filter({ has: page.getByText(name, { exact: true }) })
+      .first()
 
   /**
    * Grant somebody a role, as an admin, from the admin panel.
@@ -104,7 +117,7 @@ export function door(page, base) {
     await page.waitForTimeout(400)
   }
 
-  return { where, atGate, lock, create, unlock, promote, inApp: () => inApp(page) }
+  return { where, atGate, lock, create, unlock, promote, card, inApp: () => inApp(page) }
 }
 
 /**

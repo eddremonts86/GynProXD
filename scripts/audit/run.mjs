@@ -38,6 +38,8 @@ const GROUPS = {
     'branding-boundary',
   ],
   screens: [
+    'test-gate',
+    'test-profiles',
     'test-session',
     'test-onboarding',
     'test-gym-flow',
@@ -50,6 +52,7 @@ const GROUPS = {
     'gym-programme-boundary',
     'aurora-contrast',
     'verify-all',
+    'walk',
   ],
 }
 
