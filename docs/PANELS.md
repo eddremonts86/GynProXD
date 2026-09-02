@@ -755,3 +755,86 @@ Rolling back deletes anything still queued. A row whose `publish_at` nothing
 reads any more is a message that publishes itself the instant the field goes,
 which is the one thing a rollback must not do; rows already past their time are
 kept, because they are published messages whose schedule is now only history.
+
+## The desk: staff who can publish
+
+Plus, `PLUS_FEATURES` calls it `operators`. `/gym` → Members grows a roster: who
+can publish, who is still only invited, and — for the owner — a field to add
+somebody and a button to take them off.
+
+### The card was split first
+
+The landing sold this as "Operators and second rooms". They are not one feature.
+A roster is a list on a gym that already exists; more than one location is a
+question about what a gym *is* in the data, since every message, member, join
+code and plan check currently belongs to exactly one row. Shipping the roster
+under that headline would have left half of it unbuilt with nothing marking it,
+so `second-rooms` is now its own entry and carries its own `Coming`.
+
+### There is an owner
+
+`gyms.owner`, backfilled from the first entry in each existing operators list,
+which is how the provisioning script has always filled it. Only the owner
+changes the roster.
+
+Without one, every operator can edit `operators` — so an invited operator can
+remove the person who invited them, and the gym's account belongs to whoever
+moves first. Publishing is the shared act; the roster is not.
+
+**The owner cannot be removed, including by themselves.** Not a courtesy:
+`owner` is what every check here reads, so a gym whose owner had left its own
+operators list would be a gym nobody could ever add anybody to again,
+recoverable only by a superuser.
+
+### Invitations are rows, not lookups
+
+The obvious build takes an email, finds the account and adds it — which answers,
+for anybody who pays for a gym, whether any given address has an enForma
+account. That is an enumeration oracle handed to every customer.
+
+So an invitation is written for the address whether or not it exists, and it is
+claimed when somebody signs in with it (`onRecordAuthRequest`, so it works for
+an address that already had an account and for one that signs up later, with
+nothing to click). The audit checks that the answer is *identical* for an
+address that exists and one invented on the spot.
+
+The cap counts operators **plus** standing invitations, because an invitation is
+a seat somebody is holding. Counting only the accepted ones would let a gym
+invite thirty people and meet the cap one acceptance at a time. Base is one seat
+— a description of what a Base gym is rather than a restriction — and Plus is
+five. Past that a gym is asking for second rooms, which is marked as its own
+thing.
+
+### Reading a colleague's name
+
+`users` is `id = @request.auth.id`: an account can only read itself. So there is
+a `/api/enforma/gym/desk` endpoint that returns one field — the address — for
+the gym's own operators.
+
+The first build fetched each operator's row directly and swallowed the failure,
+so **a colleague vanished from the roster the moment they accepted**, drawn as
+an empty seat. The UI walk had not caught it because it only ever looked at the
+desk while the invitation was still pending; it now looks afterwards, which is
+when it matters.
+
+The same endpoint answers the sent list's question. An earlier attempt asked the
+pull for `expand=author`, which was never going to return anything for the same
+rule, and a third attempt signed the message at publish time — three places
+holding one fact. The desk is the one source now, and the sent list names an
+author only when more than one person could have written it, because on a
+one-person desk the answer was never in doubt.
+
+### How it is checked
+
+- `node scripts/audit/operators-boundary.mjs` — 23 checks from the receiving
+  side: an invited operator cannot remove their inviter or add anybody, a rival
+  cannot add themselves, the owner cannot be removed by anyone, the cap counts
+  held seats, and inviting an address that exists is answered exactly as one
+  that does not.
+- `node scripts/audit/test-operators.mjs` — the screens: inviting, claiming by
+  signing in, publishing as the gym, the colleague being offered no controls,
+  and the roster after acceptance.
+- The migration was rehearsed on a populated database both ways: up gives an
+  existing two-operator gym an owner without dropping anybody and leaves the
+  house without one; down keeps the gym, its operators and its messages, and
+  takes the invitations collection with the field.

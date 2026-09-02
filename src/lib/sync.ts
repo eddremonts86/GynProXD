@@ -792,6 +792,97 @@ export async function setGymJoinCode(profileId: string, gymId: string, code: str
   })
 }
 
+/** This device's account id on the sync server, or null when there is none. */
+export function activeSyncUserId(profileId: string): string | null {
+  return readSyncLink(profileId)?.userId ?? null
+}
+
+/**
+ * The address this profile's account is held under.
+ *
+ * Used to sign a message at the moment it is published. Reading it off the
+ * later pull would have worked for a colleague's message arriving from another
+ * device and not for one written here — two operators on one device publish
+ * into the same local store, and the copy the sent list draws is the local one.
+ */
+export function activeSyncEmail(profileId: string): string | null {
+  return readSyncLink(profileId)?.email ?? null
+}
+
+/** Who works this gym's desk, and who is still only invited. */
+export interface DeskRow {
+  id: string
+  email: string
+  /** The account that holds the gym. Cannot be removed. */
+  isOwner: boolean
+  /** True while this is only an invitation nobody has signed in against. */
+  pending: boolean
+}
+
+/**
+ * The desk, as the panel shows it.
+ *
+ * Two collections in one list because to a person they are one thing: the
+ * people who can post. Whether a row is an account or an address we are waiting
+ * on is a detail of how far along it is, not a different kind of entry.
+ */
+export async function gymDesk(profileId: string, gymId: string): Promise<DeskRow[]> {
+  const l = link(profileId)
+  /* Through the endpoint, not the collection: `users` is `id = @request.auth.id`,
+     so fetching a colleague's row returns nothing and the first build drew them
+     as an empty seat the moment they accepted. */
+  const desk = await request<{ people: { id: string; email: string; owner: boolean }[] }>(
+    l.server, `/api/enforma/gym/desk?gym=${encodeURIComponent(gymId)}`, { token: l.token },
+  )
+  const rows: DeskRow[] = desk.people.map((p) => ({
+    id: p.id,
+    email: p.email,
+    isOwner: p.owner,
+    pending: false,
+  }))
+  const invites = await request<ListPayload<{ id: string; email: string }>>(
+    l.server,
+    `/api/collections/gym_invites/records?perPage=50&filter=${encodeURIComponent(`gym = "${gymId}"`)}`,
+    { token: l.token },
+  ).catch(() => ({ items: [] as { id: string; email: string }[] }))
+  for (const invite of invites.items) {
+    rows.push({ id: invite.id, email: invite.email, isOwner: false, pending: true })
+  }
+  return rows
+}
+
+/** Invite an address to the desk. Says the same thing whether or not it exists. */
+export async function inviteOperator(
+  profileId: string,
+  gymId: string,
+  email: string,
+): Promise<{ joined?: boolean; already?: boolean }> {
+  const l = link(profileId)
+  return request(l.server, '/api/enforma/gym/invite', {
+    method: 'POST',
+    token: l.token,
+    body: { gym: gymId, email: email.trim() },
+  })
+}
+
+/** Take somebody off the desk, or withdraw an invitation nobody claimed. */
+export async function removeFromDesk(
+  profileId: string,
+  gymId: string,
+  row: DeskRow,
+): Promise<void> {
+  const l = link(profileId)
+  await request(
+    l.server,
+    row.pending ? '/api/enforma/gym/cancel-invite' : '/api/enforma/gym/remove-operator',
+    {
+      method: 'POST',
+      token: l.token,
+      body: row.pending ? { invite: row.id } : { gym: gymId, user: row.id },
+    },
+  )
+}
+
 /** The id of the gym this operator account runs, for the code/requests UI. */
 export async function operatedGymId(profileId: string): Promise<string | null> {
   const l = readSyncLink(profileId)
