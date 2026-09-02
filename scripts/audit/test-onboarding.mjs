@@ -70,9 +70,59 @@ await page
   .catch(() => fail('generated calendar missing'))
 console.log('ok: programme generated at', page.url())
 
-/* "Edit a copy" since the two ways to change a programme were made findable;
-   it was "Copy to planner", and it does the same thing — saves the generated
-   programme as an editable plan and opens the planner on it. */
+/**
+ * Week one, in order, starting no earlier than today.
+ *
+ * The dates used to be a rolling seven days from whenever the plan began, and
+ * the days were listed in the template's weekday order — so a plan started on
+ * any day but Monday read "Week 1: Monday the 7th, Wednesday the 2nd, Friday
+ * the 4th". Weeks are calendar weeks now and the first one holds only what is
+ * left of it.
+ */
+const weekOne = await page.evaluate(() => {
+  const NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
+  const today = new Date()
+  /* The weekday and its date sit in separate nodes, and today's card says
+     "Today" rather than a date. Both cost a run to find: an earlier version
+     matched "Wednesday 2 Sept" as one string and saw nothing, and the next one
+     saw only the days that were not today. */
+  return [...document.querySelectorAll('*')]
+    .filter((el) => el.children.length === 0 && NAMES.includes((el.textContent || '').trim()))
+    .map((el) => {
+      const day = el.textContent.trim()
+      const card = (el.closest('div, section, li') || el.parentElement)?.textContent || ''
+      if (/Today/.test(card)) {
+        return { day, key: today.getMonth() * 100 + today.getDate(), label: `${day} today` }
+      }
+      const m = card.match(/(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sept|Oct|Nov|Dec)/)
+      return m
+        ? { day, key: MONTHS.indexOf(m[2]) * 100 + Number(m[1]), label: `${day} ${m[1]} ${m[2]}` }
+        : null
+    })
+    .filter(Boolean)
+})
+
+if (weekOne.length === 0) {
+  fail('found no dated day cards on the generated plan')
+} else {
+  const NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+  const keys = weekOne.map((d) => d.key)
+  if (JSON.stringify(keys) !== JSON.stringify([...keys].sort((a, b) => a - b))) {
+    fail(`week one is out of date order: ${weekOne.map((d) => d.label).join(' | ')}`)
+  }
+  /* The fix itself: week one holds what is left of this week, so nothing in it
+     falls on a weekday already gone. */
+  const todayIdx = (new Date().getDay() + 6) % 7
+  const early = weekOne.filter((d) => NAMES.indexOf(d.day) < todayIdx)
+  if (early.length > 0) {
+    fail(`week one contains days already past: ${early.map((d) => d.label).join(', ')}`)
+  }
+  if (!process.exitCode) {
+    console.log('ok: week one reads in order —', weekOne.map((d) => d.label).join(' | '))
+  }
+}
+
 await page.getByRole('button', { name: 'Edit a copy' }).first().click()
 await page.waitForURL(/\/planner$/, { timeout: 5000 })
 await page
