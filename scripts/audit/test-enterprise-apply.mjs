@@ -43,7 +43,9 @@ try {
   await page.goto(`${BASE}/for-gyms`, { waitUntil: 'networkidle' })
   await page.waitForTimeout(2000)
   const copy = await page.textContent('body')
-  check('the hero names all three prices',
+  /* The page, not the hero: the hero carried a price line under its CTAs
+     until the layout pass took it out, and the plans section says it better. */
+  check('the page names all three prices',
     ['€200', '€300', '€1,000'].every((p) => copy.includes(p)), true)
   /* Stated so a reader can check it, which means it has to survive checking. */
   check('the saving is stated', copy.includes('€500 less'), true)

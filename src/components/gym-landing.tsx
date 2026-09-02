@@ -275,12 +275,6 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
                   See the plans
                 </Button>
               </div>
-              <p className="max-w-[52ch] text-2xs leading-relaxed text-ink-3">
-                &euro;{PRICES.base} or &euro;{PRICES.plus} a month per gym, &euro;
-                {money(PRICES.enterprise)} for up to {ENTERPRISE_GYMS}. We invoice; nothing on this
-                page charges
-                you, and applying costs nothing.
-              </p>
             </div>
 
             <Reveal className="flex xl:items-end">
@@ -291,35 +285,42 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
 
         {/* -------------------------------------------------- Why they stay */}
         <section id="why" className="scroll-mt-4 border-t border-line py-14 md:py-20">
-          {/* The heading holds still while the three reasons pass it, the same
-              shape the section below uses. It replaced a full-width stack whose
-              body copy stopped at 58ch, so half the row was empty on every line,
-              and a zig-zag that indented every second item by 12%. With three
-              items that indents exactly one, which reads as a row that slipped
-              rather than as a rhythm. Two columns spend the width the stack was
-              wasting and the reasons no longer need to pretend to be uneven. */}
-          <div className={cn(READ, 'grid gap-10 lg:grid-cols-[1fr_1.5fr] lg:gap-16')}>
-            <div className="flex flex-col gap-4 lg:sticky lg:top-10 lg:self-start">
+          {/* Three reasons across, not a fourth column of the same shape.
+              Five of this page's six sections were two-column grids, and this
+              one and the section under it had become the *same* grid to the
+              third decimal: 422.391px and 633.609px in both. Three splits in a
+              row is one past the point where a page stops having a rhythm and
+              starts having a template.
+
+              So the heading sits over the full width and the reasons run
+              beneath it in unequal columns, divided by rules rather than boxed.
+              1.35fr for the first because the programme is the argument and the
+              other two are its terms. It collapses to a stack under `md`, where
+              three columns of body copy would be four words wide. */}
+          <div className={cn(READ, 'flex flex-col gap-10')}>
+            <div className="flex max-w-[54ch] flex-col gap-4">
               <SectionHeading>Reach is worth nothing if the app gets deleted.</SectionHeading>
               <Lead>
                 So the first thing worth your money is not ours to charge for: the reason a member
                 keeps enForma on their phone after the first week.
               </Lead>
             </div>
-            <ul className="flex flex-col divide-y divide-line">
+            <ul className="grid divide-y divide-line md:grid-cols-[1.35fr_1fr_1fr] md:divide-x md:divide-y-0">
               {WHY.map((item, i) => (
-                <li key={item.title}>
-                  <Reveal
-                    delay={i * 0.05}
-                    className="grid gap-4 py-8 md:grid-cols-[auto_minmax(0,1fr)] md:gap-8"
-                  >
+                <li
+                  key={item.title}
+                  className={cn(
+                    'py-8 md:py-0',
+                    i === 0 ? 'md:pr-8' : 'md:px-8',
+                    i === WHY.length - 1 && 'md:pr-0',
+                  )}
+                >
+                  <Reveal delay={i * 0.05} className="flex flex-col gap-3">
                     {/* Green: this whole section is the member's half of the
-                        relationship — why they keep the app at all. */}
+                        relationship, why they keep the app at all. */}
                     <item.icon size={26} weight="regular" className="text-accent-member" />
-                    <div className="flex flex-col gap-2.5">
-                      <h3 className="max-w-[24ch] text-xl leading-snug text-ink">{item.title}</h3>
-                      <Body className="max-w-[58ch]">{item.body}</Body>
-                    </div>
+                    <h3 className="text-xl leading-snug text-ink">{item.title}</h3>
+                    <Body>{item.body}</Body>
                   </Reveal>
                 </li>
               ))}
@@ -407,17 +408,26 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
               </Lead>
             </div>
 
-            {/* Unequal on purpose: Plus is the argument, Base is the floor. The
-                two cards differ by about 570px, which left the cheaper plan
-                floating over a void the length of a screen. Base holds still
-                instead, so the price you are comparing against stays on screen
-                while you read what the dearer one adds. The gap does the work
-                it always did and stops looking like a layout that gave up. */}
-            <div className="grid items-start gap-5 lg:grid-cols-[1fr_1.15fr] lg:gap-6">
+            {/* Three bands, not two facing cards.
+
+                Side by side, Base was 674px and Plus 1192px, so the cheaper
+                plan floated over half a screen of nothing and neither list
+                could be read against the other. Equal-height cards only move
+                the hole inside the card; a sticky Base only helps while you
+                are scrolling.
+
+                The deeper problem is that two facing cards promise a parallel
+                comparison and this is not one. Plus is Base *and also*, which
+                is exactly what its "Everything in Base" badge says. So the
+                plans read downward now, the way the relationship works: each
+                is a full-width band with its price in a fixed left column, so
+                all three prices sit on one vertical line, and its features in
+                two columns rather than one. */}
+            <div className="flex flex-col gap-5">
               <Panel
                 tone="quiet"
                 padding="lg"
-                className="flex flex-col gap-5 lg:sticky lg:top-10 lg:self-start"
+                className="grid gap-6 lg:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] lg:gap-12"
               >
                 <div className="flex flex-col gap-1.5">
                   <span className="text-sm font-medium text-ink">Base</span>
@@ -431,59 +441,69 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
                     Everything your gym says, and the count of who listened.
                   </Body>
                 </div>
-                <ul className="flex flex-col divide-y divide-line border-t border-line">
+                {/* Two columns, and no hairline under every row: a rule per
+                    line is the laziest way to separate six of them, and the
+                    band has room for a second column. `[&>li]:py-0` drops the
+                    row padding FeatureRow carries for the single-column list
+                    it is also used in. */}
+                <ul className="grid content-start gap-x-12 gap-y-5 sm:grid-cols-2 [&>li]:py-0">
                   {BASE.map((f) => (
                     <FeatureRow key={f.title} feature={f} />
                   ))}
                 </ul>
               </Panel>
 
-              <Panel padding="lg" className="flex flex-col gap-5">
-                <div className="flex flex-col gap-1.5">
-                  <span className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-ink">Plus</span>
-                    <Tag tone="brand">Everything in Base</Tag>
-                  </span>
-                  <span className="flex items-baseline gap-1.5">
-                    <span className="num text-5xl leading-none tracking-tight text-ink">
-                      &euro;{PRICES.plus}
+              <Panel
+                padding="lg"
+                className="grid gap-6 lg:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] lg:gap-12"
+              >
+                <div className="flex flex-col gap-5">
+                  <div className="flex flex-col gap-1.5">
+                    <span className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-ink">Plus</span>
+                      <Tag tone="brand">Everything in Base</Tag>
                     </span>
-                    <span className="text-xs text-ink-3">a month, per gym</span>
-                  </span>
-                  <Body className="max-w-[38ch] pt-1">
-                    And a place in the day: the kitchen now, the programme next.
-                  </Body>
-                </div>
-                <ul className="flex flex-col divide-y divide-line border-t border-line">
+                    <span className="flex items-baseline gap-1.5">
+                      <span className="num text-5xl leading-none tracking-tight text-ink">
+                        &euro;{PRICES.plus}
+                      </span>
+                      <span className="text-xs text-ink-3">a month, per gym</span>
+                    </span>
+                    <Body className="max-w-[38ch] pt-1">
+                      And a place in the day: the kitchen now, the programme next.
+                    </Body>
+                  </div>
+                  {/* The line a gym owner deserves before they are asked for
+                      another hundred euros a month. It used to open by naming
+                      every built feature in turn, which restated the list
+                      directly above it and added six lines to the taller of
+                      two cards that were already 570px apart. The list marks
+                      its own exceptions; this only has to say what those mean.
+                      Still counted, so it cannot go stale the way "the five
+                      marked Coming" did the moment a sixth was built. */}
+                  <p className="max-w-[52ch] rounded-lg border border-dashed border-line px-3 py-2.5 text-2xs leading-relaxed text-ink-2">
+                    {COMING_PLUS.length === 1 && (
+                      <>
+                        Everything above is built and working today except the one marked{' '}
+                        <strong className="font-medium text-ink">Coming</strong>. It is what Plus
+                        becomes next, it carries no date, and it does not change what you pay now.
+                      </>
+                    )}
+                    {COMING_PLUS.length > 1 && (
+                      <>
+                        Everything above is built and working today except the{' '}
+                        {spell(COMING_PLUS.length)} marked{' '}
+                        <strong className="font-medium text-ink">Coming</strong>. They are what
+                        Plus becomes, they carry no date, and they do not change what you pay now.
+                      </>
+                    )}
+                  </p>
+                  </div>
+                  <ul className="grid content-start gap-x-12 gap-y-5 sm:grid-cols-2 [&>li]:py-0">
                   {PLUS.map((f) => (
                     <FeatureRow key={f.title} feature={f} />
                   ))}
                 </ul>
-                {/* The line a gym owner deserves before they are asked for
-                    another hundred euros a month. It used to open by naming
-                    every built feature in turn, which restated the list
-                    directly above it and added six lines to the taller of two
-                    cards that were already 570px apart. The list marks its own
-                    exceptions; this only has to say what those mean. Still
-                    counted, so it cannot go stale the way "the five marked
-                    Coming" did the moment a sixth was built. */}
-                <p className="max-w-[52ch] rounded-lg border border-dashed border-line px-3 py-2.5 text-2xs leading-relaxed text-ink-2">
-                  {COMING_PLUS.length === 1 && (
-                    <>
-                      Everything above is built and working today except the one marked{' '}
-                      <strong className="font-medium text-ink">Coming</strong>. It is what Plus
-                      becomes next, it carries no date, and it does not change what you pay now.
-                    </>
-                  )}
-                  {COMING_PLUS.length > 1 && (
-                    <>
-                      Everything above is built and working today except the{' '}
-                      {spell(COMING_PLUS.length)} marked{' '}
-                      <strong className="font-medium text-ink">Coming</strong>. They are what Plus
-                      becomes, they carry no date, and they do not change what you pay now.
-                    </>
-                  )}
-                </p>
               </Panel>
             </div>
 
