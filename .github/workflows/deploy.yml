@@ -23,7 +23,12 @@
 # Secrets, named as the rest of the fleet names them:
 #
 #   COOLIFY_API_URL    the Coolify instance
-#   COOLIFY_API_TOKEN  Keys & Tokens → API tokens, with deploy permission
+#   COOLIFY_API_TOKEN  Keys & Tokens → API tokens, permissions `deploy` + `read`
+#                      and nothing else. `read` is needed to poll a deployment
+#                      and returns metadata only; `read:sensitive` is what
+#                      would hand this workflow every environment variable on
+#                      the server, and a root token would let a leak delete
+#                      applications rather than deploy them.
 #   COOLIFY_APP_UUID   the web resource's UUID — resolve it by NAME from
 #                      GET /api/v1/applications, never from a stored value:
 #                      one server hosts many apps and a stale UUID deploys to
