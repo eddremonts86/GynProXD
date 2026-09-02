@@ -37,9 +37,14 @@ services:
   push:
     build: ./push
     restart: unless-stopped
+    # The list form on purpose. The mapping form with `condition:
+    # service_healthy` is valid compose and docker accepts it, but Coolify's
+    # compose parser does not: the deploy of 18d83ac died in loadComposeFile()
+    # with "Failed to read Git source" after a successful clone. The push
+    # service already retries until PocketBase answers, so start order is a
+    # nicety here, and PocketBase's own healthcheck still gates its status.
     depends_on:
-      pocketbase:
-        condition: service_healthy
+      - pocketbase
     environment:
       PB_URL: http://pocketbase:8090
       PB_SUPERUSER_EMAIL: ${PB_SUPERUSER_EMAIL:-}
