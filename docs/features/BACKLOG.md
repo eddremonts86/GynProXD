@@ -67,12 +67,24 @@ same manual process.
 ## 4. The gym applications queue is still hands-on
 
 `/admin` → Applications collects a row and grants nothing: no gym, no operator,
-no reach. Somebody reads it and runs the provisioning script. Deliberate — a gym
-is a paying account with a member roster, not something a form conjures — but it
-is manual work per customer, and Enterprise makes each one five gyms of it.
+no reach. Somebody reads it and runs the provisioning script. That stays
+deliberate. A gym is a paying account with a member roster, not something a form
+conjures, and a provisioning button that half-works is worse than a script
+somebody runs on purpose.
 
-Worth automating only once the volume is real. A provisioning button that
-half-works is worse than a script somebody runs on purpose.
+**What was actually broken is fixed.** The complaint was never that a person
+runs it, it was that Enterprise made each customer five runs of a script that
+did not know about owners, plans or caps. `grant-gym.mjs` now takes `--owner`,
+`--plan` and several `--gym` names in one run, raises `gym_cap` to match
+*before* it makes the rooms, and is idempotent. It refuses `--plan enterprise`
+in words, because Enterprise is not a plan value: it is one account owning
+several Plus rooms, and `gyms.plan` holds eight characters anyway.
+
+`provisioning-boundary.mjs` runs the real script against a throwaway server on
+every pull request. Nothing exercised it before, so a renamed field would have
+been found by a person mid-provisioning with a customer waiting.
+
+A button is still worth building the day the volume is real.
 
 ## 5. No geography on the open door
 
