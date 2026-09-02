@@ -838,3 +838,77 @@ one-person desk the answer was never in doubt.
   existing two-operator gym an owner without dropping anybody and leaves the
   house without one; down keeps the gym, its operators and its messages, and
   takes the invitations collection with the field.
+
+## The gym's colour
+
+Plus, `PLUS_FEATURES` calls it `branding`. `/gym` → Members grows a hex field
+with a live preview; the colour marks the gym's banner and its own surfaces in
+its members' app.
+
+### What the card used to promise
+
+"The shell your members see, wearing your gym rather than ours." That is not
+built, deliberately. The shell is where a member reads that their training is
+theirs and unreadable — a shell wearing the gym would tell them, plausibly and
+wrongly, that the gym holds it. A white label would sell €100 a month at the
+cost of the one thing that is not for sale, and it is also the reason a gym's
+messages get opened at all.
+
+So the card was rewritten to what the feature does: *your banner, your card on
+their Today screen and your name above a message, in your colour. Not the whole
+app.* The walk checks the app's own chrome is untouched.
+
+### The gym picks the colour, the app picks the ink
+
+Refusing somebody's brand for failing a contrast ratio refuses the thing they
+paid for; darkening it into compliance hands them a colour that is not theirs.
+So any colour is accepted and the text on it is chosen by measurement — the same
+answer `--aurora-ink` reached for the one coloured material this app already
+had. `inkOn` takes whichever of the two inks measures better rather than a
+luminance threshold, because a threshold picks the wrong one exactly in the
+middle of the range where the two are close.
+
+**The band neither ink can carry is not an edge case.** Measured: steel blue
+`#4682b4` tops out at 4.11:1, slate `#708090` at 4.17, sea green `#2e8b57` at
+4.25, mid grey `#808080` at 4.28, denim `#5b7c99` at 4.39, olive `#6b8e23` at
+4.44 — all under 4.5:1 against both this app's ink and white. Those are gym
+colours. The first version of the test picked lightseagreen as its example of an
+awkward colour and lightseagreen clears 6.44:1; the band had to be measured
+rather than guessed.
+
+So the fallback is the common path: such a colour keeps every surface that
+carries no text and the surfaces with words on them use the app's own. The panel
+says so in words and refuses to preview text on it, because a gym that saw its
+colour in some places and not others would reasonably think something was
+broken.
+
+### Where it comes from, and who may set it
+
+Set through `/api/enforma/gym/set-brand`, owner-only — the same hand that holds
+the roster, since a colour is the gym's face — and Plus-only. `gyms.updateRule`
+stays null: the row carries the operators list and the plan, and opening it for
+one field opens it for those. A colour the app cannot parse is refused rather
+than stored, because a stored one renders as nothing and looks exactly like the
+feature being broken.
+
+Read off the gym's row, which a member can already list, and cached nowhere: a
+gym changes it when it changes. **It only reaches a member who has a sync
+account**, because a device with no account cannot ask — such a member sees the
+app's own colour, which is the honest thing to show somebody we cannot tell.
+
+The colour is only ever applied to the gym's own messages. `scopeOf` is
+`members` or `open-door` for a gym; anything else is the platform speaking, and
+a platform message must never arrive wearing a gym's paint.
+
+### How it is checked
+
+- `node scripts/audit/branding-boundary.mjs` — 18 checks: who may set it, what
+  may be set, the plan, and that a member can read it.
+- `node scripts/audit/test-branding.mjs` — the screens, and the contrast
+  measured off the pixels the browser actually painted rather than off the
+  arithmetic that chose them. It walks the real path: the gym sets a colour and
+  publishes, the member opens an account (which files a join request, because a
+  gym name typed at the door is a claim and not a membership), the gym approves
+  it, and only then is the banner measured.
+- `src/lib/brand.spec.ts` walks the failing band rather than sampling it.
+- The migration was rehearsed on a populated database both ways.
