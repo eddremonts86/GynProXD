@@ -131,10 +131,30 @@ jobs:
       - name: Install the browser
         run: pnpm exec playwright install --with-deps chromium
 
+      # The preview's /pb proxy forwards to POCKETBASE_URL. On a laptop that is
+      # a PocketBase left over from development; here nothing would answer, the
+      # proxy would return 502, and the walks that collect console errors would
+      # fail on the harness rather than the product. So the job boots the same
+      # throwaway server the rules walks use, from this branch's own schema.
+      - name: Boot a sandbox sync server
+        run: |
+          node scripts/audit/sandbox-serve.mjs --port 8790 &
+          for i in $(seq 1 60); do
+            if curl -sf http://127.0.0.1:8790/api/health >/dev/null; then
+              echo "sandbox on 8790"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error title=No sandbox::the sandbox sync server never answered on 8790."
+          exit 1
+
       # The built app rather than the dev server, so what is walked is what
       # ships. `--strictPort` because a preview that quietly moved would leave
       # every walk talking to nothing.
       - name: Build and serve
+        env:
+          POCKETBASE_URL: http://127.0.0.1:8790
         run: |
           pnpm build
           pnpm exec vite preview --port 4173 --strictPort &
@@ -160,9 +180,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: audit-screens
-          path: |
-            docs/impeccable/shots/
-            .audit-shots/
+          path: .audit-shots/
           if-no-files-found: ignore
           retention-days: 7
 

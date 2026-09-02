@@ -141,3 +141,25 @@ export async function ensureProfile(page, base, name = 'Walker', pass = 'walk-pa
   }
   await d.inApp()
 }
+
+/**
+ * Console errors worth failing a walk over.
+ *
+ * Everything the page logs at error level and every uncaught exception, with
+ * one exception of its own: the browser's "Failed to load resource" line for
+ * the dish of the day. A server with no recipe catalogue answers that request
+ * 503 by design, the client falls back to its bundled dishes without a word,
+ * and Chrome still prints the failed load — a line no client code can quiet.
+ * A fresh sandbox has no catalogue; production does. Matched on the URL, not
+ * the text, so nothing else that fails to load gets to hide behind it.
+ */
+export function watchConsole(page) {
+  const errors = []
+  page.on('console', (m) => {
+    if (m.type() !== 'error') return
+    if (m.location()?.url?.includes('/api/enforma/daily-dish')) return
+    errors.push(m.text())
+  })
+  page.on('pageerror', (e) => errors.push(String(e)))
+  return errors
+}
