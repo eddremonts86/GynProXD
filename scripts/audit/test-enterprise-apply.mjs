@@ -50,9 +50,12 @@ try {
   check('against a total the page also states', copy.includes('€1,500 a month'), true)
   check('and says what else that money buys', copy.includes('five gyms on Base would cost'), true)
   /* Building the second-to-last Coming feature left this sentence reading "the
-     one marked Coming are not built yet". */
+     one marked Coming are not built yet". The sentence was rewritten when the
+     card stopped restating every feature listed above it; this is the same
+     check, aimed at the singular noun and its verb rather than at the wording
+     that happened to carry them before. */
   check('the Coming sentence agrees with itself',
-    /one marked\s*Coming\s*is not built/.test(copy.replace(/\s+/g, ' ')), true)
+    /one marked\s*Coming\.\s*It is what Plus becomes/.test(copy.replace(/\s+/g, ' ')), true)
   check('nothing still claims there are two plans',
     /two plans/i.test(copy), false)
 
