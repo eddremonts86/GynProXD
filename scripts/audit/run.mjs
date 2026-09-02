@@ -32,6 +32,8 @@ const ROOT = path.resolve(HERE, '../..')
 const GROUPS = {
   rules: [
     'house-gym-boundary',
+    'menus-boundary',
+    'coach-cap',
     'open-door-boundary',
     'scheduled-boundary',
     'operators-boundary',
