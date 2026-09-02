@@ -35,23 +35,26 @@ same money, with everything Plus has on all five", which a reader can check.
 pricing, which would have meant the most expensive tier had fewer features per
 gym than a single Plus account.
 
-## 2. `second-rooms` — the card still marked `Coming`
+## 2. `second-rooms` — retired, not shipped
 
-Two locations under one account, each with its own roster and its own inbox.
+It was the last card marked `Coming`, and it is gone from the Plus list rather
+than ticked. Those are different things and the difference is the point.
 
-It was split out of the operators card deliberately: a roster is a list on a gym
-that already exists, while more than one location asks **what a gym is** in the
-data. Every message, member, join code, plan, owner and colour belongs to
-exactly one row of `gyms`, and twenty collection rules are written against that.
+"Two locations under one account, each with its own roster and its own inbox" is
+what Enterprise sells. It is not something a single gym paying €300 gets, so
+leaving the row on the Plus card and marking it built would have told that
+customer they had several rooms. The proposition now lives on the Enterprise
+band, where it is priced, and that band names the switcher the desk grew.
 
-The Enterprise design below is the cheap answer to this, and the reason to
-prefer it: an account that operates five gyms leaves every one of those rules
-untouched, because `gyms.operators` is already a list per gym. One gym with five
-rooms does not.
+The recommendation this entry carried was "do not build rooms, build
+Enterprise, and let the card mean that". That is what happened. The reason it
+gave still holds and is worth keeping: a roster is a list on a gym that already
+exists, while more than one location asks what a gym *is* in the data. The
+answer turned out to be that it asks nothing, because `gyms.operators` is
+already a list per gym.
 
-**Recommendation: do not build "rooms". Build Enterprise, and let the card mean
-that.** Rewrite it the way the operators card was rewritten, rather than
-shipping half a headline.
+The Plus card now has nothing marked `Coming`, and the paragraph that explains
+what `Coming` means is behind a guard so it does not render as an empty box.
 
 ## 3. Stripe
 

@@ -51,13 +51,18 @@ try {
   check('the saving is stated', copy.includes('€500 less'), true)
   check('against a total the page also states', copy.includes('€1,500 a month'), true)
   check('and says what else that money buys', copy.includes('five gyms on Base would cost'), true)
-  /* Building the second-to-last Coming feature left this sentence reading "the
-     one marked Coming are not built yet". The sentence was rewritten when the
-     card stopped restating every feature listed above it; this is the same
-     check, aimed at the singular noun and its verb rather than at the wording
-     that happened to carry them before. */
-  check('the Coming sentence agrees with itself',
-    /one marked\s*Coming\.\s*It is what Plus becomes/.test(copy.replace(/\s+/g, ' ')), true)
+  /* An invariant rather than a fixed sentence. Building the second-to-last
+     Coming feature once left this reading "the one marked Coming are not
+     built yet", and the last one left the list entirely, which took the
+     sentence with it. So: the explanation appears exactly when something is
+     marked Coming, and agrees in number when it does. That keeps the guard
+     alive for the next feature listed before it works. */
+  const marked = (copy.match(/\bComing\b/g) || []).length
+  const flat = copy.replace(/\s+/g, ' ')
+  check('the Coming explanation appears only when something is Coming',
+    /Everything above is built/.test(flat), marked > 0)
+  check('and agrees with itself in number',
+    marked === 1 ? /the one marked Coming\. It is/.test(flat) : true, true)
   check('nothing still claims there are two plans',
     /two plans/i.test(copy), false)
 

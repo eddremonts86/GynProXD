@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isBuilt, planAllows, planOf, PLUS_FEATURES } from './gym-plan'
+import { isBuilt, planAllows, planOf, PLUS_FEATURES, type PlusFeature } from './gym-plan'
 
 /**
  * The gate the pricing page depends on.
@@ -35,14 +35,17 @@ describe('planAllows', () => {
     expect(planAllows('base', 'scheduling')).toBe(false)
   })
 
-  it('refuses an unbuilt feature to everybody', () => {
+  it('refuses a feature it has never heard of', () => {
     // A half-finished feature must not leak out through a Plus account before
-    // it is done, which is why the gate asks whether it exists first.
-    // `second-rooms` is the example because it is not built; when it ships,
-    // this moves up to the case above rather than being deleted — as
-    // `scheduling` and then `operators` each did.
-    expect(planAllows('plus', 'second-rooms')).toBe(false)
-    expect(planAllows('base', 'second-rooms')).toBe(false)
+    // it is done, which is why the gate asks whether it exists first. This used
+    // to name `second-rooms`, the last unbuilt entry; it left the list rather
+    // than shipping, because several rooms is what Enterprise sells and no
+    // single Plus gym gets it. With nothing unbuilt left to name, the check is
+    // on the gate's own default: anything it does not know is refused, which is
+    // what protects the next feature between the day it is listed and the day
+    // it works.
+    expect(planAllows('plus', 'not-a-feature' as PlusFeature)).toBe(false)
+    expect(planAllows('base', 'not-a-feature' as PlusFeature)).toBe(false)
   })
 
   it('agrees with isBuilt for every feature the page lists', () => {

@@ -12,13 +12,17 @@
  * feature cannot be advertised as shipped while the gate still refuses it, and
  * turning one on is one line in one file.
  *
- * `second-rooms` is its own entry rather than half of `operators`, because the
- * two are not one feature. Staff who can publish is a roster on a gym that
- * already exists; more than one location under one account is a question about
- * what a gym *is* in the data — every message, member, join code and plan check
- * currently belongs to exactly one row. Sold as a single card, shipping the
- * roster would have quietly left half a headline unbuilt with nothing marking
- * it.
+ * `second-rooms` used to sit in this list and is gone from it, which is not the
+ * same as having shipped. More than one location under one account is what
+ * Enterprise sells, and Enterprise is a cap on the account rather than anything
+ * a single Plus gym gets. Leaving the card on the Plus list and ticking it
+ * would have told somebody paying for one gym that they had several.
+ *
+ * It was split out of `operators` for a reason that still holds: a roster is a
+ * list on a gym that already exists, while more than one location asks what a
+ * gym *is* in the data. The answer turned out to be that it asks nothing,
+ * because `gyms.operators` is already a list per gym and an account can appear
+ * in several. See `users.gym_cap`.
  */
 
 export type GymPlan = 'base' | 'plus'
@@ -63,7 +67,6 @@ export const PLUS_FEATURES = [
   'scheduling',
   'reach-window',
   'operators',
-  'second-rooms',
   'branding',
 ] as const
 
