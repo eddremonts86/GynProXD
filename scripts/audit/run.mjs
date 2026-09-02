@@ -53,6 +53,7 @@ const GROUPS = {
     'test-enterprise-apply',
     'gym-programme-boundary',
     'aurora-contrast',
+    'a11y-sweep',
     'verify-all',
     'walk',
   ],

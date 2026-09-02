@@ -85,12 +85,20 @@ const LISTS = [
 
 export function RichTextEditor({
   id,
+  labelledBy,
   value,
   onChange,
   placeholder,
   minRows = 7,
 }: {
   id: string
+  /**
+   * The id of the element that names this field. Required because what it
+   * renders is a `contenteditable` div, not a form control: a `<label for>`
+   * points at nothing here, so an accessibility sweep reads an unnamed text
+   * box, which is what a screen reader was reading at the gym desk.
+   */
+  labelledBy: string
   value: string
   onChange: (html: string) => void
   placeholder?: string
@@ -326,6 +334,7 @@ export function RichTextEditor({
           suppressContentEditableWarning
           role="textbox"
           aria-multiline="true"
+          aria-labelledby={labelledBy}
           onInput={read}
           onBlur={read}
           onKeyUp={readSelection}
