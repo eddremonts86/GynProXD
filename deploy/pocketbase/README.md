@@ -79,6 +79,14 @@ Environment for the compose (set as Coolify env vars on this service):
 | `MINIMAX_API_KEY` (+ optional `MINIMAX_BASE_URL`) | pocketbase | the AI coach route, auth-gated |
 | `FATSECRET_CLIENT_ID` / `FATSECRET_CLIENT_SECRET` | pocketbase | tops up the recipe catalogue, auth-gated. FatSecret only issues tokens to whitelisted IPs: add this host's egress IP in their console |
 
+The coach is capped at **20 calls per account per rolling 24 hours**, counted
+over the `coach_usage` rows the proxy already writes. An account over the limit
+is answered 429 and the app falls back to its deterministic generator without
+saying anything, so the cap costs a member nothing but a slightly plainer
+programme. The number lives in `pb_hooks/shared_fetches.pb.js`; raising it is
+one constant, and `scripts/audit/coach-cap.mjs` proves the boundary in both
+directions.
+
 Generate VAPID keys once (`npx web-push generate-vapid-keys` or any P-256
 tool) and never rotate them casually: rotating invalidates every existing
 subscription.

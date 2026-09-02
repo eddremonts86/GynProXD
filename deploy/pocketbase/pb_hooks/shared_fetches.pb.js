@@ -75,6 +75,42 @@ routerAdd('GET', '/api/enforma/capabilities', (e) => {
 routerAdd('POST', '/api/minimax/chat/completions', (e) => {
   if (!e.auth) return e.json(401, { message: 'Sign in to use the coach.' })
 
+  /**
+   * The cap.
+   *
+   * Every call is billed to us and nothing stopped one account making them in
+   * a loop. The meter below already writes a row per call, so the limit is a
+   * count over it rather than a new table.
+   *
+   * Twenty a day per account: the intake spends one call per programme and the
+   * kitchen one per suggestion, so twenty is a working day of both and still
+   * two orders of magnitude short of a bill that hurts.
+   *
+   * Checked before the key on purpose. Over the limit is true whether or not
+   * this server has a coach configured, and asking it first is what makes the
+   * boundary testable on a sandbox that has no vendor key. An unreadable meter
+   * must never become a closed door, hence the catch.
+   *
+   * Nobody sees an error for it: both callers fall back to the deterministic
+   * generator on any non-2xx, so an account over the limit still gets a
+   * programme — designed by us instead of rented.
+   */
+  const CALLS_PER_DAY = 20
+  try {
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().replace('T', ' ')
+    const used = $app.countRecords(
+      'coach_usage',
+      $dbx.exp('owner = {:owner} AND created >= {:since}', { owner: e.auth.id, since: since }),
+    )
+    if (used >= CALLS_PER_DAY) {
+      return e.json(429, {
+        message: 'The coach has already answered ' + CALLS_PER_DAY + ' times for this account today.',
+      })
+    }
+  } catch {
+    /* Unmetered, and still answered. */
+  }
+
   const key = $os.getenv('COACH_API_KEY') || $os.getenv('MINIMAX_API_KEY')
   if (!key) return e.json(503, { message: 'No coach on this server.' })
   const base =
