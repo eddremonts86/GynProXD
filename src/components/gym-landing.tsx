@@ -162,12 +162,12 @@ const BASE: Feature[] = [
 const PLUS: Feature[] = [
   { id: 'kitchen', icon: ForkKnife, title: 'The kitchen', body: 'The daily menu and your standing kitchen card, on Today and on its own page. The one surface here that leads where money changes hands.' },
   { id: 'programmes', icon: Barbell, title: 'Programmes signed by your gym', body: 'Publish a programme your members adopt in one tap, with your name on it, instead of the one the app would have built. Each one gets their own dated copy, and what they do with it stays on their phone.' },
-  { id: 'open-door', icon: Storefront, title: 'Reach people with no gym', body: 'The one thing here that wins you somebody you have not already got: an offer to everyone on enForma who has not joined a gym. One a month. You are never told who they are, and there is no location filter — we hold no location for anybody, and we would rather say so than imply a segmentation that does not exist.' },
-  { id: 'scheduling', icon: Clock, title: 'Write it now, publish it later', body: 'Monday’s menu on Sunday evening. A week of posts in one sitting. Nobody can read one before its time — the server will not hand it over, not even to somebody asking for it directly.' },
+  { id: 'open-door', icon: Storefront, title: 'Reach people with no gym', body: 'The one thing here that wins you somebody you have not already got: an offer to everyone on enForma who has not joined a gym. One a month. You are never told who they are, and there is no location filter. We hold no location for anybody, and we would rather say so than imply a segmentation that does not exist.' },
+  { id: 'scheduling', icon: Clock, title: 'Write it now, publish it later', body: 'Monday’s menu on Sunday evening. A week of posts in one sitting. Nobody can read one before its time. The server will not hand it over, not even to somebody asking for it directly.' },
   { id: 'reach-window', icon: ChartLineUp, title: 'Reach with no window, exported', body: `Past the ${REACH_WINDOW_DAYS} days, and out as a file you can put next to your own numbers.` },
   { id: 'operators', icon: UsersThree, title: 'Staff who can publish', body: 'Invite the people who actually work the desk, so posting is not one person’s phone. Every message says who sent it, and the roster is the owner’s to change.' },
   { id: 'second-rooms', icon: Buildings, title: 'More than one room', body: 'Two locations under one account, each with its own roster and its own inbox.' },
-  { id: 'branding', icon: Sparkle, title: 'Your colour on your own surfaces', body: 'Your banner, your card on their Today screen and your name above a message, in your colour. Not the whole app: the shell stays ours, because it is where a member reads that their training is theirs and unreadable — and a shell wearing your name would quietly tell them otherwise.' },
+  { id: 'branding', icon: Sparkle, title: 'Your colour on your own surfaces', body: 'Your banner, your card on their Today screen and your name above a message, in your colour. Not the whole app: the shell stays ours, because it is where a member reads that their training is theirs and unreadable, and a shell wearing your name would quietly tell them otherwise.' },
 ]
 
 const BUILT_PLUS = PLUS.filter((f) => f.id && isBuilt(f.id))
@@ -277,9 +277,8 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
                 Your members keep this app. You get to be the gym in it.
               </h1>
               <Lead>
-                enForma builds each member a periodised programme, free, on their own device. What
-                they train is encrypted and reaches nobody &mdash; which is why they keep it, and why
-                what you put in front of them gets opened.
+                Each member gets a periodised programme, free, on their own device. What they train
+                is encrypted, so they keep it.
               </Lead>
               <div className="flex flex-wrap items-center gap-3">
                 <Button variant="primary" onClick={() => jump('apply')} className="active:translate-y-px">
@@ -368,7 +367,7 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
             <div className="flex flex-col gap-5">
               <SectionHeading>What you learn, and what nobody learns.</SectionHeading>
               <Body className="max-w-[56ch]">
-                Every figure in your panel is counted from something a member actually did &mdash;
+                Every figure in your panel is counted from something a member actually did:
                 opened it, answered it, saved it, reserved it, joined it. None of it is modelled and
                 none of it is a guess.
               </Body>
@@ -400,7 +399,7 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
                 </Body>
                 <Body className="max-w-none">
                   You will never see what somebody lifted, and neither will we. That is not a
-                  setting we could change for the right price &mdash; there is no copy of the key to
+                  setting we could change for the right price. There is no copy of the key to
                   change it with.
                 </Body>
               </Panel>
@@ -477,7 +476,7 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
                     <>
                       {' '}
                       The one marked <strong className="font-medium text-ink">Coming</strong> is not
-                      built yet &mdash; it is what Plus becomes next, it carries no date, and it
+                      built yet. It is what Plus becomes next, it carries no date, and it
                       does not change what you pay now.
                     </>
                   )}
@@ -486,7 +485,7 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
                       {' '}
                       The {spell(COMING_PLUS.length)} marked{' '}
                       <strong className="font-medium text-ink">Coming</strong> are not built yet
-                      &mdash; they are what Plus becomes, they carry no date, and they do not change
+                      . They are what Plus becomes, they carry no date, and they do not change
                       what you pay now.
                     </>
                   )}
@@ -540,7 +539,7 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
               </div>
               <p className="max-w-[64ch] border-t border-line pt-4 text-2xs leading-relaxed text-ink-2">
                 More than {spell(ENTERPRISE_GYMS)}? Tell us how many and we will price it. There is
-                no ladder of tiers behind this — the number of gyms on an account is a number, and
+                no ladder of tiers behind this. The number of gyms on an account is a number, and
                 we set it to whatever you actually run.
               </p>
             </Panel>
@@ -588,7 +587,7 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
 
         <footer className="border-t border-line py-10">
           <div className={cn(READ, 'flex flex-wrap items-center justify-between gap-4')}>
-            <Label>enForma &mdash; for gyms</Label>
+            <Label>enForma for gyms</Label>
             <a
               href="/"
               className="text-sm text-brand underline-offset-2 hover:underline"

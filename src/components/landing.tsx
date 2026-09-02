@@ -348,10 +348,8 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
                   A plan that admits how long it takes.
                 </h1>
                 <Lead>
-                  enForma reads your goal, your level and the hours you actually have, then builds a
-                  periodized programme out of {LIBRARY_SIZE} freely licensed
-                  movements. It runs on this device, and the estimate it gives you is arithmetic you
-                  can check.
+                  Your goal, your level, the hours you actually have. It builds the plan on this
+                  device and shows the arithmetic.
                 </Lead>
               </div>
 
@@ -546,8 +544,8 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
               <Lead>
                 {LIBRARY_SIZE} movements, freely licensed, filtered by muscle
                 and by the equipment you can actually reach today. Bar at the gym, rings in a
-                doorway, nothing but the floor —
-                the generator picks from what you have and the weekly planner keeps both disciplines
+                doorway, nothing but the floor. The
+                generator picks from what you have, and the weekly planner keeps both disciplines
                 on the same page.
               </Lead>
               <Lead>
@@ -710,7 +708,7 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
               <SectionHeading>Start with a plan, not a promise.</SectionHeading>
               <Lead>
                 Give it four or five answers and it will hand back a dated programme and the months
-                it honestly takes. If you already train here, unlock your profile — or sign in to
+                it honestly takes. If you already train here, unlock your profile, or sign in to
                 pull your training onto this device.
               </Lead>
               <ul className="flex flex-col gap-4 border-t border-line pt-8">
@@ -757,7 +755,7 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
             </span>
             <p className="max-w-[52ch] text-sm leading-relaxed text-ink-3">
               Movement data from the public-domain free-exercise-db and by RepDB (repdb.co).
-              enForma gives training structure, not medical advice — talk to a professional
+              enForma gives training structure, not medical advice. Talk to a professional
               before a large change.
             </p>
           </div>

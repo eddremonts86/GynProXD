@@ -424,7 +424,7 @@ export function AuthPanel({
           <div className="flex flex-col gap-1">
             <h2 className="text-xl text-ink">Sign in to sync</h2>
             <p className="text-2xs text-ink-3">
-              Your training pulls onto this device. One password signs you in and decrypts it — the
+              Your training pulls onto this device. One password signs you in and decrypts it. The
               server only ever holds sealed rows.
             </p>
           </div>
@@ -510,7 +510,7 @@ export function AuthPanel({
             <h2 className="text-xl text-ink">Reset your password</h2>
             <p className="text-2xs text-ink-3">
               {resetStep === 'request'
-                ? 'A reset code goes to your account email. You will also need your recovery code — it is the only thing that can re-open the training data.'
+                ? 'A reset code goes to your account email. You will also need your recovery code. It is the only thing that can re-open the training data.'
                 : `Code sent to ${email.trim()}. Check the inbox, then set the new password.`}
             </p>
           </div>
@@ -678,13 +678,14 @@ export function AuthPanel({
                 setError(null)
               }}
               inputMode="numeric"
-              placeholder="—"
             />
             <FormSelect
               label="Sex"
               value={sex}
               onValueChange={(v) => setSex(v as typeof sex)}
-              placeholder="—"
+              /* A word, not a dash. The em-dash read as a value rather than an
+                 absence, and it was the one on this page a reader could see. */
+              placeholder="Select"
               options={(['hombre', 'mujer', 'otro'] as const).map((v) => ({
                 value: v,
                 label: SEX_LABELS[v],
@@ -700,11 +701,10 @@ export function AuthPanel({
               }}
               inputMode="numeric"
               suffix="cm"
-              placeholder="—"
             />
           </div>
           <p className="-mt-1 text-2xs text-ink-3">
-            Optional — prefills your programme and unlocks BMI on Today.
+            Optional. Prefills your programme and unlocks BMI on Today.
           </p>
           <Input
             id={fid('passphrase')}
