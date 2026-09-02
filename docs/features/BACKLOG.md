@@ -81,19 +81,18 @@ privacy conversation that goes with it. Not free, and not obviously right.
 
 ## 6. Promote the audit walks to required checks
 
-**Done: they run in CI.** `pnpm audit:rules` (ten seconds, no browser) and
-`pnpm audit:screens` (about nine minutes locally, twelve on a runner) are two
-jobs on every pull request, and CI calls the same entry point a person does.
+**Done for `Audit the rules`, on both `main` and `dev`.** It is ten seconds,
+no browser, no clocks, and it guards the collection rules every boundary in
+this product rests on. The condition this entry set, a few green runs first,
+was met decisively: 25 runs, 25 green, no flakes, across a day of real merges.
 
-What is *not* done is adding them to branch protection. They had never run in
-CI before, and a check that has passed once in a new environment is not yet a
-check worth blocking a merge on — one flake and nobody can ship. `Audit the
-rules` is the obvious first promotion: ten seconds, no browser, no clocks, and
-it guards the collection rules that every boundary in this product rests on.
-
-Give `Audit the screens` a few green runs first. Two of its walks wait on real
-clocks, which is deliberate — a schedule tested against a mocked clock proves
-the mock works — and it is where a flake would come from.
+**`Audit the screens` still runs on every pull request and still is not
+required.** Same 25 for 25, so the evidence is there, but its failure mode is
+different: eight minutes, a browser, and two walks that wait on real clocks by
+design, because a schedule tested against a mocked clock only proves the mock
+works. A flake there blocks a release rather than catching a bug. Promoting it
+is one entry in branch protection whenever somebody decides that trade is worth
+making; the walks themselves are already the thing that would have to hold.
 
 ## 7. Week 1 of a plan that starts mid-week
 
