@@ -291,9 +291,11 @@ a record that skips the question reads like nobody asked.
   own hostname and certificate, and the secret is `https://`.
 - **F-12** the 601 KB exercise chunk → **accepted**, unchanged.
 - **F-14** a `menus-boundary` walk → **built**, and in the rules group.
-- Lighthouse and an axe sweep → **still not done**. This audit had no tool for
-  either, and adding one was not the audit's call. They remain the largest
-  measured gap in what has been checked.
+- The axe sweep → **built**, as `a11y-sweep.mjs` in the screens group. It runs
+  over the whole route inventory at two viewports and found one serious
+  violation on thirty-one screens: an unnamed text field at the gym desk.
+- Lighthouse → **still not done.** Bundle sizes were measured by hand and the
+  numbers are in F-12; nothing measures the loading experience.
 
 ---
 

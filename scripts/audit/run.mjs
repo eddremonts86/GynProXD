@@ -33,6 +33,7 @@ const GROUPS = {
   rules: [
     'house-gym-boundary',
     'menus-boundary',
+    'gym-cap-boundary',
     'coach-cap',
     'open-door-boundary',
     'scheduled-boundary',
@@ -51,6 +52,7 @@ const GROUPS = {
     'test-operators',
     'test-branding',
     'test-enterprise-apply',
+    'test-enterprise-rooms',
     'gym-programme-boundary',
     'aurora-contrast',
     'a11y-sweep',

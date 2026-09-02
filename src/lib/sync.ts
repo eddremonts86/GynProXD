@@ -911,12 +911,27 @@ export async function removeFromDesk(
   )
 }
 
-/** The id of the gym this operator account runs, for the code/requests UI. */
-export async function operatedGymId(profileId: string): Promise<string | null> {
+/** One room an account runs. Enterprise is several of these under one login. */
+export interface OperatedGym {
+  id: string
+  name: string
+}
+
+/**
+ * Every gym this account operates, not the first one it happens to find.
+ *
+ * This returned a single id until Enterprise made "several gyms, one account"
+ * a thing somebody pays for. It was the one place in the codebase that assumed
+ * an operator has exactly one gym, and `find` quietly picked whichever the
+ * server listed first.
+ */
+export async function operatedGyms(profileId: string): Promise<OperatedGym[]> {
   const l = readSyncLink(profileId)
-  if (!l?.token) return null
+  if (!l?.token) return []
   const gyms = await fetchGyms(l).catch(() => [])
-  return gyms.find((g) => g.operators?.includes(l.userId))?.id ?? null
+  return gyms
+    .filter((g) => g.operators?.includes(l.userId))
+    .map((g) => ({ id: g.id, name: g.name }))
 }
 
 /** Refreshes an expired session. Nothing about the data or keys changes. */

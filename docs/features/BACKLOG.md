@@ -14,11 +14,15 @@ conversation. A thing everybody has half-remembered is a thing nobody owns.
 
 ## 1. Enterprise: one account, several gyms
 
-**Status: sold, not built.** The third column is live at €1,000 for up to five
-gyms. Behind it an account still holds exactly one, and provisioning five is
-five gyms of manual work — so this is now the most urgent thing on the list,
-because it is the only one a customer could ask for and not get. See the design below — it matters that this
-is the same feature as `second-rooms`, priced.
+**Status: built.** `users.gym_cap` is the integer, a hook on `gyms` refuses the
+gym past it on the only path that creates one, and `/gym` offers a switcher
+when an account runs more than one room, remembered per device. Proved from the
+API by `gym-cap-boundary.mjs` and through the app by `test-enterprise-rooms.mjs`.
+
+It was built exactly as the design below describes, and the design is kept
+because the reasoning for a cap rather than an `orgs` collection is the part
+worth re-reading before somebody adds one. It matters that this is the same
+feature as `second-rooms`, priced: that card is now the only thing left.
 
 - €1,000 a month, up to five gyms under one account.
 - Plus at €300 stays exactly one gym.
