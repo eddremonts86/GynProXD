@@ -2,7 +2,7 @@
  * Grant (or update) a gym and its operators — the platform-admin act that
  * turns verified, paying gyms into publishers. Run by the superuser only.
  *
- *   PB_SU_EMAIL=... PB_SU_PASSWORD=... node scripts/admin/grant-gym.mjs \
+ *   PB_SUPERUSER_EMAIL=... PB_SUPERUSER_PASSWORD=... node scripts/admin/grant-gym.mjs \
  *     --server https://enforma-sync.example.com \
  *     --gym "Iron House" \
  *     --operators coach@example.com[,other@example.com]
@@ -20,11 +20,11 @@ const args = Object.fromEntries(
 const SERVER = (args.server ?? '').replace(/\/+$/, '')
 const GYM = args.gym
 const OPERATORS = (args.operators ?? '').split(',').map((e) => e.trim()).filter(Boolean)
-const EMAIL = process.env.PB_SU_EMAIL
-const PASSWORD = process.env.PB_SU_PASSWORD
+const EMAIL = (process.env.PB_SUPERUSER_EMAIL ?? process.env.PB_SU_EMAIL)
+const PASSWORD = (process.env.PB_SUPERUSER_PASSWORD ?? process.env.PB_SU_PASSWORD)
 
 if (!SERVER || !GYM || OPERATORS.length === 0 || !EMAIL || !PASSWORD) {
-  console.error('usage: PB_SU_EMAIL=… PB_SU_PASSWORD=… node grant-gym.mjs --server URL --gym NAME --operators a@b.c[,d@e.f]')
+  console.error('usage: PB_SUPERUSER_EMAIL=… PB_SUPERUSER_PASSWORD=… node grant-gym.mjs --server URL --gym NAME --operators a@b.c[,d@e.f]')
   process.exit(1)
 }
 

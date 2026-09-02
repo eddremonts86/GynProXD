@@ -4,7 +4,7 @@
  * profile so empty states get exercised too.
  */
 import { chromium } from 'playwright'
-import { ensureProfile } from './gate.mjs'
+import { ensureProfile, watchConsole } from './gate.mjs'
 
 const BASE = process.env.BASE_URL ?? 'http://localhost:3015'
 const browser = await chromium.launch()
@@ -13,11 +13,7 @@ await ctx.addInitScript(() => localStorage.setItem('forma-coach', 'off'))
 const page = await ctx.newPage()
 await ensureProfile(page, BASE)
 
-const errors = []
-page.on('console', (m) => {
-  if (m.type() === 'error') errors.push(m.text())
-})
-page.on('pageerror', (e) => errors.push(String(e)))
+const errors = watchConsole(page)
 
 const fail = (message) => {
   console.error(`FAIL ${message}`)

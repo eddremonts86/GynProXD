@@ -29,6 +29,10 @@ const VAPID_PRIVATE = process.env.VAPID_PRIVATE_KEY
 const SUBJECT = process.env.VAPID_SUBJECT ?? 'mailto:sync@enforma.local'
 const POLL_MS = Number(process.env.POLL_MS ?? 10_000)
 const STATE_FILE = process.env.STATE_FILE ?? '/state/cursor'
+/* Touched after every tick, so a healthcheck can tell a poller that is
+   looping from one that has hung; the cursor file only moves when a message
+   does, which on a quiet server is never. */
+const ALIVE_FILE = process.env.ALIVE_FILE ?? '/state/alive'
 
 if (!EMAIL || !PASSWORD || !VAPID_PUBLIC || !VAPID_PRIVATE) {
   console.error('push: missing PB_SUPERUSER_EMAIL/PASSWORD or VAPID keys; refusing to start')
@@ -200,6 +204,7 @@ console.log(`push: watching ${PB} every ${POLL_MS}ms`)
 for (;;) {
   try {
     await tick()
+    await writeFile(ALIVE_FILE, String(Date.now())).catch(() => {})
   } catch (err) {
     console.error(`push: tick failed (${err?.message ?? err})`)
   }

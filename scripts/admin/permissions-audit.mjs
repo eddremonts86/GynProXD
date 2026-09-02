@@ -3,7 +3,7 @@
  * and privilege-escalation move, independently of what the client UI allows.
  * A route guard is not a permission; this hits PocketBase directly.
  *
- *   PB_SU_EMAIL=… PB_SU_PASSWORD=… node scripts/admin/permissions-audit.mjs \
+ *   PB_SUPERUSER_EMAIL=… PB_SUPERUSER_PASSWORD=… node scripts/admin/permissions-audit.mjs \
  *     --server http://enforma-sync.localhost
  *
  * Exit non-zero if any invariant is violated. Fixtures are timestamped and
@@ -43,7 +43,7 @@ const check = (name, pass, detail = '') => {
 }
 
 const su = await api('/api/collections/_superusers/auth-with-password', { method: 'POST',
-  body: { identity: process.env.PB_SU_EMAIL, password: process.env.PB_SU_PASSWORD },
+  body: { identity: (process.env.PB_SUPERUSER_EMAIL ?? process.env.PB_SU_EMAIL), password: (process.env.PB_SUPERUSER_PASSWORD ?? process.env.PB_SU_PASSWORD) },
 })
 if (!su.data.token) {
   console.error('superuser auth failed — set PB_SU_EMAIL / PB_SU_PASSWORD')

@@ -7,10 +7,10 @@ import { fileURLToPath } from 'node:url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '../..')
 const BASE = process.env.BASE_URL ?? 'http://localhost:3015'
-const OUT_DIR = join(ROOT, 'docs/impeccable/shots')
+const OUT_DIR = join(ROOT, '.audit-shots/walk')
 const PREFIX = process.env.SHOT_PREFIX ?? 'before'
-const REPORT = join(ROOT, `docs/impeccable/walk-report-${PREFIX}.json`)
-const REPORT_MD = join(ROOT, `docs/impeccable/walk-report-${PREFIX}.md`)
+const REPORT = join(ROOT, `.audit-shots/walk-report-${PREFIX}.json`)
+const REPORT_MD = join(ROOT, `.audit-shots/walk-report-${PREFIX}.md`)
 
 const ROUTES = [
   { path: '/', name: 'today' },

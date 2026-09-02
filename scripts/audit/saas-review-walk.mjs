@@ -10,8 +10,9 @@
  */
 import { mkdir, writeFile } from 'node:fs/promises'
 import { chromium } from 'playwright'
+import { door, panelOf } from './gate.mjs'
 
-const BASE = process.env.WALK_BASE ?? 'http://localhost:3015'
+const BASE = process.env.BASE_URL ?? process.env.WALK_BASE ?? 'http://localhost:3015'
 const EVID = new URL('../../docs/ui-audit/evidence/', import.meta.url).pathname
 const PASS = 'walk1234'
 
@@ -78,48 +79,37 @@ async function gap(what, err) {
 }
 
 /**
- * Create a profile from the gate's create form. The gate only makes members;
- * the first profile on a fresh context becomes the device admin on its own.
+ * The four door fixtures, on the shared `door()`.
+ *
+ * They used to reach for `#f-name` and a `/lock/i` button. The landing now
+ * renders the sign-in panel twice with prefixed ids, and this walker had been
+ * reporting four GAPs at the door and no real sweep since — which is the same
+ * rot that took the other walks, fixed in the same place.
  */
-async function createProfile(page, { name, gym }) {
-  await page.fill('#f-name', name)
-  if (gym) {
-    await page.fill('#f-gym', gym)
-    await page.waitForTimeout(300)
-    // Pick the matching item (or the "Add gym" creator) so blur cannot wipe it.
-    const item = page.getByRole('option').filter({ hasText: gym }).first()
-    if (await item.isVisible().catch(() => false)) await item.click()
-    else await page.keyboard.press('Escape')
-  }
-  await page.fill('#f-passphrase', PASS)
-  await page.fill('#f-repeat-passphrase', PASS)
-  await page.getByRole('button', { name: 'Create profile' }).click()
-  await page.waitForTimeout(1200)
+/* One door per page: the solo pass runs in a second context, and a door bound
+   to the first page would be driving a tab that has already been closed. */
+const doors = new WeakMap()
+const theDoor = (page) => {
+  if (!doors.has(page)) doors.set(page, door(page, BASE))
+  return doors.get(page)
 }
 
-/** Unlock an existing profile from the gate's list. */
+async function createProfile(page, { name, gym }) {
+  await theDoor(page).create(name, PASS, gym ? { gym } : {})
+}
+
 async function unlockAs(page, name) {
   await page.goto(BASE + '/', { waitUntil: 'load' })
   await page.waitForTimeout(600)
-  await page.getByRole('button', { name: new RegExp(name, 'i') }).first().click()
-  await page.fill('#f-passphrase', PASS)
-  await page.getByRole('button', { name: /^unlock/i }).click()
-  await page.waitForTimeout(1500)
+  await theDoor(page).unlock(name, PASS)
 }
 
-/** Lock the active profile from Settings and land back on the gate. */
 async function lockProfile(page) {
-  await page.goto(BASE + '/settings', { waitUntil: 'load' })
-  await page.waitForTimeout(600)
-  await page.getByRole('button', { name: /lock/i }).first().click()
-  await page.waitForTimeout(800)
+  await theDoor(page).lock()
 }
 
-/** From the unlock gate, open the create form. */
-async function gateToCreate(page) {
-  await page.getByRole('button', { name: /new profile/i }).click()
-  await page.waitForTimeout(300)
-}
+/** `create()` opens the form itself when the gate is showing. */
+async function gateToCreate() {}
 
 const MEMBER_ROUTES = [
   ['/', 'today'],
@@ -167,7 +157,7 @@ async function main() {
   const ms0 = await visit(page, '/', 'gate-first-run')
   await shoot(page, 'gate-first-run', { path: '/', ms: ms0 })
   try {
-    await page.getByRole('button', { name: 'Create profile' }).click()
+    await panelOf(page).first().getByRole('button', { name: 'Create profile' }).click()
     await page.waitForTimeout(300)
     await shoot(page, 'gate-validation-empty-name', { path: '/' })
   } catch (e) {
@@ -191,10 +181,7 @@ async function main() {
     await createProfile(page, { name: 'Iron Boss', gym: 'Iron House' })
     await lockProfile(page)
     await unlockAs(page, 'Root Admin')
-    await page.goto(BASE + '/admin', { waitUntil: 'load' })
-    await page.waitForTimeout(700)
-    await page.getByLabel('Role for Iron Boss').click()
-    await page.getByRole('option', { name: 'Gym' }).click()
+    await theDoor(page).promote('Iron Boss', 'Gym')
     freshBucket('admin-panel')
     await page.waitForTimeout(600)
     await shoot(page, 'admin-panel', { path: '/admin' })
@@ -206,14 +193,21 @@ async function main() {
     // Publish one announcement so the member inbox has content.
     await page.getByLabel('Title').fill('Open day Saturday')
     await page
-      .getByLabel('Message')
+      .locator('#gym-body')
       .fill('Doors open at 10:00. Bring a friend, the coffee is on the house.')
     await page.getByRole('button', { name: /publish/i }).click()
     await page.waitForTimeout(700)
     await shoot(page, 'gym-panel-published', { path: '/gym' })
-    for (const tab of ['Sent', 'Menu', 'Members']) {
+    /* Menu is a Plus feature; Iron House is a base gym, so its absence is the
+       product, not a gap. Only the tabs that exist are walked. */
+    for (const tab of ['Sent', 'Menu', 'Members', 'Requests']) {
       try {
-        await page.getByRole('tab', { name: tab }).click()
+        const trigger = page.getByRole('tab', { name: tab })
+        if ((await trigger.count()) === 0) {
+          console.log(`  skip gym tab ${tab}: not on this plan`)
+          continue
+        }
+        await trigger.click()
         await page.waitForTimeout(500)
         await shoot(page, `gym-panel-${tab.toLowerCase()}`, { path: '/gym' })
       } catch (e) {
@@ -242,18 +236,23 @@ async function main() {
     }
   }
 
-  // Onboarding estimate card (no AI call: structured fields only).
+  // Onboarding estimate: the intake is a five-step wizard now. Free text seeds
+  // it, each step is walked forward, and the estimate is the last screen.
   try {
     await visit(page, '/onboarding', 'onboarding-estimate')
-    for (const [labelText, value] of [
-      ['Age', '40'],
-      ['Height', '178'],
-      ['Current weight', '100'],
-      ['Target weight', '80'],
-    ]) {
-      await page.getByLabel(labelText, { exact: false }).first().fill(value)
+    await page
+      .locator('textarea')
+      .first()
+      .fill('male, 40 years old, 100kg, want to get down to 80kg, gym 3 times a week')
+    await page.getByRole('button', { name: 'Use this and check it' }).click()
+    await page.waitForTimeout(300)
+    const next = page.getByRole('button', { name: /^(Continue|Skip and fill it in)/ })
+    const finish = page.getByRole('button', { name: /Design my programme/ })
+    for (let step = 0; step < 10 && (await finish.count()) === 0; step++) {
+      await next.click()
+      await page.waitForTimeout(250)
     }
-    await page.waitForTimeout(700)
+    await page.waitForTimeout(400)
     await shoot(page, 'onboarding-estimate', { path: '/onboarding' })
   } catch (e) {
     await gap('onboarding estimate', e)

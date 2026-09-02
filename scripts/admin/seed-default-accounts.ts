@@ -8,7 +8,7 @@
  *
  *   DEFAULT_ADMIN_EMAIL / DEFAULT_ADMIN_PASSWORD   → account + platform admin
  *   DEFAULT_USER_EMAIL  / DEFAULT_USER_PASSWORD    → ordinary member account
- *   PB_SU_EMAIL         / PB_SU_PASSWORD           → the PocketBase superuser
+ *   PB_SUPERUSER_EMAIL  / PB_SUPERUSER_PASSWORD    → the PocketBase superuser (PB_SU_* still read)
  *
  * Idempotent: an account that already exists is left alone rather than having
  * its password reset, because on this server a password is not a login detail —
@@ -62,8 +62,8 @@ for (let i = 2; i < process.argv.length; i += 1) {
 }
 
 const SERVER = (args.server ?? process.env.ENFORMA_SYNC_URL ?? '').replace(/\/+$/, '')
-const SU_EMAIL = process.env.PB_SU_EMAIL ?? process.env.PB_SUPERUSER_EMAIL
-const SU_PASSWORD = process.env.PB_SU_PASSWORD ?? process.env.PB_SUPERUSER_PASSWORD
+const SU_EMAIL = process.env.PB_SUPERUSER_EMAIL ?? process.env.PB_SU_EMAIL
+const SU_PASSWORD = process.env.PB_SUPERUSER_PASSWORD ?? process.env.PB_SU_PASSWORD
 
 const ACCOUNTS = [
   {
@@ -89,7 +89,7 @@ if (!SERVER) {
   fail('No server. Pass --server http://… (or set ENFORMA_SYNC_URL).')
 }
 if (!SU_EMAIL || !SU_PASSWORD) {
-  fail('No superuser. Set PB_SU_EMAIL and PB_SU_PASSWORD — the pair the sync server booted with.')
+  fail('No superuser. Set PB_SUPERUSER_EMAIL and PB_SUPERUSER_PASSWORD — the pair the sync server booted with.')
 }
 
 const missing = ACCOUNTS.filter((a) => !a.email || !a.password).map((a) => a.label)
