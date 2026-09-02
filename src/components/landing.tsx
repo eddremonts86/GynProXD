@@ -167,7 +167,7 @@ const INSIDE: { icon: Icon; title: string; body: string }[] = [
   {
     icon: ForkKnife,
     title: 'Recipes and the day plate',
-    body: 'A searchable catalogue, with portions worked out for the day you actually planned.',
+    body: 'A searchable catalogue, with portions worked out for the day you planned.',
   },
   {
     icon: Megaphone,
@@ -425,7 +425,7 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
                 Fat loss is paced between 0.4 and 1.0 kg a week and muscle between 0.06 and 0.35,
                 adjusted for your age, your training days and how hard you said you would go. If the
                 length you picked cannot hold the goal, the estimator says so before you commit, and
-                recommends the shortest option that actually fits.
+                recommends the shortest option that fits.
               </Lead>
               <ul className="flex max-w-[44ch] flex-col gap-4 text-base text-ink-2">
                 {[
@@ -543,7 +543,7 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
               <SectionHeading>Calisthenics and the barbell in one planner.</SectionHeading>
               <Lead>
                 {LIBRARY_SIZE} movements, freely licensed, filtered by muscle
-                and by the equipment you can actually reach today. Bar at the gym, rings in a
+                and by the equipment you can reach today. Bar at the gym, rings in a
                 doorway, nothing but the floor. The
                 generator picks from what you have, and the weekly planner keeps both disciplines
                 on the same page.
@@ -641,7 +641,7 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
                     ['The library, the planner, the session', 'Free, and it stays free.'],
                     ['Forget the passphrase and it is gone', 'No reset exists. Nobody can open it, us included.'],
                     ['One browser, one device', 'Clear the site data and the training goes with it.'],
-                    ['Nobody can reach you', 'Gym news and enForma&rsquo;s own both need an account.'],
+                    ['Nobody can reach you', 'Gym news and enForma’s own both need an account.'],
                   ],
                 },
                 {
