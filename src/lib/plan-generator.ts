@@ -234,6 +234,28 @@ export function assemblePlan(
   const dayToOffset: Record<DayOfWeek, number> = { mon: 0, tue: 1, wed: 2, thu: 3, fri: 4, sat: 5, sun: 6 }
   const startDay = (start.getDay() + 6) % 7
 
+  /**
+   * Weeks are calendar weeks, counted from a Monday.
+   *
+   * They used to be a rolling seven days from whenever the plan began, which
+   * put the Monday session at the *end* of every week: a plan started on a
+   * Tuesday read "Week 1 — Monday 7th, Wednesday 2nd, Friday 4th". No date was
+   * wrong and the whole thing read as a bug, in every week rather than only the
+   * first.
+   *
+   * So the grid is anchored to a Monday and the first week keeps whatever
+   * training days are left in it. `firstMonday` is the offset from the start
+   * date to that Monday — negative, into the week already under way.
+   *
+   * Unless nothing is left of it. Somebody who begins on a Sunday with a
+   * Monday/Wednesday/Friday week has no session to place, and an empty first
+   * week is worse than starting on the Monday they would have started on
+   * anyway — so the grid moves forward and nothing is dropped.
+   */
+  const trainingDays = blocks[0].days.filter((d) => d.exercises.length > 0)
+  const anyLeftThisWeek = trainingDays.some((d) => (dayToOffset[d.day] ?? 0) >= startDay)
+  const firstMonday = anyLeftThisWeek ? -startDay : 7 - startDay
+
   for (let w = 0; w < actualWeeks; w++) {
     const isDeload = (w + 1) % 4 === 0
     const blockIndex = Math.floor(w / 4) % blocks.length
@@ -242,7 +264,7 @@ export function assemblePlan(
       .map((d) => {
         let exercises = d.exercises
         if (isDeload) exercises = exercises.slice(0, Math.max(2, exercises.length - 2)).map((e) => ({ ...e, progression: 'none' as const }))
-        const offset = ((dayToOffset[d.day] ?? 0) - startDay + 7) % 7 + w * 7
+        const offset = firstMonday + (dayToOffset[d.day] ?? 0) + w * 7
         const date = new Date(start)
         date.setDate(start.getDate() + offset)
         return {
@@ -251,8 +273,14 @@ export function assemblePlan(
           exercises,
           /* A deload week is the one week extra work would undo. */
           ecNote: isDeload ? undefined : d.ecNote,
+          /* Negative only in the first week, for a day already gone. */
+          past: offset < 0,
         }
       })
+      /* Dropped rather than shown greyed out: a session that was over before
+         the plan existed is not something anybody missed. */
+      .filter((d) => !d.past)
+      .map(({ past: _past, ...day }) => day)
     weeks.push({ weekIndex: w, blockIndex, days })
   }
 

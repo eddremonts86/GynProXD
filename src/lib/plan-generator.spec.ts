@@ -128,3 +128,75 @@ describe('assemblePlan with blocks that differ', () => {
     expect(secondMonth).toContain('Barbell_Full_Squat')
   })
 })
+
+/**
+ * When a plan begins on a day that is not Monday.
+ *
+ * The dates were placed as a rolling seven-day window from the start, and the
+ * days were emitted in the template's own weekday order — so a plan begun on a
+ * Tuesday showed "Week 1: Monday 7th, Wednesday 2nd, Friday 4th". Every week
+ * had its Monday at the end, not only the first, and the card read as a bug
+ * even though no date was wrong.
+ *
+ * Weeks are calendar weeks now. The first one holds whatever training days are
+ * left in it, and every week after is the full pattern in order.
+ */
+describe('a plan that starts mid-week', () => {
+  /* A goal a month can actually hold: `base` is 140kg to 80kg, which
+     `resolveDuration` rightly bumps to a year. */
+  const short: OnboardingInput = { ...base, weightKg: 80, targetWeightKg: 78 }
+  const days = (plan: ReturnType<typeof generatePlan>, w: number) =>
+    plan.weeks[w].days.map((d) => `${d.day} ${d.date}`)
+
+  it('starting on a Monday puts the first session on the start date', () => {
+    const plan = generatePlan(short, 'mensual', new Date('2026-01-05'))
+    expect(plan.weeks[0].days[0].date).toBe('2026-01-05')
+    expect(plan.weeks[0].days).toHaveLength(3)
+  })
+
+  it('starting on a Tuesday drops the day already gone', () => {
+    // Tue 1 Sept, training Mon/Wed/Fri. Monday was yesterday: it belongs to
+    // week two, not to the end of week one.
+    const plan = generatePlan(short, 'mensual', new Date('2026-09-01'))
+    expect(days(plan, 0)).toEqual(['wed 2026-09-02', 'fri 2026-09-04'])
+    expect(days(plan, 1)).toEqual(['mon 2026-09-07', 'wed 2026-09-09', 'fri 2026-09-11'])
+  })
+
+  it('never dates a session before the day the plan begins', () => {
+    for (const start of ['2026-09-01', '2026-09-02', '2026-09-03', '2026-09-04', '2026-09-05']) {
+      const plan = generatePlan(short, 'mensual', new Date(start))
+      for (const week of plan.weeks) {
+        for (const day of week.days) {
+          expect(day.date >= start, `${start}: ${day.day} ${day.date}`).toBe(true)
+        }
+      }
+    }
+  })
+
+  it('keeps every week in date order, whichever day it begins', () => {
+    // The visible half of the bug, walked across a whole week of start dates
+    // rather than sampled: the fix is only a fix if it holds for all of them.
+    for (const start of ['2026-09-01', '2026-09-02', '2026-09-03', '2026-09-04', '2026-09-05', '2026-09-06', '2026-09-07']) {
+      const plan = generatePlan(short, 'mensual', new Date(start))
+      for (const week of plan.weeks) {
+        const dates = week.days.map((d) => d.date)
+        expect([...dates].sort(), `${start} week ${week.weekIndex}`).toEqual(dates)
+      }
+    }
+  })
+
+  it('begins the following Monday when nothing is left of this week', () => {
+    // Sunday, training Mon/Wed/Fri: there is no session left to place, and an
+    // empty first week is worse than starting on the Monday a member would
+    // have started on anyway.
+    const plan = generatePlan(short, 'mensual', new Date('2026-09-06'))
+    expect(days(plan, 0)).toEqual(['mon 2026-09-07', 'wed 2026-09-09', 'fri 2026-09-11'])
+    expect(plan.weeks.every((w) => w.days.length > 0)).toBe(true)
+  })
+
+  it('still runs for the weeks it promised', () => {
+    for (const start of ['2026-09-01', '2026-09-06', '2026-01-05']) {
+      expect(generatePlan(short, 'mensual', new Date(start)).weeks).toHaveLength(4)
+    }
+  })
+})
