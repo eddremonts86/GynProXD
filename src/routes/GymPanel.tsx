@@ -717,7 +717,11 @@ export function GymDesk({
                   place to explain what you are selling. */}
               <div className="flex flex-col gap-1.5">
                 <span className="flex flex-wrap items-baseline justify-between gap-2">
-                  <label htmlFor="gym-body" className="text-2xs font-medium text-ink-3">
+                  <label
+                    id="gym-body-label"
+                    htmlFor="gym-body"
+                    className="text-2xs font-medium text-ink-3"
+                  >
                     Message body
                   </label>
                   {!isEmptyHtml(body) && (
@@ -728,6 +732,7 @@ export function GymDesk({
                 </span>
                 <RichTextEditor
                   id="gym-body"
+                  labelledBy="gym-body-label"
                   value={body}
                   onChange={touch(setBody)}
                   placeholder={BODY_PLACEHOLDER[kind]}
