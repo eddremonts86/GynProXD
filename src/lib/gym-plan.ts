@@ -48,6 +48,7 @@ const BUILT = new Set<PlusFeature>([
   'scheduling',
   'reach-window',
   'operators',
+  'branding',
 ])
 
 /**

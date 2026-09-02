@@ -3,8 +3,11 @@ import { Link } from '@tanstack/react-router'
 import { Megaphone, X } from '@phosphor-icons/react'
 import { useSession } from '@/store/useSession'
 import { useMessages } from '@/store/useMessages'
-import { activeBanners } from '@/lib/messages'
+import { activeBanners, scopeOf } from '@/lib/messages'
 import { viewerFor } from '@/lib/profiles'
+import { brandSurface } from '@/lib/brand'
+import { gymBrandColor } from '@/lib/sync'
+import { cn } from '@/lib/utils'
 
 /**
  * The announcement strip under the top bar. Only messages published with a
@@ -16,6 +19,25 @@ export function GymBanner() {
   const gym = useSession((s) => s.gym)
   const messages = useMessages((s) => s.messages)
   const dismissBanner = useMessages((s) => s.dismissBanner)
+
+  /**
+   * The gym's colour, read from the server rather than kept.
+   *
+   * A gym changes it when it changes; a cached copy would leave a member
+   * looking at last month's paint with no way to know why. Absent for a
+   * profile with no account, which is every member who never turned sync on —
+   * they see the app's own colour, which is the honest answer since there is
+   * nothing to ask.
+   */
+  const [brand, setBrand] = useState<string | null>(null)
+  useEffect(() => {
+    if (!profileId || !gym) return
+    let alive = true
+    gymBrandColor(profileId, gym)
+      .then((c) => { if (alive) setBrand(c) })
+      .catch(() => {})
+    return () => { alive = false }
+  }, [profileId, gym])
 
   /* Banners expire on the clock, not on user action: re-check twice a minute. */
   const [now, setNow] = useState(() => Date.now())
@@ -29,10 +51,27 @@ export function GymBanner() {
   const top = banners[0]
   if (!top) return null
 
+  /**
+   * The gym's own colour, when it has one that can carry words.
+   *
+   * Only for its own messages: `scopeOf` is `members` or `open-door` for a gym
+   * and anything else is the platform speaking, which must never arrive wearing
+   * a gym's paint. And only when the colour can carry text — the band that
+   * neither ink clears runs through the middle of the palette, and a banner
+   * nobody can read is worse than one in the app's own colour.
+   */
+  const own = scopeOf(top) === 'members' || scopeOf(top) === 'open-door'
+  const paint = own ? brandSurface(brand) : null
+  const wearing = paint?.text ? paint : null
+
   return (
     <div
       role="status"
-      className="mb-6 flex items-center gap-3 rounded-lg bg-brand px-4 py-3 text-brand-ink shadow-[var(--shadow-panel)]"
+      className={cn(
+        'mb-6 flex items-center gap-3 rounded-lg px-4 py-3 shadow-[var(--shadow-panel)]',
+        wearing ? '' : 'bg-brand text-brand-ink',
+      )}
+      style={wearing ? { background: wearing.bg, color: wearing.ink } : undefined}
     >
       <Megaphone size={18} weight="fill" className="shrink-0 opacity-80" />
       <span className="min-w-0 flex-1">

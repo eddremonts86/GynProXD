@@ -156,7 +156,7 @@ const PLUS: Feature[] = [
   { id: 'reach-window', icon: ChartLineUp, title: 'Reach with no window, exported', body: `Past the ${REACH_WINDOW_DAYS} days, and out as a file you can put next to your own numbers.` },
   { id: 'operators', icon: UsersThree, title: 'Staff who can publish', body: 'Invite the people who actually work the desk, so posting is not one person’s phone. Every message says who sent it, and the roster is the owner’s to change.' },
   { id: 'second-rooms', icon: Buildings, title: 'More than one room', body: 'Two locations under one account, each with its own roster and its own inbox.' },
-  { id: 'branding', icon: Sparkle, title: 'Your name and colour in their app', body: 'The shell your members see, wearing your gym rather than ours.' },
+  { id: 'branding', icon: Sparkle, title: 'Your colour on your own surfaces', body: 'Your banner, your card on their Today screen and your name above a message, in your colour. Not the whole app: the shell stays ours, because it is where a member reads that their training is theirs and unreadable — and a shell wearing your name would quietly tell them otherwise.' },
 ]
 
 const BUILT_PLUS = PLUS.filter((f) => f.id && isBuilt(f.id))
