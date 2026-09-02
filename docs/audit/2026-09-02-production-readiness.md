@@ -81,6 +81,10 @@ the same double sign-in panel that broke five other walks — and neither is in
 any group `run.mjs` knows about. The product's central promise has had no
 automated check for weeks. **Fix:** port both to the shared `door()` and add
 them to `screens`. Then promote `Audit the rules` to a required check.
+*Done, later the same day: both walks were added to CI, and `Audit the rules`
+is a required check on `main` and `dev` after 25 green runs with no flakes.
+`Audit the screens` runs on every pull request and stays optional, because
+two of its walks wait on real clocks and a flake there would block a release.*
 
 ### P1
 
