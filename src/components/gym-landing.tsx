@@ -25,7 +25,14 @@ import { CATALOGUE_SIZE } from '@/data/catalogue-stats'
 import { WGER_SIZE } from '@/data/wger-stats'
 import { REACH_WINDOW_DAYS } from '@/lib/gym-reach'
 import { TEMPLATE_LABELS } from '@/lib/messages'
-import { isBuilt, type PlusFeature } from '@/lib/gym-plan'
+import {
+  ENTERPRISE_GYMS,
+  ENTERPRISE_MATCHES_BASE,
+  ENTERPRISE_SAVING,
+  isBuilt,
+  PRICES,
+  type PlusFeature,
+} from '@/lib/gym-plan'
 import { activeAuthHeader, activeServer, readSyncLink } from '@/lib/sync'
 import { activeProfile } from '@/lib/profiles'
 import { AuthPanel } from '@/components/auth-panel'
@@ -74,7 +81,7 @@ const SECTIONS: LandingSection[] = [
   { id: 'why', label: 'Why they stay', icon: Barbell },
   { id: 'say', label: 'What you can say', icon: Megaphone },
   { id: 'learn', label: 'What you learn', icon: ChartLineUp },
-  { id: 'plans', label: 'Two plans', icon: Receipt },
+  { id: 'plans', label: 'Plans', icon: Receipt },
   { id: 'apply', label: 'Apply', icon: SealCheck },
 ]
 
@@ -92,6 +99,10 @@ const BASE_TEMPLATE_COUNT = TEMPLATE_COUNT - 1
 
 const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
 const spell = (n: number) => WORDS[n] ?? String(n)
+
+/* Grouped, like every other figure on this page: "€1000" beside "2,076" reads
+   as a typo rather than as a price. */
+const money = (n: number) => n.toLocaleString('en-GB')
 
 /** Why the attention exists before anybody sells access to it. */
 const WHY: { icon: Icon; title: string; body: string }[] = [
@@ -276,11 +287,13 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
                   <ArrowRight size={16} weight="bold" />
                 </Button>
                 <Button variant="ghost" onClick={() => jump('plans')}>
-                  See the two plans
+                  See the plans
                 </Button>
               </div>
               <p className="max-w-[52ch] text-2xs leading-relaxed text-ink-3">
-                &euro;200 or &euro;300 a month, per gym. We invoice; nothing on this page charges
+                &euro;{PRICES.base} or &euro;{PRICES.plus} a month per gym, &euro;
+                {money(PRICES.enterprise)} for up to {ENTERPRISE_GYMS}. We invoice; nothing on this
+                page charges
                 you, and applying costs nothing.
               </p>
             </div>
@@ -399,10 +412,11 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
         <section id="plans" className="scroll-mt-4 border-t border-line py-14 md:py-20">
           <div className={cn(READ, 'flex flex-col gap-10')}>
             <div className="flex flex-col gap-4">
-              <SectionHeading>Two plans, and the difference is the day.</SectionHeading>
+              <SectionHeading>Two per gym, and one for a group of them.</SectionHeading>
               <Lead>
                 The first buys everything your gym says. The second buys a place in the screen your
-                members open before they have got their shoes on.
+                members open before they have got their shoes on. The third is for whoever runs
+                more than one room.
               </Lead>
             </div>
 
@@ -412,7 +426,9 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
                 <div className="flex flex-col gap-1.5">
                   <span className="text-sm font-medium text-ink">Base</span>
                   <span className="flex items-baseline gap-1.5">
-                    <span className="num text-4xl leading-none tracking-tight text-ink">&euro;200</span>
+                    <span className="num text-4xl leading-none tracking-tight text-ink">
+                      &euro;{PRICES.base}
+                    </span>
                     <span className="text-xs text-ink-3">a month, per gym</span>
                   </span>
                   <Body className="max-w-[38ch] pt-1">
@@ -433,7 +449,9 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
                     <Tag tone="brand">Everything in Base</Tag>
                   </span>
                   <span className="flex items-baseline gap-1.5">
-                    <span className="num text-5xl leading-none tracking-tight text-ink">&euro;300</span>
+                    <span className="num text-5xl leading-none tracking-tight text-ink">
+                      &euro;{PRICES.plus}
+                    </span>
                     <span className="text-xs text-ink-3">a month, per gym</span>
                   </span>
                   <Body className="max-w-[38ch] pt-1">
@@ -451,7 +469,19 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
                     sixth was built. */}
                 <p className="max-w-[52ch] rounded-lg border border-dashed border-line px-3 py-2.5 text-2xs leading-relaxed text-ink-2">
                   Today, Plus buys you {readable(BUILT_PLUS)}.
-                  {COMING_PLUS.length > 0 && (
+                  {/* Singular and plural both, because the count is counted:
+                      building the second-to-last of these left the sentence
+                      reading "the one marked Coming are not built yet — they
+                      are what Plus becomes", on a page that charges money. */}
+                  {COMING_PLUS.length === 1 && (
+                    <>
+                      {' '}
+                      The one marked <strong className="font-medium text-ink">Coming</strong> is not
+                      built yet &mdash; it is what Plus becomes next, it carries no date, and it
+                      does not change what you pay now.
+                    </>
+                  )}
+                  {COMING_PLUS.length > 1 && (
                     <>
                       {' '}
                       The {spell(COMING_PLUS.length)} marked{' '}
@@ -463,6 +493,57 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
                 </p>
               </Panel>
             </div>
+
+            {/* Third, and deliberately below rather than beside: it is a
+                different question — how many gyms — not a longer list of
+                features, and putting it in the same row would invite reading it
+                as "Plus, but more". */}
+            <Panel tone="quiet" padding="lg" className="flex flex-col gap-5">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <span className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-ink">Enterprise</span>
+                    <Tag tone="brand">Everything in Plus, per gym</Tag>
+                  </span>
+                  <span className="flex items-baseline gap-1.5">
+                    <span className="num text-4xl leading-none tracking-tight text-ink">
+                      &euro;{money(PRICES.enterprise)}
+                    </span>
+                    <span className="text-xs text-ink-3">a month, up to {ENTERPRISE_GYMS} gyms</span>
+                  </span>
+                  <Body className="max-w-[44ch] pt-1">
+                    One account across all of them, each with its own roster, its own members and
+                    its own inbox. A member belongs to the room they train in, not to the company.
+                  </Body>
+                </div>
+                {/* Arithmetic rather than an adjective, and computed from the
+                    two prices above it so it cannot drift from them. A saving a
+                    reader can check is worth more than one they have to take on
+                    trust — and this page is read by people with a calculator. */}
+                <div className="flex flex-col items-start gap-1 rounded-lg border border-dashed border-line px-4 py-3">
+                  <span className="num text-2xl leading-none tracking-tight text-ink">
+                    &euro;{money(ENTERPRISE_SAVING)} less
+                  </span>
+                  <span className="max-w-[32ch] text-2xs leading-relaxed text-ink-3">
+                    than {spell(ENTERPRISE_GYMS)} Plus accounts, which would be &euro;
+                    {money(PRICES.plus * ENTERPRISE_GYMS)} a month.
+                    {ENTERPRISE_MATCHES_BASE && (
+                      <>
+                        {' '}
+                        It is what {spell(ENTERPRISE_GYMS)} gyms on{' '}
+                        <strong className="font-medium text-ink">Base</strong> would cost, with
+                        everything Plus has on all of them.
+                      </>
+                    )}
+                  </span>
+                </div>
+              </div>
+              <p className="max-w-[64ch] border-t border-line pt-4 text-2xs leading-relaxed text-ink-2">
+                More than {spell(ENTERPRISE_GYMS)}? Tell us how many and we will price it. There is
+                no ladder of tiers behind this — the number of gyms on an account is a number, and
+                we set it to whatever you actually run.
+              </p>
+            </Panel>
 
             <p className="max-w-[64ch] text-2xs leading-relaxed text-ink-3">
               We invoice monthly and there is no card form anywhere in this product yet. Applying
@@ -538,7 +619,7 @@ function ApplyPanel({ onUnlocked }: { onUnlocked?: () => void }) {
   const [phone, setPhone] = useState('')
   const [city, setCity] = useState('')
   const [size, setSize] = useState<string>(SIZES[1])
-  const [plan, setPlan] = useState<'base' | 'plus'>('plus')
+  const [plan, setPlan] = useState<'base' | 'plus' | 'enterprise'>('plus')
   const [note, setNote] = useState('')
   const [busy, setBusy] = useState(false)
   const [sent, setSent] = useState<Sent>(null)
@@ -661,7 +742,7 @@ function ApplyPanel({ onUnlocked }: { onUnlocked?: () => void }) {
       <div className="flex flex-col gap-2">
         <span className="text-2xs font-medium text-ink-3">Which plan brought you here</span>
         <div className="flex flex-wrap gap-1.5">
-          {(['base', 'plus'] as const).map((key) => (
+          {(['base', 'plus', 'enterprise'] as const).map((key) => (
             <button
               key={key}
               type="button"
@@ -671,7 +752,11 @@ function ApplyPanel({ onUnlocked }: { onUnlocked?: () => void }) {
                 plan === key ? 'bg-brand text-brand-ink' : 'bg-surface-2 text-ink-3 hover:text-ink',
               )}
             >
-              {key === 'base' ? 'Base, €200' : 'Plus, €300'}
+              {key === 'base'
+                ? `Base, €${PRICES.base}`
+                : key === 'plus'
+                  ? `Plus, €${PRICES.plus}`
+                  : `Enterprise, €${money(PRICES.enterprise)}`}
             </button>
           ))}
         </div>

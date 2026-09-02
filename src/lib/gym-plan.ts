@@ -23,6 +23,38 @@
 
 export type GymPlan = 'base' | 'plus'
 
+/**
+ * What each tier costs, and how many gyms it covers.
+ *
+ * Here rather than in the landing because three places read them now: the
+ * pricing section, the apply form's own labels, and the admin queue that says
+ * which tier a gym asked for. The queue had its own hardcoded copy of two of
+ * these, which is two places to update and one place to forget.
+ *
+ * Enterprise is not a `GymPlan`: a gym is still `base` or `plus`, and
+ * Enterprise is a fact about the *account* — how many gyms it may hold. Keeping
+ * it out of that union is deliberate, so no plan check can be handed a value it
+ * has no answer for.
+ */
+export const PRICES = { base: 200, plus: 300, enterprise: 1000 } as const
+
+/** How many gyms an Enterprise account covers before we price it by hand. */
+export const ENTERPRISE_GYMS = 5
+
+/** What five separate Plus accounts would cost, less what Enterprise costs. */
+export const ENTERPRISE_SAVING = PRICES.plus * ENTERPRISE_GYMS - PRICES.enterprise
+
+/**
+ * Whether Enterprise happens to cost exactly what the same gyms on Base would.
+ *
+ * At today's numbers it does — €1,000 is five Base accounts — which is the
+ * clearest thing the pricing page can say about it: the same money, with
+ * everything Plus has on all five. Asserted rather than written into the copy,
+ * so the sentence disappears if a price moves instead of quietly becoming
+ * false.
+ */
+export const ENTERPRISE_MATCHES_BASE = PRICES.enterprise === PRICES.base * ENTERPRISE_GYMS
+
 /** Everything Plus adds, in the order the page lists it. */
 export const PLUS_FEATURES = [
   'kitchen',
