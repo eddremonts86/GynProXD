@@ -166,7 +166,6 @@ const PLUS: Feature[] = [
   { id: 'scheduling', icon: Clock, title: 'Write it now, publish it later', body: 'Monday’s menu on Sunday evening. A week of posts in one sitting. Nobody can read one before its time. The server will not hand it over, not even to somebody asking for it directly.' },
   { id: 'reach-window', icon: ChartLineUp, title: 'Reach with no window, exported', body: `Past the ${REACH_WINDOW_DAYS} days, and out as a file you can put next to your own numbers.` },
   { id: 'operators', icon: UsersThree, title: 'Staff who can publish', body: 'Invite the people who actually work the desk, so posting is not one person’s phone. Every message says who sent it, and the roster is the owner’s to change.' },
-  { id: 'second-rooms', icon: Buildings, title: 'More than one room', body: 'Two locations under one account, each with its own roster and its own inbox.' },
   { id: 'branding', icon: Sparkle, title: 'Your colour on your own surfaces', body: 'Your banner, your card on their Today screen and your name above a message, in your colour. Not the whole app: the shell stays ours, because it is where a member reads that their training is theirs and unreadable, and a shell wearing your name would quietly tell them otherwise.' },
 ]
 
@@ -481,23 +480,25 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
                       its own exceptions; this only has to say what those mean.
                       Still counted, so it cannot go stale the way "the five
                       marked Coming" did the moment a sixth was built. */}
-                  <p className="max-w-[52ch] rounded-lg border border-dashed border-line px-3 py-2.5 text-2xs leading-relaxed text-ink-2">
-                    {COMING_PLUS.length === 1 && (
-                      <>
-                        Everything above is built and working today except the one marked{' '}
-                        <strong className="font-medium text-ink">Coming</strong>. It is what Plus
-                        becomes next, it carries no date, and it does not change what you pay now.
-                      </>
-                    )}
-                    {COMING_PLUS.length > 1 && (
-                      <>
-                        Everything above is built and working today except the{' '}
-                        {spell(COMING_PLUS.length)} marked{' '}
-                        <strong className="font-medium text-ink">Coming</strong>. They are what
-                        Plus becomes, they carry no date, and they do not change what you pay now.
-                      </>
-                    )}
-                  </p>
+                  {COMING_PLUS.length > 0 && (
+                    <p className="max-w-[52ch] rounded-lg border border-dashed border-line px-3 py-2.5 text-2xs leading-relaxed text-ink-2">
+                      {COMING_PLUS.length === 1 && (
+                        <>
+                          Everything above is built and working today except the one marked{' '}
+                          <strong className="font-medium text-ink">Coming</strong>. It is what Plus
+                          becomes next, it carries no date, and it does not change what you pay now.
+                        </>
+                      )}
+                      {COMING_PLUS.length > 1 && (
+                        <>
+                          Everything above is built and working today except the{' '}
+                          {spell(COMING_PLUS.length)} marked{' '}
+                          <strong className="font-medium text-ink">Coming</strong>. They are what
+                          Plus becomes, they carry no date, and they do not change what you pay now.
+                        </>
+                      )}
+                    </p>
+                  )}
                   </div>
                   <ul className="grid content-start gap-x-12 gap-y-5 sm:grid-cols-2 [&>li]:py-0">
                   {PLUS.map((f) => (
@@ -526,7 +527,8 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
                   </span>
                   <Body className="max-w-[44ch] pt-1">
                     One account across all of them, each with its own roster, its own members and
-                    its own inbox. A member belongs to the room they train in, not to the company.
+                    its own inbox, and a switcher at the desk for moving between them. A member
+                    belongs to the room they train in, not to the company.
                   </Body>
                 </div>
                 {/* Arithmetic rather than an adjective, and computed from the
