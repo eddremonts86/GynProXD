@@ -241,3 +241,49 @@ F-05 and F-12 are decisions to record, not code to write.
 
 **This is the hard stop.** Nothing below this line is built until you say which
 of the above to build.
+
+---
+
+## Remediation record — same day
+
+Built on your word: everything marked *mechanical*, nothing marked
+*decision*. One commit per phase, gates between, all verified against a
+running system.
+
+| Phase | Findings | Commit | Verified by |
+| --- | --- | --- | --- |
+| 1 | F-01, F-06, F-09 | `966af04` | test-gate 9/9, test-profiles 9/9, walk all pages ok, saas walker 48 shots / 0 gaps |
+| 2 | F-08 | `5032078` | sandbox on 8790 + preview on 4174 as CI runs it; test-session and test-onboarding clean |
+| 3 | F-02, F-03, F-10 | `c245454`, `f005b77` | the built image on a user-defined network: every header on 7 response kinds, container healthy, 8 walks clean under the CSP |
+| 4 | F-07 | `798e648` | 10 cases, 506/506 overall |
+| 5 | F-11, F-13 | `20973e8` | tsc, tests, lint, build |
+
+Three things the work itself turned up, none in the original list:
+
+- **The unlock list matched by prefix.** `gate.mjs`'s `unlock('Sol')` took
+  "Sol Desk" as readily as Sol; only the walk order had hidden it. Fixed with
+  an exact match on the name span (`card()`), which every walk now uses.
+- **A fresh server's `daily-dish` is a 503 by design**, and Chrome prints the
+  failed load no matter how quietly the client falls back. `watchConsole()`
+  ignores exactly that URL and nothing else; the alternative was a
+  multi-hour recipe crawl in CI.
+- **A strict umask makes the image serve 403s.** `COPY` keeps the checkout's
+  file modes; 0600 illustrations under `/repdb` were unreadable to nginx's
+  worker. Production only escaped because its clone was 0644. The build stage
+  now normalises modes.
+
+One correction to the record: commit `c245454`'s message lists
+`test-banner-menu` as clean under the CSP. It was not — the policy refused
+the http loopback server every account-bearing walk uses — and `f005b77`
+fixes both the policy and the claim.
+
+### Still open — decisions, not code
+
+- **F-04** the coach cap: how many calls per account per day, and refuse or
+  degrade. The meter exists; the cap is a query and a sentence.
+- **F-05** the Coolify token over plain HTTP: TLS on Coolify, or accept in
+  writing.
+- **F-12** the 601 KB exercise chunk: listed so it is not a surprise; a fair
+  trade until it is not.
+- **F-14** a `menus-boundary` walk, in the pattern of the other five.
+- Lighthouse and an axe sweep, which this audit had no tool for.
