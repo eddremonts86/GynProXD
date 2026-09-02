@@ -38,7 +38,7 @@ Every app in this fleet seeds an admin and an ordinary member from
 Here that is:
 
 ```bash
-pnpm seed:accounts --server http://127.0.0.1:8095
+pnpm seed:accounts --server http://127.0.0.1:8090
 ```
 
 Idempotent, and it refuses any server that is not a local address unless you
