@@ -32,8 +32,10 @@
 #   COOLIFY_SYNC_UUID  the PocketBase resource's UUID — optional; unset means
 #                      this workflow never touches the sync server
 #
-# Caveat worth knowing: if COOLIFY_API_URL is http:// rather than https://, the
-# bearer token travels unencrypted from GitHub's runners.
+# COOLIFY_API_URL must stay https://. It was http://<ip>:8000 until 2 Sept,
+# which sent the bearer token unencrypted from GitHub's runners on every push;
+# the instance now has its own hostname and certificate. Reverting it to an IP
+# and a port would quietly undo that, and nothing here would fail to warn you.
 name: Deploy
 
 on:
