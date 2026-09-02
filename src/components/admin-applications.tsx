@@ -7,6 +7,7 @@ import { Panel } from '../ui/Panel'
 import { Tag } from '../ui/Tag'
 import { EmptyState } from '../ui/EmptyState'
 import { FormSelect } from '../ui/FormSelect'
+import { ENTERPRISE_GYMS, PRICES } from '../lib/gym-plan'
 
 /**
  * Gyms asking to be set up.
@@ -140,7 +141,16 @@ export function AdminApplications() {
                     <Tag tone={TONE[row.status] ?? 'neutral'}>
                       {STATUSES.find((s) => s.value === row.status)?.label ?? row.status}
                     </Tag>
-                    <Tag tone="outline">{row.plan === 'base' ? 'Base, €200' : 'Plus, €300'}</Tag>
+                    {/* From the same table the pricing page reads. This had its
+                        own copy of two of these prices, which is a second place
+                        to update and the one that would have been forgotten. */}
+                    <Tag tone="outline">
+                      {row.plan === 'base'
+                        ? `Base, €${PRICES.base}`
+                        : row.plan === 'enterprise'
+                          ? `Enterprise, €${PRICES.enterprise} · up to ${ENTERPRISE_GYMS} gyms`
+                          : `Plus, €${PRICES.plus}`}
+                    </Tag>
                   </span>
                   <span className="text-2xs text-ink-3">
                     {row.contact}

@@ -14,9 +14,16 @@ conversation. A thing everybody has half-remembered is a thing nobody owns.
 **Status: proposed, not decided.** See the design below — it matters that this
 is the same feature as `second-rooms`, priced.
 
-- €500 a month, up to five gyms under one account.
+- €1,000 a month, up to five gyms under one account.
 - Plus at €300 stays exactly one gym.
 - More than five: talk to us. Not a different feature — a different integer.
+
+The price was €500 in the first draft, then €800, and settled at €1,000 because
+that is exactly what five gyms on Base would cost — so the page can say "the
+same money, with everything Plus has on all five", which a reader can check.
+€800 was going to be sold as "save €200", and €200 is only true against Base
+pricing, which would have meant the most expensive tier had fewer features per
+gym than a single Plus account.
 
 ## 2. `second-rooms` — the card still marked `Coming`
 

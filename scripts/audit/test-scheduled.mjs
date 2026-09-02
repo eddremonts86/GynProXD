@@ -6,8 +6,8 @@
  * queueing one and being told plainly that it has reached nobody, and a member
  * whose inbox stays empty until it is time.
  *
- * The wait is real — a message two seconds out, then the clock passing it — so
- * this is slow on purpose. A schedule tested by mocking the clock proves the
+ * The wait is real — a message a minute or so out, then the clock passing it —
+ * so this is slow on purpose. A schedule tested by mocking the clock proves the
  * mock works.
  *
  *   node scripts/audit/test-scheduled.mjs
@@ -85,10 +85,21 @@ try {
   const when = page.getByLabel('Publish at')
   check('Plus offers a time', (await when.count()) > 0, true)
   await page.getByLabel('Title').fill('Monday menu')
-  /* Forty seconds out: long enough to still be queued while the member looks,
-     short enough that waiting for it to arrive is not a coffee break. */
-  const dueAt = Date.now() + 40_000
-  await when.fill(localStamp(dueAt))
+  /**
+   * The deadline is read back off the field, not chosen.
+   *
+   * `<input type="datetime-local">` holds minutes, so `localStamp` truncates —
+   * and asking for "forty seconds from now" gave anywhere from ten seconds to
+   * ninety depending on where in the minute the walk started. It passed or
+   * failed on luck. So: aim comfortably past the next minute boundary, then
+   * take the moment the app will actually use from the value the field holds.
+   */
+  const stamp = localStamp(Date.now() + 100_000)
+  await when.fill(stamp)
+  const dueAt = Date.parse(stamp)
+  if (!(dueAt - Date.now() > 30_000)) {
+    throw new Error(`the schedule landed only ${dueAt - Date.now()}ms out; the stamp is wrong`)
+  }
   await page.waitForTimeout(300)
   const composer = await page.textContent('body')
   check('and says plainly that nobody can read it yet',
