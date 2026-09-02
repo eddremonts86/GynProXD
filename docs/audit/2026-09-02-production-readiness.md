@@ -277,16 +277,19 @@ One correction to the record: commit `c245454`'s message lists
 the http loopback server every account-bearing walk uses — and `f005b77`
 fixes both the policy and the claim.
 
-### Still open — decisions, not code
+### What was still open at that point — all of it closed later the same day
 
-- **F-04** the coach cap: how many calls per account per day, and refuse or
-  degrade. The meter exists; the cap is a query and a sentence.
-- **F-05** the Coolify token over plain HTTP: TLS on Coolify, or accept in
-  writing.
-- **F-12** the 601 KB exercise chunk: listed so it is not a surprise; a fair
-  trade until it is not.
-- **F-14** a `menus-boundary` walk, in the pattern of the other five.
-- Lighthouse and an axe sweep, which this audit had no tool for.
+Left here as it was written, because the section below is the answer to it and
+a record that skips the question reads like nobody asked.
+
+- **F-04** the coach cap → **built**: 20 calls per account per rolling 24 hours.
+- **F-05** the Coolify token over plain HTTP → **fixed**: the instance has its
+  own hostname and certificate, and the secret is `https://`.
+- **F-12** the 601 KB exercise chunk → **accepted**, unchanged.
+- **F-14** a `menus-boundary` walk → **built**, and in the rules group.
+- Lighthouse and an axe sweep → **still not done**. This audit had no tool for
+  either, and adding one was not the audit's call. They remain the largest
+  measured gap in what has been checked.
 
 ---
 
