@@ -769,7 +769,9 @@ A roster is a list on a gym that already exists; more than one location is a
 question about what a gym *is* in the data, since every message, member, join
 code and plan check currently belongs to exactly one row. Shipping the roster
 under that headline would have left half of it unbuilt with nothing marking it,
-so `second-rooms` is now its own entry and carries its own `Coming`.
+so `second-rooms` was its own entry and carried its own `Coming`. It has since
+left the Plus list entirely: several rooms is what Enterprise sells, and a gym
+paying for one should not read it as included.
 
 ### There is an owner
 
