@@ -287,3 +287,96 @@ fixes both the policy and the claim.
   trade until it is not.
 - **F-14** a `menus-boundary` walk, in the pattern of the other five.
 - Lighthouse and an axe sweep, which this audit had no tool for.
+
+---
+
+## The decisions, taken — same day
+
+You handed these back to me to decide. Here is what was decided and why, and
+what was built for each.
+
+### F-04 · The coach cap — **built**
+
+**Twenty calls per account per rolling 24 hours.** Counted over the
+`coach_usage` rows the proxy already wrote, so no new table. Over the limit is
+a 429; both callers already fall back to the deterministic generator on any
+non-2xx, so a member over the limit still gets a programme and never sees an
+error.
+
+Twenty because the intake spends one call per programme and the kitchen one per
+suggestion: that is a working day of both, and still two orders of magnitude
+short of a bill worth noticing. The check runs *before* the vendor-key check —
+"over the limit" is true whether or not this server has a coach, and asking
+first is what makes the boundary provable on a sandbox that has no key and
+spends nothing. Proved by `scripts/audit/coach-cap.mjs`, in the rules group.
+
+### F-05 · The deploy token over plain HTTP — **accepted, in writing**
+
+`COOLIFY_API_URL` stays `http://178.105.106.79:8000`, so the bearer token
+leaves GitHub's runners unencrypted on every push to `main`. Measured: that
+host answers nothing on 443 or on 8000 over TLS, and the Coolify instance has
+no FQDN of its own — only its hosted apps do. Its API cannot add one, and its
+update endpoint cannot even change an application's deploy key, let alone the
+instance's own certificate. So this is not a decision code in this repo can
+carry out.
+
+**Accepted** on these terms: the blast radius of that token is every app on one
+personal server, the exposure is a token in a header on a path from GitHub to a
+Hetzner IP, and the alternative today is not deploying. Two follow-ups a human
+can do in a few minutes each, in this order:
+
+1. Give the Coolify instance a hostname with TLS (Settings → Instance → FQDN),
+   then change the `COOLIFY_API_URL` secret to `https://…`. One-line change here.
+2. Replace the deploy secret with a **deploy-scoped** API token rather than a
+   root one, so a leak deploys rather than owns.
+
+### F-12 · The 601 KB exercise chunk — **accepted, unchanged**
+
+`exercise-details` is loaded on demand and is correctly not precached; what
+every install downloads is `exercise-data` at 243 KB gzipped. That is the price
+of 2,076 movements working offline and it is a fair one. No code, no budget
+check, no split. If it ever stops being fair the split is by muscle group at the
+manifest, and it will be obvious when that day arrives.
+
+### F-14 · The menus boundary — **built**
+
+`scripts/audit/menus-boundary.mjs`, in the pattern of the other five. It asks
+from a rival operator's account, not from the UI: write a card into my gym,
+reprice mine, delete mine, read what my members are charged, read it with no
+gym at all, read it signed out. All refused; the member reads and cannot write.
+
+This closes the gap the finding named — `gym_menus` create and update are
+permissive as rules and correct only because a hook follows the relation, and
+nothing tested what happens if that hook stops loading.
+
+---
+
+## The deploy incident of 2 September, and what caused it
+
+Four consecutive sync deploys failed after the release, with two different
+messages from Coolify (`Failed to read Git source`, then `Failed to read the
+Docker Compose file from the repository`). Both come from the same method, and
+both are wrappers around a shell command run **on the host**: Coolify pre-reads
+the compose file with an anonymous `git ls-remote` plus a sparse checkout before
+the containerised clone ever starts.
+
+Measured from the host itself: **seven of eight anonymous `git ls-remote` calls
+to this public repository were answered with a credentials prompt** — GitHub
+throttling unauthenticated git per IP, on a box that deploys many repositories.
+The in-container clone succeeded every time; only the host-side pre-read failed.
+
+`depends_on` in mapping form was a wrong first hypothesis, committed as
+`2481f7c`-and-superseded reasoning in #56. The list form is still the right
+shape to keep — Coolify's parser is not the only reader of that file — but it
+was not the cause. A plain re-trigger with no code change deployed cleanly.
+
+**The durable fix is pre-staged and needs one dropdown.** A dedicated ed25519
+key now exists as `enForma deploy key` in Coolify (Keys & Tokens) and as a
+**read-only** deploy key on `eddremonts86/enForma`. Attaching it to the two
+applications makes every clone authenticated SSH and removes this failure class
+for good. It has to be done in the Coolify UI: the API's application-update
+endpoint rejects `private_key_uuid` outright, and the only endpoints that accept
+one create a new application, which would drop the environment and volumes.
+
+Until then, a failed sync deploy is a re-run of the job, and production keeps
+serving from the previous container throughout — as it did here.
