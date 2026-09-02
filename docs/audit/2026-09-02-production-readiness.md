@@ -336,9 +336,27 @@ hand with the sync server included — deployed both applications green through
 the new URL. The plain `http://…:8000` endpoint still answers, so nothing that
 has not been switched over is stranded.
 
-**One follow-up left, and it is not code.** The deploy secret is still a *root*
-API token. A deploy-scoped token would mean a leak deploys rather than owns;
-Coolify mints those in Keys & Tokens, and its API cannot create one.
+**The token was narrowed too.** `COOLIFY_API_TOKEN` was a *root* token, so a
+leak owned the server rather than merely deploying to it. It is now a token
+scoped to **`deploy` + `read`**, and the difference is measurable rather than
+claimed:
+
+| Request | root | deploy + read |
+| --- | --- | --- |
+| trigger a deploy, poll it | yes | yes |
+| `applications/{uuid}/envs` | **real values** — this is where the PocketBase superuser password was read from earlier today | 200, every value **empty** |
+| `security/keys` | full records | metadata only, no private key material |
+| `DELETE applications/{uuid}` | yes | **403** |
+
+`read:sensitive` is the permission that returns values, and it is deliberately
+not granted. Verified by a full `Deploy` run with the sync server included,
+green on the new token.
+
+It does not expire, on purpose: an unattended CI credential that dies quietly
+is an outage nobody has scheduled, and the scope is now small enough that
+longevity is the lesser risk. Worth knowing: the **root** token still in the
+fleet's local `.env` **expires on 28 September 2026**, and nothing warns about
+that either.
 
 ### F-12 · The 601 KB exercise chunk — **accepted, unchanged**
 
