@@ -14,7 +14,6 @@ import {
   gymDesk,
   gymJoinCode,
   inviteOperator,
-  operatedGymId,
   pendingJoinRequests,
   removeFromDesk,
   setGymBrand,
@@ -93,21 +92,22 @@ export function GymRequests() {
 }
 
 /** Show and set the code that lets members join this gym instantly. */
-export function GymJoinCode() {
+export function GymJoinCode({ gymId }: { gymId: string | null }) {
   const profileId = activeProfile()?.id ?? null
-  const [gymId, setGymId] = useState<string | null>(null)
   const [code, setCode] = useState('')
   const [saved, setSaved] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  /* The gym comes from the panel's own choice now. It used to look up "the gym
+     this account operates", which had no answer once an account could operate
+     five. */
   useEffect(() => {
-    if (!profileId) return
-    void operatedGymId(profileId).then((id) => {
-      setGymId(id)
-      if (id) void gymJoinCode(profileId, id).then((c) => { setSaved(c); if (c) setCode(c) }).catch(() => {})
-    })
-  }, [profileId])
+    if (!profileId || !gymId) return
+    void gymJoinCode(profileId, gymId)
+      .then((c) => { setSaved(c); if (c) setCode(c) })
+      .catch(() => {})
+  }, [profileId, gymId])
   if (!profileId || !gymId) return null
 
   const save = async () => {
