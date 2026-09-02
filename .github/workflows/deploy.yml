@@ -1,8 +1,17 @@
 # Tell Coolify that `main` moved, and wait to hear whether it worked.
 #
-# Coolify's "public repository" source installs no webhook and never deploys on
-# its own — five merges once sat undeployed for two hours behind that. The
-# trigger therefore lives here, where it is versioned and reviewable.
+# The trigger lives here, where it is versioned and reviewable, and it is the
+# only one. It began as a necessity: Coolify's "public repository" source
+# installs no webhook and never deploys on its own, and five merges once sat
+# undeployed for two hours behind that.
+#
+# Both apps now use a GitHub App source instead — anonymous git from that host
+# was being throttled by GitHub, which failed four sync deploys on 2 Sept — and
+# a GitHub App *does* deliver push webhooks. So "Auto Deploy" is deliberately
+# switched off on both applications in Coolify. Turning it back on would deploy
+# every push twice, and would restart PocketBase under whoever is mid-sync on
+# pushes that changed nothing it runs; the `what` job below exists precisely to
+# avoid that.
 #
 # The talking-to-Coolify part lives in ai-os, not here. Those forty lines were
 # written four times across this fleet and got three different things wrong in

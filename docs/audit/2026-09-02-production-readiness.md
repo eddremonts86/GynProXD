@@ -370,13 +370,30 @@ The in-container clone succeeded every time; only the host-side pre-read failed.
 shape to keep — Coolify's parser is not the only reader of that file — but it
 was not the cause. A plain re-trigger with no code change deployed cleanly.
 
-**The durable fix is pre-staged and needs one dropdown.** A dedicated ed25519
-key now exists as `enForma deploy key` in Coolify (Keys & Tokens) and as a
-**read-only** deploy key on `eddremonts86/enForma`. Attaching it to the two
-applications makes every clone authenticated SSH and removes this failure class
-for good. It has to be done in the Coolify UI: the API's application-update
-endpoint rejects `private_key_uuid` outright, and the only endpoints that accept
-one create a new application, which would drop the environment and volumes.
+**Fixed at the source, the same afternoon.** Coolify offers no deploy-key
+selector for an application created from a public repository — the first
+attempt at this assumed it did, and the `Git Source` tab says only
+"Currently connected source: Public GitHub" with no key to choose. The
+supported route is a **GitHub App source**, which did not exist on this
+instance:
 
-Until then, a failed sync deploy is a re-run of the job, and production keeps
-serving from the previous container throughout — as it did here.
+- `coolify-eddremonts86` created as a GitHub App and installed on
+  **`eddremonts86/enForma` only**, not all repositories: that box's API speaks
+  plain HTTP and its database holds the App's private key, so the narrower the
+  grant the better (see F-05).
+- Both applications switched to it. Every clone and every compose pre-read is
+  now authenticated, so there is no anonymous request left to throttle.
+- Proved by **three consecutive sync deploys**, on the exact path that had
+  failed four times in a row. The brief 503 after the third was the container
+  coming up; healthy 30 seconds later.
+- The read-only deploy key staged during the wrong hypothesis was removed from
+  both the repository and Coolify, so no unused credential is left behind.
+
+**One thing the new source brought with it, and one decision about it.** A
+GitHub App delivers push webhooks, which the old public source never did, and
+both applications had **Auto Deploy** switched on — so every push to `main`
+would have deployed twice, once by webhook and once by this repository's
+workflow, and the sync server would have restarted on pushes that changed
+nothing it runs. Auto Deploy is now **off** on both. The workflow stays the
+only trigger: it is versioned and reviewable, it waits for the result, and it
+deploys the sync server only when `deploy/pocketbase/` actually changed.
