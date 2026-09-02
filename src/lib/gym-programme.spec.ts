@@ -7,6 +7,7 @@ import {
   programmeMismatch,
 } from './gym-programme'
 import { mergeWithDefaults } from './onboarding-parse'
+import { generatePlan } from './plan-generator'
 import type { GeneratedPlan, OnboardingInput } from './types'
 
 /** An operator's own plan, with everything about their body filled in. */
@@ -231,5 +232,35 @@ describe('the copy a member ends up with', () => {
     const mine = adoptProgramme(published, member)
     expect(mine.id).toMatch(/^gen-/)
     expect(mine.id).not.toContain('adopted')
+  })
+})
+
+/**
+ * A programme published from a plan that began mid-week.
+ *
+ * Blocks are recovered from `plan.weeks`, and the first week of a plan begun on
+ * a Tuesday is short by however many training days had already gone. Taking the
+ * first week seen for each block would publish a two-day week to every member
+ * of the gym — a real programme, missing a session, with nothing saying so.
+ */
+describe('recovering blocks from a real plan', () => {
+  const member = mergeWithDefaults({ weightKg: 80, targetWeightKg: 78, daysPerWeek: 3 })
+
+  it('publishes the full week even when the plan started on a Tuesday', () => {
+    const tuesday = generatePlan(member, 'mensual', new Date('2026-09-01'))
+    expect(tuesday.weeks[0].days).toHaveLength(2)
+    const published = programmeFromPlan(tuesday, 'Hierro Viejo', 'Four weeks')
+    expect(published.blocks[0].days).toHaveLength(3)
+  })
+
+  it('and the same programme whichever day the designer happened to start', () => {
+    const shape = (start: string) =>
+      programmeFromPlan(
+        generatePlan(member, 'mensual', new Date(start)),
+        'Hierro Viejo',
+        'Four weeks',
+      ).blocks.map((b) => b.days.map((d) => d.day).join(','))
+
+    expect(shape('2026-09-01')).toEqual(shape('2026-01-05'))
   })
 })

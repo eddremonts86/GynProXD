@@ -83,7 +83,7 @@ function undated(day: { day: PlannedDay['day']; exercises: PlannedDay['exercises
  * because `GeneratedPlan` stores `blocks` as metadata only — the days live in
  * `weeks`, tagged with `blockIndex`. One week per block is enough: the calendar
  * repeats them, so the second week of a block is the first one again with later
- * dates.
+ * dates — but it has to be a *whole* week, and the first one need not be.
  */
 export function programmeFromPlan(
   plan: GeneratedPlan,
@@ -92,10 +92,21 @@ export function programmeFromPlan(
   blurb?: string,
   id = `gp-${plan.id}`,
 ): GymProgramme {
+  /**
+   * The fullest week of each block, not the first one.
+   *
+   * The first week of a plan begun mid-week is short by however many training
+   * days had already gone — weeks are calendar weeks, so a Tuesday start has no
+   * Monday session in week one. Taking the first week seen would publish that
+   * gap to every member of the gym as if it were the programme, which it is
+   * not: it is an artefact of the day its designer happened to press the
+   * button.
+   */
   const byBlock = new Map<number, PlannedDay[]>()
   for (const week of plan.weeks) {
     const index = week.blockIndex ?? 0
-    if (byBlock.has(index)) continue
+    const held = byBlock.get(index)
+    if (held && held.length >= week.days.length) continue
     byBlock.set(index, week.days.map(undated))
   }
 
