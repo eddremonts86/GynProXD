@@ -25,7 +25,14 @@ import {
   type TemplateKind,
 } from '../lib/messages'
 import { listProfiles } from '../lib/profiles'
-import { gymDesk, publishToServer, readSyncLink, type DeskRow } from '../lib/sync'
+import {
+  gymDesk,
+  operatedGyms,
+  publishToServer,
+  readSyncLink,
+  type DeskRow,
+  type OperatedGym,
+} from '../lib/sync'
 import {
   AudienceStrip,
   CommercialConfirm,
@@ -104,16 +111,92 @@ function exerciseIdByName(name: string): string | null {
   return match?.id ?? null
 }
 
-/** The gym operator's desk: members, composer with templates, sent history. */
+/** Which room this device is looking at, when the account runs more than one. */
+const CHOICE_KEY = (profileId: string) => `forma-gym-choice-${profileId}`
+
+/**
+ * The gym operator's desk: members, composer with templates, sent history.
+ *
+ * One account can now run several gyms, so the first question the desk has to
+ * answer is which one. The profile still carries a single gym name, which is
+ * right for the common case and useless for Enterprise, so the choice lives on
+ * the device: the phone at the front desk of one room should stay on that room
+ * without anybody choosing it again every morning.
+ *
+ * A single-gym operator sees none of this. There is nothing to switch, and a
+ * switcher offering one option is a control that exists to say "no".
+ */
 export function GymPanelPage() {
   const role = useSession((s) => s.role)
   const gym = useSession((s) => s.gym)
   const profileId = useSession((s) => s.profileId)
+  const [rooms, setRooms] = useState<OperatedGym[] | null>(null)
+  const [chosen, setChosen] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!profileId) return
+    void operatedGyms(profileId).then((list) => {
+      setRooms(list)
+      let remembered: string | null = null
+      try {
+        remembered = localStorage.getItem(CHOICE_KEY(profileId))
+      } catch {
+        /* A browser that refuses storage still gets a working desk. */
+      }
+      /* A remembered room that is no longer operated falls back rather than
+         showing an empty desk somebody cannot leave. */
+      const valid = list.some((r) => r.name === remembered)
+      setChosen(valid ? remembered : (list[0]?.name ?? null))
+    })
+  }, [profileId])
 
   if (role !== 'gym' || !gym || !profileId) {
     return <Navigate to={role === 'admin' ? '/admin' : '/'} />
   }
-  return <GymDesk gym={gym} profileId={profileId} />
+
+  const pick = (name: string) => {
+    setChosen(name)
+    try {
+      localStorage.setItem(CHOICE_KEY(profileId), name)
+    } catch {
+      /* Not remembered, still switched. */
+    }
+  }
+
+  /* Until the list arrives, and for every account that runs one room, the desk
+     is the profile's own gym exactly as it always was. */
+  const many = (rooms?.length ?? 0) > 1
+  const current = many ? (chosen ?? gym) : gym
+
+  return (
+    <div className="flex flex-col gap-4">
+      {many && rooms && (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-2xs text-ink-3">Desk for</span>
+          <div role="tablist" aria-label="Which gym" className="flex flex-wrap gap-1.5">
+            {rooms.map((room) => (
+              <button
+                key={room.id}
+                type="button"
+                role="tab"
+                aria-selected={room.name === current}
+                onClick={() => pick(room.name)}
+                className={cn(
+                  'rounded-full px-3 py-1.5 text-2xs transition-colors',
+                  room.name === current
+                    ? 'bg-accent-gym-soft font-medium text-ink'
+                    : 'bg-surface-2 text-ink-2 hover:text-ink',
+                )}
+              >
+                {room.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      <GymDesk key={current} gym={current} profileId={profileId} />
+    </div>
+  )
 }
 
 /**
@@ -1449,7 +1532,7 @@ export function GymDesk({
         <TabPanel value="members" className="flex flex-col gap-4">
           {canOperators && <OperatorRoster gymId={gymId} plan={plan} />}
           {canBranding && <GymBrand gymId={gymId} plan={plan} />}
-          <GymJoinCode />
+          <GymJoinCode gymId={gymId} />
           <Panel padding="lg">
             {members.length === 0 ? (
               <p className="max-w-[40ch] text-sm text-ink-3">
