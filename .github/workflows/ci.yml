@@ -8,6 +8,11 @@
 # and every one of them fails the deploy. An afternoon of green local builds
 # once proved nothing at all about the image that actually ships.
 #
+# The audit walks are the third and fourth jobs. They existed for a long time
+# and nothing ran them, which is how five of them came to be failing at their
+# first step — the landing grew a second sign-in panel and every selector at the
+# door broke at once, silently, for weeks. A test nobody runs is a comment.
+#
 # Both jobs always run and always report. A job that is conditionally skipped
 # cannot be a required status check — GitHub leaves the check pending forever
 # and the branch never becomes mergeable — so the one conditional piece here
@@ -66,6 +71,100 @@ jobs:
       # and exits 0 — which hid type errors here for a whole session.
       - name: Typecheck and build
         run: pnpm build
+
+  # Collection rules, asked of a real PocketBase from the receiving side. No
+  # browser and no app: a leak in a rule does not need the front end to be
+  # involved, and this whole job is about ten seconds.
+  audit-rules:
+    name: Audit the rules
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Fetch PocketBase
+        run: bash .github/scripts/fetch-pocketbase.sh
+
+      - name: Walk the rules
+        run: pnpm audit:rules
+
+  # The app, in a real browser. Slow on purpose: two of these wait on actual
+  # clocks, because a schedule tested against a mocked one proves the mock
+  # works.
+  audit-screens:
+    name: Audit the screens
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Fetch PocketBase
+        run: bash .github/scripts/fetch-pocketbase.sh
+
+      # Chromium only: every walk launches `chromium` by name.
+      - name: Install the browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      # The built app rather than the dev server, so what is walked is what
+      # ships. `--strictPort` because a preview that quietly moved would leave
+      # every walk talking to nothing.
+      - name: Build and serve
+        run: |
+          pnpm build
+          pnpm exec vite preview --port 4173 --strictPort &
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:4173/ >/dev/null; then
+              echo "serving on 4173"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error title=No app::vite preview never answered on 4173."
+          exit 1
+
+      - name: Walk the screens
+        env:
+          BASE_URL: http://localhost:4173
+        run: pnpm audit:screens
+
+      # The contrast probe and the route sweep both leave pictures behind, and
+      # a failure is far easier to read with them than without.
+      - name: Keep the screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-screens
+          path: |
+            docs/impeccable/shots/
+            .audit-shots/
+          if-no-files-found: ignore
+          retention-days: 7
 
   images:
     name: Build the images Coolify ships

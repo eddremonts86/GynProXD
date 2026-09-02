@@ -8,6 +8,9 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "test": "vitest run",
+    "audit": "node scripts/audit/run.mjs",
+    "audit:rules": "node scripts/audit/run.mjs rules",
+    "audit:screens": "node scripts/audit/run.mjs screens",
     "seed:accounts": "node --env-file-if-exists=.env.local --env-file-if-exists=.env scripts/admin/seed-default-accounts.ts",
     "preview": "vite preview"
   },
