@@ -199,7 +199,7 @@ export function GymHeroProof({ libraryFigure }: { libraryFigure: string }) {
       <div className="flex items-baseline gap-3 border-t-2 border-accent-member bg-surface-2 px-5 py-4 md:px-6">
         <span className="num-dot shrink-0 text-xl leading-none text-ink">{libraryFigure}</span>
         <span className="text-2xs leading-relaxed text-ink-3">
-          movements, the planner and the history &mdash; free, already on their phone
+          movements, the planner and the history: free, already on their phone
         </span>
       </div>
     </Panel>
