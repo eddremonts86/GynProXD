@@ -1,4 +1,10 @@
 import { chromium } from 'playwright'
+
+/* Screenshots go under `.audit-shots/`, which is gitignored, like every other
+   walk's. They used to land in `docs/impeccable/shots/`, where twelve of them
+   were tracked — so running the audit locally produced a twelve-file binary
+   diff that meant nothing but showed up in every `git status` afterwards. The
+   other files in that directory stay: the phase documents reference them. */
 import { ensureProfile } from './gate.mjs'
 
 const BASE = process.env.BASE_URL ?? 'http://localhost:3015'
@@ -49,7 +55,7 @@ for (const vp of viewports) {
     if (await toggle.count() > 0) console.log('  theme toggle ok')
     // check for console errors
     // take screenshot for evidence
-    await page.screenshot({ path: `docs/impeccable/shots/verify-${vp.name}-${r.name}.png`, fullPage: false })
+    await page.screenshot({ path: `.audit-shots/verify/${vp.name}-${r.name}.png`, fullPage: false })
   }
   // test interactions: onboarding generate flow
   console.log('-> testing onboarding generate flow')
