@@ -310,25 +310,32 @@ short of a bill worth noticing. The check runs *before* the vendor-key check —
 first is what makes the boundary provable on a sandbox that has no key and
 spends nothing. Proved by `scripts/audit/coach-cap.mjs`, in the rules group.
 
-### F-05 · The deploy token over plain HTTP — **accepted, in writing**
+### F-05 · The deploy token over plain HTTP — **fixed**
 
-`COOLIFY_API_URL` stays `http://178.105.106.79:8000`, so the bearer token
-leaves GitHub's runners unencrypted on every push to `main`. Measured: that
-host answers nothing on 443 or on 8000 over TLS, and the Coolify instance has
-no FQDN of its own — only its hosted apps do. Its API cannot add one, and its
-update endpoint cannot even change an application's deploy key, let alone the
-instance's own certificate. So this is not a decision code in this repo can
-carry out.
+`COOLIFY_API_URL` was `http://178.105.106.79:8000`, so on every push to `main`
+the bearer token that can deploy any app on that server left GitHub's runners
+unencrypted. It was accepted in writing earlier today on the grounds that the
+instance answered nothing on TLS and had no hostname of its own. Both halves of
+that turned out to be one setting away from false:
 
-**Accepted** on these terms: the blast radius of that token is every app on one
-personal server, the exposure is a token in a header on a path from GitHub to a
-Hetzner IP, and the alternative today is not deploying. Two follow-ups a human
-can do in a few minutes each, in this order:
+- `coolify.eduardoinerarte.dk` already resolved to the server, and Traefik was
+  already terminating TLS there for the hosted apps — the instance simply had
+  no router of its own, so that name 404'd over http and had no certificate.
+- Coolify's own **URL** setting (Settings → Configuration → General) is what
+  creates that router. Set to `https://coolify.eduardoinerarte.dk`, Traefik
+  issued a Let's Encrypt certificate (`CN=coolify.eduardoinerarte.dk`, valid to
+  1 December 2026) within seconds.
 
-1. Give the Coolify instance a hostname with TLS (Settings → Instance → FQDN),
-   then change the `COOLIFY_API_URL` secret to `https://…`. One-line change here.
-2. Replace the deploy secret with a **deploy-scoped** API token rather than a
-   root one, so a leak deploys rather than owns.
+The `COOLIFY_API_URL` secret and the fleet's local copy now both point at
+`https://coolify.eduardoinerarte.dk`. Verified: the authenticated API answers
+200 over TLS with a verified chain, and a full `Deploy` run — dispatched by
+hand with the sync server included — deployed both applications green through
+the new URL. The plain `http://…:8000` endpoint still answers, so nothing that
+has not been switched over is stranded.
+
+**One follow-up left, and it is not code.** The deploy secret is still a *root*
+API token. A deploy-scoped token would mean a leak deploys rather than owns;
+Coolify mints those in Keys & Tokens, and its API cannot create one.
 
 ### F-12 · The 601 KB exercise chunk — **accepted, unchanged**
 
