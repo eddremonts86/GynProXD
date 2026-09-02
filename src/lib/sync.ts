@@ -851,6 +851,34 @@ export async function gymDesk(profileId: string, gymId: string): Promise<DeskRow
   return rows
 }
 
+/** Set or clear the gym's colour. Empty goes back to the app's own. */
+export async function setGymBrand(
+  profileId: string,
+  gymId: string,
+  color: string,
+): Promise<{ color: string }> {
+  const l = link(profileId)
+  return request(l.server, '/api/enforma/gym/set-brand', {
+    method: 'POST',
+    token: l.token,
+    body: { gym: gymId, color: color.trim() },
+  })
+}
+
+/**
+ * The colour of the gym a member belongs to, if it has one.
+ *
+ * Read from the gym row, which a member can already list. Cached nowhere: it
+ * changes when a gym decides it changes, and a stale copy would leave somebody
+ * looking at last month's colour with no way to know why.
+ */
+export async function gymBrandColor(profileId: string, gymName: string): Promise<string | null> {
+  const l = readSyncLink(profileId)
+  if (!l?.token) return null
+  const gyms = await fetchGyms(l).catch(() => [])
+  return gyms.find((g) => sameName(g.name, gymName))?.brand_color || null
+}
+
 /** Invite an address to the desk. Says the same thing whether or not it exists. */
 export async function inviteOperator(
   profileId: string,
@@ -969,6 +997,8 @@ interface GymRow {
   operators: string[]
   /** 'house' on the one row the platform speaks through; absent on old servers. */
   kind?: string
+  /** '#rrggbb', or empty on a gym that never set one. */
+  brand_color?: string
 }
 
 interface WireMessage {

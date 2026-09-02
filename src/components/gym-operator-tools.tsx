@@ -7,6 +7,8 @@ import { Panel } from '@/ui/Panel'
 import { Tag } from '@/ui/Tag'
 import { activeProfile } from '@/lib/profiles'
 import {
+  activeAuthHeader,
+  activeServer,
   activeSyncUserId,
   decideJoinRequest,
   gymDesk,
@@ -15,11 +17,13 @@ import {
   operatedGymId,
   pendingJoinRequests,
   removeFromDesk,
+  setGymBrand,
   setGymJoinCode,
   type DeskRow,
   type JoinRequestRow,
 } from '@/lib/sync'
 import { SEATS_FOR, type GymPlan } from '@/lib/gym-plan'
+import { brandSurface } from '@/lib/brand'
 
 /** Approve or decline members asking to join this gym. */
 export function GymRequests() {
@@ -277,6 +281,153 @@ export function OperatorRoster({ gymId, plan }: { gymId: string | null; plan: Gy
         <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-2xs text-ink-3">
           <Tag tone="outline">Plus</Tag>
           Base covers one person at the desk. Plus covers five.
+        </p>
+      )}
+
+      {status && (
+        <p
+          role="status"
+          className={
+            status.tone === 'good'
+              ? 'rounded-md bg-good-soft px-3 py-2 text-sm text-good'
+              : 'rounded-md bg-danger-soft px-3 py-2 text-sm text-danger'
+          }
+        >
+          {status.text}
+        </p>
+      )}
+    </Panel>
+  )
+}
+
+/**
+ * The gym's colour.
+ *
+ * Only the owner, for the same reason they alone hold the roster: a colour is
+ * the gym's face, and an operator repainting it without the owner knowing is
+ * the same class of act.
+ *
+ * The preview is the point of the control. A gym types a hex and cannot know
+ * what the app will do with it — which surfaces take it, what colour the words
+ * on it become, and whether the words go on it at all. All three are answered
+ * here, before it is saved, by the same functions the member's app will use.
+ */
+export function GymBrand({ gymId, plan }: { gymId: string | null; plan: GymPlan }) {
+  const profileId = activeProfile()?.id ?? null
+  const [color, setColor] = useState('')
+  const [saved, setSaved] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [status, setStatus] = useState<{ tone: 'good' | 'danger'; text: string } | null>(null)
+
+  useEffect(() => {
+    if (!profileId || !gymId) return
+    /* Read back rather than assumed: another operator's device, or a superuser,
+       may have changed it since this panel last drew. */
+    void gymDesk(profileId, gymId).catch(() => [])
+    fetch(`${activeServer()}/api/collections/gyms/records/${gymId}`, {
+      headers: activeAuthHeader() ?? {},
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((row: { brand_color?: string } | null) => {
+        setSaved(row?.brand_color ?? '')
+        setColor(row?.brand_color ?? '')
+      })
+      .catch(() => {})
+  }, [profileId, gymId])
+
+  if (!profileId || !gymId) return null
+
+  const surface = brandSurface(color)
+  const save = async (next: string) => {
+    setBusy(true)
+    setStatus(null)
+    try {
+      const res = await setGymBrand(profileId, gymId, next)
+      setSaved(res.color)
+      setColor(res.color)
+      setStatus({
+        tone: 'good',
+        text: res.color ? 'Saved. Your members see it next time they open the app.'
+          : 'Cleared. Your surfaces go back to enForma’s own colours.',
+      })
+    } catch (e) {
+      setStatus({ tone: 'danger', text: e instanceof Error ? e.message : 'That did not work.' })
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <Panel padding="lg" className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1">
+        <span className="text-sm font-semibold text-ink">Your colour</span>
+        <span className="max-w-[60ch] text-2xs leading-relaxed text-ink-3">
+          Your banner, your card on their Today screen and your name above a message. Not the app
+          around it — that stays ours, because it is where a member reads that their training is
+          theirs and unreadable.
+        </span>
+      </div>
+
+      <div className="flex flex-wrap items-end gap-3">
+        <Input
+          label="Hex"
+          value={color}
+          onChange={(e) => setColor(e.target.value)}
+          placeholder="#1e3a5f"
+          className="w-40"
+        />
+        <Button
+          variant="primary"
+          disabled={busy || !surface || color === saved}
+          onClick={() => void save(color)}
+        >
+          Save
+        </Button>
+        {saved && (
+          <Button variant="ghost" disabled={busy} onClick={() => void save('')}>
+            Clear
+          </Button>
+        )}
+      </div>
+
+      {color.trim() && !surface && (
+        <p className="text-2xs text-danger">A colour looks like #1e3a5f.</p>
+      )}
+
+      {surface && (
+        <div className="flex flex-col gap-2">
+          <span className="text-2xs font-medium text-ink-3">What your members will see</span>
+          <div
+            className="flex items-center justify-between gap-3 rounded-lg px-4 py-3"
+            style={{ background: surface.bg, color: surface.text ? surface.ink : undefined }}
+          >
+            {surface.text ? (
+              <>
+                <span className="text-sm font-medium">The kitchen is open until two</span>
+                <span className="num text-2xs opacity-80">Today</span>
+              </>
+            ) : (
+              <span className="h-5" />
+            )}
+          </div>
+          {!surface.text && (
+            /* Not a rare case: the band that neither ink can carry runs through
+               the middle of the palette. Said plainly, because a gym that saw
+               its colour in some places and not others would reasonably think
+               something was broken. */
+            <p className="max-w-[60ch] text-2xs leading-relaxed text-ink-2">
+              Words on this colour would not be legible — it sits too near the middle for either
+              black or white to carry them. It still marks your edges, rules and dots; anything
+              with words in it uses enForma’s colours so your members can read it.
+            </p>
+          )}
+        </div>
+      )}
+
+      {plan !== 'plus' && (
+        <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-2xs text-ink-3">
+          <Tag tone="outline">Plus</Tag>
+          Your colour on your own surfaces comes with Plus.
         </p>
       )}
 

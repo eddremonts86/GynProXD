@@ -31,7 +31,7 @@ import {
   CommercialConfirm,
   type BroadcastScope,
 } from '@/components/broadcast-audience'
-import { GymJoinCode, GymRequests, OperatorRoster } from '@/components/gym-operator-tools'
+import { GymBrand, GymJoinCode, GymRequests, OperatorRoster } from '@/components/gym-operator-tools'
 import { DURATION_LABELS, formatShortDate, pluralize } from '../lib/labels'
 import { todayIso } from '../lib/dates'
 import { generatedExercises } from '../data/exercises-generated'
@@ -338,6 +338,7 @@ export function GymDesk({
   /* Base is a one-person desk, which is a description rather than a limit — so
      the panel is still shown, and says so. */
   const canOperators = isBuilt('operators')
+  const canBranding = planAllows(plan, 'branding')
   /* The open door is never a list, so it never narrows to picked names. */
   const sendingWide = canOpenDoor && openDoor && !broadcast
   const windowedDays = windowDays(reachWindow)
@@ -1442,6 +1443,7 @@ export function GymDesk({
 
         <TabPanel value="members" className="flex flex-col gap-4">
           {canOperators && <OperatorRoster gymId={gymId} plan={plan} />}
+          {canBranding && <GymBrand gymId={gymId} plan={plan} />}
           <GymJoinCode />
           <Panel padding="lg">
             {members.length === 0 ? (
