@@ -18,7 +18,7 @@ Point a compose service at this directory (`docker-compose.yml`). First boot:
 3. Gyms are yours to grant: once a gym is verified (and has paid), run
 
    ```bash
-   PB_SU_EMAIL=… PB_SU_PASSWORD=… node scripts/admin/grant-gym.mjs \
+   PB_SUPERUSER_EMAIL=… PB_SUPERUSER_PASSWORD=… node scripts/admin/grant-gym.mjs \
      --server https://<sync-domain> --gym "Iron House" --operators coach@example.com
    ```
 

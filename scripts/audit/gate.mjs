@@ -83,11 +83,24 @@ export function door(page, base) {
     /* Past two profiles the list collapses, which is the point of it. */
     const more = w.getByRole('button', { name: /more on this device$/ })
     if ((await more.count()) > 0) await more.click()
-    await w.getByRole('button', { name }).first().click()
+    await card(name).click()
     await w.getByLabel('Passphrase', { exact: true }).fill(pass)
     await w.getByRole('button', { name: 'Unlock' }).click()
     await inApp(page)
   }
+
+  /**
+   * A profile's card on the unlock list. The button's accessible name is the
+   * whole row — "Sol · since 2 Sep" — so matching on the name alone would take
+   * "Sol" to "Sol Desk" as readily as to Sol. The name sits in its own span,
+   * and an exact text match on that span is the one thing only Sol's card has.
+   */
+  const card = (name) =>
+    panelOf(page)
+      .first()
+      .getByRole('button')
+      .filter({ has: page.getByText(name, { exact: true }) })
+      .first()
 
   /**
    * Grant somebody a role, as an admin, from the admin panel.
@@ -104,7 +117,7 @@ export function door(page, base) {
     await page.waitForTimeout(400)
   }
 
-  return { where, atGate, lock, create, unlock, promote, inApp: () => inApp(page) }
+  return { where, atGate, lock, create, unlock, promote, card, inApp: () => inApp(page) }
 }
 
 /**
@@ -127,4 +140,26 @@ export async function ensureProfile(page, base, name = 'Walker', pass = 'walk-pa
     await w.getByRole('button', { name: 'Unlock' }).click()
   }
   await d.inApp()
+}
+
+/**
+ * Console errors worth failing a walk over.
+ *
+ * Everything the page logs at error level and every uncaught exception, with
+ * one exception of its own: the browser's "Failed to load resource" line for
+ * the dish of the day. A server with no recipe catalogue answers that request
+ * 503 by design, the client falls back to its bundled dishes without a word,
+ * and Chrome still prints the failed load — a line no client code can quiet.
+ * A fresh sandbox has no catalogue; production does. Matched on the URL, not
+ * the text, so nothing else that fails to load gets to hide behind it.
+ */
+export function watchConsole(page) {
+  const errors = []
+  page.on('console', (m) => {
+    if (m.type() !== 'error') return
+    if (m.location()?.url?.includes('/api/enforma/daily-dish')) return
+    errors.push(m.text())
+  })
+  page.on('pageerror', (e) => errors.push(String(e)))
+  return errors
 }

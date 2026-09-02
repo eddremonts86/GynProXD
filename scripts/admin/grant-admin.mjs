@@ -4,7 +4,7 @@
  * proper auth material) — this only marks it platform admin, which the app
  * adopts as role='admin' on that account's next sync, on every device.
  *
- *   PB_SU_EMAIL=… PB_SU_PASSWORD=… node scripts/admin/grant-admin.mjs \
+ *   PB_SUPERUSER_EMAIL=… PB_SUPERUSER_PASSWORD=… node scripts/admin/grant-admin.mjs \
  *     --server http://enforma-sync.localhost --account edd@example.com
  *
  * Idempotent. Use --revoke to remove the grant.
@@ -18,11 +18,11 @@ const args = Object.fromEntries(
 const SERVER = (args.server ?? '').replace(/\/+$/, '')
 const ACCOUNT = args.account
 const REVOKE = args.revoke === true
-const EMAIL = process.env.PB_SU_EMAIL
-const PASSWORD = process.env.PB_SU_PASSWORD
+const EMAIL = (process.env.PB_SUPERUSER_EMAIL ?? process.env.PB_SU_EMAIL)
+const PASSWORD = (process.env.PB_SUPERUSER_PASSWORD ?? process.env.PB_SU_PASSWORD)
 
 if (!SERVER || !ACCOUNT || !EMAIL || !PASSWORD) {
-  console.error('usage: PB_SU_EMAIL=… PB_SU_PASSWORD=… node grant-admin.mjs --server URL --account email [--revoke]')
+  console.error('usage: PB_SUPERUSER_EMAIL=… PB_SUPERUSER_PASSWORD=… node grant-admin.mjs --server URL --account email [--revoke]')
   process.exit(1)
 }
 

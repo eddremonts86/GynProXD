@@ -38,7 +38,8 @@ services:
     build: ./push
     restart: unless-stopped
     depends_on:
-      - pocketbase
+      pocketbase:
+        condition: service_healthy
     environment:
       PB_URL: http://pocketbase:8090
       PB_SUPERUSER_EMAIL: ${PB_SUPERUSER_EMAIL:-}
