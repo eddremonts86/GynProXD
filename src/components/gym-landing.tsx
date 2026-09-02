@@ -17,6 +17,7 @@ import {
   Sparkle,
   Stack,
   Storefront,
+  UsersThree,
   Trophy,
   Users,
 } from '@phosphor-icons/react'
@@ -153,7 +154,8 @@ const PLUS: Feature[] = [
   { id: 'open-door', icon: Storefront, title: 'Reach people with no gym', body: 'The one thing here that wins you somebody you have not already got: an offer to everyone on enForma who has not joined a gym. One a month. You are never told who they are, and there is no location filter — we hold no location for anybody, and we would rather say so than imply a segmentation that does not exist.' },
   { id: 'scheduling', icon: Clock, title: 'Write it now, publish it later', body: 'Monday’s menu on Sunday evening. A week of posts in one sitting. Nobody can read one before its time — the server will not hand it over, not even to somebody asking for it directly.' },
   { id: 'reach-window', icon: ChartLineUp, title: 'Reach with no window, exported', body: `Past the ${REACH_WINDOW_DAYS} days, and out as a file you can put next to your own numbers.` },
-  { id: 'operators', icon: Buildings, title: 'Operators and second rooms', body: 'Staff who can publish, and more than one location under the same account.' },
+  { id: 'operators', icon: UsersThree, title: 'Staff who can publish', body: 'Invite the people who actually work the desk, so posting is not one person’s phone. Every message says who sent it, and the roster is the owner’s to change.' },
+  { id: 'second-rooms', icon: Buildings, title: 'More than one room', body: 'Two locations under one account, each with its own roster and its own inbox.' },
   { id: 'branding', icon: Sparkle, title: 'Your name and colour in their app', body: 'The shell your members see, wearing your gym rather than ours.' },
 ]
 

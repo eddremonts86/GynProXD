@@ -25,13 +25,13 @@ import {
   type TemplateKind,
 } from '../lib/messages'
 import { listProfiles } from '../lib/profiles'
-import { publishToServer, readSyncLink } from '../lib/sync'
+import { gymDesk, publishToServer, readSyncLink, type DeskRow } from '../lib/sync'
 import {
   AudienceStrip,
   CommercialConfirm,
   type BroadcastScope,
 } from '@/components/broadcast-audience'
-import { GymJoinCode, GymRequests } from '@/components/gym-operator-tools'
+import { GymJoinCode, GymRequests, OperatorRoster } from '@/components/gym-operator-tools'
 import { DURATION_LABELS, formatShortDate, pluralize } from '../lib/labels'
 import { todayIso } from '../lib/dates'
 import { generatedExercises } from '../data/exercises-generated'
@@ -72,7 +72,7 @@ import {
   windowStart,
   type ReachWindowKey,
 } from '../lib/gym-reach'
-import { planAllows, planOf, type GymPlan } from '../lib/gym-plan'
+import { isBuilt, planAllows, planOf, type GymPlan } from '../lib/gym-plan'
 import { guestList } from '../lib/gym-responses'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
@@ -273,6 +273,22 @@ export function GymDesk({
    * feature that is now paid for or hand over one that is not.
    */
   const [plan, setPlan] = useState<GymPlan>('base')
+  /* The gym's row id, which the desk needs and the name alone cannot give. */
+  const [gymId, setGymId] = useState<string | null>(null)
+  /**
+   * The desk, which answers two questions the sent list asks: how many people
+   * could have written a message — deciding whether naming one is information
+   * or clutter — and which of them did.
+   *
+   * From the endpoint rather than the message rows: `users` is
+   * `id = @request.auth.id`, so nothing on the wire can carry a colleague's
+   * address and the first build's `expand=author` was never going to return
+   * anything.
+   */
+  const [desk, setDesk] = useState<DeskRow[]>([])
+  const deskSize = desk.length || 1
+  const nameOf = (authorId: string) =>
+    desk.find((p) => `srv-${p.id}` === authorId || p.id === authorId)?.email ?? null
   const [reachWindow, setReachWindow] = useState<ReachWindowKey>('d30')
 
   /* Files need somewhere to live that is not this browser's storage quota, so
@@ -287,7 +303,12 @@ export function GymDesk({
       headers: { authorization: link.token },
     })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-      .then((data: { items: { plan?: string }[] }) => setPlan(planOf(data.items[0]?.plan)))
+      .then((data: { items: { id: string; plan?: string }[] }) => {
+        setPlan(planOf(data.items[0]?.plan))
+        const id = data.items[0]?.id ?? null
+        setGymId(id)
+        if (id) gymDesk(profileId, id).then(setDesk).catch(() => setDesk([]))
+      })
       /* A server that will not say stays on the cheaper answer: refusing a paid
          feature is a complaint, handing over an unpaid one is a habit. */
       .catch(() => setPlan('base'))
@@ -314,6 +335,9 @@ export function GymDesk({
   const canOpenDoor = planAllows(plan, 'open-door')
   /* Write it now, publish it later. */
   const canSchedule = planAllows(plan, 'scheduling')
+  /* Base is a one-person desk, which is a description rather than a limit — so
+     the panel is still shown, and says so. */
+  const canOperators = isBuilt('operators')
   /* The open door is never a list, so it never narrows to picked names. */
   const sendingWide = canOpenDoor && openDoor && !broadcast
   const windowedDays = windowDays(reachWindow)
@@ -1320,7 +1344,14 @@ export function GymDesk({
                               </span>
                             ) : (
                               <>
-                                {formatShortDate(m.createdAt.slice(0, 10))} ·{' '}
+                                {formatShortDate(m.createdAt.slice(0, 10))}
+                                {/* Who wrote it, once there is more than one
+                                    person who could have. On a one-person desk
+                                    the answer was never in doubt and the name
+                                    is noise. */}
+                                {deskSize > 1 && nameOf(m.authorId)
+                                  ? ` · ${nameOf(m.authorId)}`
+                                  : ''} ·{' '}
                                 {m.audience === 'all'
                                   ? 'everyone'
                                   : pluralize(m.audience.length, 'member')}{' '}
@@ -1410,6 +1441,7 @@ export function GymDesk({
         </TabPanel>
 
         <TabPanel value="members" className="flex flex-col gap-4">
+          {canOperators && <OperatorRoster gymId={gymId} plan={plan} />}
           <GymJoinCode />
           <Panel padding="lg">
             {members.length === 0 ? (
