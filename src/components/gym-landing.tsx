@@ -170,21 +170,7 @@ const PLUS: Feature[] = [
   { id: 'branding', icon: Sparkle, title: 'Your colour on your own surfaces', body: 'Your banner, your card on their Today screen and your name above a message, in your colour. Not the whole app: the shell stays ours, because it is where a member reads that their training is theirs and unreadable, and a shell wearing your name would quietly tell them otherwise.' },
 ]
 
-const BUILT_PLUS = PLUS.filter((f) => f.id && isBuilt(f.id))
 const COMING_PLUS = PLUS.filter((f) => f.id && !isBuilt(f.id))
-
-/**
- * "the kitchen", "the kitchen and the reach window", "a, b and c".
- *
- * Lower-cased from the feature titles rather than written a second time, so the
- * sentence and the list above it cannot describe different things.
- */
-function readable(features: Feature[]): string {
-  const names = features.map((f) => f.title.replace(/^The /, 'the ').replace(/^([A-Z])/, (c) => c.toLowerCase()))
-  if (names.length === 0) return 'nothing yet'
-  if (names.length === 1) return names[0]
-  return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`
-}
 
 const SIZES = ['Under 100', '100 to 300', '300 to 800', 'More than 800'] as const
 
@@ -305,25 +291,27 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
 
         {/* -------------------------------------------------- Why they stay */}
         <section id="why" className="scroll-mt-4 border-t border-line py-14 md:py-20">
-          <div className={cn(READ, 'flex flex-col gap-10')}>
-            <div className="flex flex-col gap-4">
+          {/* The heading holds still while the three reasons pass it, the same
+              shape the section below uses. It replaced a full-width stack whose
+              body copy stopped at 58ch, so half the row was empty on every line,
+              and a zig-zag that indented every second item by 12%. With three
+              items that indents exactly one, which reads as a row that slipped
+              rather than as a rhythm. Two columns spend the width the stack was
+              wasting and the reasons no longer need to pretend to be uneven. */}
+          <div className={cn(READ, 'grid gap-10 lg:grid-cols-[1fr_1.5fr] lg:gap-16')}>
+            <div className="flex flex-col gap-4 lg:sticky lg:top-10 lg:self-start">
               <SectionHeading>Reach is worth nothing if the app gets deleted.</SectionHeading>
               <Lead>
                 So the first thing worth your money is not ours to charge for: the reason a member
                 keeps enForma on their phone after the first week.
               </Lead>
             </div>
-            {/* Zig-zag rather than a row of equal cards: each of these is a
-                different length and pretending otherwise flattens all three. */}
             <ul className="flex flex-col divide-y divide-line">
               {WHY.map((item, i) => (
                 <li key={item.title}>
                   <Reveal
                     delay={i * 0.05}
-                    className={cn(
-                      'grid gap-4 py-8 md:grid-cols-[auto_minmax(0,1fr)] md:gap-8',
-                      i % 2 === 1 && 'md:pl-[12%]',
-                    )}
+                    className="grid gap-4 py-8 md:grid-cols-[auto_minmax(0,1fr)] md:gap-8"
                   >
                     {/* Green: this whole section is the member's half of the
                         relationship — why they keep the app at all. */}
@@ -419,9 +407,18 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
               </Lead>
             </div>
 
-            {/* Unequal on purpose: Plus is the argument, Base is the floor. */}
+            {/* Unequal on purpose: Plus is the argument, Base is the floor. The
+                two cards differ by about 570px, which left the cheaper plan
+                floating over a void the length of a screen. Base holds still
+                instead, so the price you are comparing against stays on screen
+                while you read what the dearer one adds. The gap does the work
+                it always did and stops looking like a layout that gave up. */}
             <div className="grid items-start gap-5 lg:grid-cols-[1fr_1.15fr] lg:gap-6">
-              <Panel tone="quiet" padding="lg" className="flex flex-col gap-5">
+              <Panel
+                tone="quiet"
+                padding="lg"
+                className="flex flex-col gap-5 lg:sticky lg:top-10 lg:self-start"
+              >
                 <div className="flex flex-col gap-1.5">
                   <span className="text-sm font-medium text-ink">Base</span>
                   <span className="flex items-baseline gap-1.5">
@@ -463,30 +460,27 @@ export function GymLanding({ onUnlocked }: { onUnlocked?: () => void } = {}) {
                   ))}
                 </ul>
                 {/* The line a gym owner deserves before they are asked for
-                    another hundred euros a month — and counted, so it cannot go
-                    stale the way "the five marked Coming" did the moment a
-                    sixth was built. */}
+                    another hundred euros a month. It used to open by naming
+                    every built feature in turn, which restated the list
+                    directly above it and added six lines to the taller of two
+                    cards that were already 570px apart. The list marks its own
+                    exceptions; this only has to say what those mean. Still
+                    counted, so it cannot go stale the way "the five marked
+                    Coming" did the moment a sixth was built. */}
                 <p className="max-w-[52ch] rounded-lg border border-dashed border-line px-3 py-2.5 text-2xs leading-relaxed text-ink-2">
-                  Today, Plus buys you {readable(BUILT_PLUS)}.
-                  {/* Singular and plural both, because the count is counted:
-                      building the second-to-last of these left the sentence
-                      reading "the one marked Coming are not built yet — they
-                      are what Plus becomes", on a page that charges money. */}
                   {COMING_PLUS.length === 1 && (
                     <>
-                      {' '}
-                      The one marked <strong className="font-medium text-ink">Coming</strong> is not
-                      built yet. It is what Plus becomes next, it carries no date, and it
-                      does not change what you pay now.
+                      Everything above is built and working today except the one marked{' '}
+                      <strong className="font-medium text-ink">Coming</strong>. It is what Plus
+                      becomes next, it carries no date, and it does not change what you pay now.
                     </>
                   )}
                   {COMING_PLUS.length > 1 && (
                     <>
-                      {' '}
-                      The {spell(COMING_PLUS.length)} marked{' '}
-                      <strong className="font-medium text-ink">Coming</strong> are not built yet
-                      . They are what Plus becomes, they carry no date, and they do not change
-                      what you pay now.
+                      Everything above is built and working today except the{' '}
+                      {spell(COMING_PLUS.length)} marked{' '}
+                      <strong className="font-medium text-ink">Coming</strong>. They are what Plus
+                      becomes, they carry no date, and they do not change what you pay now.
                     </>
                   )}
                 </p>
