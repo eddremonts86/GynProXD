@@ -49,6 +49,18 @@ routerAdd('GET', '/api/enforma/capabilities', (e) => {
       hasCatalogue ||
       !!($os.getenv('FATSECRET_CLIENT_ID') && $os.getenv('FATSECRET_CLIENT_SECRET')),
     push: $os.getenv('VAPID_PUBLIC_KEY') || null,
+    /**
+     * Whether this server can actually take a card.
+     *
+     * Both halves, because either one missing is a button that goes nowhere: a
+     * key with no price id opens a checkout for nothing. The client shows the
+     * button only when this is true AND a Pro feature is built, so a member is
+     * never asked for money before there is something behind it.
+     */
+    billing: !!($os.getenv('STRIPE_SECRET_KEY') && $os.getenv('STRIPE_PRICE_MONTHLY')),
+    /* Stripe's own hosted portal, where cancelling happens. A configured URL
+       rather than a route of ours: cancelling is legally theirs to get right. */
+    portal: $os.getenv('STRIPE_PORTAL_URL') || null,
   })
 })
 

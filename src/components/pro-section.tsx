@@ -5,6 +5,9 @@ import { Panel } from '@/ui/Panel'
 import { activeProfile } from '@/lib/profiles'
 import { anythingBuilt } from '@/lib/member-plan'
 import { proStateOf, refreshEntitlement, type ProState } from '@/lib/entitlement'
+import { serverCapabilities } from '@/lib/capabilities'
+import { PRO_PRICE } from '@/lib/member-plan'
+import { activeAuthHeader, activeServer } from '@/lib/sync'
 import { useSession } from '@/store/useSession'
 
 /**
@@ -70,10 +73,12 @@ export function ProSection() {
    */
   const link = useSession((s) => s.linked)
   const [busy, setBusy] = useState(false)
+  const [checkout, setCheckout] = useState<string | null>(null)
   const [, forceRender] = useState(0)
 
   if (!profileId) return null
   const state = proStateOf(profileId)
+  const caps = serverCapabilities()
   const { label, detail } = describe(state)
 
   const recheck = async () => {
@@ -84,6 +89,33 @@ export function ProSection() {
     } finally {
       setBusy(false)
       forceRender((n) => n + 1)
+    }
+  }
+
+  /**
+   * Asks the server to open a Stripe checkout, and goes where it says.
+   *
+   * The URL is Stripe's own domain and the card is entered there. There is no
+   * card field anywhere in this app, in any phase, and this is the reason it
+   * never needs one.
+   */
+  const buy = async () => {
+    if (busy) return
+    setBusy(true)
+    setCheckout(null)
+    try {
+      const base = activeServer().replace(/\/+$/, '') || '/pb'
+      const res = await fetch(`${base}/api/enforma/checkout`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', ...(activeAuthHeader() ?? {}) },
+      })
+      const parsed = (await res.json().catch(() => ({}))) as { url?: unknown }
+      if (res.ok && typeof parsed.url === 'string') window.location.assign(parsed.url)
+      else setCheckout('Stripe could not open a checkout just now. Nothing was charged.')
+    } catch {
+      setCheckout('Could not reach the server. Nothing was charged.')
+    } finally {
+      setBusy(false)
     }
   }
 
@@ -113,9 +145,11 @@ export function ProSection() {
           </p>
         ) : (
           <p className="max-w-[62ch] text-sm text-ink-3">
-            {anythingBuilt()
-              ? 'Pro covers the day planner and what it draws on.'
-              : 'Nothing is sold yet. This is here so an account can already tell you where it stands.'}
+            {!anythingBuilt()
+              ? 'Nothing is sold yet. This is here so an account can already tell you where it stands.'
+              : caps.billing
+                ? `Pro covers the day planner and what it draws on. EUR ${PRO_PRICE} a month, tax added at checkout, cancel any time.`
+                : 'Pro covers the day planner and what it draws on. This server cannot take a card yet.'}
           </p>
         )}
       </div>
@@ -127,12 +161,34 @@ export function ProSection() {
             <span className="text-lg text-ink">{label}</span>
             <p className="max-w-[52ch] text-sm text-ink-3">{detail}</p>
           </div>
-          <Button variant="ghost" size="sm" onClick={() => void recheck()} disabled={busy}>
-            <ArrowsClockwise size={16} className={busy ? 'animate-spin' : undefined} />
-            {busy ? 'Checking' : 'Check again'}
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            {/**
+             * Offered only when the server can actually take a card AND there is
+             * something behind the subscription. Either one missing is a button
+             * that asks for money and delivers nothing, which is the one thing
+             * this panel has refused to do since it was a placeholder.
+             */}
+            {caps.billing && anythingBuilt() && !state.pro && (
+              <Button variant="primary" onClick={() => void buy()} disabled={busy}>
+                {busy ? 'Opening' : `Go Pro, EUR ${PRO_PRICE} a month`}
+              </Button>
+            )}
+            {state.pro && caps.portal && (
+              /* Stripe's own portal. Cancelling is legally theirs to get right
+                 and we do not build a button for it. */
+              <Button variant="secondary" onClick={() => window.location.assign(caps.portal!)}>
+                Manage or cancel
+              </Button>
+            )}
+            <Button variant="ghost" size="sm" onClick={() => void recheck()} disabled={busy}>
+              <ArrowsClockwise size={16} className={busy ? 'animate-spin' : undefined} />
+              {busy ? 'Checking' : 'Check again'}
+            </Button>
+          </div>
         </div>
       )}
+
+      {checkout && <p className="max-w-[62ch] text-sm text-ink-3">{checkout}</p>}
     </Panel>
   )
 }

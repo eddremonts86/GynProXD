@@ -23,10 +23,27 @@ export interface ServerCapabilities {
   recipes: boolean
   /** VAPID public key when the server can deliver Web Push, else null. */
   push: string | null
+  /**
+   * Whether this server can take a card: a Stripe key and a price id, both.
+   *
+   * Absent reads as false, like every other flag here. The direction to be
+   * wrong in is a member not being offered a subscription, rather than a button
+   * that opens a checkout for nothing.
+   */
+  billing: boolean
+  /** Stripe's hosted billing portal, where cancelling happens. Null when unset. */
+  portal: string | null
 }
 
 const CACHE_KEY = 'forma-caps'
-const NONE: ServerCapabilities = { coach: false, coachHost: null, recipes: false, push: null }
+const NONE: ServerCapabilities = {
+  coach: false,
+  coachHost: null,
+  recipes: false,
+  push: null,
+  billing: false,
+  portal: null,
+}
 
 let caps: ServerCapabilities = load()
 
@@ -40,6 +57,8 @@ function load(): ServerCapabilities {
       coachHost: parsed.coachHost === 'self' ? 'self' : parsed.coachHost === 'external' ? 'external' : null,
       recipes: parsed.recipes === true,
       push: typeof parsed.push === 'string' ? parsed.push : null,
+      billing: parsed.billing === true,
+      portal: typeof parsed.portal === 'string' ? parsed.portal : null,
     }
   } catch {
     return NONE
@@ -65,6 +84,9 @@ export async function refreshCapabilities(server = '/pb'): Promise<void> {
         parsed.coachHost === 'self' ? 'self' : parsed.coachHost === 'external' ? 'external' : null,
       recipes: parsed.recipes === true,
       push: typeof parsed.push === 'string' && parsed.push.length > 0 ? parsed.push : null,
+      billing: parsed.billing === true,
+      portal:
+        typeof parsed.portal === 'string' && parsed.portal.length > 0 ? parsed.portal : null,
     }
     try {
       localStorage.setItem(CACHE_KEY, JSON.stringify(caps))

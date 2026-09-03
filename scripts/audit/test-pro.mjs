@@ -32,6 +32,17 @@ import { startSandbox } from './pb-sandbox.mjs'
 const BASE = process.env.BASE_URL ?? 'http://localhost:3015'
 const SHOTS = process.env.SHOT_DIR ?? path.join(import.meta.dirname, '../../.audit-shots')
 
+/**
+ * The sandbox inherits this environment, so it reports `billing: true` and the
+ * checkout button is drawn. The key is a fake and is never used: clicking would
+ * reach Stripe, and what is under test here is the gating, not whether Stripe
+ * accepts our payload. That last part needs a real key and is the one thing in
+ * Phase 7 this cannot prove.
+ */
+process.env.STRIPE_SECRET_KEY = 'sk_test_screens_probe'
+process.env.STRIPE_PRICE_MONTHLY = 'price_screens_probe'
+process.env.STRIPE_PORTAL_URL = 'https://billing.stripe.com/p/login/test_probe'
+
 let failures = 0
 const check = (label, got, want) => {
   const ok = JSON.stringify(got) === JSON.stringify(want)
@@ -98,11 +109,11 @@ try {
   if (!payer) throw new Error('the sync dialog did not create an account')
   await openData()
   check('the panel shows a state', /This account/.test(await stateText()), true)
-  check(
-    'and says nothing is on sale yet',
-    /Nothing is sold yet/.test(await stateText()),
-    true,
-  )
+  /* This used to assert "Nothing is sold yet", which was the honest line while
+     BUILT was empty in Phase 1. Four features later the panel says what Pro
+     covers, and the guard that flipped it is `anythingBuilt()` rather than
+     somebody remembering to come back here. */
+  check('and says what Pro covers', /Pro covers the day planner/.test(await stateText()), true)
 
   console.log('\nwith nothing paid')
   /**
@@ -125,6 +136,14 @@ try {
   await page.waitForTimeout(1500)
   check('says the same thing', /Free/.test(await stateText()), true)
 
+  console.log('\nthe card, when the server can take one')
+  check('a way to pay is offered', await panel().getByRole('button', { name: /^Go Pro/ }).count(), 1)
+  check('with the price on it', /EUR 15 a month/.test(await panel().innerText()), true)
+  check('and what happens to tax', /tax added at checkout/.test(await panel().innerText()), true)
+  check('and no card field anywhere on the page', await page.locator('input[autocomplete*="cc-"], input[name*="card"]').count(), 0)
+  /* Not clicked. The click reaches Stripe with a fake key, and what is being
+     checked is which buttons exist for which state. */
+
   console.log('\nafter a grant')
   const granted = await grantPro(['--account', 'payer@pro.test', '--months', '1'])
   check('the script exits clean', granted.code, 0)
@@ -137,6 +156,12 @@ try {
   /* One picture of the state somebody paid for, for whoever reads the run. */
   await mkdir(SHOTS, { recursive: true })
   await panel().screenshot({ path: path.join(SHOTS, 'pro-subscription.png') })
+
+  console.log('\nand once it is paid')
+  check('the way to pay is gone', await panel().getByRole('button', { name: /^Go Pro/ }).count(), 0)
+  /* Stripe's own portal. Cancelling is legally theirs to get right and there is
+     no button of ours for it. */
+  check('cancelling points at Stripe', await panel().getByRole('button', { name: /Manage or cancel/ }).count(), 1)
 
   console.log('\nwhen it is revoked')
   check('the script exits clean', (await grantPro(['--account', 'payer@pro.test', '--revoke'])).code, 0)

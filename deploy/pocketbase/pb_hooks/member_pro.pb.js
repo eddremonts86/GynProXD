@@ -60,6 +60,23 @@ onRecordUpdateRequest((e) => {
   if (String(e.record.get('pro_source') || '') !== String(before.get('pro_source') || '')) {
     throw new ForbiddenError('A subscription is not something an account sets on itself.')
   }
+  /**
+   * And the customer id, which is the one of these three that is worth stealing.
+   *
+   * `invoice.paid` carries a customer and no account reference, so this field is
+   * the only route from a renewal back to a person. An account that could set it
+   * to somebody else's customer would be pointing that person's renewals at
+   * itself: every month they paid would extend the wrong subscription, and the
+   * person paying would watch theirs lapse.
+   *
+   * Found by `pro-boundary.mjs`, after the migration that added the field had
+   * already claimed in a comment that this guard covered it. It did not.
+   */
+  if (
+    String(e.record.get('stripe_customer') || '') !== String(before.get('stripe_customer') || '')
+  ) {
+    throw new ForbiddenError('A billing customer is not something an account sets on itself.')
+  }
   e.next()
 }, 'users')
 
