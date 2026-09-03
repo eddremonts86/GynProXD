@@ -110,15 +110,23 @@ onRecordUpdateRequest((e) => {
  * verdict draws the screen; the date is what lets a device that goes offline
  * decide for itself for a while, instead of asking a server it cannot reach.
  *
+ * `admin` is the third thing, and it is not a date. Whoever administers the
+ * platform gets every paid surface, because somebody has to be able to open
+ * every screen in the product they run. It is reported rather than written into
+ * `pro_until`: stamping a far-future date on an admin would be a lie in the one
+ * field the billing webhook owns, and it would survive them ceasing to be one.
+ *
  * Nothing about anybody else, and nothing about payment: no customer id, no
  * amount, no card. The account asking already knows what it pays.
  */
 routerAdd('GET', '/api/enforma/me', (e) => {
   if (!e.auth) return e.json(401, { message: 'Sign in first.' })
-  const { dateText, isProAt } = require(`${__hooks}/utils/entitlement.js`)
+  const { dateText, isProAt, isPlatformAdmin } = require(`${__hooks}/utils/entitlement.js`)
   const until = dateText(e.auth.get('pro_until'))
+  const admin = isPlatformAdmin(e.app, e.auth.id)
   return e.json(200, {
     proUntil: until === '' ? null : until,
-    pro: isProAt(until, Date.now()),
+    pro: admin || isProAt(until, Date.now()),
+    admin: admin,
   })
 })

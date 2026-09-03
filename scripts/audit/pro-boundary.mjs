@@ -184,6 +184,22 @@ try {
     `/api/collections/users/records/${member.id}`,
     { pro_until: `${inMonths(12)} 00:00:00.000Z` }, staff.token)).status, 404)
 
+  console.log('\nwhat the app\'s own admin role opens')
+  /**
+   * Every paid surface, because whoever runs the platform has to be able to
+   * open every screen in it. Answered by the server rather than by a
+   * client-side exception, so there is one answer rather than two that can
+   * disagree — and reported rather than written, because stamping a date on an
+   * admin would be a lie in the field the billing webhook owns and would
+   * outlive them being one.
+   */
+  check('an admin is Pro', (await me(staff.token)).json?.pro, true)
+  check('and is told why', (await me(staff.token)).json?.admin, true)
+  check('with no date invented for them', (await me(staff.token)).json?.proUntil, null)
+  check('and nothing written to the field', (await proOf(staff.id)).until, '')
+  check('an ordinary member is not', (await me(member.token)).json?.pro, false)
+  check('nor claimed to be an admin', (await me(member.token)).json?.admin, false)
+
   console.log('\na member subscription')
   const payer = await account('payer@billing.test')
   const periodEnd = Math.floor(Date.now() / 1000) + 30 * 86400

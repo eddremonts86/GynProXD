@@ -51,6 +51,26 @@ describe('decide', () => {
   })
 })
 
+describe('an account that administers the platform', () => {
+  it('is Pro, whatever the date says', () => {
+    // The rule: whoever runs this thing has to be able to open every screen in
+    // it, or they are debugging a product they cannot see.
+    const state = decide({ proUntil: null, checkedAt: new Date(NOW).toISOString(), admin: true }, NOW)
+    expect(state).toEqual({ pro: true, reason: 'admin', until: null })
+  })
+
+  it('stays Pro with a subscription that lapsed years ago', () => {
+    const stale = { proUntil: pb(NOW - 400 * DAY), checkedAt: new Date(NOW - 400 * DAY).toISOString(), admin: true }
+    expect(decide(stale, NOW).pro).toBe(true)
+  })
+
+  it('is not read from an absent flag', () => {
+    // Absent is not admin. The direction to be wrong in is a member being
+    // refused something, not somebody getting the run of the product.
+    expect(decide({ proUntil: null, checkedAt: new Date(NOW).toISOString() }, NOW).pro).toBe(false)
+  })
+})
+
 describe('the grace window', () => {
   it('keeps a subscription that was live the last time we could ask', () => {
     // Paid up to yesterday, last checked a week before that, and since then the

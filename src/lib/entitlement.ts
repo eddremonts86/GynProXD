@@ -42,6 +42,16 @@ export interface Entitlement {
   proUntil: string | null
   /** When this device last got an answer. ISO, this device's clock. */
   checkedAt: string
+  /**
+   * Whether this account administers the platform.
+   *
+   * Cached alongside the date and honoured ahead of it, because whoever runs
+   * this thing has to be able to open every screen in it. Not a date, and not
+   * written into `pro_until`: stamping a far-future date on an admin would be a
+   * lie in the field the billing webhook owns, and it would outlive them being
+   * one. The server decides; this is where the answer is kept.
+   */
+  admin?: boolean
 }
 
 /**
@@ -51,7 +61,7 @@ export interface Entitlement {
  * not told they have not paid. Getting that sentence wrong is the kind of
  * accusation people remember.
  */
-export type ProReason = 'active' | 'grace' | 'lapsed' | 'unknown'
+export type ProReason = 'active' | 'grace' | 'lapsed' | 'unknown' | 'admin'
 
 export interface ProState {
   pro: boolean
@@ -77,6 +87,10 @@ function instant(text: string | null): number {
  */
 export function decide(cache: Entitlement | null, nowMs: number): ProState {
   if (!cache) return { pro: false, reason: 'unknown', until: null }
+
+  /* Before the date, and regardless of it. An admin with a lapsed subscription
+     is still an admin, and an admin who has never paid is the ordinary case. */
+  if (cache.admin) return { pro: true, reason: 'admin', until: null }
 
   const until = instant(cache.proUntil)
   if (!Number.isFinite(until)) {
@@ -112,6 +126,7 @@ export function readEntitlement(profileId: string): Entitlement | null {
     return {
       proUntil: typeof parsed.proUntil === 'string' ? parsed.proUntil : null,
       checkedAt: parsed.checkedAt,
+      admin: parsed.admin === true,
     }
   } catch {
     return null
@@ -185,10 +200,11 @@ export async function refreshEntitlement(profileId: string): Promise<ProState> {
       signal: AbortSignal.timeout(4000),
     })
     if (!res.ok) return publish(profileId, proStateOf(profileId))
-    const parsed = (await res.json()) as { proUntil?: unknown }
+    const parsed = (await res.json()) as { proUntil?: unknown; admin?: unknown }
     const cache: Entitlement = {
       proUntil: typeof parsed.proUntil === 'string' ? parsed.proUntil : null,
       checkedAt: new Date().toISOString(),
+      admin: parsed.admin === true,
     }
     try {
       localStorage.setItem(KEY_PREFIX + profileId, JSON.stringify(cache))

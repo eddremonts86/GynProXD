@@ -33,6 +33,12 @@ function formatDate(iso: string | null): string | null {
 
 function describe(state: ProState): { label: string; detail: string } {
   const until = formatDate(state.until)
+  if (state.reason === 'admin') {
+    return {
+      label: 'Pro',
+      detail: 'This account administers the platform, so every paid surface is open to it.',
+    }
+  }
   if (state.reason === 'active') {
     return {
       label: 'Pro',

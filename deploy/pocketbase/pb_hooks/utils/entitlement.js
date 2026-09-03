@@ -85,4 +85,26 @@ function isPro(app, userId, nowMs) {
   }
 }
 
-module.exports = { dateText, parseInstant, isProAt, isPro }
+/**
+ * Whether this account administers the platform.
+ *
+ * An admin gets every paid surface, and that is a product rule rather than a
+ * courtesy: the person who runs this thing has to be able to open every screen
+ * in it, or they are debugging a product they cannot see. It is answered here,
+ * on the server, next to the other half of the same question — a client-side
+ * exception would be one more place for the two answers to disagree.
+ *
+ * `platform_admins` is the same collection the app already reads to hand an
+ * account the admin role on every device it signs into.
+ */
+function isPlatformAdmin(app, userId) {
+  if (!userId) return false
+  try {
+    app.findFirstRecordByFilter('platform_admins', 'owner = {:o}', { o: userId })
+    return true
+  } catch {
+    return false
+  }
+}
+
+module.exports = { dateText, parseInstant, isProAt, isPro, isPlatformAdmin }

@@ -138,6 +138,33 @@ try {
   await page.waitForTimeout(1500)
   check('says the same thing', /Free/.test(await stateText()), true)
 
+  console.log('\nan account that administers the platform')
+  /**
+   * Every paid surface, and it was not so until somebody tried to demonstrate
+   * the product with an admin account and found the gate in the way. Whoever
+   * runs this thing has to be able to open every screen in it.
+   *
+   * Granted through `platform_admins` and answered by the server, with nothing
+   * written into `pro_until`: a date stamped on an admin would be a lie in the
+   * field the billing webhook owns, and it would outlive them being one.
+   */
+  await grantPro(['--account', 'payer@pro.test', '--revoke'])
+  await pb.api('POST', '/api/collections/platform_admins/records', { owner: payer.id }, pb.su)
+  await panel().getByRole('button', { name: /Check again|Checking/ }).click()
+  await page.waitForTimeout(1500)
+  const asAdmin = await panel().innerText()
+  check('is Pro with no subscription at all', /\bPro\b/.test(asAdmin), true)
+  check('and is told why', /administers the platform/.test(asAdmin), true)
+  check('the day is open to them', await page.getByRole('link', { name: 'Your day' }).count(), 1)
+  check('and so is the module switch', await page.getByRole('region', { name: 'Intimate activity' }).getByRole('switch').count(), 1)
+  /* Put it back, so the checks below are about a paying member again. */
+  const adminRow = await pb.api('GET',
+    `/api/collections/platform_admins/records?filter=${encodeURIComponent(`owner = "${payer.id}"`)}`, undefined, pb.su)
+  await pb.api('DELETE', `/api/collections/platform_admins/records/${adminRow.json.items[0].id}`, undefined, pb.su)
+  await panel().getByRole('button', { name: /Check again|Checking/ }).click()
+  await page.waitForTimeout(1500)
+  check('and it goes away when the role does', /administers the platform/.test(await panel().innerText()), false)
+
   console.log('\nthe card, when the server can take one')
   check('a way to pay is offered', await panel().getByRole('button', { name: /^Go Pro/ }).count(), 1)
   check('with the price on it', /EUR 15 a month/.test(await panel().innerText()), true)
