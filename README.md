@@ -69,6 +69,34 @@ all fall back to the built-in deterministic generator.
 - **Local profiles.** Per-person encrypted stores on one device, with a lock
   screen, passphrase-gated unlock and one-time migration of pre-profile data.
 
+### Pro, for members
+
+A subscription on the account, EUR 15 a month, tax added at checkout. What it
+buys is a day rather than more of the gym:
+
+- **Your day.** Tell it the hours you do not choose — work, the commute, the
+  school run — and it arranges the session, the day's plate and the challenge
+  day in what is left. It does not fill the day: free time stays free and what
+  did not fit is said out loud rather than dropped.
+- **Describe your week.** One paragraph read into proposed fixed hours, by
+  regexes always and by the coach when the server has one. Nothing is saved
+  until you tap it, and anything worked out rather than quoted is labelled.
+- **Calendars, as files.** Export from whichever calendar you use and pick the
+  file: it reads three weeks ahead, keeps only what blocks time, and shows the
+  titles without storing them unless you ask. The day exports back out the same
+  way. No OAuth, no token on our server that can read your calendar.
+- **What is on locally.** A gym event you said yes to blocks the time you said
+  yes to. An invitation you have not answered stays in the inbox.
+- **Intimate activity.** Arrangements described plainly and filtered by what
+  your body is working around, which is the useful part. Off until you turn it
+  on, adults only, and the switch never leaves the device. Nothing is recorded,
+  nothing is counted, and no calorie figure is printed because the honest one is
+  far below what magazines claim.
+
+Entitlement is one date on the account, so a device that cannot reach the server
+still knows where it stands, with a fortnight of grace. Paying is Stripe's
+hosted checkout: there is no card field anywhere in this codebase.
+
 ## Exercise imagery & data licensing
 
 Clean-room rebuild: zero code or assets from openGym (AGPL). All movement

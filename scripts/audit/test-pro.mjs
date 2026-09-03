@@ -159,6 +159,21 @@ try {
   await mkdir(SHOTS, { recursive: true })
   await panel().screenshot({ path: path.join(SHOTS, 'pro-subscription.png') })
 
+  console.log('\ncoming back from Stripe')
+  /**
+   * The worst moment to get wrong. Stripe redirects the instant the card
+   * clears and the webhook that writes the date arrives separately, so a panel
+   * that read its cache would tell somebody who has just paid that they have
+   * not. The account here is already Pro, so what is checked is the wording of
+   * the moment rather than the polling.
+   */
+  await page.goto(`${BASE}/settings?billing=done`, { waitUntil: 'networkidle' })
+  await page.getByRole('tab', { name: /^Data/ }).click()
+  await page.waitForTimeout(1200)
+  const returned = await panel().innerText()
+  check('is never told they have not paid', /Free|not on Pro/.test(returned), false)
+  check('and lands on Pro once the webhook has', /Paid up to/.test(returned), true)
+
   console.log('\nand once it is paid')
   check('the way to pay is gone', await panel().getByRole('button', { name: /^Go Pro/ }).count(), 0)
   /* Stripe's own portal. Cancelling is legally theirs to get right and there is

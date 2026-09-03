@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ArrowsClockwise, Sparkle } from '@phosphor-icons/react'
 import { Button } from '@/ui/Button'
 import { Panel } from '@/ui/Panel'
@@ -74,7 +74,51 @@ export function ProSection() {
   const link = useSession((s) => s.linked)
   const [busy, setBusy] = useState(false)
   const [checkout, setCheckout] = useState<string | null>(null)
+  /* Initialised from the URL rather than set inside the effect: it is knowable
+     on the first render, and setting it in an effect starts a second one. */
+  const [confirming, setConfirming] = useState(
+    () => typeof window !== 'undefined' && /[?&]billing=done\b/.test(window.location.search),
+  )
   const [, forceRender] = useState(0)
+
+  /**
+   * The moment right after paying, which is the worst one to get wrong.
+   *
+   * Stripe redirects back here the instant the card clears, and the webhook
+   * that writes `pro_until` arrives separately — usually within seconds, and
+   * not guaranteed to be first. Without this the panel reads a cache that says
+   * nothing has been paid and tells somebody who has just paid that they have
+   * not, which is the exact accusation `decide`'s `unknown` reason exists to
+   * avoid everywhere else.
+   *
+   * So: say it is being confirmed, and ask again a few times. `window.location`
+   * rather than the router's search, because the parameter is Stripe's and
+   * belongs to nothing this app declared.
+   */
+  useEffect(() => {
+    if (!profileId || !confirming) return undefined
+    let live = true
+    let tries = 0
+    const ask = async () => {
+      const state = await refreshEntitlement(profileId)
+      tries += 1
+      if (!live) return
+      forceRender((n) => n + 1)
+      /* Fifteen tries at two seconds is half a minute, which is far longer than
+         Stripe usually takes and short enough not to sit there spinning. */
+      if (state.pro || tries >= 15) {
+        setConfirming(false)
+        return
+      }
+      window.setTimeout(() => void ask(), 2000)
+    }
+    void ask()
+    return () => {
+      live = false
+    }
+    /* `confirming` is a real dependency and is listed. It only ever goes true to
+       false, so the re-run it causes falls out at the guard above. */
+  }, [profileId, confirming])
 
   if (!profileId) return null
   const state = proStateOf(profileId)
@@ -158,8 +202,12 @@ export function ProSection() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="flex flex-col gap-0.5">
             <span className="text-2xs text-ink-3">This account</span>
-            <span className="text-lg text-ink">{label}</span>
-            <p className="max-w-[52ch] text-sm text-ink-3">{detail}</p>
+            <span className="text-lg text-ink">{confirming ? 'Confirming' : label}</span>
+            <p className="max-w-[52ch] text-sm text-ink-3">
+              {confirming
+                ? 'Your payment went through. Stripe tells us separately and it usually takes a few seconds.'
+                : detail}
+            </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {/**
