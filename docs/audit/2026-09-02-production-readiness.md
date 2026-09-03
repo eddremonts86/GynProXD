@@ -541,6 +541,31 @@ The app got smaller too, not just the landing: the `Today` route and everything
 it pulls went from 675 KB to 642 KB. It costs about ten more requests there,
 which are multiplexed and precached.
 
+**In production, measured three times after the deploy:**
+
+|              |            | perf | LCP  |
+| ------------ | ---------- | ---- | ---- |
+| `/`          | mobile     |   95 | 2.4s |
+| `/`          | desktop    |  100 | 0.6s |
+| `/for-gyms`  | mobile     | 85–90 | 2.9–3.2s |
+| `/for-gyms`  | desktop    | 97–100 | 0.6s |
+
+**`/` is under the 2.5s target and the target is met there.** 95 and 2.4s came
+back identically on all three runs, so that is the number and not a good one.
+
+**`/for-gyms` is not, and this is where it stops being a bundling problem.** It
+pays 60 KB and one extra round trip that `/` does not, because its page is a
+lazy route: the entry bundle has to arrive and run before the browser learns
+the page exists. 38 KB of that 60 is `motion`, pulled in by the animated proof
+block in the hero, which uses `AnimatePresence` for a real enter-and-exit
+sequence rather than the scroll reveal that came out of `Reveal`. Rewriting
+that in CSS is a change to a designed thing, not a performance fix, and it is
+not mine to make on the way past.
+
+Warming the chunk earlier was tried and measured nothing: `React.lazy` already
+requests it during the first render pass, so asking at module scope moves the
+fetch by less than a render. It was reverted rather than shipped.
+
 **A byte budget, because the LCP ceiling cannot do this job.** Half a second
 moves between two Lighthouse runs on a busy laptop, so a ceiling tight enough
 to catch a 40 KB library arriving on the critical path is a ceiling loose
