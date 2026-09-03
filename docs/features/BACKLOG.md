@@ -56,30 +56,46 @@ already a list per gym.
 The Plus card now has nothing marked `Coming`, and the paragraph that explains
 what `Coming` means is behind a guard so it does not render as an empty box.
 
-## 3. Stripe
+## 3. Stripe — built, in test mode
 
-The page charges €200 / €300 and a person writes the invoice. `gyms.plan` is a
-text field somebody sets by hand, and `1757900000_gym_plan.js` says why: a
-subscription state machine with no payments behind it is a mechanism pretending
-to be a fact.
+`1757900000_gym_plan.js` said why `gyms.plan` was a text field a person set by
+hand: there was no Stripe, and a subscription state machine with no payments
+behind it is a mechanism pretending to be a fact. There are payments behind it
+now.
 
-The page says "we invoice", so it is not a lie — but it is the only thing
-between the landing and actually selling. Enterprise adds a third price to the
-same manual process.
+**The shape is one-directional.** Nothing in the product ever asks Stripe a
+question. The webhook writes `gyms.plan` and `users.gym_cap`, and every gate
+keeps reading those two fields exactly as it did when a human set them. A Stripe
+outage cannot decide whether a gym may publish tonight, and the plan check still
+has no network call in it.
 
-## 3b. Member Pro, and the first consumer payment
+**The subscription hangs off the owner account, not the gym.** One Enterprise
+subscription covers several rooms, so putting it on a `gyms` row would make one
+of five rooms hold the truth for the other four.
 
-The Life Plan feature (`docs/plans/2026-09-03-life-plan.md`) is sold to members
-rather than to gyms, and that is a different problem from §3. Invoicing four
-hundred people by hand is not a process, so Phase 1 of that plan is the first
-real payment path in the product: Stripe Checkout, a webhook, and one date on
-the account (`users.pro_until`).
+**What happens when the money stops** is a product decision, written down in
+`utils/billing.js` where it can be read: `canceled` and `unpaid` drop every gym
+the account owns to `base` and the cap to one, and destroy nothing. The roster,
+the history, the messages and the members all stay, so paying again is a webhook
+rather than a rebuild. `past_due` changes nothing at all, because Stripe is
+still retrying and taking a customer's kitchen away over one failed retry is how
+an expired card becomes a cancellation.
 
-It does not resolve §3. Gyms keep their invoices, because €200 a month from a
-business with a contract is a conversation and a consumer subscription is not.
-What it does is put a webhook, an idempotency ledger and a boundary audit in the
-repo, so whenever somebody decides gyms should self-serve, the mechanism exists
-and only the price ids change.
+`billing-boundary.mjs` computes Stripe's own HMAC and asks the questions from
+outside: unsigned, wrongly signed, signed for different content and signed an
+hour ago are all refused; a real event moves the plan and the cap; cancelling
+leaves the gym standing. The checkout route was also exercised against the real
+Stripe test API, which returned a session and stored the customer.
+
+### Still to do
+
+- **Live keys and a live webhook.** Everything above is `sk_test`. The account
+  currently in use is the fleet's shared BuilderHunt test account; enForma has
+  its own products in it (`enf_sub_*`) but should have its own account before
+  anybody is charged.
+- **A button.** There is no UI that calls `/api/enforma/billing/checkout` yet:
+  the route exists and is proved, and the gym panel still shows what a person
+  provisioned by hand.
 
 ## 4. The gym applications queue is still hands-on
 

@@ -35,6 +35,7 @@ const GROUPS = {
     'menus-boundary',
     'gym-cap-boundary',
     'provisioning-boundary',
+    'billing-boundary',
     'coach-cap',
     'open-door-boundary',
     'scheduled-boundary',
