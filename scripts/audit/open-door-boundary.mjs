@@ -140,6 +140,55 @@ try {
   const row = (seen.json.items ?? [])[0]
   check('the row names the gym that sent it, not the house', row?.gym, plus.id)
   check('and it is not the house row', row?.gym === house.id, false)
+
+  console.log('\nand where it lands')
+  /* Three people the message could reach, differing only in what they said
+     about where they train. The gym never learns which of them matched. */
+  const inTown = await account('lisboa@enforma.test')
+  const elsewhere = await account('porto@enforma.test')
+  await api('PATCH', `/api/collections/users/records/${inTown.id}`, { area: 'Lisboa' }, su)
+  await api('PATCH', `/api/collections/users/records/${elsewhere.id}`, { area: 'porto' }, su)
+  const stored = await api('GET', `/api/collections/users/records/${inTown.id}`, undefined, su)
+  check('an area is stored one way however it was typed', stored.json.area, 'lisboa')
+
+  /* The gym spent its one message for the month further up, and the cap is
+     proved there. Clearing it as a superuser is test setup, not a hole: no
+     account on the wire can do this. */
+  const spent = await api('GET',
+    `/api/collections/gym_messages/records?perPage=50&filter=${encodeURIComponent("scope='open-door'")}`,
+    undefined, su)
+  for (const row of spent.json.items ?? []) {
+    await api('DELETE', `/api/collections/gym_messages/records/${row.id}`, undefined, su)
+  }
+  const aimed = await api('POST', '/api/collections/gym_messages/records',
+    { gym: plus.id, author: plusDesk.id, kind: 'offer', title: 'Lisbon only',
+      scope: 'open-door', area: '  LISBOA ' }, plusDesk.token)
+  const aimedId = aimed.json?.id ?? null
+  check('a gym may aim one at a place', typeof aimedId === 'string', true)
+
+  const canSee = async (who) => {
+    const seen = await api('GET', '/api/collections/gym_messages/records?perPage=50', undefined, who.token)
+    return (seen.json.items ?? []).some((m) => m.id === aimedId)
+  }
+  check('somebody in that place receives it', await canSee(inTown), true)
+  check('somebody elsewhere does not', await canSee(elsewhere), false)
+  check('and somebody who never said where they train does not either',
+    await canSee(loner), false)
+
+  console.log('\nwhat aiming does not buy')
+  /* The whole point: naming a place must not become a way to count who is in
+     it. This is the same question the section above asks, asked again with the
+     one new lever a gym has. */
+  const peekArea = await api('GET',
+    `/api/collections/users/records?perPage=200&filter=${encodeURIComponent("area='lisboa'")}`,
+    undefined, plusDesk.token)
+  check('a gym cannot ask who is in the place it aimed at',
+    (peekArea.json.items ?? []).filter((u) => u.id !== plusDesk.id).length, 0)
+  const back = await api('GET', `/api/collections/gym_messages/records/${aimedId}`, undefined, plusDesk.token)
+  check('and reading its own message back tells it nothing about who got it',
+    Object.keys(back.json).some((k) => /recipient|reader|audience|count/i.test(k)), false)
+
+
 } finally {
   await pb.stop()
 }
