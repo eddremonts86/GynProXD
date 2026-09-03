@@ -492,6 +492,91 @@ required check gets switched off the first week it disagrees with somebody.
 
 ---
 
+### The 400 milliseconds — **closed on the bundle, measured in production**
+
+The section above left mobile LCP at 2.9s in production against a 2.5s target
+and said pre-rendering was no longer the only way to close it. This is the
+other way, and the first thing it needed was to stop guessing.
+
+**First paint is the whole cost.** FCP measured 3.3s and LCP 3.4s on the same
+run: nothing appears at all until the entry bundle has arrived and run, and the
+largest element lands a tenth of a second later. So the reveal animations were
+not delaying anything, the images were not delaying anything, and every
+kilobyte off the critical path moves the number more or less proportionally.
+
+**One wrong hypothesis, measured before it was built.** The app chrome — the
+nav rail, the mobile bar, the utility cluster, ten Phosphor icons — is rendered
+only for a signed-in member and looked like obvious waste on a stranger's first
+paint. Stubbing it out moved the critical path by **8 KB**. The 240-line
+extraction that would have made it lazy was not worth writing, and measuring
+first is the only reason it did not get written.
+
+**What was actually there was `manualChunks`.** Three packages were named into
+two chunks called `ui` and `primitives`. Naming a package welds every module in
+it into one file, and that file joins the critical path the moment *anything*
+on the first paint needs *any* of it:
+
+- `motion` shared its chunk with a CommonJS copy of React that the shell needs.
+  40 KB of animation library therefore loaded before the landing painted — for
+  a scroll reveal a stranger has not scrolled to yet.
+- Base UI arrived whole, dialogs and menus and all, for the two primitives the
+  front door actually uses.
+
+Left to the bundler, both split by who imports them. The front door takes the
+handful it needs; the dialogs travel with the screens that open them.
+
+`Reveal` was rewritten off `motion` at the same time — an IntersectionObserver
+and a CSS transition, the same observer that already lights up the section rail
+two files over. The animation is unchanged: same 24px rise, same 500ms, same
+easing, same once-only, and reduced motion now handled by a media query rather
+than a hook, so it keeps working if the preference changes mid-visit.
+
+|                         | before | after |
+| ----------------------- | ------ | ----- |
+| critical path (gzip)    | 331 KB | 245 KB |
+| `/` mobile, preview LCP |  3.5s  | 3.1s  |
+| `/` mobile, preview perf |   84  |   89  |
+
+The app got smaller too, not just the landing: the `Today` route and everything
+it pulls went from 675 KB to 642 KB. It costs about ten more requests there,
+which are multiplexed and precached.
+
+**In production, measured three times after the deploy:**
+
+|              |            | perf | LCP  |
+| ------------ | ---------- | ---- | ---- |
+| `/`          | mobile     |   95 | 2.4s |
+| `/`          | desktop    |  100 | 0.6s |
+| `/for-gyms`  | mobile     | 85–90 | 2.9–3.2s |
+| `/for-gyms`  | desktop    | 97–100 | 0.6s |
+
+**`/` is under the 2.5s target and the target is met there.** 95 and 2.4s came
+back identically on all three runs, so that is the number and not a good one.
+
+**`/for-gyms` is not, and this is where it stops being a bundling problem.** It
+pays 60 KB and one extra round trip that `/` does not, because its page is a
+lazy route: the entry bundle has to arrive and run before the browser learns
+the page exists. 38 KB of that 60 is `motion`, pulled in by the animated proof
+block in the hero, which uses `AnimatePresence` for a real enter-and-exit
+sequence rather than the scroll reveal that came out of `Reveal`. Rewriting
+that in CSS is a change to a designed thing, not a performance fix, and it is
+not mine to make on the way past.
+
+Warming the chunk earlier was tried and measured nothing: `React.lazy` already
+requests it during the first render pass, so asking at module scope moves the
+fetch by less than a render. It was reverted rather than shipped.
+
+**A byte budget, because the LCP ceiling cannot do this job.** Half a second
+moves between two Lighthouse runs on a busy laptop, so a ceiling tight enough
+to catch a 40 KB library arriving on the critical path is a ceiling loose
+enough to fail on a Tuesday. `bundle-budget.mjs` weighs exactly what
+`index.html` tells the browser it needs before first paint — the entry, its
+`modulepreload` graph, and the stylesheet — and compares it to 265 KB. No
+browser, no network, no variance. The Lighthouse walk keeps its slack and
+measures the consequence.
+
+---
+
 ## The deploy incident of 2 September, and what caused it
 
 Four consecutive sync deploys failed after the release, with two different

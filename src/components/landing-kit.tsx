@@ -1,5 +1,4 @@
-import type { ReactNode } from 'react'
-import { motion, useReducedMotion } from 'motion/react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { ArrowRight, type Icon } from '@phosphor-icons/react'
 import { Wordmark } from '@/components/brand'
 import { ThemeToggle } from '@/components/theme-toggle'
@@ -26,7 +25,19 @@ export const GUTTER = 'px-4 sm:px-6 md:px-8 lg:px-10'
 export const SHELL = `mx-auto w-full max-w-[90rem] ${GUTTER}`
 export const READ = `mx-auto w-full max-w-[82rem] ${GUTTER}`
 
-/** A section that rises into place once, and not at all under reduced motion. */
+/**
+ * A section that rises into place once, and not at all under reduced motion.
+ *
+ * An observer and a CSS transition rather than a motion component. This is the
+ * first thing a stranger downloads, and the animation library it used to need
+ * was 40 KB gzip of the critical path — a fifth of a second on a throttled
+ * phone, spent before anything has been painted, for a fade nobody has reached
+ * yet. The same observer already lights up the section rail two files over.
+ *
+ * Reduced motion is handled in CSS rather than by branching on a hook: the
+ * media query keeps working if the preference changes mid-visit, and there is
+ * no second render.
+ */
 export function Reveal({
   children,
   className,
@@ -36,18 +47,41 @@ export function Reveal({
   className?: string
   delay?: number
 }) {
-  const reduceMotion = useReducedMotion()
-  if (reduceMotion) return <div className={className}>{children}</div>
+  const ref = useRef<HTMLDivElement>(null)
+  const [shown, setShown] = useState(false)
+
+  useEffect(() => {
+    const el = ref.current
+    /* No observer, no staging: show it rather than hide it forever. */
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      setShown(true)
+      return undefined
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return
+        setShown(true)
+        observer.disconnect()
+      },
+      { rootMargin: '-80px' },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-80px' }}
-      transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] }}
+    <div
+      ref={ref}
+      className={cn(
+        'transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
+        shown ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0',
+        'motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none',
+        className,
+      )}
+      style={delay ? { transitionDelay: `${delay}s` } : undefined}
     >
       {children}
-    </motion.div>
+    </div>
   )
 }
 

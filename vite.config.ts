@@ -124,9 +124,31 @@ export default defineConfig(({ mode }) => {
           if (id.includes('src/data/catalogue-stats')) return undefined
           // The movement dataset barely changes, so it gets its own long-lived chunk.
           if (id.includes('src/data/')) return 'exercise-data'
+          // What every page needs on its first paint, and nothing else. A name
+          // here is a promise that every module under it is worth downloading
+          // before anything is on screen, so the list is deliberately short.
           if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('@tanstack') || id.includes('zustand')) return 'vendor'
-          if (id.includes('@phosphor-icons') || id.includes('node_modules/motion')) return 'ui'
-          if (id.includes('@base-ui') || id.includes('class-variance-authority') || id.includes('clsx') || id.includes('tailwind-merge')) return 'primitives'
+          if (id.includes('class-variance-authority') || id.includes('clsx') || id.includes('tailwind-merge')) return 'primitives'
+          /*
+           * Phosphor's icons, Base UI and `motion` used to be named here too,
+           * in two chunks called `ui` and `primitives`. Naming a package is not
+           * free: it welds every module in it into one file, and the file goes
+           * on the critical path as soon as *anything* on the first paint needs
+           * *any* of it.
+           *
+           * That is what happened. `motion` shared its chunk with a CommonJS
+           * copy of React that the shell needs, so 40 KB of animation library
+           * loaded before the landing page painted — for a scroll reveal a
+           * stranger has not got to yet. Base UI arrived whole, dialogs and
+           * menus and all, for the two primitives the front door uses.
+           * Together they were 90 KB gzip of a 308 KB critical path.
+           *
+           * Left to the bundler, these split by who actually imports them:
+           * the front door takes the handful it needs and the dialogs travel
+           * with the screens that open them. It costs about ten more requests
+           * on an app route, which are multiplexed and precached, and that
+           * route got 33 KB smaller anyway.
+           */
           return undefined
         },
       },
