@@ -53,6 +53,9 @@ const DayPage = React.lazy(() => import('./routes/Day').then((m) => ({ default: 
 const DayIntakePage = React.lazy(() =>
   import('./routes/DayIntake').then((m) => ({ default: m.DayIntakePage })),
 )
+const IntimacyPage = React.lazy(() =>
+  import('./routes/Intimacy').then((m) => ({ default: m.IntimacyPage })),
+)
 
 const rootRoute = createRootRoute({
   component: AppShell,
@@ -123,6 +126,7 @@ export const router = createRouter({
     lazyRoute('/', TodayPage),
     lazyRoute('/day', DayPage),
     lazyRoute('/day/intake', DayIntakePage),
+    lazyRoute('/intimacy', IntimacyPage),
     lazyRoute('/planner', PlannerPage),
     lazyRoute('/challenges', ChallengesPage),
     lazyRoute('/story', StoryPage),

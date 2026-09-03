@@ -53,7 +53,7 @@ export const PRO_FEATURES = [
 export type ProFeature = (typeof PRO_FEATURES)[number]
 
 /**
- * What is actually built. Three entries, and they earned it.
+ * What is actually built. Four entries.
  *
  * `day-plan` is `/day`: the anchors somebody enters, and the session, plate and
  * challenge day arranged around them. `companion` is `/day/intake`: a paragraph
@@ -62,8 +62,13 @@ export type ProFeature = (typeof PRO_FEATURES)[number]
  * `calendar` is the `.ics` half of `/day`: a file the member picks, read three
  * weeks ahead into dated busy blocks, and the day exported back out.
  *
- * `culture` and `intimacy` are still names, and the entry for `culture` above
- * says at length why reading the gym bus into the day did not earn it.
+ * `intimacy` is `/intimacy` plus half an hour on the day: arrangements
+ * described plainly, filtered by what a body is working around, with no log, no
+ * streak and no calorie figure. It is off until somebody turns it on in
+ * Settings, and that switch never leaves the device.
+ *
+ * `culture` is still a name, and its entry above says at length why reading the
+ * gym bus into the day did not earn it.
  *
  * Each feature joins this set in the phase that finishes it, which is why the
  * gate and the copy cannot drift apart: one set, read by both. The failure it
@@ -72,7 +77,7 @@ export type ProFeature = (typeof PRO_FEATURES)[number]
  * behind it existed, and the fix was to take the card away rather than to tick
  * it. A `BUILT` set is that lesson written down where it cannot be forgotten.
  */
-const BUILT = new Set<ProFeature>(['day-plan', 'companion', 'calendar'])
+const BUILT = new Set<ProFeature>(['day-plan', 'companion', 'calendar', 'intimacy'])
 
 export function isBuilt(feature: ProFeature): boolean {
   return BUILT.has(feature)

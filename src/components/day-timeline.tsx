@@ -1,4 +1,12 @@
-import { Barbell, CalendarBlank, CalendarX, ForkKnife, Ticket, Trophy } from '@phosphor-icons/react'
+import {
+  Barbell,
+  CalendarBlank,
+  CalendarX,
+  ForkKnife,
+  Heart,
+  Ticket,
+  Trophy,
+} from '@phosphor-icons/react'
 import type { Icon } from '@phosphor-icons/react'
 import { Link } from '@tanstack/react-router'
 import { Panel } from '@/ui/Panel'
@@ -30,6 +38,7 @@ const ICONS: Record<SlotKind, Icon> = {
   training: Barbell,
   meal: ForkKnife,
   challenge: Trophy,
+  intimacy: Heart,
 }
 
 const TONE: Record<SlotKind, string> = {
@@ -39,17 +48,21 @@ const TONE: Record<SlotKind, string> = {
   training: 'text-brand',
   meal: 'text-ink-2',
   challenge: 'text-ink-2',
+  intimacy: 'text-ink-2',
 }
 
 /** Where a slot links to, when it points at something with a screen of its own. */
 function hrefOf(
   slot: DaySlot,
-): { to: '/planner' | '/recipe/$id' | '/challenges' | '/inbox'; params?: { id: string } } | null {
+):
+  | { to: '/planner' | '/recipe/$id' | '/challenges' | '/inbox' | '/intimacy'; params?: { id: string } }
+  | null {
   if (slot.kind === 'training') return { to: '/planner' }
   if (slot.kind === 'challenge') return { to: '/challenges' }
   if (slot.kind === 'meal' && slot.ref) return { to: '/recipe/$id', params: { id: slot.ref } }
   /* Back to the invitation, which is where the details and the RSVP live. */
   if (slot.kind === 'event') return { to: '/inbox' }
+  if (slot.kind === 'intimacy') return { to: '/intimacy' }
   return null
 }
 

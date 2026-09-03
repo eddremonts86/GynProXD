@@ -25,6 +25,7 @@ import { Collapse } from '../ui/Collapse'
 import { InstallAppButton } from '@/components/install-app-button'
 import { SyncSection } from '@/components/sync-section'
 import { ProSection } from '@/components/pro-section'
+import { IntimacySection } from '@/components/intimacy-section'
 import { GymMembership } from '@/components/gym-membership'
 import { OpenDoorToggle } from '@/components/open-door-toggle'
 import { SEX_LABELS } from '../lib/labels'
@@ -256,6 +257,7 @@ export function SettingsPage() {
 
         <SyncSection />
         <ProSection />
+        <IntimacySection />
 
         <Panel padding="lg">
         <Collapse header={<span className="text-danger">Danger zone</span>}>

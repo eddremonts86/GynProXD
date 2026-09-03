@@ -16,16 +16,16 @@ import {
  */
 describe('proAllows', () => {
   it('gives a built feature to a paying account and to nobody else', () => {
-    for (const feature of ['day-plan', 'companion', 'calendar'] as const) {
+    for (const feature of ['day-plan', 'companion', 'calendar', 'intimacy'] as const) {
       expect(proAllows(true, feature)).toBe(true)
       expect(proAllows(false, feature)).toBe(false)
     }
   })
 
   it('refuses everything still unbuilt, paid or not', () => {
-    // These two are names on a list. When a phase finishes one it joins BUILT
-    // and moves to the test above, which is the point of asserting it here.
-    for (const feature of ['culture', 'intimacy'] as const) {
+    // One name left on the list, and `member-plan.ts` says why it may stay
+    // there: there is no source for what the word promises.
+    for (const feature of ['culture'] as const) {
       expect(proAllows(true, feature)).toBe(false)
       expect(proAllows(false, feature)).toBe(false)
     }
@@ -53,7 +53,12 @@ describe('anythingBuilt', () => {
     // print. This guard is what let the subscription panel exist before the
     // first Pro screen did, and what flips its wording now that one does.
     expect(anythingBuilt()).toBe(true)
-    expect(PRO_FEATURES.filter(isBuilt)).toEqual(['day-plan', 'companion', 'calendar'])
+    expect(PRO_FEATURES.filter(isBuilt)).toEqual([
+      'day-plan',
+      'companion',
+      'calendar',
+      'intimacy',
+    ])
   })
 })
 

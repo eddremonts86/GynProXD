@@ -16,6 +16,8 @@
  *                 not stored unless asked, and the day exports back out
  *   the gym bus   an event the member said yes to blocks time; one they have
  *                 not answered does not
+ *   the module    intimate activity is off until switched on, takes only what
+ *                 is left of a day, and never reaches the calendar file
  *
  * The last one is the whole feature in one assertion. Everything else on that
  * screen comes from somewhere else in the app; what this phase added is the
@@ -27,7 +29,7 @@
  * server for the app; point at it with BASE_URL.
  */
 import { spawn } from 'node:child_process'
-import { mkdir, mkdtemp, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import AxeBuilder from '@axe-core/playwright'
@@ -410,6 +412,89 @@ try {
      the seeded hour and the checks below count it. */
   await page.goto(`${BASE}/day`, { waitUntil: 'networkidle' })
   await page.getByRole('heading', { name: 'Your day', level: 1 }).waitFor({ timeout: 10000 })
+
+  console.log('\nthe intimate activity module')
+  await page.goto(`${BASE}/settings`, { waitUntil: 'networkidle' })
+  await page.getByRole('tab', { name: /^Data/ }).click()
+  const module_ = page.getByRole('region', { name: 'Intimate activity' })
+  await module_.waitFor({ timeout: 8000 })
+  check('is offered to a Pro account', (await module_.innerText()).length > 0, true)
+  check('and is off', /\bOff\b/.test(await module_.innerText()), true)
+  check('with the eighteen line before the switch', /over eighteen/.test(await module_.innerText()), true)
+
+  /* Typing the URL is the only way in with it off, and it says so rather than
+     drawing the module. */
+  await page.goto(`${BASE}/intimacy`, { waitUntil: 'networkidle' })
+  const shut = await dayText()
+  check('the screen refuses while it is off', /Switched off/.test(shut), true)
+  check('and draws none of the content', /Arrangements/.test(shut), false)
+
+  console.log('\nswitched on')
+  await page.goto(`${BASE}/settings`, { waitUntil: 'networkidle' })
+  await page.getByRole('tab', { name: /^Data/ }).click()
+  await page.getByRole('switch', { name: 'Show intimate activity' }).click()
+  await page.waitForTimeout(400)
+  check('the switch holds', /On, on this device/.test(await module_.innerText()), true)
+  await page.getByRole('button', { name: /^Open it/ }).click()
+  await page.getByRole('heading', { name: 'Time together', level: 1 }).waitFor({ timeout: 10000 })
+  const open = await dayText()
+  check('the arrangements are there', /Arrangements/.test(open), true)
+  check('with the effort in units somebody can check', /MET/.test(open), true)
+  check('and no calorie figure anywhere', /\bkcal\b|\bcalorie/i.test(open), false)
+  check('nothing is counted or streaked', /streak|in a row|days? running/i.test(open), false)
+  check('and it says what it is not', /not medical advice/.test(open), true)
+  await page.screenshot({ path: path.join(SHOTS, 'intimacy.png'), fullPage: false })
+
+  /* `a11y-sweep.mjs` reaches /intimacy with the module off, so what it sweeps
+     there is the notice. The screen itself only exists for a Pro account that
+     has switched it on, which is what this walk is holding. */
+  const moduleAxe = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+    .analyze()
+  check(
+    'no serious or critical violations on the module',
+    moduleAxe.violations
+      .filter((v) => v.impact === 'serious' || v.impact === 'critical')
+      .map((v) => `${v.id} (${v.nodes.length})`),
+    [],
+  )
+
+  console.log('\nthe filter, which is the feature')
+  const before = await page.getByRole('article').count()
+  await page.getByRole('button', { name: 'Knees' }).click()
+  await page.waitForTimeout(300)
+  const after = await page.getByRole('article').count()
+  check('naming a limitation shortens the list', after < before, true)
+  check('and says how many were left out', /left out/.test(await dayText()), true)
+  check('but never to nothing', after > 0, true)
+
+  console.log('\nwhat the day does with it')
+  await page.goto(`${BASE}/day`, { waitUntil: 'networkidle' })
+  await page.getByRole('heading', { name: 'Your day', level: 1 }).waitFor({ timeout: 10000 })
+  const dayWithModule = await dayText()
+  check('half an hour on the day, neutrally labelled', /Time together/.test(dayWithModule), true)
+
+  console.log('\nand what the calendar file does not')
+  const exported = page.waitForEvent('download', { timeout: 10000 })
+  await page.getByRole('button', { name: /Send today to my calendar/ }).click()
+  const icsFile = await exported
+  const icsText = await readFile(await icsFile.path(), 'utf8')
+  /* The one thing on that screen that leaves the device by design. Everything
+     about this module stays on one device on purpose, and an export carrying it
+     out would undo that where nobody would notice. */
+  check('the day is in the file', /BEGIN:VEVENT/.test(icsText), true)
+  check('and the module is not', /Time together/.test(icsText), false)
+
+  console.log('\nforgetting it')
+  await page.goto(`${BASE}/settings`, { waitUntil: 'networkidle' })
+  await page.getByRole('tab', { name: /^Data/ }).click()
+  await page.getByRole('button', { name: /Forget it on this device/ }).click()
+  await page.waitForTimeout(400)
+  check('back to off', /\bOff\b/.test(await module_.innerText()), true)
+  check('and asking again', /over eighteen/.test(await module_.innerText()), true)
+  await page.goto(`${BASE}/day`, { waitUntil: 'networkidle' })
+  await page.getByRole('heading', { name: 'Your day', level: 1 }).waitFor({ timeout: 10000 })
+  check('and gone from the day', /Time together/.test(await dayText()), false)
 
   console.log('\ntaking it back off')
   await page.getByRole('button', { name: 'Remove school run' }).click()

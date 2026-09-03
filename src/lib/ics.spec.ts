@@ -389,6 +389,15 @@ describe('toIcs', () => {
     ])
   })
 
+  it('writes whatever it is handed, so the filtering is the caller job', () => {
+    // Worth pinning where the responsibility sits: `toIcs` has no opinion about
+    // slot kinds, and `calendar-import.tsx` is what drops the intimate activity
+    // slot before the file is written. A test here that expected filtering
+    // would be testing the wrong file.
+    const text = toIcs([{ date: '2026-09-07', start: '21:00', end: '21:30', title: 'Anything' }], 'x')
+    expect(text).toContain('SUMMARY:Anything')
+  })
+
   it('gives every event a distinct uid', () => {
     const uids = toIcs(day, 'x').match(/^UID:.*$/gm) ?? []
     expect(new Set(uids).size).toBe(2)

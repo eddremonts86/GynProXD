@@ -28,7 +28,14 @@ import {
  * There is no `rest` slot: an empty hour is not an activity.
  */
 
-export type SlotKind = 'anchor' | 'busy' | 'event' | 'training' | 'meal' | 'challenge'
+export type SlotKind =
+  | 'anchor'
+  | 'busy'
+  | 'event'
+  | 'training'
+  | 'meal'
+  | 'challenge'
+  | 'intimacy'
 
 /**
  * The kinds this file places into free time, as opposed to the two it is told
@@ -36,7 +43,7 @@ export type SlotKind = 'anchor' | 'busy' | 'event' | 'training' | 'meal' | 'chal
  * the union and an `Exclude<SlotKind, 'anchor'>` quietly started claiming a
  * calendar block could come back unplaced.
  */
-export type PlacedKind = 'training' | 'meal' | 'challenge'
+export type PlacedKind = 'training' | 'meal' | 'challenge' | 'intimacy'
 
 export interface DaySlot {
   /** `HH:MM`, local. */
@@ -109,6 +116,15 @@ export interface DayInput {
    * ends the relationship.
    */
   commitments?: readonly { label: string; start: string; end: string; ref?: string }[]
+  /**
+   * The intimate activity module, when it is switched on for this device.
+   *
+   * Placed last of everything, so it can never displace a session, a meal or a
+   * challenge day: it takes whatever is left. The label is the caller's and it
+   * is neutral on purpose — a day plan is a thing people leave open on a
+   * kitchen table.
+   */
+  intimacy?: { label: string; minutes: number } | null
 }
 
 type Preference = { mode: 'largest' } | { mode: 'near'; at: number }
@@ -294,6 +310,11 @@ export function buildDay(input: DayInput, now = new Date()): DayPlan {
     put('challenge', CHALLENGE_MINUTES, input.challenge.label, input.challenge.ref, {
       mode: 'largest',
     })
+  }
+  /* Last, on purpose. Everything the rest of the app is actually about has
+     already taken the room it needs. */
+  if (input.intimacy && input.intimacy.minutes > 0) {
+    put('intimacy', input.intimacy.minutes, input.intimacy.label, undefined, { mode: 'largest' })
   }
 
   slots.sort((a, b) => a.start.localeCompare(b.start) || a.end.localeCompare(b.end))

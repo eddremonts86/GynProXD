@@ -43,6 +43,10 @@ const MEMBER = [
      the screen behind the gate is swept by `test-day-plan.mjs`, which is where
      a paid account already exists. */
   '/day',
+  /* Off on a fresh device, so what this sweeps is the "switched off" notice
+     with its one button. The module itself is swept by `test-day-plan.mjs`,
+     which has a Pro account and turns it on. */
+  '/intimacy',
 ]
 
 let failures = 0

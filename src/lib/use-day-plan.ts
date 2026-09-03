@@ -3,6 +3,7 @@ import { useMessages } from '../store/useMessages'
 import { useSession } from '../store/useSession'
 import { challengeCalendar } from './challenge'
 import { commitmentsOn } from './local-events'
+import { INTIMACY_LABEL, INTIMACY_MINUTES, intimacyVisible } from './intimacy'
 import { viewerFor } from './profiles'
 import { buildDay, weekdayOf, type DayPlan } from './day-plan'
 import { emptyLifeProfile, type LifeProfile } from './life-profile'
@@ -80,6 +81,7 @@ export function useDayPlan(date: string, plate: DayPlate | null = null): {
   const messages = useMessages((s) => s.messages)
   const profileId = useSession((s) => s.profileId)
   const gym = useSession((s) => s.gym)
+  const pro = useSession((s) => s.pro)
 
   const profile = stored ?? emptyLifeProfile()
   const weekday = weekdayOf(date)
@@ -96,8 +98,15 @@ export function useDayPlan(date: string, plate: DayPlate | null = null): {
     ? commitmentsOn(messages, viewerFor(profileId, gym), date)
     : []
 
+  /* Read on every render rather than subscribed to, because the switch lives in
+     localStorage on purpose and nothing re-renders on a write to it. The one
+     screen that can change it navigates away to do so, which remounts this. */
+  const intimacy = intimacyVisible(pro)
+    ? { label: INTIMACY_LABEL, minutes: INTIMACY_MINUTES }
+    : null
+
   return {
-    plan: buildDay({ date, profile, training, plate, challenge, commitments }),
+    plan: buildDay({ date, profile, training, plate, challenge, commitments, intimacy }),
     profile,
   }
 }

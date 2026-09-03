@@ -347,6 +347,62 @@ describe('something they said they would turn up to', () => {
   })
 })
 
+describe('the intimate activity module, when it is on', () => {
+  const intimacy = { label: 'Time together', minutes: 30 }
+
+  it('takes what is left, and nothing else has to move', () => {
+    const p = profile({ anchors: [anchor()] })
+    const plan = buildDay(
+      {
+        date: MONDAY,
+        profile: p,
+        training: { label: 'Push', minutes: 90 },
+        plate: { label: 'Chicken creole' },
+        challenge: { label: 'Day 4' },
+        intimacy,
+      },
+      NOW,
+    )
+    /**
+     * Free time is 07:00-09:00 and 17:00-23:00. The session takes the larger,
+     * 17:00-18:30. The plate then goes to whichever free half hour is nearest
+     * one o'clock, and that is 08:30 before work rather than 18:30 after the
+     * session, which is four and a half hours away against five and a half.
+     *
+     * The assertion is that none of it moves because the module is on.
+     */
+    expect(at('training', plan)).toEqual(['17:00-18:30'])
+    expect(at('meal', plan)).toEqual(['08:30-09:00'])
+    expect(plan.unplaced).toEqual([])
+    expect(at('intimacy', plan)).toHaveLength(1)
+  })
+
+  it('is the one that goes without, when the day is nearly full', () => {
+    // Placed last on purpose: everything the rest of the app is actually about
+    // has already taken the room it needs.
+    const p = profile({ wake: '18:00', sleep: '19:45' })
+    const plan = buildDay(
+      { date: MONDAY, profile: p, training: { label: 'Push', minutes: 90 }, intimacy },
+      NOW,
+    )
+    expect(at('training', plan)).toEqual(['18:00-19:30'])
+    expect(plan.unplaced).toEqual(['intimacy'])
+  })
+
+  it('is absent when the module is off', () => {
+    expect(at('intimacy', day({ intimacy: null }))).toEqual([])
+    expect(at('intimacy', day({}))).toEqual([])
+  })
+
+  it('carries the neutral label it was given and no reference', () => {
+    // A day plan is a thing people leave open on a kitchen table. Nothing on it
+    // needs to announce this, and there is no record to point at.
+    const slot = day({ intimacy }).slots.find((s) => s.kind === 'intimacy')
+    expect(slot?.label).toBe('Time together')
+    expect(slot?.ref).toBeUndefined()
+  })
+})
+
 describe('the shape of the output', () => {
   it('is sorted by the time of day', () => {
     const plan = day({

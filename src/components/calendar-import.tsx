@@ -90,12 +90,24 @@ export function CalendarImport({
 
   const download = () => {
     const text = toIcs(
-      plan.slots.map((slot) => ({
-        date: plan.date,
-        start: slot.start,
-        end: slot.end,
-        title: slot.label,
-      })),
+      /**
+       * The intimate activity slot is left out of the file, and that is not
+       * squeamishness about a neutral label.
+       *
+       * A calendar file is the one thing on this screen that leaves the device
+       * by design: it gets opened in a work account, synced to a shared family
+       * calendar, mailed to somebody. Everything else about that module stays on
+       * one device on purpose, and an export that quietly carried it out would
+       * undo that in the one direction nobody would notice.
+       */
+      plan.slots
+        .filter((slot) => slot.kind !== 'intimacy')
+        .map((slot) => ({
+          date: plan.date,
+          start: slot.start,
+          end: slot.end,
+          title: slot.label,
+        })),
       `enForma, ${formatShortDate(plan.date)}`,
     )
     const url = URL.createObjectURL(new Blob([text], { type: 'text/calendar;charset=utf-8' }))
