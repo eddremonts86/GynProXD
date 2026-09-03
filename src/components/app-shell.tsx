@@ -40,6 +40,7 @@ import { todayIso } from '@/lib/dates'
 import { activeProfile, lockProfile, resumeSession, type ProfileRole, viewerFor } from '@/lib/profiles'
 import { readSyncLink, syncNow } from '@/lib/sync'
 import { refreshCapabilities } from '@/lib/capabilities'
+import { adoptEntitlement, refreshEntitlement } from '@/lib/entitlement'
 import { SignOut } from '@phosphor-icons/react'
 import { IconButton } from '@/ui/Button'
 import { Avatar } from '@/ui/Avatar'
@@ -287,11 +288,18 @@ function ProfileFooter() {
 
 /* Linked profiles catch up in the background on unlock; failures stay quiet
    here because Settings → Data shows them where they can be acted on. The
-   capability probe rides along so coach/recipe copy tells today's truth. */
+   capability probe rides along so coach/recipe copy tells today's truth.
+   Entitlement is adopted from cache first and then asked about: a paying
+   member's screens have to be there on the first frame, not after a round
+   trip that may not complete. */
 function syncQuietly(profileId: string): void {
   const link = readSyncLink(profileId)
+  adoptEntitlement(profileId)
   void refreshCapabilities(link?.server ?? '/pb')
-  if (link) void syncNow(profileId)
+  if (link) {
+    void refreshEntitlement(profileId)
+    void syncNow(profileId)
+  }
 }
 
 export function AppShell() {

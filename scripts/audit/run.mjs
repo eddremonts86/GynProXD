@@ -55,6 +55,7 @@ const GROUPS = {
     'test-branding',
     'test-enterprise-apply',
     'test-enterprise-rooms',
+    'test-pro',
     'gym-programme-boundary',
     'aurora-contrast',
     'a11y-sweep',
