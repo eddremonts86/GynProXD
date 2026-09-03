@@ -722,6 +722,47 @@ export async function leaveGym(profileId: string): Promise<void> {
  * server that will not answer must not stop somebody from setting a preference
  * on their own device — the local answer is the one the inbox obeys either way.
  */
+/**
+ * Where this person trains, in their own words, for the open door alone.
+ *
+ * Empty for everybody who does not fill it in, which is the default and the
+ * common case. Lower-cased and trimmed on the server so one spelling of a place
+ * is one place; sent as typed so the member is not corrected mid-sentence.
+ *
+ * It lives on the account rather than on the local profile because the filter
+ * is a server rule: a place kept only on this device could not decide what the
+ * server hands over, which is the same reason the switch above is not local.
+ */
+export async function setArea(profileId: string, area: string): Promise<void> {
+  const l = readSyncLink(profileId)
+  if (!l?.token) return
+  try {
+    await request(l.server, `/api/collections/users/records/${l.userId}`, {
+      method: 'PATCH',
+      token: l.token,
+      body: { area: area.trim().slice(0, 60) },
+    })
+  } catch {
+    /* Unsaved rather than wrong: the next attempt sends the same string. */
+  }
+}
+
+/** What the server currently has, so the field shows the truth and not a guess. */
+export async function currentArea(profileId: string): Promise<string> {
+  const l = readSyncLink(profileId)
+  if (!l?.token) return ''
+  try {
+    const row = await request<{ area?: string }>(
+      l.server,
+      `/api/collections/users/records/${l.userId}`,
+      { token: l.token },
+    )
+    return row.area ?? ''
+  } catch {
+    return ''
+  }
+}
+
 export async function setOpenToGyms(profileId: string, open: boolean): Promise<void> {
   const l = readSyncLink(profileId)
   if (!l?.token) return
@@ -1404,6 +1445,10 @@ export async function publishToServer(
        schedule that did not survive the trip — so an unscheduled message must
        not send the field at all. */
     if (input.publishAt) form.set('publish_at', input.publishAt)
+    /* Aimed only where aiming means something. Sent on every open-door message,
+       empty included, so clearing the field clears the aim rather than leaving
+       the last one in place. */
+    if (input.scope === 'open-door') form.set('area', input.area ?? '')
     form.set('body', input.body ?? '')
     form.set('payload', JSON.stringify(payload))
     for (const { file } of images) form.append('images', file)
