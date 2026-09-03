@@ -36,11 +36,13 @@ const SHOTS = process.env.SHOT_DIR ?? path.join(import.meta.dirname, '../../.aud
  * The sandbox inherits this environment, so it reports `billing: true` and the
  * checkout button is drawn. The key is a fake and is never used: clicking would
  * reach Stripe, and what is under test here is the gating, not whether Stripe
- * accepts our payload. That last part needs a real key and is the one thing in
- * Phase 7 this cannot prove.
+ * accepts our payload. That last part needs a real key, and
+ * `test-billing-button.mjs` is the walk that runs where one exists.
+ *
+ * No price id: the server resolves those from lookup keys, so a key is the only
+ * thing the capability check needs.
  */
 process.env.STRIPE_SECRET_KEY = 'sk_test_screens_probe'
-process.env.STRIPE_PRICE_MONTHLY = 'price_screens_probe'
 process.env.STRIPE_PORTAL_URL = 'https://billing.stripe.com/p/login/test_probe'
 
 let failures = 0

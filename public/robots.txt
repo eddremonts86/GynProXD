@@ -1,0 +1,13 @@
+# enForma is local-first: past these two front doors every route renders only
+# after a profile is unlocked on the device, so a crawler that follows them
+# finds an empty shell and a lock screen. They are disallowed to keep a dozen
+# identical shells out of an index, not to hide anything.
+#
+# /assets/ is explicitly allowed because it has to be: the two pages that are
+# allowed are client-rendered, and a crawler that cannot fetch the bundle sees
+# nothing on them at all.
+User-agent: *
+Allow: /$
+Allow: /for-gyms
+Allow: /assets/
+Disallow: /

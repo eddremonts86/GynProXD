@@ -6,8 +6,8 @@ import { activeProfile } from '@/lib/profiles'
 import { anythingBuilt } from '@/lib/member-plan'
 import { proStateOf, refreshEntitlement, type ProState } from '@/lib/entitlement'
 import { serverCapabilities } from '@/lib/capabilities'
-import { PRO_PRICE } from '@/lib/member-plan'
-import { activeAuthHeader, activeServer } from '@/lib/sync'
+import { PRO_LOOKUP_KEY, PRO_PRICE } from '@/lib/member-plan'
+import { startCheckout } from '@/lib/sync'
 import { useSession } from '@/store/useSession'
 
 /**
@@ -95,25 +95,25 @@ export function ProSection() {
   /**
    * Asks the server to open a Stripe checkout, and goes where it says.
    *
-   * The URL is Stripe's own domain and the card is entered there. There is no
-   * card field anywhere in this app, in any phase, and this is the reason it
-   * never needs one.
+   * `startCheckout` is the gym panel's own call, reused rather than repeated: a
+   * second fetch to the same route is a second place to get the body shape
+   * wrong, and this one sends a *lookup key* rather than a price id for the
+   * reason recorded there — a client that can name a price id can name any
+   * price in the account, and on a shared Stripe account that is another
+   * product's.
+   *
+   * The URL it returns is Stripe's own domain and the card is entered there.
+   * There is no card field anywhere in this app, in any phase, and handing off
+   * is the whole reason it never needs one.
    */
   const buy = async () => {
     if (busy) return
     setBusy(true)
     setCheckout(null)
     try {
-      const base = activeServer().replace(/\/+$/, '') || '/pb'
-      const res = await fetch(`${base}/api/enforma/checkout`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', ...(activeAuthHeader() ?? {}) },
-      })
-      const parsed = (await res.json().catch(() => ({}))) as { url?: unknown }
-      if (res.ok && typeof parsed.url === 'string') window.location.assign(parsed.url)
+      const url = await startCheckout(profileId, PRO_LOOKUP_KEY)
+      if (url) window.location.assign(url)
       else setCheckout('Stripe could not open a checkout just now. Nothing was charged.')
-    } catch {
-      setCheckout('Could not reach the server. Nothing was charged.')
     } finally {
       setBusy(false)
     }

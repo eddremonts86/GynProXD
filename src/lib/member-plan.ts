@@ -19,6 +19,22 @@
 export const PRO_PRICE = 15
 
 /**
+ * The Stripe price this buys, named by its lookup key.
+ *
+ * A lookup key and not a price id, which is the gym panel's decision applied
+ * here: a price id changes the day somebody edits an amount, and a client that
+ * can name one can name any price in the account — which on a Stripe account
+ * shared with another product is that product's. The server holds the allowlist
+ * in `pb_hooks/utils/billing.js` and resolves the id itself.
+ *
+ * `PRO_PRICE` above is what the copy says and this is what is charged. They are
+ * two facts in two systems and nothing but a person keeps them equal; the price
+ * on screen is the one to fix if they ever disagree, because it is the one
+ * somebody read before they paid.
+ */
+export const PRO_LOOKUP_KEY = 'enf_sub_pro_eur_month'
+
+/**
  * Everything Pro covers, in the order the product will present it.
  *
  * A name in this list is a promise the interface may make. Whether it is a

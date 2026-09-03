@@ -40,3 +40,6 @@ deploy/pocketbase/fixtures/
 # One-time import working data (images + scraped JSON).
 scripts/import/out/
 .audit-shots/
+
+# Worktrees other sessions open in here; not this repository's content.
+.claude/worktrees/

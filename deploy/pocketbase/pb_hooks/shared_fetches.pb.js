@@ -52,12 +52,16 @@ routerAdd('GET', '/api/enforma/capabilities', (e) => {
     /**
      * Whether this server can actually take a card.
      *
-     * Both halves, because either one missing is a button that goes nowhere: a
-     * key with no price id opens a checkout for nothing. The client shows the
-     * button only when this is true AND a Pro feature is built, so a member is
-     * never asked for money before there is something behind it.
+     * The key is the whole test, because the price ids are not configured here:
+     * `utils/billing.js` holds an allowlist of Stripe *lookup keys* and the
+     * checkout resolves the id from Stripe at the time. A client that could
+     * name a price id could name any price in the account, which on a shared
+     * account is another project's.
+     *
+     * The client shows the button only when this is true AND a Pro feature is
+     * built, so nobody is asked for money before there is something behind it.
      */
-    billing: !!($os.getenv('STRIPE_SECRET_KEY') && $os.getenv('STRIPE_PRICE_MONTHLY')),
+    billing: !!$os.getenv('STRIPE_SECRET_KEY'),
     /* Stripe's own hosted portal, where cancelling happens. A configured URL
        rather than a route of ours: cancelling is legally theirs to get right. */
     portal: $os.getenv('STRIPE_PORTAL_URL') || null,

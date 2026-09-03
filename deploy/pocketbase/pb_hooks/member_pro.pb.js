@@ -72,10 +72,28 @@ onRecordUpdateRequest((e) => {
    * Found by `pro-boundary.mjs`, after the migration that added the field had
    * already claimed in a comment that this guard covered it. It did not.
    */
-  if (
-    String(e.record.get('stripe_customer') || '') !== String(before.get('stripe_customer') || '')
-  ) {
-    throw new ForbiddenError('A billing customer is not something an account sets on itself.')
+  /**
+   * Every field the billing webhook writes, not just the ones this file added.
+   *
+   * `stripe_customer` is the one worth stealing: `customer.subscription.*`
+   * carries a customer and no account reference, so it is the route from a
+   * renewal back to a person, and an account that could claim somebody else's
+   * would point their renewals at itself — every month they paid extending the
+   * wrong subscription while theirs quietly lapsed.
+   *
+   * `stripe_subscription` and `billing_status` gate nothing today, so writing
+   * them buys a lie in a diagnostic field rather than a feature. They are here
+   * anyway: they are read by whoever is looking into a support question, and a
+   * field a member can set is a field that cannot be quoted back to them.
+   *
+   * `stripe_customer` was found writable by `pro-boundary.mjs`, after the
+   * migration that added it had already claimed in a comment that this guard
+   * covered it. It did not.
+   */
+  for (const field of ['stripe_customer', 'stripe_subscription', 'billing_status']) {
+    if (String(e.record.get(field) || '') !== String(before.get(field) || '')) {
+      throw new ForbiddenError('Billing is not something an account sets on itself.')
+    }
   }
   e.next()
 }, 'users')
