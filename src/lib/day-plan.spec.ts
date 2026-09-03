@@ -127,6 +127,69 @@ describe('the training session', () => {
   })
 })
 
+describe('what a calendar says about this one day', () => {
+  const block = (over: Partial<{ date: string; start: string; end: string; label: string }> = {}) => ({
+    id: `b-${over.start ?? '14:00'}`,
+    date: MONDAY,
+    start: '14:00',
+    end: '15:00',
+    source: 'ics' as const,
+    ...over,
+  })
+
+  it('is on the day, and blocks the time', () => {
+    const p = profile({ busy: [block({ label: 'Physio' })] })
+    const plan = buildDay({ date: MONDAY, profile: p }, NOW)
+    expect(plan.slots.map((s) => `${s.kind} ${s.start}-${s.end} ${s.label}`)).toEqual([
+      'busy 14:00-15:00 Physio',
+    ])
+  })
+
+  it('is labelled Busy when no title was kept', () => {
+    // The import can drop titles. "Busy" is the honest label for a block with
+    // none, and it is all the day needs to know.
+    const p = profile({ busy: [block()] })
+    expect(buildDay({ date: MONDAY, profile: p }, NOW).slots[0].label).toBe('Busy')
+  })
+
+  it('only appears on its own date', () => {
+    const p = profile({ busy: [block()] })
+    expect(buildDay({ date: SATURDAY, profile: p }, NOW).slots).toEqual([])
+  })
+
+  it('pushes the session out of the time it holds', () => {
+    // The reason this type exists. A planner that puts the session inside
+    // Thursday's meeting gets closed and not reopened.
+    const p = profile({ wake: '13:00', sleep: '17:00', busy: [block()] })
+    const plan = buildDay({ date: MONDAY, profile: p, training: { label: 'Push', minutes: 90 } }, NOW)
+    expect(at('training', plan)).toEqual(['15:00-16:30'])
+  })
+
+  it('merges with an anchor it runs into, leaving no gap of no length', () => {
+    // Two sources feed the placer now. Merging each list separately would leave
+    // the seam between them unmerged, and a zero-length gap between work and a
+    // meeting that starts the moment it ends is a slot with no duration.
+    const p = profile({
+      anchors: [anchor({ start: '09:00', end: '14:00' })],
+      busy: [block({ start: '14:00', end: '18:00' })],
+    })
+    const plan = buildDay({ date: MONDAY, profile: p, training: { label: 'Push', minutes: 60 } }, NOW)
+    /* 07:00-09:00 and 18:00-23:00 are the only free time; the evening is bigger. */
+    expect(at('training', plan)).toEqual(['18:00-19:00'])
+  })
+
+  it('is ignored when its times make no sense', () => {
+    const p = profile({ busy: [block({ start: '15:00', end: '14:00' })] })
+    expect(buildDay({ date: MONDAY, profile: p }, NOW).slots).toEqual([])
+  })
+
+  it('can take the whole day, and the session says so', () => {
+    const p = profile({ busy: [block({ start: '07:00', end: '23:00' })] })
+    const plan = buildDay({ date: MONDAY, profile: p, training: { label: 'Push', minutes: 60 } }, NOW)
+    expect(plan.unplaced).toEqual(['training'])
+  })
+})
+
 describe('an hour they would rather train', () => {
   it('is aimed at when they have named one', () => {
     // Work 09:00-17:00 leaves 07:00-09:00 and 17:00-23:00. Without a

@@ -1,4 +1,4 @@
-import { Barbell, CalendarBlank, ForkKnife, Trophy } from '@phosphor-icons/react'
+import { Barbell, CalendarBlank, CalendarX, ForkKnife, Trophy } from '@phosphor-icons/react'
 import type { Icon } from '@phosphor-icons/react'
 import { Link } from '@tanstack/react-router'
 import { Panel } from '@/ui/Panel'
@@ -22,6 +22,9 @@ import { clockOf, minutesOf, wakingWindow, type LifeProfile } from '@/lib/life-p
 
 const ICONS: Record<SlotKind, Icon> = {
   anchor: CalendarBlank,
+  /* A different mark from an anchor on purpose: one is a pattern somebody
+     described, the other is a thing their calendar says about this one day. */
+  busy: CalendarX,
   training: Barbell,
   meal: ForkKnife,
   challenge: Trophy,
@@ -29,6 +32,7 @@ const ICONS: Record<SlotKind, Icon> = {
 
 const TONE: Record<SlotKind, string> = {
   anchor: 'text-ink-3',
+  busy: 'text-ink-3',
   training: 'text-brand',
   meal: 'text-ink-2',
   challenge: 'text-ink-2',

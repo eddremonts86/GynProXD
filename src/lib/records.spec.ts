@@ -100,6 +100,50 @@ describe('the life profile', () => {
     expect(useGym.getState().lifeProfile?.anchors).toEqual([{ ...anchor, end: '15:00' }])
   })
 
+  it('prunes what is past and refuses a duplicate on import', () => {
+    // The profile is one synced row with arrays inside it, so the pruning is a
+    // fact about the record rather than about a screen. Yesterday's meetings
+    // are weight it should not carry on every sync for the life of the account.
+    hydrateGym(EMPTY_SNAPSHOT)
+    const block = (date: string, start: string) => ({
+      date,
+      start,
+      end: '15:00',
+      source: 'ics' as const,
+    })
+    const added = useGym.getState().importBusy(
+      [block('2026-09-01', '14:00'), block('2026-09-20', '14:00'), block('2026-09-21', '09:00')],
+      '2026-09-10',
+    )
+    expect(added).toBe(2)
+    expect(useGym.getState().lifeProfile?.busy?.map((b) => b.date)).toEqual([
+      '2026-09-20',
+      '2026-09-21',
+    ])
+
+    /* The same file again adds nothing, which is what makes importing twice
+       harmless rather than doubling somebody's week. */
+    expect(useGym.getState().importBusy([block('2026-09-20', '14:00')], '2026-09-10')).toBe(0)
+    expect(useGym.getState().lifeProfile?.busy).toHaveLength(2)
+  })
+
+  it('drops the imported blocks on request and keeps the anchors', () => {
+    hydrateGym(EMPTY_SNAPSHOT)
+    useGym.getState().addAnchor({
+      label: 'work',
+      days: ['mon'],
+      start: '09:00',
+      end: '17:00',
+      kind: 'work',
+    })
+    useGym
+      .getState()
+      .importBusy([{ date: '2026-09-20', start: '14:00', end: '15:00', source: 'ics' }], '2026-09-10')
+    useGym.getState().clearBusy()
+    expect(useGym.getState().lifeProfile?.busy).toEqual([])
+    expect(useGym.getState().lifeProfile?.anchors).toHaveLength(1)
+  })
+
   it('is absent from the rows until somebody fills it in', () => {
     // An empty singleton must not become a row, or every profile on the server
     // grows one the moment this code ships.

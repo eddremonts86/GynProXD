@@ -7,6 +7,7 @@ import { Input } from '@/ui/Input'
 import { Button } from '@/ui/Button'
 import { ProGate } from '@/components/pro-gate'
 import { AnchorEditor } from '@/components/anchor-editor'
+import { CalendarImport } from '@/components/calendar-import'
 import { DayTimeline } from '@/components/day-timeline'
 import { useGym } from '@/store/useGym'
 import { useDayPlates } from '@/lib/use-day-plates'
@@ -47,6 +48,8 @@ function DayPlanner() {
   const addAnchor = useGym((s) => s.addAnchor)
   const saveAnchor = useGym((s) => s.saveAnchor)
   const removeAnchor = useGym((s) => s.removeAnchor)
+  const importBusy = useGym((s) => s.importBusy)
+  const clearBusy = useGym((s) => s.clearBusy)
 
   const [date] = useState(todayIso())
   const plates = useDayPlates([date])
@@ -155,6 +158,16 @@ function DayPlanner() {
           onAdd={addAnchor}
           onSave={saveAnchor}
           onRemove={removeAnchor}
+        />
+      </Section>
+
+      <Section title="From a calendar" hint={`${(profile.busy ?? []).length}`}>
+        <CalendarImport
+          busy={profile.busy ?? []}
+          plan={plan}
+          today={date}
+          onImport={(blocks) => importBusy(blocks, date)}
+          onClear={clearBusy}
         />
       </Section>
     </div>

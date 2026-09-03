@@ -12,6 +12,8 @@
  *                 it, and the header's free total moves with it
  *   the companion a paragraph becomes proposals, the guesses are labelled as
  *                 guesses, and nothing is saved until it is tapped
+ *   the calendar  a real .ics file blocks real time, its titles are shown and
+ *                 not stored unless asked, and the day exports back out
  *
  * The last one is the whole feature in one assertion. Everything else on that
  * screen comes from somewhere else in the app; what this phase added is the
@@ -23,7 +25,8 @@
  * server for the app; point at it with BASE_URL.
  */
 import { spawn } from 'node:child_process'
-import { mkdir } from 'node:fs/promises'
+import { mkdir, mkdtemp, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
 import path from 'node:path'
 import AxeBuilder from '@axe-core/playwright'
 import { chromium } from 'playwright'
@@ -241,6 +244,92 @@ try {
   await page.getByLabel('Train around').fill('20:00')
   await page.waitForTimeout(400)
   check('the preference is held', await page.getByLabel('Train around').inputValue(), '20:00')
+
+  console.log('\na calendar file')
+  /* Dates relative to today, because the parser windows on today and a fixture
+     with fixed dates would start passing for the wrong reason and then stop. */
+  const inDays = (n) => {
+    const at = new Date()
+    at.setDate(at.getDate() + n)
+    return `${at.getFullYear()}${String(at.getMonth() + 1).padStart(2, '0')}${String(at.getDate()).padStart(2, '0')}`
+  }
+  const ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Google Inc//Google Calendar 70.9054//EN',
+    'BEGIN:VEVENT',
+    `DTSTART;TZID=Europe/Madrid:${inDays(0)}T190000`,
+    `DTEND;TZID=Europe/Madrid:${inDays(0)}T210000`,
+    'SUMMARY:Dentist, the long appointment',
+    'TRANSP:OPAQUE',
+    'END:VEVENT',
+    'BEGIN:VEVENT',
+    `DTSTART;VALUE=DATE:${inDays(1)}`,
+    `DTEND;VALUE=DATE:${inDays(2)}`,
+    'SUMMARY:Somebody birthday',
+    'END:VEVENT',
+    'BEGIN:VEVENT',
+    `DTSTART:${inDays(3)}T100000`,
+    `DTEND:${inDays(3)}T110000`,
+    'SUMMARY:Focus block',
+    'TRANSP:TRANSPARENT',
+    'END:VEVENT',
+    'END:VCALENDAR',
+  ].join('\r\n')
+  const dir = await mkdtemp(path.join(tmpdir(), 'enforma-ics-'))
+  const file = path.join(dir, 'calendar.ics')
+  await writeFile(file, ics, 'utf8')
+
+  await page.setInputFiles('#ics-file', file)
+  await page.waitForTimeout(600)
+  const preview = await dayText()
+  check('the timed event is offered', /Dentist, the long appointment/.test(preview), true)
+  check('the all-day one is not', /birthday/i.test(preview), false)
+  check('nor the one the calendar calls free', /Focus block/.test(preview), false)
+  check('one event, not three', /1 event found/.test(preview), true)
+  check('and the titles are off by default', /Titles are shown here and not saved/.test(preview), true)
+
+  await page.getByRole('button', { name: 'Add the ticked ones' }).click()
+  await page.waitForTimeout(600)
+  const withBlock = await dayText()
+  check('it went on the day', /1 block added/.test(withBlock), true)
+  check('as Busy, with no title stored', /Busy/.test(withBlock), true)
+  check('and the title did not follow it', /Dentist/.test(withBlock), false)
+  /* 16h awake, less 8h of work, half an hour of school run and the two hours
+     the dentist takes. */
+  check('the free total dropped by what it takes', /5h 30m free/.test(withBlock), true)
+  await page.screenshot({ path: path.join(SHOTS, 'day-calendar.png'), fullPage: false })
+
+  console.log('\nthe same file again')
+  await page.setInputFiles('#ics-file', file)
+  await page.waitForTimeout(600)
+  await page.getByRole('button', { name: 'Add the ticked ones' }).click()
+  await page.waitForTimeout(600)
+  /* Importing twice is what somebody does when they are not sure it worked. */
+  check('adds nothing', /Nothing new/.test(await dayText()), true)
+
+  console.log('\nkeeping the titles, when asked')
+  await page.getByRole('button', { name: /^Forget \d+ imported/ }).click()
+  await page.waitForTimeout(400)
+  await page.setInputFiles('#ics-file', file)
+  await page.waitForTimeout(600)
+  await page.getByRole('switch', { name: 'Keep the titles' }).click()
+  await page.getByRole('button', { name: 'Add the ticked ones' }).click()
+  await page.waitForTimeout(600)
+  check('the title is on the day now', /Dentist, the long appointment/.test(await dayText()), true)
+
+  console.log('\nexporting the day')
+  const download = page.waitForEvent('download', { timeout: 10000 })
+  await page.getByRole('button', { name: /Send today to my calendar/ }).click()
+  const saved = await download
+  check('a file comes back', saved.suggestedFilename().endsWith('.ics'), true)
+
+  console.log('\nforgetting what was imported')
+  await page.getByRole('button', { name: /^Forget \d+ imported/ }).click()
+  await page.waitForTimeout(500)
+  const cleared = await dayText()
+  check('the block is gone', /Dentist/.test(cleared), false)
+  check('and the anchors are not', /school run/.test(cleared), true)
 
   console.log('\ntaking it back off')
   await page.getByRole('button', { name: 'Remove school run' }).click()

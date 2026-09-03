@@ -30,8 +30,46 @@ export interface Anchor {
   source?: 'ics'
 }
 
+/**
+ * Busy time on one date, from a calendar.
+ *
+ * Not an anchor, and the difference is the whole reason this type exists. An
+ * anchor is a weekly pattern somebody described: work, every weekday, nine to
+ * five. A real calendar is mostly one-off appointments on named dates, and
+ * those are the ones a day planner has to avoid to be trusted at all — a
+ * planner that puts your session inside Thursday's meeting gets closed and not
+ * reopened.
+ *
+ * `label` is optional because the import decides whether to keep it. Reading a
+ * file somebody picked is not a privacy event; storing "oncology follow-up" in
+ * a synced record is a different question, and it is theirs to answer.
+ */
+export interface BusyBlock {
+  id: string
+  /** yyyy-mm-dd, local. */
+  date: string
+  /** `HH:MM`, local. */
+  start: string
+  end: string
+  label?: string
+  source: 'ics'
+}
+
+/**
+ * How far ahead a calendar is read, and how many blocks are ever held.
+ *
+ * The profile is one synced record with arrays inside it, so it is not the
+ * place for a decade of anybody's meetings. Three weeks is wider than the day
+ * planner ever looks and narrow enough that the record stays small; past dates
+ * are dropped on every import rather than accumulating.
+ */
+export const IMPORT_DAYS = 21
+export const MAX_BUSY = 200
+
 export interface LifeProfile {
   anchors: Anchor[]
+  /** Dated busy time, from an imported calendar. See `BusyBlock`. */
+  busy?: BusyBlock[]
   /** `HH:MM`. Absent falls back to WAKE_DEFAULT. */
   wake?: string
   sleep?: string
@@ -151,15 +189,44 @@ export function busySpans(anchors: readonly Anchor[], day: DayOfWeek, window: Sp
     const clipped = { start: Math.max(start, window.start), end: Math.min(end, window.end) }
     if (clipped.end > clipped.start) spans.push(clipped)
   }
-  spans.sort((a, b) => a.start - b.start || a.end - b.end)
+  return mergeSpans(spans)
+}
 
+/**
+ * Sorted, with anything touching or overlapping folded into one.
+ *
+ * Its own function because two sources feed the placer now — weekly anchors and
+ * dated calendar blocks — and merging each list separately would leave the
+ * seam between them unmerged. A zero-length gap between an anchor and a meeting
+ * that starts the moment it ends is a slot with no duration on somebody's day.
+ */
+export function mergeSpans(spans: readonly Span[]): Span[] {
+  const sorted = [...spans].sort((a, b) => a.start - b.start || a.end - b.end)
   const merged: Span[] = []
-  for (const span of spans) {
+  for (const span of sorted) {
     const last = merged[merged.length - 1]
     if (last && span.start <= last.end) last.end = Math.max(last.end, span.end)
     else merged.push({ ...span })
   }
   return merged
+}
+
+/** The calendar blocks on one date, as spans clipped to the waking window. */
+export function datedSpans(
+  busy: readonly BusyBlock[] | undefined,
+  date: string,
+  window: Span,
+): Span[] {
+  const spans: Span[] = []
+  for (const block of busy ?? []) {
+    if (block.date !== date) continue
+    const start = minutesOf(block.start)
+    const end = minutesOf(block.end)
+    if (start === null || end === null || end <= start) continue
+    const clipped = { start: Math.max(start, window.start), end: Math.min(end, window.end) }
+    if (clipped.end > clipped.start) spans.push(clipped)
+  }
+  return mergeSpans(spans)
 }
 
 /** The waking window, from the profile, with both ends defaulted and ordered. */

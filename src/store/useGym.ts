@@ -19,7 +19,13 @@ import { todayIso } from '../lib/dates'
 import { withRecordIds } from '../lib/records'
 import type { ActiveChallenge, Challenge } from '../lib/challenge'
 import type { FitnessTestResult } from '../lib/fitness-test'
-import { emptyLifeProfile, type Anchor, type LifeProfile } from '../lib/life-profile'
+import {
+  emptyLifeProfile,
+  MAX_BUSY,
+  type Anchor,
+  type BusyBlock,
+  type LifeProfile,
+} from '../lib/life-profile'
 import type { StoryProgress, TrackId } from '../lib/story'
 
 export const DAYS: DayOfWeek[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
@@ -102,6 +108,17 @@ interface GymState {
   addAnchor: (anchor: Omit<Anchor, 'id'>) => string
   saveAnchor: (anchor: Anchor) => void
   removeAnchor: (id: string) => void
+  /**
+   * Adds imported calendar blocks, dropping what is past and what is already
+   * there, and returns how many were actually new.
+   *
+   * The pruning is here rather than in the import screen because it is a fact
+   * about the record, not about a screen: the profile is one synced row with
+   * arrays inside it, and yesterday's meetings are weight it should not carry
+   * on every sync for the rest of the account's life.
+   */
+  importBusy: (blocks: readonly Omit<BusyBlock, 'id'>[], today: string) => number
+  clearBusy: () => void
   story: StoryProgress | null
   startStory: (programId: string) => void
   leaveStory: () => void
@@ -168,6 +185,36 @@ export const useGym = create<GymState>()((set, get) => ({
             : [...base.anchors, anchor]
           return { lifeProfile: { ...base, anchors, updatedAt: new Date().toISOString() } }
         }),
+      importBusy: (blocks, today) => {
+        let added = 0
+        set((s) => {
+          const base = s.lifeProfile ?? emptyLifeProfile()
+          const kept = (base.busy ?? []).filter((b) => b.date >= today)
+          const seen = new Set(kept.map((b) => `${b.date}|${b.start}|${b.end}`))
+          const next = [...kept]
+          for (const block of blocks) {
+            if (block.date < today) continue
+            const key = `${block.date}|${block.start}|${block.end}`
+            if (seen.has(key)) continue
+            if (next.length >= MAX_BUSY) break
+            seen.add(key)
+            next.push({
+              ...block,
+              id: `busy-${block.date}-${block.start.replace(':', '')}-${next.length}`,
+            })
+            added += 1
+          }
+          next.sort((a, b) => a.date.localeCompare(b.date) || a.start.localeCompare(b.start))
+          return { lifeProfile: { ...base, busy: next, updatedAt: new Date().toISOString() } }
+        })
+        return added
+      },
+      clearBusy: () =>
+        set((s) =>
+          s.lifeProfile
+            ? { lifeProfile: { ...s.lifeProfile, busy: [], updatedAt: new Date().toISOString() } }
+            : {},
+        ),
       removeAnchor: (id) =>
         set((s) =>
           s.lifeProfile

@@ -2,7 +2,9 @@ import type { DayOfWeek } from './types'
 import {
   busySpans,
   clockOf,
+  datedSpans,
   freeSpans,
+  mergeSpans,
   minutesOf,
   wakingWindow,
   type LifeProfile,
@@ -26,7 +28,15 @@ import {
  * There is no `rest` slot: an empty hour is not an activity.
  */
 
-export type SlotKind = 'anchor' | 'training' | 'meal' | 'challenge'
+export type SlotKind = 'anchor' | 'busy' | 'training' | 'meal' | 'challenge'
+
+/**
+ * The kinds this file places into free time, as opposed to the two it is told
+ * about. Spelled out rather than derived with `Exclude`, because `busy` joined
+ * the union and an `Exclude<SlotKind, 'anchor'>` quietly started claiming a
+ * calendar block could come back unplaced.
+ */
+export type PlacedKind = 'training' | 'meal' | 'challenge'
 
 export interface DaySlot {
   /** `HH:MM`, local. */
@@ -54,7 +64,7 @@ export interface DayPlan {
    * than logged: a member whose Tuesday has no ninety-minute hole in it should
    * be told that, not shown a day with the session mysteriously absent.
    */
-  unplaced: Exclude<SlotKind, 'anchor'>[]
+  unplaced: PlacedKind[]
   generatedAt: string
 }
 
@@ -159,7 +169,12 @@ export function buildDay(input: DayInput, now = new Date()): DayPlan {
   const { date, profile } = input
   const day = weekdayOf(date)
   const window = wakingWindow(profile)
-  const busy = day ? busySpans(profile.anchors, day, window) : []
+  /* Two sources, merged once. Weekly anchors are what somebody described;
+     dated blocks are what their calendar says about this particular day. */
+  const busy = mergeSpans([
+    ...(day ? busySpans(profile.anchors, day, window) : []),
+    ...datedSpans(profile.busy, date, window),
+  ])
 
   const slots: DaySlot[] = []
   for (const anchor of profile.anchors) {
@@ -179,11 +194,30 @@ export function buildDay(input: DayInput, now = new Date()): DayPlan {
     })
   }
 
+  for (const block of profile.busy ?? []) {
+    if (block.date !== date) continue
+    const from = minutesOf(block.start)
+    const to = minutesOf(block.end)
+    /* The same guard `datedSpans` applies, and it has to be here too: without
+       it a block whose end precedes its start blocked nothing and still drew a
+       row on the day, which is a slot running backwards on somebody's screen. */
+    if (from === null || to === null || to <= from) continue
+    slots.push({
+      start: block.start,
+      end: block.end,
+      kind: 'busy',
+      /* No title kept means no title shown. "Busy" is the honest label for a
+         block imported without one, and it is what the day needs to know. */
+      label: block.label && block.label.trim() !== '' ? block.label : 'Busy',
+      ref: block.id,
+    })
+  }
+
   let free = freeSpans(busy, window)
-  const unplaced: Exclude<SlotKind, 'anchor'>[] = []
+  const unplaced: PlacedKind[] = []
 
   const put = (
-    kind: Exclude<SlotKind, 'anchor'>,
+    kind: PlacedKind,
     minutes: number,
     label: string,
     ref: string | undefined,
