@@ -232,9 +232,11 @@ export function MobileBar({
               submit do not fit, and the door somebody did not come through is
               the one that gives up its words. It gives up words it was written
               to give up, not whichever ones fall off the end. */}
+          {/* No aria-label: it used to carry the desktop wording, which left a
+              link reading "For members" and answering to "I want to train".
+              Speech input says what it sees (WCAG 2.5.3). */}
           <a
             href={crossLink.href}
-            aria-label={crossLink.label}
             className="px-2 text-xs whitespace-nowrap text-ink-3 underline-offset-2 hover:text-ink hover:underline"
           >
             {crossLink.short}

@@ -294,8 +294,11 @@ a record that skips the question reads like nobody asked.
 - The axe sweep → **built**, as `a11y-sweep.mjs` in the screens group. It runs
   over the whole route inventory at two viewports and found one serious
   violation on thirty-one screens: an unnamed text field at the gym desk.
-- Lighthouse → **still not done.** Bundle sizes were measured by hand and the
-  numbers are in F-12; nothing measures the loading experience.
+- Lighthouse → **built**, as `lighthouse-sweep.mjs` in the screens group, over
+  the two doors a stranger can reach. It found what hand-measuring bundle sizes
+  could not: the landing page was 4.8s to Largest Contentful Paint on a
+  throttled phone, because the entry chunk pulled in the 243 KB movement
+  catalogue. See below.
 
 ---
 
@@ -382,6 +385,87 @@ gym at all, read it signed out. All refused; the member reads and cannot write.
 This closes the gap the finding named — `gym_menus` create and update are
 permissive as rules and correct only because a hook follows the relation, and
 nothing tested what happens if that hook stops loading.
+
+---
+
+### Lighthouse — **built**, and it found something
+
+Run over `/` and `/for-gyms` at two form factors, because everything else is
+behind a lock screen and Lighthouse's cold-load-on-a-slow-phone model says
+nothing true about a screen you reach on your fourth visit from a warm service
+worker.
+
+The first run, before anything was changed:
+
+|              |            | perf | a11y | best | seo | LCP  |
+| ------------ | ---------- | ---- | ---- | ---- | --- | ---- |
+| `/`          | mobile     |   71 |  100 |  100 |  92 | 4.8s |
+| `/`          | desktop    |   98 |  100 |  100 |  92 | 0.9s |
+| `/for-gyms`  | mobile     |   73 |  100 |  100 |  91 | 4.5s |
+| `/for-gyms`  | desktop    |   98 |  100 |  100 |  91 | 0.9s |
+
+Accessibility at 100 across the board is the axe sweep's work showing up in a
+second tool. The mobile column is the finding: **4.8 seconds to first paint on
+the marketing page**, against the 2.5s the audit itself set as the target.
+
+Total mainthread work was 0.5s and blocking time was 0ms, so this was not
+JavaScript being slow — it was 646 KB of it having to arrive first. Of that,
+**243 KB was the movement catalogue, on a page that never names a movement.**
+
+It arrived through one import. `store/useGym.ts` pulled in the catalogue to
+seed the id → movement lookup at module scope, `components/app-shell.tsx`
+imports the store, and the shell is the entry. A signed-out visitor reading the
+landing was downloading 2,076 exercises to render a headline.
+
+Two of the four seeding calls in the store were the same line written twice at
+module scope, and were the only two that ran for a signed-out visitor; the
+other two run on hydration, after a profile is unlocked. So the fix is a split,
+not a rewrite: `lib/exercise-cache.ts` now owns the Map and imports nothing,
+`lib/exercises.ts` owns the catalogue and seeds that cache when it loads, and
+the store imports the cache alone. Every surface that renders a movement name
+imports `lib/exercises`, so the cache is still seeded synchronously before any
+of them first render — the invariant holds by construction rather than by two
+module-scope calls remembering to run.
+
+The catalogue is still precached by the service worker, which is what makes it
+work offline and is the whole point of F-12. What changed is that it is no
+longer a render-blocking `modulepreload` in `index.html`: it now loads with the
+route chunks that need it, and in the background for offline use.
+
+Two smaller things the same run found:
+
+- **No `robots.txt`.** Written, allowing the two public doors and disallowing
+  the rest, which renders an empty shell to anything that follows it.
+- **WCAG 2.5.3, Label in Name.** The landing's mobile header carried a link
+  reading "For members" whose accessible name was "I want to train" — speech
+  input says what it sees, and this link answered to nothing a person could
+  read on it. The `aria-label` was there to give the mobile link its desktop
+  wording; it was removed, and the visible text is the name. The axe sweep did
+  not catch this because the rule lives in axe's `experimental` set, outside
+  the WCAG tags that sweep runs.
+
+After all three:
+
+|              |            | perf | a11y | best | seo | LCP  |
+| ------------ | ---------- | ---- | ---- | ---- | --- | ---- |
+| `/`          | mobile     |   84 |  100 |  100 | 100 | 3.5s |
+| `/`          | desktop    |  100 |  100 |  100 | 100 | 0.7s |
+| `/for-gyms`  | mobile     |   87 |  100 |  100 | 100 | 3.2s |
+| `/for-gyms`  | desktop    |  100 |  100 |  100 | 100 | 0.6s |
+
+**Mobile LCP is still 3.5s, above the 2.5s target.** What remains is the shape
+of the thing: a client-rendered SPA cannot paint a headline before its entry
+bundle has arrived and run, and the remaining 400 KB is React, the router, the
+design system and the shell. Getting under 2.5s means pre-rendering the two
+marketing routes to static HTML, which is a real change to how the app is
+built and is not something to slip into an audit remediation. It is written
+down here rather than left as a number nobody looks at.
+
+The walk's floors are set from these measurements with a few points of slack,
+not from ambition: 78 mobile and 92 desktop for performance, 100 for the other
+three categories, and an LCP ceiling of 4.0s mobile and 1.5s desktop. A
+threshold invented before the measurement is an opinion, and an opinion in a
+required check gets switched off the first week it disagrees with somebody.
 
 ---
 

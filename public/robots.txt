@@ -1,0 +1,7 @@
+# enForma is local-first: past these two front doors every route renders only
+# after a profile is unlocked on the device, so a crawler that follows them
+# finds an empty shell and a lock screen.
+User-agent: *
+Allow: /$
+Allow: /for-gyms
+Disallow: /
