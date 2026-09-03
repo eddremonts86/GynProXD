@@ -952,6 +952,63 @@ export async function removeFromDesk(
   )
 }
 
+/**
+ * What this account pays for, as the server sees it.
+ *
+ * Read rather than remembered: a plan can change between one visit and the next
+ * because somebody upgraded on another device or a card expired overnight, and
+ * a cached copy would either refuse a feature that is now paid for or offer one
+ * that is not.
+ */
+export interface Billing {
+  /** Stripe's own word: active, past_due, canceled, unpaid, trialing, or ''. */
+  status: string
+  /** Whether this account is the one Stripe bills, which is the gym's owner. */
+  isOwner: boolean
+}
+
+/**
+ * Start a subscription and hand back the Stripe page to send them to.
+ *
+ * The lookup key travels, never a Stripe price id: the server keeps the
+ * allowlist and resolves the id, so this cannot be pointed at another price in
+ * the account, and editing an amount in Stripe does not need a release here.
+ */
+export async function startCheckout(profileId: string, price: string): Promise<string | null> {
+  const l = readSyncLink(profileId)
+  if (!l?.token) return null
+  try {
+    const out = await request<{ url?: string }>(l.server, '/api/enforma/billing/checkout', {
+      method: 'POST',
+      token: l.token,
+      body: { price, origin: window.location.origin },
+    })
+    return out.url ?? null
+  } catch {
+    return null
+  }
+}
+
+/** The account's own billing row. Nobody else's is readable, by rule. */
+export async function billingFor(profileId: string): Promise<Billing | null> {
+  const l = readSyncLink(profileId)
+  if (!l?.token) return null
+  try {
+    const row = await request<{ billing_status?: string }>(
+      l.server,
+      `/api/collections/users/records/${l.userId}`,
+      { token: l.token },
+    )
+    const gyms = await fetchGyms(l).catch(() => [])
+    return {
+      status: row.billing_status ?? '',
+      isOwner: gyms.some((g) => g.owner === l.userId),
+    }
+  } catch {
+    return null
+  }
+}
+
 /** One room an account runs. Enterprise is several of these under one login. */
 export interface OperatedGym {
   id: string
@@ -1055,6 +1112,10 @@ interface GymRow {
   kind?: string
   /** '#rrggbb', or empty on a gym that never set one. */
   brand_color?: string
+  /** The account Stripe bills, and the only one that may change the roster. */
+  owner?: string
+  /** 'base' or 'plus'. Absent on a row from before the plan field existed. */
+  plan?: string
 }
 
 interface WireMessage {

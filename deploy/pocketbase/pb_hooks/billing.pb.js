@@ -65,13 +65,27 @@ routerAdd('POST', '/api/enforma/billing/checkout', (e) => {
       e.app.save(row)
     }
 
+    /* The price id is resolved here rather than sent by the client. A client
+       that names a Stripe price id can name any price in the account, which on
+       a shared account is another project's, and it would have to be updated
+       every time somebody edits an amount. The lookup key is stable and the
+       allowlist above already vouched for it. */
+    const priced = $http.send({
+      url: 'https://api.stripe.com/v1/prices?lookup_keys[]=' + encodeURIComponent(lookup) + '&active=true',
+      method: 'GET',
+      headers: { authorization: 'Bearer ' + secret },
+      timeout: 30,
+    })
+    const priceId = String((((priced.json || {}).data || [])[0] || {}).id || '')
+    if (!priceId) return e.json(502, { message: 'That price is not set up in Stripe.' })
+
     const session = $http.send({
       url: 'https://api.stripe.com/v1/checkout/sessions',
       method: 'POST',
       body: form([
         ['mode', 'subscription'],
         ['customer', customer],
-        ['line_items[0][price]', String(body.priceId || '')],
+        ['line_items[0][price]', priceId],
         ['line_items[0][quantity]', '1'],
         ['success_url', origin + '/gym?billing=done'],
         ['cancel_url', origin + '/gym?billing=cancelled'],
