@@ -220,6 +220,11 @@ Stated so nobody re-audits it next month.
 
 ## What this audit could not do
 
+*Left as written on the day. The first two were closed afterwards: the axe
+sweep and Lighthouse are both walks now, and the remediation record below says
+what each of them found. The third was not — this audit ran in one context and
+no second opinion was ever taken on it.*
+
 - **Accessibility sweep.** No axe. The aurora-contrast probe covers one surface
   class. Recommend `@axe-core/playwright` as a dev dependency and a walk that
   runs it across the route inventory.
