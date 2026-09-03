@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { CATALOGUE_SIZE } from '@/data/catalogue-stats'
 import { WGER_SIZE } from '@/data/wger-stats'
-import { useReducedMotion } from 'motion/react'
 import {
   ArrowDown,
   ArrowRight,
@@ -264,7 +263,6 @@ function MilestoneLadder({ className }: { className?: string }) {
  * left edge of the content sits exactly where it sits once you are signed in.
  */
 export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
-  const reduceMotion = useReducedMotion()
   const railHidden = useRailHidden()
   const [active, setActive] = useState('top')
 
@@ -301,13 +299,17 @@ export function Landing({ onUnlocked }: { onUnlocked: () => void }) {
     (id: string) => {
       const target = document.getElementById(id)
       if (!target) return
-      target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' })
+      /* Asked at the moment of the jump rather than held in state: the answer
+         is one media query, and reading it here keeps working if the person
+         changes the preference while the page is open. */
+      const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      target.scrollIntoView({ behavior: still ? 'auto' : 'smooth', block: 'start' })
       const focusable = target.querySelector<HTMLElement>(
         'input:not([type="hidden"]), button, [tabindex]:not([tabindex="-1"])',
       )
       focusable?.focus({ preventScroll: true })
     },
-    [reduceMotion],
+    [],
   )
 
   return (
