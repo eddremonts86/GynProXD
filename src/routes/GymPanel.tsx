@@ -297,6 +297,7 @@ export function GymDesk({
    * and the names on screen describe different sets.
    */
   const [openDoor, setOpenDoor] = useState(false)
+  const [area, setArea] = useState('')
   /**
    * When this should go out, as `<input type="datetime-local">` gives it:
    * "YYYY-MM-DDTHH:MM", in the operator's own timezone. Empty is now.
@@ -624,6 +625,9 @@ export function GymDesk({
          empty as a date it could not parse — which is what catches a schedule
          that did not survive the trip — so an unscheduled message sends none. */
       ...(canSchedule && publishAt ? { publishAt: new Date(publishAt).toISOString() } : {}),
+      /* Only on the one scope where a place decides anything. Sent even when
+         empty so clearing it clears the aim. */
+      ...(sendScope === 'open-door' ? { area: area.trim() } : {}),
       banner: bannerOn ? { minutes: Number(bannerMinutes) } : undefined,
     }
     /* Server bus first when this operator account can reach it: the same id
@@ -1178,12 +1182,26 @@ export function GymDesk({
                     ))}
                   </div>
                   {openDoor && (
-                    <p className="max-w-[64ch] text-2xs leading-relaxed text-ink-3">
-                      Everybody on enForma who has not joined a gym and has not turned this off.
-                      One a month, and you cannot choose who — you are never told who they are,
-                      and we are not going to tell you. There is no location filter because we
-                      hold no location for anybody.
-                    </p>
+                    <div className="flex flex-col gap-3">
+                      <p className="max-w-[64ch] text-2xs leading-relaxed text-ink-3">
+                        Everybody on enForma who has not joined a gym and has not turned this
+                        off. One a month, and you cannot choose who: you are never told who they
+                        are, and we are not going to tell you.
+                      </p>
+                      <Input
+                        id="open-door-area"
+                        label="Aim it at a place (optional)"
+                        value={area}
+                        onChange={(e) => setArea(e.target.value)}
+                        placeholder="A town or a postcode"
+                      />
+                      <p className="max-w-[64ch] text-2xs leading-relaxed text-ink-3">
+                        Leave it empty to reach everybody. Fill it in and it reaches only the
+                        people who wrote the same place, and only the ones who wrote one at all.
+                        You are told neither who they are nor how many, which is the same answer
+                        as before and the reason this is safe to offer.
+                      </p>
+                    </div>
                   )}
                 </div>
               )}

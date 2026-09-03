@@ -85,7 +85,13 @@ try {
   check('and no names to pick from', (await page.getByRole('button', { name: /^Nadie$/ }).count()), 0)
   const body = await page.textContent('body')
   check('it says why there are none', body.includes('you cannot choose who'), true)
-  check('and does not imply a location filter', body.includes('no location'), true)
+  /* This used to assert the composer said "no location", which was true until
+     an area filter shipped. What has to stay true is the part that made aiming
+     safe to offer at all: a gym names a place and is told nothing about who is
+     in it. */
+  check('it offers a place to aim at', body.includes('Aim it at a place'), true)
+  check('and still promises nothing about who is there',
+    /neither who they are nor how many/.test(body), true)
 
   await page.getByRole('button', { name: 'Publish' }).click()
   await page.getByText(/Published to/).first().waitFor({ timeout: 10000 })

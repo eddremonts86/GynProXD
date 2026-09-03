@@ -36,6 +36,14 @@ function persist(messages: GymMessage[]): void {
 }
 
 export interface PublishInput {
+  /**
+   * The place an open-door message is aimed at, empty for everywhere.
+   *
+   * Only meaningful on that one scope: every other message travels inside a
+   * relationship somebody already chose, and narrowing those by town would be
+   * a gym deciding which of its own members deserve to hear from it.
+   */
+  area?: string
   gym: string
   authorId: string
   kind: TemplateKind

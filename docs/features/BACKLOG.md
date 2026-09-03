@@ -67,6 +67,20 @@ The page says "we invoice", so it is not a lie — but it is the only thing
 between the landing and actually selling. Enterprise adds a third price to the
 same manual process.
 
+## 3b. Member Pro, and the first consumer payment
+
+The Life Plan feature (`docs/plans/2026-09-03-life-plan.md`) is sold to members
+rather than to gyms, and that is a different problem from §3. Invoicing four
+hundred people by hand is not a process, so Phase 1 of that plan is the first
+real payment path in the product: Stripe Checkout, a webhook, and one date on
+the account (`users.pro_until`).
+
+It does not resolve §3. Gyms keep their invoices, because €200 a month from a
+business with a contract is a conversation and a consumer subscription is not.
+What it does is put a webhook, an idempotency ledger and a boundary audit in the
+repo, so whenever somebody decides gyms should self-serve, the mechanism exists
+and only the price ids change.
+
 ## 4. The gym applications queue is still hands-on
 
 `/admin` → Applications collects a row and grants nothing: no gym, no operator,
@@ -89,14 +103,36 @@ been found by a person mid-provisioning with a customer waiting.
 
 A button is still worth building the day the volume is real.
 
-## 5. No geography on the open door
+## 5. Geography on the open door — built, and the promise rewritten
 
-A Plus gym reaches everybody with no gym and nothing finer, because we hold no
-location for anybody. The landing says so rather than implying a segmentation
-that does not exist.
+A member may write a town or a postcode on their own account, and a gym may aim
+one open-door message at a place. Both are optional and empty by default.
 
-Adding it means asking members for a city — a new personal field, with the
-privacy conversation that goes with it. Not free, and not obviously right.
+**This changed a promise, which is the part worth reading.** The page used to
+say, in these words: "there is no location filter. We hold no location for
+anybody, and we would rather say so than imply a segmentation that does not
+exist." That was true and worth saying, and it is no longer what the product
+does. The copy now says what it does: you can aim it at a town or a postcode,
+it reaches the people who wrote that place themselves, and you are never told
+who they are, how many, or whether anybody was there at all.
+
+What did not change is the thing that made the open door acceptable. The filter
+is an arm of the read rule, evaluated on the server against the reader's own
+row, so aiming buys a gym nothing it did not already have. `users.area` sits on
+the member's own record, which is `id = @request.auth.id`, so no other account
+can read it. `open-door-boundary.mjs` asks the new question the same way it
+asked the old ones: from the gym's side, whether naming a place has become a way
+to count who is in it. It has not.
+
+Both sides are lower-cased and trimmed on write, because the rule matches
+exactly and cannot normalise. Without that, "Lisboa" against "lisboa " is a
+message that silently reaches nobody, which is the worst possible failure for a
+feature a gym gets one shot a month at.
+
+There is deliberately no list of valid places. A fixed list is a product
+decision nobody has made, it is wrong in every country it was not written for,
+and it turns "where do you train" into a question you have to be in the right
+city to answer.
 
 ## 6. Promote the audit walks to required checks
 

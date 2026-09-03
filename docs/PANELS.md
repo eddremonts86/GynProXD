@@ -649,9 +649,16 @@ platform-wide monthly quota enforced at publish, not a filter at display.
 Everybody with no gym who has not said no. The audience is a scope the server
 evaluates, never a list — a gym is never told who is in it, and the composer
 offers no names to pick from, because a picker that could not honour a pick
-would be a promise the send cannot keep. There is no location filter either: we
-hold no location for anybody, and the landing page says so rather than implying
-a segmentation that does not exist.
+would be a promise the send cannot keep. There **is** a location filter, and it changed what
+the landing page says rather than the other way round. A member may write a town
+or a postcode on their own account, empty by default and empty for everybody who
+never fills it in; a gym may aim one message at a place. The match is an arm of
+the read rule, evaluated on the server against the reader's own row, so aiming
+buys a gym exactly nothing it did not already have: not who is in the place, not
+how many, not whether anybody was. `users.area` is on the member's own row,
+which is `id = @request.auth.id`, so nobody else can read it at all. Both sides
+are lower-cased and trimmed on write, because the rule matches exactly and
+cannot normalise, and "Lisboa" against "lisboa " would deliver nothing.
 
 `users.closed_to_gyms` is phrased as the refusal on purpose. The setting
 defaults to on, and the first version was `open_to_gyms` backfilled to `true` —
