@@ -458,13 +458,31 @@ After all three:
 | `/for-gyms`  | mobile     |   87 |  100 |  100 | 100 | 3.2s |
 | `/for-gyms`  | desktop    |  100 |  100 |  100 | 100 | 0.6s |
 
-**Mobile LCP is still 3.5s, above the 2.5s target.** What remains is the shape
-of the thing: a client-rendered SPA cannot paint a headline before its entry
-bundle has arrived and run, and the remaining 400 KB is React, the router, the
-design system and the shell. Getting under 2.5s means pre-rendering the two
-marketing routes to static HTML, which is a real change to how the app is
-built and is not something to slip into an audit remediation. It is written
-down here rather than left as a number nobody looks at.
+Those are `vite preview` numbers. Run again against production once it was
+deployed, the same walk reports better ones, because nginx is not the preview
+server:
+
+|              |            | perf | a11y | best | seo | LCP  |
+| ------------ | ---------- | ---- | ---- | ---- | --- | ---- |
+| `/`          | mobile     |   90 |  100 |  100 | 100 | 2.9s |
+| `/`          | desktop    |  100 |  100 |  100 | 100 | 0.7s |
+| `/for-gyms`  | mobile     |   88 |  100 |  100 | 100 | 3.1s |
+| `/for-gyms`  | desktop    |  100 |  100 |  100 | 100 | 0.7s |
+
+**Production mobile LCP is 2.9s against a 2.5s target — 0.4s short, not 2.3s
+short.** That is a different conclusion from the one this section was about to
+draw. Pre-rendering the marketing routes to static HTML would certainly close
+it, but it is no longer the only thing that would: 400 milliseconds is within
+reach of ordinary work on the entry bundle, and the remaining 400 KB is React,
+the router, the design system and the shell, none of which has been looked at
+with this number in hand.
+
+The walk's floors stay set from the preview measurements rather than these.
+Production is the number that matters to a person, but it is measured across a
+real network from one laptop in one country, and a floor that moves with the
+weather fails a walk for reasons nobody can act on. The preview is
+reproducible, it is what CI can run, and it is strictly the pessimistic of the
+two.
 
 The walk's floors are set from these measurements with a few points of slack,
 not from ambition: 78 mobile and 92 desktop for performance, 100 for the other
