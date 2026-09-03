@@ -39,21 +39,27 @@ const FORM_FACTORS = {
 
 /**
  * Measured on 2026-09-03 against the built app, after the entry chunk stopped
- * dragging the movement catalogue onto the landing page:
+ * dragging the movement catalogue, Base UI and an animation library onto the
+ * landing page:
  *
  *                        perf  a11y  best  seo   LCP
- *   /          mobile      84   100   100  100   3.5s
- *   /          desktop    100   100   100  100   0.7s
- *   /for-gyms  mobile      87   100   100  100   3.2s
- *   /for-gyms  desktop    100   100   100  100   0.6s
+ *   /          mobile      89   100   100  100   3.1s
+ *   /          desktop    100   100   100  100   0.6s
+ *   /for-gyms  mobile      89   100   100  100   3.2s
+ *   /for-gyms  desktop    100   100   100  100   0.7s
  *
  * Accessibility and best practices are held at 100 because that is where they
  * are; letting them slip to 90 buys nothing and hides the first regression.
- * Mobile performance carries the slack because it is the number that moves
- * when someone adds a dependency, which is exactly what this is here to catch.
+ *
+ * Mobile performance keeps real slack, and deliberately. Half a second moves
+ * between two runs of this on a busy laptop, so a floor tight enough to catch
+ * a 40 KB library arriving on the critical path is a floor loose enough to
+ * fail on a Tuesday. `bundle-budget.mjs` is the tight guard for that — it
+ * weighs the same bytes with no browser and no variance. What is left here is
+ * the consequence, and the classes of problem a byte count cannot see.
  */
 const FLOORS = {
-  mobile: { performance: 78, accessibility: 100, 'best-practices': 100, seo: 100 },
+  mobile: { performance: 82, accessibility: 100, 'best-practices': 100, seo: 100 },
   desktop: { performance: 92, accessibility: 100, 'best-practices': 100, seo: 100 },
 }
 
@@ -62,7 +68,7 @@ const FLOORS = {
  * the hero paints when the entry bundle has landed and run — this is a bundle
  * budget wearing a different hat, and it is the honest way to hold one.
  */
-const LCP_CEILING = { mobile: 4.0, desktop: 1.5 }
+const LCP_CEILING = { mobile: 3.8, desktop: 1.5 }
 
 const browser = await chromium.launch({ args: [`--remote-debugging-port=${PORT}`] })
 const failures = []
