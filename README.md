@@ -40,6 +40,12 @@ supersets; timelines and safe rates stay computed locally and every movement id
 is validated against the catalogue. No key, a timeout or an invalid response
 all fall back to the built-in deterministic generator.
 
+In production the key sits on the sync server as `COACH_API_KEY`, with
+`COACH_BASE_URL` and `COACH_MODEL` naming any OpenAI-compatible vendor
+(DeepSeek: `https://api.deepseek.com/v1`, `deepseek-chat`). The same coach
+reads a Pro member's day on `/day` when they ask it to, and says on screen
+whether their day leaves the building. See `.env.example`.
+
 ## Features
 
 - **Plan builder.** Describe your situation in free text ("40 years old, 140kg,

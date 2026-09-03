@@ -69,6 +69,21 @@ export function serverCapabilities(): ServerCapabilities {
   return caps
 }
 
+/**
+ * Whoever is drawing from `caps` right now.
+ *
+ * The refresh below lands after the first render of whatever screen asked, and
+ * a module variable changing tells React nothing. A screen that read "no coach"
+ * a moment before the answer arrived stayed that way until something else made
+ * it draw again, which on a quiet screen was never. Subscribers get told.
+ */
+const listeners = new Set<() => void>()
+
+export function subscribeCapabilities(listener: () => void): () => void {
+  listeners.add(listener)
+  return () => listeners.delete(listener)
+}
+
 /** Asks the server what it can do. Quiet on failure: capabilities only grow. */
 export async function refreshCapabilities(server = '/pb'): Promise<void> {
   try {
@@ -93,6 +108,7 @@ export async function refreshCapabilities(server = '/pb'): Promise<void> {
     } catch {
       /* Private mode: the next boot just probes again. */
     }
+    for (const listener of listeners) listener()
   } catch {
     /* Offline or no server: the cached answer stands. */
   }

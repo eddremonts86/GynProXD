@@ -12,16 +12,16 @@ import {
 } from '@phosphor-icons/react'
 import type { Icon } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
-import { formatMinutes, lanesFor, type DayPlan, type DaySlot, type SlotKind } from '@/lib/day-plan'
 import {
-  clockOf,
-  freeSpans,
-  mergeSpans,
-  minutesOf,
-  wakingWindow,
-  type LifeProfile,
-  type Span,
-} from '@/lib/life-profile'
+  formatMinutes,
+  freeGaps,
+  lanesFor,
+  type DayPlan,
+  type DaySlot,
+  type SlotKind,
+} from '@/lib/day-plan'
+import type { GapNote } from '@/lib/day-read'
+import { clockOf, minutesOf, wakingWindow, type LifeProfile, type Span } from '@/lib/life-profile'
 import { useNowMinutes } from '@/hooks/use-now-minutes'
 
 /**
@@ -48,6 +48,8 @@ export const HOUR_PX = 64
 const PX_PER_MIN = HOUR_PX / 60
 /** A gap shorter than this carries no label; the space still shows. */
 const MIN_LABELLED_GAP_PX = 40
+/** And shorter than this, no suggestion: two lines of text need the room. */
+const MIN_NOTED_GAP_PX = 56
 const SPRING = { type: 'spring', stiffness: 100, damping: 20 } as const
 
 const ICONS: Record<SlotKind, Icon> = {
@@ -117,18 +119,6 @@ function place(plan: DayPlan, window: Span): Placed[] {
     })
   })
   return out
-}
-
-function gaps(plan: DayPlan, window: Span): Span[] {
-  const busy: Span[] = []
-  for (const slot of plan.slots) {
-    const start = minutesOf(slot.start)
-    const end = minutesOf(slot.end)
-    if (start === null || end === null || end <= start) continue
-    const clipped = { start: Math.max(start, window.start), end: Math.min(end, window.end) }
-    if (clipped.end > clipped.start) busy.push(clipped)
-  }
-  return freeSpans(mergeSpans(busy), window)
 }
 
 /** The breathing dot on the now line. Isolated so its loop touches nothing else. */
@@ -221,16 +211,19 @@ export function DayTimeline({
   plan,
   profile,
   isToday,
+  notes = [],
 }: {
   plan: DayPlan
   profile: LifeProfile
   isToday: boolean
+  /** What the model said each free gap allows, drawn inside the gap. */
+  notes?: readonly GapNote[]
 }) {
   const still = useReducedMotion() === true
   const window = wakingWindow(profile)
   const height = (window.end - window.start) * PX_PER_MIN
   const placed = place(plan, window)
-  const free = gaps(plan, window)
+  const free = freeGaps(plan, profile)
 
   const firstHour = Math.ceil(window.start / 60)
   const lastHour = Math.floor(window.end / 60)
@@ -266,13 +259,29 @@ export function DayTimeline({
         {free.map((gap) => {
           const gapHeight = (gap.end - gap.start) * PX_PER_MIN
           if (gapHeight < MIN_LABELLED_GAP_PX) return null
+          const middle = (gap.start - window.start) * PX_PER_MIN + gapHeight / 2
+          const note = gapHeight >= MIN_NOTED_GAP_PX ? notes.find((n) => n.start === gap.start) : undefined
           return (
-            <li
-              key={`gap-${gap.start}`}
-              className="num pointer-events-none absolute right-4 -translate-y-1/2 text-2xs text-ink-3"
-              style={{ top: (gap.start - window.start) * PX_PER_MIN + gapHeight / 2 }}
-            >
-              {formatMinutes(gap.end - gap.start)} free
+            <li key={`gap-${gap.start}`} className="contents">
+              <span
+                className="num pointer-events-none absolute right-4 -translate-y-1/2 text-2xs text-ink-3"
+                style={{ top: middle }}
+              >
+                {formatMinutes(gap.end - gap.start)} free
+              </span>
+              {/* The suggestion sits in the space it is about. Left of the label,
+                  two lines at most, and it arrives rather than appears. */}
+              {note && (
+                <motion.span
+                  className="pointer-events-none absolute left-4 right-24 line-clamp-2 -translate-y-1/2 text-2xs leading-snug text-ink-2"
+                  style={{ top: middle }}
+                  initial={still ? false : { opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={SPRING}
+                >
+                  {note.text}
+                </motion.span>
+              )}
             </li>
           )
         })}

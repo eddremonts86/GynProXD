@@ -12,6 +12,7 @@ import {
   toBase64,
   type CipherBlob,
 } from './crypto'
+import { refreshCapabilities } from './capabilities'
 import { recordKey, type Collection, type RecordMeta } from './records'
 import { listEnvelopes, writeRemoteEnvelope, type EnvelopeRow } from './record-store'
 import {
@@ -115,8 +116,14 @@ function publishLinked(profileId: string, linked: boolean): void {
 }
 
 function writeSyncLink(profileId: string, link: SyncLink): void {
+  /* A new server is a new set of capabilities. The shell probes them on
+     unlock, but an account created or signed into after that would have left
+     the app believing whatever the previous server, or no server, had said,
+     until the next unlock. Cursor updates hit the same server and skip this. */
+  const before = readSyncLink(profileId)
   localStorage.setItem(linkKey(profileId), JSON.stringify(link))
   publishLinked(profileId, true)
+  if (!before || before.server !== link.server) void refreshCapabilities(link.server)
 }
 
 /** Forgets the account on this device. Local rows stay exactly as they are. */

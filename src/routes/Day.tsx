@@ -6,8 +6,10 @@ import { Button } from '@/ui/Button'
 import { EmptyState } from '@/ui/EmptyState'
 import { ProGate } from '@/components/pro-gate'
 import { DayNowTile } from '@/components/day-now-tile'
+import { DayReadPanel } from '@/components/day-read'
 import { DaySheet } from '@/components/day-sheet'
 import { DayTimeline } from '@/components/day-timeline'
+import { useDayRead } from '@/hooks/use-day-read'
 import { useGym } from '@/store/useGym'
 import { useDayPlates } from '@/lib/use-day-plates'
 import { useDayPlan } from '@/lib/use-day-plan'
@@ -54,6 +56,8 @@ function DayPlanner() {
 
   const free = freeMinutes(plan, profile)
   const hasAnything = plan.slots.length > 0
+  const reading = useDayRead(plan, profile)
+  const notes = reading.state.kind === 'done' ? reading.state.read.notes : []
   const openSheet = () => void navigate({ to: '/day', search: { edit: true } })
   const closeSheet = () => void navigate({ to: '/day', search: {} })
 
@@ -77,6 +81,18 @@ function DayPlanner() {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] md:items-start">
         <aside className="order-first flex flex-col gap-4 md:order-last md:sticky md:top-6">
           <DayNowTile plan={plan} profile={profile} isToday freeMinutesTotal={free} />
+
+          {/* Asked for, never automatic: the day carries what somebody typed,
+              and reading it spends a metered call. An empty day has nothing
+              to read. */}
+          {hasAnything && (
+            <DayReadPanel
+              state={reading.state}
+              offered={reading.offered}
+              host={reading.host}
+              onAsk={() => void reading.ask()}
+            />
+          )}
 
           {plan.unplaced.length > 0 && (
             <ul className="flex flex-col gap-2 border-t border-line pt-4">
@@ -108,7 +124,7 @@ function DayPlanner() {
         </aside>
 
         <div className="min-w-0">
-          <DayTimeline plan={plan} profile={profile} isToday />
+          <DayTimeline plan={plan} profile={profile} isToday notes={notes} />
         </div>
       </div>
 

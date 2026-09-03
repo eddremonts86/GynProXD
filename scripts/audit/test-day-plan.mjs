@@ -29,6 +29,7 @@
  * server for the app; point at it with BASE_URL.
  */
 import { spawn } from 'node:child_process'
+import http from 'node:http'
 import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
@@ -50,7 +51,49 @@ const check = (label, got, want) => {
   )
 }
 
-const pb = await startSandbox()
+/**
+ * A coach that answers instantly, on loopback.
+ *
+ * The sandbox gets COACH_* pointed here, so the server reports a coach on our
+ * own hardware and the day read has something to talk to. It answers the day
+ * prompt with one suggestion per gap it was told about plus one gap it was not,
+ * and a dash the house does not use, so the walk can watch the gate drop the
+ * invention and clean the text. Anything else (the intake) gets no anchors,
+ * which leaves the regex path in charge exactly as a server with no coach would.
+ */
+const coach = http.createServer((req, res) => {
+  let body = ''
+  req.on('data', (d) => (body += d))
+  req.on('end', () => {
+    let content = '{"anchors":[]}'
+    try {
+      const { messages } = JSON.parse(body)
+      const user = messages.find((m) => m.role === 'user')?.content ?? ''
+      if (/what it allows/.test(user)) {
+        const gaps = [...user.matchAll(/^- (\d\d:\d\d) to (\d\d:\d\d) \(/gm)].map((m) => ({ start: m[1], end: m[2] }))
+        content = JSON.stringify({
+          read: 'Work takes the middle — the edges are yours.',
+          gaps: [
+            ...gaps.map((g) => ({ ...g, suggestion: `Something for ${g.start}` })),
+            { start: '03:00', end: '04:00', suggestion: 'Invented at three in the morning' },
+          ],
+        })
+      }
+    } catch {
+      /* The default answer. */
+    }
+    res.writeHead(200, { 'content-type': 'application/json' })
+    res.end(JSON.stringify({
+      model: 'fake',
+      usage: { prompt_tokens: 1, completion_tokens: 1 },
+      choices: [{ message: { role: 'assistant', content } }],
+    }))
+  })
+})
+await new Promise((r) => coach.listen(0, '127.0.0.1', r))
+const pb = await startSandbox({
+  env: { COACH_API_KEY: 'fake', COACH_BASE_URL: `http://127.0.0.1:${coach.address().port}` },
+})
 const browser = await chromium.launch()
 
 const grantPro = (args) =>
@@ -207,6 +250,46 @@ try {
     [],
   )
 
+  console.log('\nthe day, read')
+  /* The sheet is still open from the axe pass above and its backdrop takes
+     every click meant for the page behind it. */
+  await closeSheet()
+  const beforeRead = await dayText()
+  check('is offered, and says where the day goes', /Read by a model running on our own hardware/.test(beforeRead), true)
+  check('and nothing was read before anybody asked', /the edges are yours/.test(beforeRead), false)
+  await main().getByRole('button', { name: 'Read my day' }).click()
+  /* Whichever sentence the panel settles on. Waiting for the good one alone
+     turned a wrong answer into a timeout with nothing to read. */
+  const OUTCOME = /the edges are yours|could not be reached|did not fit the day|answered enough times|No coach on this server/
+  await main().getByText(OUTCOME).first().waitFor({ timeout: 15000 }).catch(() => {})
+  const withRead = await dayText()
+  const panelText = (await main().locator('section[aria-labelledby="day-read-title"]').innerText()).replace(/\s+/g, ' ').trim()
+  check(
+    'two sentences about the day, with the dash the house does not use gone',
+    /Work takes the middle , the edges are yours\./.test(withRead) ? 'the edges are yours, comma and all' : `panel says: ${panelText}`,
+    'the edges are yours, comma and all',
+  )
+  check('a suggestion sits in the morning gap', /Something for 07:00/.test(withRead), true)
+  check('and the gap it invented at three in the morning does not', /Invented at three/.test(withRead), false)
+  const spent = async () =>
+    (await pb.api('GET', '/api/collections/coach_usage/records?perPage=1', undefined, pb.su)).json.totalItems
+  check('the meter counted one call', await spent(), 1)
+  await page.reload({ waitUntil: 'networkidle' })
+  await main().getByText(/the edges are yours/).waitFor({ timeout: 15000 })
+  check('a reload keeps the reading without asking again', await spent(), 1)
+  const { violations: readViolations } = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+    .analyze()
+  check(
+    'and the reading passes axe',
+    readViolations
+      .filter((v) => v.impact === 'serious' || v.impact === 'critical')
+      .map((v) => `${v.id} (${v.nodes.length}) ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join(' | ')}`),
+    [],
+  )
+  /* The next section works inside the sheet. */
+  await openSheet()
+
   console.log('\nwhat the form refuses')
   await sheet().getByRole('button', { name: 'Add more fixed hours' }).click()
   await sheet().getByLabel('What is it').fill('night shift')
@@ -239,7 +322,10 @@ try {
   /* No coach is configured against a sandbox, so the sentence has to be the
      one that promises nothing leaves. The point of `where()` living in one
      place is that this sentence and the request cannot disagree. */
-  check('says where the words go, before the box is used', /Nothing you type here is sent anywhere/.test(intake), true)
+  /* The sandbox's coach is the fake one on loopback, which the server classifies
+     as our own hardware, and the sentence has to say that rather than promise
+     the words stayed on the device. */
+  check('says where the words go, before the box is used', /model running on our own hardware/.test(intake), true)
   check('and nothing is proposed before it is asked', /What it read/.test(intake), false)
 
   await page.getByLabel('Describe your week').fill(
@@ -282,6 +368,7 @@ try {
   check('the discarded one is not', /train home/.test(afterIntake), false)
   await openSheet()
   check('two anchors now', await sheet().getByRole('button', { name: /^Remove / }).count(), 2)
+  check('and the reading is gone, because the day changed', /the edges are yours/.test(await dayText()), false)
 
   console.log('\nan hour they would rather train')
   /* Work 09:00-17:00 leaves 07:00-08:15 (the school run now takes 08:15),
@@ -570,6 +657,7 @@ try {
 } finally {
   await browser.close()
   await pb.stop()
+  coach.close()
 }
 
 console.log(failures === 0 ? '\nall clear\n' : `\n${failures} failed\n`)

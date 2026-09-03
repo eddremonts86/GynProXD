@@ -336,8 +336,14 @@ export function formatMinutes(minutes: number): string {
   return m === 0 ? `${h}h` : `${h}h ${m}m`
 }
 
-/** How much of the waking day is still free, in minutes. For one honest line. */
-export function freeMinutes(plan: DayPlan, profile: LifeProfile): number {
+/**
+ * The free spans of the waking day, clipped to it and merged.
+ *
+ * One function because three things depend on the same answer: the timeline
+ * draws these as space, the total is their sum, and the day read names each one
+ * to the model and refuses any suggestion for a gap that is not here.
+ */
+export function freeGaps(plan: DayPlan, profile: LifeProfile): Span[] {
   const window = wakingWindow(profile)
   const busy: Span[] = []
   for (const slot of plan.slots) {
@@ -347,14 +353,12 @@ export function freeMinutes(plan: DayPlan, profile: LifeProfile): number {
     const clipped = { start: Math.max(start, window.start), end: Math.min(end, window.end) }
     if (clipped.end > clipped.start) busy.push(clipped)
   }
-  busy.sort((a, b) => a.start - b.start)
-  const merged: Span[] = []
-  for (const span of busy) {
-    const last = merged[merged.length - 1]
-    if (last && span.start <= last.end) last.end = Math.max(last.end, span.end)
-    else merged.push({ ...span })
-  }
-  return freeSpans(merged, window).reduce((total, gap) => total + (gap.end - gap.start), 0)
+  return freeSpans(mergeSpans(busy), window)
+}
+
+/** How much of the waking day is still free, in minutes. For one honest line. */
+export function freeMinutes(plan: DayPlan, profile: LifeProfile): number {
+  return freeGaps(plan, profile).reduce((total, gap) => total + (gap.end - gap.start), 0)
 }
 
 /* -------------------------------------------------------------- the screen */
