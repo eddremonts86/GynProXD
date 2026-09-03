@@ -28,7 +28,7 @@ import {
  * There is no `rest` slot: an empty hour is not an activity.
  */
 
-export type SlotKind = 'anchor' | 'busy' | 'training' | 'meal' | 'challenge'
+export type SlotKind = 'anchor' | 'busy' | 'event' | 'training' | 'meal' | 'challenge'
 
 /**
  * The kinds this file places into free time, as opposed to the two it is told
@@ -100,6 +100,15 @@ export interface DayInput {
   plate?: { label: string; ref?: string } | null
   /** A challenge already running, on a day it asks for. */
   challenge?: { label: string; ref?: string } | null
+  /**
+   * Things the member said yes to on this date: a gym event with an RSVP.
+   *
+   * Fixed time, like an anchor and unlike everything the placer arranges. Being
+   * somewhere at seven because you said you would be is not a preference, and a
+   * planner that scheduled a session over it would be wrong in the way that
+   * ends the relationship.
+   */
+  commitments?: readonly { label: string; start: string; end: string; ref?: string }[]
 }
 
 type Preference = { mode: 'largest' } | { mode: 'near'; at: number }
@@ -171,9 +180,22 @@ export function buildDay(input: DayInput, now = new Date()): DayPlan {
   const window = wakingWindow(profile)
   /* Two sources, merged once. Weekly anchors are what somebody described;
      dated blocks are what their calendar says about this particular day. */
+  const committed: Span[] = []
+  for (const item of input.commitments ?? []) {
+    const from = minutesOf(item.start)
+    const to = minutesOf(item.end)
+    if (from === null || to === null || to <= from) continue
+    const clipped = { start: Math.max(from, window.start), end: Math.min(to, window.end) }
+    if (clipped.end > clipped.start) committed.push(clipped)
+  }
+
+  /* Three sources, merged once. Weekly anchors are what somebody described,
+     dated blocks are what their calendar says, and commitments are what they
+     told a gym they would turn up to. */
   const busy = mergeSpans([
     ...(day ? busySpans(profile.anchors, day, window) : []),
     ...datedSpans(profile.busy, date, window),
+    ...committed,
   ])
 
   const slots: DaySlot[] = []
@@ -210,6 +232,19 @@ export function buildDay(input: DayInput, now = new Date()): DayPlan {
          block imported without one, and it is what the day needs to know. */
       label: block.label && block.label.trim() !== '' ? block.label : 'Busy',
       ref: block.id,
+    })
+  }
+
+  for (const item of input.commitments ?? []) {
+    const from = minutesOf(item.start)
+    const to = minutesOf(item.end)
+    if (from === null || to === null || to <= from) continue
+    slots.push({
+      start: item.start,
+      end: item.end,
+      kind: 'event',
+      label: item.label,
+      ref: item.ref,
     })
   }
 

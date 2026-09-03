@@ -28,6 +28,24 @@ export const PRO_FEATURES = [
   'day-plan',
   'companion',
   'calendar',
+  /**
+   * Local culture, and the reason it is still a name.
+   *
+   * A gym on the platform publishes events, and the day planner reads the ones
+   * a member has said yes to — but that is the gym they already train at
+   * telling them about its own class, which is an improvement to `day-plan`
+   * rather than a feature somebody would pay separately for.
+   *
+   * What this word promises is what is on in somebody's town, and there is no
+   * source for that. A venue's own calendar cannot be fetched from a browser
+   * (no CORS headers on anybody's `.ics`) and fetching it server-side is a
+   * route that will retrieve an arbitrary URL on our behalf, which is a
+   * security boundary rather than a convenience. A curated per-area list is the
+   * remaining option and it is a content business with a person in it.
+   *
+   * So the card stays untickable until there is a source. `second-rooms` is the
+   * precedent: it left the Plus list rather than being marked built.
+   */
   'culture',
   'intimacy',
 ] as const
@@ -42,8 +60,10 @@ export type ProFeature = (typeof PRO_FEATURES)[number]
  * about somebody's week read into proposed anchors, by regexes always and by a
  * model when the server has one, with nothing saved until it is tapped.
  * `calendar` is the `.ics` half of `/day`: a file the member picks, read three
- * weeks ahead into dated busy blocks, and the day exported back out. Everything
- * else on the list above is still a name.
+ * weeks ahead into dated busy blocks, and the day exported back out.
+ *
+ * `culture` and `intimacy` are still names, and the entry for `culture` above
+ * says at length why reading the gym bus into the day did not earn it.
  *
  * Each feature joins this set in the phase that finishes it, which is why the
  * gate and the copy cannot drift apart: one set, read by both. The failure it

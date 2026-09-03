@@ -200,9 +200,7 @@ export function CalendarImport({
                 }
               />
               <span className="num w-[9.5rem] shrink-0 text-2xs text-ink-3">
-                {formatShortDate(event.date)} {event.start}
-                <span className="px-1">to</span>
-                {event.end}
+                {`${formatShortDate(event.date)} ${event.start} to ${event.end}`}
               </span>
               <span className="min-w-0 flex-1 truncate text-sm text-ink">{event.title}</span>
             </label>

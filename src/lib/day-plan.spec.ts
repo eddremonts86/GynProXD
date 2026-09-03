@@ -296,6 +296,57 @@ describe('the challenge day', () => {
   })
 })
 
+describe('something they said they would turn up to', () => {
+  const commitment = { label: 'Saturday class', start: '10:00', end: '11:00', ref: 'm1' }
+
+  it('is on the day at the hour it was answered for', () => {
+    const plan = day({ commitments: [commitment] })
+    expect(plan.slots.map((s) => `${s.kind} ${s.start}-${s.end} ${s.label}`)).toEqual([
+      'event 10:00-11:00 Saturday class',
+    ])
+  })
+
+  it('blocks the time, like an anchor and unlike anything placed', () => {
+    // Being somewhere at ten because you said you would be is not a
+    // preference. A planner that scheduled a session over it would be wrong in
+    // the way that ends the relationship.
+    const p = profile({ wake: '09:00', sleep: '13:00' })
+    const plan = buildDay(
+      { date: MONDAY, profile: p, training: { label: 'Push', minutes: 90 }, commitments: [commitment] },
+      NOW,
+    )
+    expect(at('training', plan)).toEqual(['11:00-12:30'])
+  })
+
+  it('merges with an anchor it runs into', () => {
+    const p = profile({ anchors: [anchor({ start: '11:00', end: '17:00' })] })
+    const plan = buildDay(
+      {
+        date: MONDAY,
+        profile: p,
+        training: { label: 'Push', minutes: 60 },
+        commitments: [commitment],
+      },
+      NOW,
+    )
+    /* 07:00-10:00 and 17:00-23:00 are the free time; the evening is bigger. */
+    expect(at('training', plan)).toEqual(['17:00-18:00'])
+  })
+
+  it('can leave a day with no room, and says so', () => {
+    const plan = day({
+      commitments: [{ ...commitment, start: '07:00', end: '23:00' }],
+      training: { label: 'Push', minutes: 60 },
+    })
+    expect(plan.unplaced).toEqual(['training'])
+  })
+
+  it('is ignored when its times make no sense', () => {
+    const plan = day({ commitments: [{ ...commitment, start: '11:00', end: '10:00' }] })
+    expect(plan.slots).toEqual([])
+  })
+})
+
 describe('the shape of the output', () => {
   it('is sorted by the time of day', () => {
     const plan = day({

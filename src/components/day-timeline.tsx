@@ -1,4 +1,4 @@
-import { Barbell, CalendarBlank, CalendarX, ForkKnife, Trophy } from '@phosphor-icons/react'
+import { Barbell, CalendarBlank, CalendarX, ForkKnife, Ticket, Trophy } from '@phosphor-icons/react'
 import type { Icon } from '@phosphor-icons/react'
 import { Link } from '@tanstack/react-router'
 import { Panel } from '@/ui/Panel'
@@ -25,6 +25,8 @@ const ICONS: Record<SlotKind, Icon> = {
   /* A different mark from an anchor on purpose: one is a pattern somebody
      described, the other is a thing their calendar says about this one day. */
   busy: CalendarX,
+  /* An invitation answered, not an hour imposed. */
+  event: Ticket,
   training: Barbell,
   meal: ForkKnife,
   challenge: Trophy,
@@ -33,16 +35,21 @@ const ICONS: Record<SlotKind, Icon> = {
 const TONE: Record<SlotKind, string> = {
   anchor: 'text-ink-3',
   busy: 'text-ink-3',
+  event: 'text-ink-2',
   training: 'text-brand',
   meal: 'text-ink-2',
   challenge: 'text-ink-2',
 }
 
 /** Where a slot links to, when it points at something with a screen of its own. */
-function hrefOf(slot: DaySlot): { to: '/planner' | '/recipe/$id' | '/challenges'; params?: { id: string } } | null {
+function hrefOf(
+  slot: DaySlot,
+): { to: '/planner' | '/recipe/$id' | '/challenges' | '/inbox'; params?: { id: string } } | null {
   if (slot.kind === 'training') return { to: '/planner' }
   if (slot.kind === 'challenge') return { to: '/challenges' }
   if (slot.kind === 'meal' && slot.ref) return { to: '/recipe/$id', params: { id: slot.ref } }
+  /* Back to the invitation, which is where the details and the RSVP live. */
+  if (slot.kind === 'event') return { to: '/inbox' }
   return null
 }
 
@@ -50,10 +57,11 @@ function Row({ slot }: { slot: DaySlot }) {
   const IconFor = ICONS[slot.kind]
   const body = (
     <>
+      {/* One string, not two with padding between them. The padded version
+          looked right and read as "20:00to21:00" to anything consuming the
+          text, which is a screen reader and every assertion about this row. */}
       <span className="num w-[5.5rem] shrink-0 text-2xs text-ink-3">
-        {slot.start}
-        <span className="px-1 text-ink-3">to</span>
-        {slot.end}
+        {`${slot.start} to ${slot.end}`}
       </span>
       <IconFor size={16} className={TONE[slot.kind]} />
       <span className="min-w-0 flex-1 truncate text-sm text-ink">{slot.label}</span>

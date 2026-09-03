@@ -1,5 +1,9 @@
 import { useGym } from '../store/useGym'
+import { useMessages } from '../store/useMessages'
+import { useSession } from '../store/useSession'
 import { challengeCalendar } from './challenge'
+import { commitmentsOn } from './local-events'
+import { viewerFor } from './profiles'
 import { buildDay, weekdayOf, type DayPlan } from './day-plan'
 import { emptyLifeProfile, type LifeProfile } from './life-profile'
 
@@ -73,6 +77,9 @@ export function useDayPlan(date: string, plate: DayPlate | null = null): {
   const plans = useGym((s) => s.plans)
   const generatedPlans = useGym((s) => s.generatedPlans)
   const challenges = useGym((s) => s.challenges)
+  const messages = useMessages((s) => s.messages)
+  const profileId = useSession((s) => s.profileId)
+  const gym = useSession((s) => s.gym)
 
   const profile = stored ?? emptyLifeProfile()
   const weekday = weekdayOf(date)
@@ -81,6 +88,16 @@ export function useDayPlan(date: string, plate: DayPlate | null = null): {
      which is the rule Today already uses to decide what is scheduled. */
   const training = trainingFor(plans, generatedPlans, weekday)
   const challenge = challengeFor(challenges, date)
+  /* `viewerFor` rather than a hand-assembled `{ id, gym }`, and `inboxFor`
+     inside `commitmentsOn` rather than a second answer to who a message
+     reaches. `profiles.ts` records what it cost the last time six screens each
+     worked that out for themselves. */
+  const commitments = profileId
+    ? commitmentsOn(messages, viewerFor(profileId, gym), date)
+    : []
 
-  return { plan: buildDay({ date, profile, training, plate, challenge }), profile }
+  return {
+    plan: buildDay({ date, profile, training, plate, challenge, commitments }),
+    profile,
+  }
 }

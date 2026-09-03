@@ -14,6 +14,8 @@
  *                 guesses, and nothing is saved until it is tapped
  *   the calendar  a real .ics file blocks real time, its titles are shown and
  *                 not stored unless asked, and the day exports back out
+ *   the gym bus   an event the member said yes to blocks time; one they have
+ *                 not answered does not
  *
  * The last one is the whole feature in one assertion. Everything else on that
  * screen comes from somewhere else in the app; what this phase added is the
@@ -330,6 +332,84 @@ try {
   const cleared = await dayText()
   check('the block is gone', /Dentist/.test(cleared), false)
   check('and the anchors are not', /school run/.test(cleared), true)
+
+  console.log('\nan event the gym published')
+  /**
+   * Seeded into the device bus rather than published through the gym panel,
+   * which `test-gym-flow` already walks end to end. What is new here is the
+   * day planner reading it, and that is what this exercises: the same row
+   * shape the bus holds, unanswered first and answered second, so the rule
+   * that decides between them is the thing under test.
+   */
+  const eventDate = await page.evaluate(() => {
+    const at = new Date()
+    return `${at.getFullYear()}-${String(at.getMonth() + 1).padStart(2, '0')}-${String(at.getDate()).padStart(2, '0')}`
+  })
+  const seed = async (rsvp) => {
+    await page.evaluate(
+      ([date, answer]) => {
+        const raw = localStorage.getItem('forma-gym-messages')
+        const rows = raw ? JSON.parse(raw) : []
+        const mine = rows.filter((r) => r.id !== 'seeded-event')
+        mine.push({
+          id: 'seeded-event',
+          gym: '',
+          authorId: 'op-seed',
+          createdAt: new Date().toISOString(),
+          kind: 'event',
+          /* The open door: the scope that reaches somebody with no gym, which
+             is what "what is on near me" actually means for this member. A
+             default-scoped message would need them to belong to the gym that
+             sent it. */
+          scope: 'open-door',
+          title: 'Salsa night at the club',
+          audience: 'all',
+          readBy: [],
+          rsvp: answer,
+          saved: [],
+          event: { date, time: '20:00', place: 'The club' },
+        })
+        localStorage.setItem('forma-gym-messages', JSON.stringify(mine))
+      },
+      [eventDate, rsvp],
+    )
+    await page.goto(`${BASE}/day`, { waitUntil: 'networkidle' })
+    await page.getByRole('heading', { name: 'Your day', level: 1 }).waitFor({ timeout: 10000 })
+  }
+
+  /* Unanswered: an invitation, not a commitment. */
+  await seed({})
+  const unanswered = await dayText()
+  check('an invitation does not touch the day', /Salsa night/.test(unanswered), false)
+
+  /* Answered yes: something they said they would turn up to. */
+  const profileId = await page.evaluate(() => {
+    const raw = localStorage.getItem('forma-profiles')
+    const parsed = raw ? JSON.parse(raw) : null
+    return parsed?.profiles?.[0]?.id ?? null
+  })
+  check('the walk found the profile it is answering as', typeof profileId, 'string')
+  await seed({ [profileId]: 'yes' })
+  const answered = await dayText()
+  check('one they said yes to is on the day', /Salsa night at the club/.test(answered), true)
+  check('at the hour it was answered for', /20:00 to 21:00/.test(answered), true)
+
+  /* Cleared before the checks below, which are about an empty day. Leaving a
+     seeded hour on it would have made three later assertions fail for a reason
+     that has nothing to do with what they test. */
+  await page.evaluate(() => {
+    const raw = localStorage.getItem('forma-gym-messages')
+    const rows = raw ? JSON.parse(raw) : []
+    localStorage.setItem(
+      'forma-gym-messages',
+      JSON.stringify(rows.filter((r) => r.id !== 'seeded-event')),
+    )
+  })
+  /* And reloaded, because the bus is hydrated from localStorage on boot and a
+     same-tab write raises no storage event. Without this the store still holds
+     the seeded hour and the checks below count it. */
+  await page.goto(`${BASE}/day`, { waitUntil: 'networkidle' })
+  await page.getByRole('heading', { name: 'Your day', level: 1 }).waitFor({ timeout: 10000 })
 
   console.log('\ntaking it back off')
   await page.getByRole('button', { name: 'Remove school run' }).click()
