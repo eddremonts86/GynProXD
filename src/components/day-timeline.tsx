@@ -1,3 +1,6 @@
+import { memo } from 'react'
+import { motion, useReducedMotion } from 'motion/react'
+import { Link } from '@tanstack/react-router'
 import {
   Barbell,
   CalendarBlank,
@@ -8,32 +11,48 @@ import {
   Trophy,
 } from '@phosphor-icons/react'
 import type { Icon } from '@phosphor-icons/react'
-import { Link } from '@tanstack/react-router'
-import { Panel } from '@/ui/Panel'
-import { formatMinutes, type DayPlan, type DaySlot, type SlotKind } from '@/lib/day-plan'
-import { clockOf, minutesOf, wakingWindow, type LifeProfile } from '@/lib/life-profile'
+import { cn } from '@/lib/utils'
+import { formatMinutes, lanesFor, type DayPlan, type DaySlot, type SlotKind } from '@/lib/day-plan'
+import {
+  clockOf,
+  freeSpans,
+  mergeSpans,
+  minutesOf,
+  wakingWindow,
+  type LifeProfile,
+  type Span,
+} from '@/lib/life-profile'
+import { useNowMinutes } from '@/hooks/use-now-minutes'
 
 /**
- * The day, read top to bottom.
+ * The day, drawn to scale.
  *
- * A list with the free time called out between the rows, not a proportional
- * strip. Proportional was the first idea and it is wrong on a phone: an eight
- * hour work block drawn to scale reduces a ninety minute session to a sliver
- * and the plate to a line, so the two things somebody opened the screen for are
- * the two hardest to read. Here every row is legible and the gaps carry a
- * number, which is the same information without the scale problem.
+ * Hours are a ruler down the left; every block is positioned where its minutes
+ * are and is as tall as it is long. Free time is the space between blocks,
+ * which is what free time looks like, and only the gaps tall enough to carry a
+ * label get one.
  *
- * The gaps are computed from the slots rather than emitted by `buildDay`,
- * because free time is not an activity and the planner does not invent one. It
- * is the space between things, and space is a rendering concern.
+ * The first version was a list with "2h free" rows between the items. It read
+ * as a spreadsheet, and the annotation on the screenshot circled it. A block
+ * you can see the height of is information a row of text is not.
+ *
+ * Two things at once sit side by side rather than on top of each other:
+ * `lanesFor` works out the columns. The current minute is a hairline across
+ * the track, moving on the half minute, with a dot that breathes. That dot is
+ * the one perpetual animation on the screen and it is isolated in its own
+ * memoised component so nothing else re-renders for it.
  */
+
+/** Pixels per hour. Sixty-four puts a half-hour block at one legible line. */
+export const HOUR_PX = 64
+const PX_PER_MIN = HOUR_PX / 60
+/** A gap shorter than this carries no label; the space still shows. */
+const MIN_LABELLED_GAP_PX = 40
+const SPRING = { type: 'spring', stiffness: 100, damping: 20 } as const
 
 const ICONS: Record<SlotKind, Icon> = {
   anchor: CalendarBlank,
-  /* A different mark from an anchor on purpose: one is a pattern somebody
-     described, the other is a thing their calendar says about this one day. */
   busy: CalendarX,
-  /* An invitation answered, not an hour imposed. */
   event: Ticket,
   training: Barbell,
   meal: ForkKnife,
@@ -41,17 +60,21 @@ const ICONS: Record<SlotKind, Icon> = {
   intimacy: Heart,
 }
 
-const TONE: Record<SlotKind, string> = {
-  anchor: 'text-ink-3',
-  busy: 'text-ink-3',
-  event: 'text-ink-2',
-  training: 'text-brand',
-  meal: 'text-ink-2',
-  challenge: 'text-ink-2',
-  intimacy: 'text-ink-2',
+/**
+ * How each kind is painted. One signal: the session, which is what the rest of
+ * the app is about, takes the strongest contrast. Everything imposed on the day
+ * (anchors, calendar, events) is quiet; everything placed into it is a step up.
+ */
+const PAINT: Record<SlotKind, string> = {
+  anchor: 'bg-surface-2 text-ink-2 ring-line',
+  busy: 'bg-surface-2 text-ink-2 ring-line-strong [background-image:repeating-linear-gradient(135deg,transparent_0_6px,rgb(0_0_0/0.04)_6px_7px)]',
+  event: 'bg-surface text-ink ring-line',
+  training: 'bg-brand text-brand-ink ring-transparent shadow-[var(--shadow-tile)]',
+  meal: 'bg-surface text-ink ring-line',
+  challenge: 'bg-surface text-ink ring-line',
+  intimacy: 'bg-surface text-ink ring-line',
 }
 
-/** Where a slot links to, when it points at something with a screen of its own. */
 function hrefOf(
   slot: DaySlot,
 ):
@@ -60,70 +83,211 @@ function hrefOf(
   if (slot.kind === 'training') return { to: '/planner' }
   if (slot.kind === 'challenge') return { to: '/challenges' }
   if (slot.kind === 'meal' && slot.ref) return { to: '/recipe/$id', params: { id: slot.ref } }
-  /* Back to the invitation, which is where the details and the RSVP live. */
   if (slot.kind === 'event') return { to: '/inbox' }
   if (slot.kind === 'intimacy') return { to: '/intimacy' }
   return null
 }
 
-function Row({ slot }: { slot: DaySlot }) {
-  const IconFor = ICONS[slot.kind]
-  const body = (
-    <>
-      {/* One string, not two with padding between them. The padded version
-          looked right and read as "20:00to21:00" to anything consuming the
-          text, which is a screen reader and every assertion about this row. */}
-      <span className="num w-[5.5rem] shrink-0 text-2xs text-ink-3">
-        {`${slot.start} to ${slot.end}`}
-      </span>
-      <IconFor size={16} className={TONE[slot.kind]} />
-      <span className="min-w-0 flex-1 truncate text-sm text-ink">{slot.label}</span>
-    </>
-  )
-  const href = hrefOf(slot)
-  return href ? (
-    <Link
-      {...href}
-      className="flex min-h-11 items-center gap-2 px-3 py-2 hover:bg-surface-2"
-    >
-      {body}
-    </Link>
-  ) : (
-    <div className="flex min-h-11 items-center gap-2 px-3 py-2">{body}</div>
-  )
+interface Placed {
+  slot: DaySlot
+  top: number
+  height: number
+  lane: number
+  lanes: number
 }
 
-function Gap({ from, to }: { from: number; to: number }) {
-  return (
-    <div className="flex items-center gap-2 px-3 py-1.5">
-      <span className="num w-[5.5rem] shrink-0 text-2xs text-ink-3">{clockOf(from)}</span>
-      <span className="h-px flex-1 border-t border-dashed border-line" />
-      <span className="num text-2xs text-ink-3">{formatMinutes(to - from)} free</span>
-    </div>
-  )
-}
-
-export function DayTimeline({ plan, profile }: { plan: DayPlan; profile: LifeProfile }) {
-  const window = wakingWindow(profile)
-  const rows: React.ReactNode[] = []
-  /* Where the drawing has got to. Not the same as the previous slot's end: an
-     anchor is drawn as entered and may overhang the window or a neighbour, and
-     a gap computed from an overhang would be negative. */
-  let cursor = window.start
-
+function place(plan: DayPlan, window: Span): Placed[] {
+  const lanes = lanesFor(plan.slots)
+  const out: Placed[] = []
   plan.slots.forEach((slot, index) => {
     const start = minutesOf(slot.start)
     const end = minutesOf(slot.end)
-    if (start === null || end === null) return
-    if (start > cursor) rows.push(<Gap key={`gap-${index}`} from={cursor} to={start} />)
-    rows.push(<Row key={`${slot.kind}-${slot.start}-${index}`} slot={slot} />)
-    cursor = Math.max(cursor, end)
+    if (start === null || end === null || end <= start) return
+    /* Clipped to the window for drawing, so a shift that starts before the
+       alarm begins at the top of the track rather than above it. */
+    const from = Math.max(start, window.start)
+    const to = Math.min(end, window.end)
+    if (to <= from) return
+    out.push({
+      slot,
+      top: (from - window.start) * PX_PER_MIN,
+      height: (to - from) * PX_PER_MIN,
+      lane: lanes[index].lane,
+      lanes: lanes[index].lanes,
+    })
   })
-  if (cursor < window.end) rows.push(<Gap key="gap-last" from={cursor} to={window.end} />)
+  return out
+}
+
+function gaps(plan: DayPlan, window: Span): Span[] {
+  const busy: Span[] = []
+  for (const slot of plan.slots) {
+    const start = minutesOf(slot.start)
+    const end = minutesOf(slot.end)
+    if (start === null || end === null || end <= start) continue
+    const clipped = { start: Math.max(start, window.start), end: Math.min(end, window.end) }
+    if (clipped.end > clipped.start) busy.push(clipped)
+  }
+  return freeSpans(mergeSpans(busy), window)
+}
+
+/** The breathing dot on the now line. Isolated so its loop touches nothing else. */
+const Pulse = memo(function Pulse({ still }: { still: boolean }) {
+  return (
+    <motion.span
+      aria-hidden
+      className="absolute -top-[4px] -left-[5px] size-2.5 rounded-full bg-danger"
+      animate={still ? undefined : { scale: [1, 1.5, 1], opacity: [1, 0.55, 1] }}
+      transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+    />
+  )
+})
+
+const NowLine = memo(function NowLine({ window, still }: { window: Span; still: boolean }) {
+  const now = useNowMinutes()
+  if (now < window.start || now >= window.end) return null
+  const top = (now - window.start) * PX_PER_MIN
+  return (
+    <div
+      className="pointer-events-none absolute inset-x-0 z-10"
+      style={{ top }}
+      aria-label={`Now, ${clockOf(now)}`}
+      role="img"
+    >
+      <div className="relative h-px bg-danger/70">
+        <Pulse still={still} />
+      </div>
+    </div>
+  )
+})
+
+function Block({ placed, index, still }: { placed: Placed; index: number; still: boolean }) {
+  const { slot, top, height, lane, lanes } = placed
+  const IconFor = ICONS[slot.kind]
+  const compact = height < 44
+  const tiny = height < 26
+  const href = hrefOf(slot)
+
+  const body = (
+    <>
+      <span className="flex min-w-0 items-center gap-1.5">
+        <IconFor size={tiny ? 12 : 14} className="shrink-0 opacity-80" />
+        <span className={cn('min-w-0 truncate font-medium', tiny ? 'text-2xs' : 'text-xs')}>
+          {slot.label}
+        </span>
+      </span>
+      {!compact && (
+        <span className="num text-2xs">{`${slot.start} to ${slot.end}`}</span>
+      )}
+    </>
+  )
+
+  const face = cn(
+    'absolute inset-0 flex flex-col justify-between overflow-hidden rounded-md px-2.5 ring-1 ring-inset',
+    'transition-[filter] duration-150 hover:brightness-[1.06] active:scale-[0.99]',
+    tiny ? 'py-0.5' : 'py-1.5',
+    PAINT[slot.kind],
+  )
+  const style = {
+    top,
+    height: Math.max(height, 18),
+    left: `calc(${(lane / lanes) * 100}% + ${lane === 0 ? 0 : 2}px)`,
+    width: `calc(${100 / lanes}% - ${lanes > 1 ? 2 : 0}px)`,
+  }
 
   return (
-    <Panel padding="none" className="divide-y divide-line">
-      {rows}
-    </Panel>
+    <motion.div
+      layout
+      initial={still ? false : { opacity: 0, y: 6, scale: 0.985 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ ...SPRING, delay: still ? 0 : index * 0.035 }}
+      className="absolute"
+      style={style}
+    >
+      {href ? (
+        <Link {...href} className={cn(face, 'text-inherit no-underline')}>
+          {body}
+        </Link>
+      ) : (
+        <div className={face}>{body}</div>
+      )}
+    </motion.div>
+  )
+}
+
+export function DayTimeline({
+  plan,
+  profile,
+  isToday,
+}: {
+  plan: DayPlan
+  profile: LifeProfile
+  isToday: boolean
+}) {
+  const still = useReducedMotion() === true
+  const window = wakingWindow(profile)
+  const height = (window.end - window.start) * PX_PER_MIN
+  const placed = place(plan, window)
+  const free = gaps(plan, window)
+
+  const firstHour = Math.ceil(window.start / 60)
+  const lastHour = Math.floor(window.end / 60)
+  const hours: number[] = []
+  for (let h = firstHour; h <= lastHour; h += 1) hours.push(h)
+
+  return (
+    <div className="grid grid-cols-[3.25rem_minmax(0,1fr)] gap-x-3" aria-label="Today, to scale">
+      {/* The ruler. Labels sit on the hour lines, not between them. */}
+      <div className="relative" style={{ height }} aria-hidden>
+        {hours.map((h) => (
+          <span
+            key={h}
+            className="num absolute right-0 -translate-y-1/2 text-2xs text-ink-3"
+            style={{ top: (h * 60 - window.start) * PX_PER_MIN }}
+          >
+            {clockOf(h * 60)}
+          </span>
+        ))}
+      </div>
+
+      {/* The track. */}
+      <ul className="relative m-0 list-none p-0" style={{ height }}>
+        {hours.map((h) => (
+          <li
+            key={`rule-${h}`}
+            aria-hidden
+            className="absolute inset-x-0 h-px bg-line"
+            style={{ top: (h * 60 - window.start) * PX_PER_MIN }}
+          />
+        ))}
+
+        {free.map((gap) => {
+          const gapHeight = (gap.end - gap.start) * PX_PER_MIN
+          if (gapHeight < MIN_LABELLED_GAP_PX) return null
+          return (
+            <li
+              key={`gap-${gap.start}`}
+              className="num pointer-events-none absolute right-2 -translate-y-1/2 text-2xs text-ink-3"
+              style={{ top: (gap.start - window.start) * PX_PER_MIN + gapHeight / 2 }}
+            >
+              {formatMinutes(gap.end - gap.start)} free
+            </li>
+          )
+        })}
+
+        {placed.map((item, index) => (
+          <li key={`${item.slot.kind}-${item.slot.start}-${item.slot.label}`} className="contents">
+            <Block placed={item} index={index} still={still} />
+          </li>
+        ))}
+
+        {/* An item too, so the track is a list of nothing but items. */}
+        {isToday && (
+          <li className="contents">
+            <NowLine window={window} still={still} />
+          </li>
+        )}
+      </ul>
+    </div>
   )
 }

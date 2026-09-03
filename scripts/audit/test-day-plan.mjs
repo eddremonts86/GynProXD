@@ -74,6 +74,30 @@ try {
 
   const main = () => page.locator('main')
   const dayText = async () => (await main().innerText()).replace(/\s+/g, ' ').trim()
+  /**
+   * Everything that shapes the day lives in a sheet at `?edit`, portaled out
+   * of <main>, so `dayText` never sees it and `sheetText` sees only it. That
+   * separation is the redesign: the screen is the day, the forms are a drawer.
+   */
+  const sheet = () => page.getByRole('dialog')
+  const sheetText = async () => (await sheet().innerText()).replace(/\s+/g, ' ').trim()
+  const openSheet = async () => {
+    if ((await sheet().count()) > 0 && (await sheet().isVisible())) return
+    await page.getByRole('button', { name: /Shape my day/ }).click()
+    await sheet().waitFor({ timeout: 8000 })
+    /* Let it finish sliding in. axe measures contrast through a half-faded
+       sheet otherwise, and a click during the slide lands beside its target. */
+    await page.waitForFunction(() => {
+      const d = document.querySelector('[role="dialog"]')
+      return d !== null && d.getAnimations({ subtree: true }).every((a) => a.playState === 'finished')
+    }, undefined, { timeout: 8000 })
+  }
+  const closeSheet = async () => {
+    if ((await sheet().count()) === 0) return
+    await page.keyboard.press('Escape')
+    await sheet().waitFor({ state: 'hidden', timeout: 8000 }).catch(() => {})
+    await page.waitForTimeout(250)
+  }
 
   console.log('\nbefore anybody has paid')
   await page.goto(BASE, { waitUntil: 'networkidle' })
@@ -127,15 +151,18 @@ try {
   const empty = await dayText()
   check('opens now', /Your day/.test(empty), true)
   check('with sixteen hours of nothing', /16h free/.test(empty), true)
-  check('and says what it wants', /Nothing fixed yet/.test(empty), true)
+  check('and says what it wants', /Nothing on it yet/.test(empty), true)
+  check('with the hour ruler already drawn', /07:00/.test(empty) && /22:00/.test(empty), true)
 
   console.log('\nan hour somebody does not choose')
-  await page.getByRole('button', { name: 'Add fixed hours' }).click()
-  await page.getByLabel('What is it').fill('work')
-  await page.getByLabel('Starts').fill('09:00')
-  await page.getByLabel('Ends').fill('17:00')
-  await page.getByRole('button', { name: 'Add it' }).click()
+  await openSheet()
+  await sheet().getByRole('button', { name: 'Add fixed hours' }).click()
+  await sheet().getByLabel('What is it').fill('work')
+  await sheet().getByLabel('Starts').fill('09:00')
+  await sheet().getByLabel('Ends').fill('17:00')
+  await sheet().getByRole('button', { name: 'Add it' }).click()
   await page.waitForTimeout(500)
+  await closeSheet()
   const withWork = await dayText()
   check('is on the day', /work/.test(withWork), true)
   check('at the hours it was given', /09:00 to 17:00/.test(withWork), true)
@@ -164,26 +191,40 @@ try {
     .analyze()
   const serious = violations
     .filter((v) => v.impact === 'serious' || v.impact === 'critical')
-    .map((v) => `${v.id} (${v.nodes.length})`)
+    .map((v) => `${v.id} (${v.nodes.length}) ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join(' | ')}`)
   check('no serious or critical violations', serious, [])
+  await openSheet()
+  /* Scoped to the sheet: what is behind the backdrop is dimmed on purpose. */
+  const { violations: sheetViolations } = await new AxeBuilder({ page })
+    .include('[role="dialog"]')
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+    .analyze()
+  check(
+    'and none with the sheet open',
+    sheetViolations
+      .filter((v) => v.impact === 'serious' || v.impact === 'critical')
+      .map((v) => `${v.id} (${v.nodes.length}) ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join(' | ')}`),
+    [],
+  )
 
   console.log('\nwhat the form refuses')
-  await page.getByRole('button', { name: 'Add more fixed hours' }).click()
-  await page.getByLabel('What is it').fill('night shift')
-  await page.getByLabel('Starts').fill('22:00')
-  await page.getByLabel('Ends').fill('06:00')
-  await page.getByRole('button', { name: 'Add it' }).click()
+  await sheet().getByRole('button', { name: 'Add more fixed hours' }).click()
+  await sheet().getByLabel('What is it').fill('night shift')
+  await sheet().getByLabel('Starts').fill('22:00')
+  await sheet().getByLabel('Ends').fill('06:00')
+  await sheet().getByRole('button', { name: 'Add it' }).click()
   await page.waitForTimeout(300)
-  const refusedAnchor = await dayText()
+  const refusedAnchor = await sheetText()
   check('an entry that ends before it starts is refused', /two entries/.test(refusedAnchor), true)
   /* Counting the rows rather than searching the text: the rejected label is
      still sitting in the form's own input, and an input's value is not part of
      innerText, so a text search would have "proved" it was not saved either
      way. One remove button per saved anchor is the fact worth asserting. */
-  check('and nothing was added', await page.getByRole('button', { name: /^Remove / }).count(), 1)
-  await page.getByRole('button', { name: 'Cancel' }).click()
+  check('and nothing was added', await sheet().getByRole('button', { name: /^Remove / }).count(), 1)
+  await sheet().getByRole('button', { name: 'Cancel' }).click()
   await page.waitForTimeout(300)
-  check('cancelling leaves the one good anchor', await page.getByRole('button', { name: /^Remove / }).count(), 1)
+  check('cancelling leaves the one good anchor', await sheet().getByRole('button', { name: /^Remove / }).count(), 1)
+  await closeSheet()
 
   console.log('\nToday, while the day has something on it')
   await page.goto(BASE, { waitUntil: 'networkidle' })
@@ -239,15 +280,16 @@ try {
   const afterIntake = await dayText()
   check('the kept hour is on it', /school run/.test(afterIntake), true)
   check('the discarded one is not', /train home/.test(afterIntake), false)
-  check('two anchors now', await page.getByRole('button', { name: /^Remove / }).count(), 2)
+  await openSheet()
+  check('two anchors now', await sheet().getByRole('button', { name: /^Remove / }).count(), 2)
 
   console.log('\nan hour they would rather train')
   /* Work 09:00-17:00 leaves 07:00-08:15 (the school run now takes 08:15),
      and 17:00-23:00. Without a preference a 90 minute session takes the
      evening; asked for the morning it cannot fit, so it stays in the evening. */
-  await page.getByLabel('Train around').fill('20:00')
+  await sheet().getByLabel('Train around').fill('20:00')
   await page.waitForTimeout(400)
-  check('the preference is held', await page.getByLabel('Train around').inputValue(), '20:00')
+  check('the preference is held', await sheet().getByLabel('Train around').inputValue(), '20:00')
 
   console.log('\na calendar file')
   /* Dates relative to today, because the parser windows on today and a fixture
@@ -284,19 +326,21 @@ try {
   const file = path.join(dir, 'calendar.ics')
   await writeFile(file, ics, 'utf8')
 
+  await openSheet()
   await page.setInputFiles('#ics-file', file)
   await page.waitForTimeout(600)
-  const preview = await dayText()
+  const preview = await sheetText()
   check('the timed event is offered', /Dentist, the long appointment/.test(preview), true)
   check('the all-day one is not', /birthday/i.test(preview), false)
   check('nor the one the calendar calls free', /Focus block/.test(preview), false)
   check('one event, not three', /1 event found/.test(preview), true)
   check('and the titles are off by default', /Titles are shown here and not saved/.test(preview), true)
 
-  await page.getByRole('button', { name: 'Add the ticked ones' }).click()
+  await sheet().getByRole('button', { name: 'Add the ticked ones' }).click()
   await page.waitForTimeout(600)
+  check('it went on the day', /1 block added/.test(await sheetText()), true)
+  await closeSheet()
   const withBlock = await dayText()
-  check('it went on the day', /1 block added/.test(withBlock), true)
   check('as Busy, with no title stored', /Busy/.test(withBlock), true)
   check('and the title did not follow it', /Dentist/.test(withBlock), false)
   /* 16h awake, less 8h of work, half an hour of school run and the two hours
@@ -305,32 +349,36 @@ try {
   await page.screenshot({ path: path.join(SHOTS, 'day-calendar.png'), fullPage: false })
 
   console.log('\nthe same file again')
+  await openSheet()
   await page.setInputFiles('#ics-file', file)
   await page.waitForTimeout(600)
-  await page.getByRole('button', { name: 'Add the ticked ones' }).click()
+  await sheet().getByRole('button', { name: 'Add the ticked ones' }).click()
   await page.waitForTimeout(600)
   /* Importing twice is what somebody does when they are not sure it worked. */
-  check('adds nothing', /Nothing new/.test(await dayText()), true)
+  check('adds nothing', /Nothing new/.test(await sheetText()), true)
 
   console.log('\nkeeping the titles, when asked')
-  await page.getByRole('button', { name: /^Forget \d+ imported/ }).click()
+  await sheet().getByRole('button', { name: /^Forget \d+ imported/ }).click()
   await page.waitForTimeout(400)
   await page.setInputFiles('#ics-file', file)
   await page.waitForTimeout(600)
-  await page.getByRole('switch', { name: 'Keep the titles' }).click()
-  await page.getByRole('button', { name: 'Add the ticked ones' }).click()
+  await sheet().getByRole('switch', { name: 'Keep the titles' }).click()
+  await sheet().getByRole('button', { name: 'Add the ticked ones' }).click()
   await page.waitForTimeout(600)
+  await closeSheet()
   check('the title is on the day now', /Dentist, the long appointment/.test(await dayText()), true)
 
   console.log('\nexporting the day')
+  await openSheet()
   const download = page.waitForEvent('download', { timeout: 10000 })
-  await page.getByRole('button', { name: /Send today to my calendar/ }).click()
+  await sheet().getByRole('button', { name: /Send today to my calendar/ }).click()
   const saved = await download
   check('a file comes back', saved.suggestedFilename().endsWith('.ics'), true)
 
   console.log('\nforgetting what was imported')
-  await page.getByRole('button', { name: /^Forget \d+ imported/ }).click()
+  await sheet().getByRole('button', { name: /^Forget \d+ imported/ }).click()
   await page.waitForTimeout(500)
+  await closeSheet()
   const cleared = await dayText()
   check('the block is gone', /Dentist/.test(cleared), false)
   check('and the anchors are not', /school run/.test(cleared), true)
@@ -455,7 +503,7 @@ try {
     'no serious or critical violations on the module',
     moduleAxe.violations
       .filter((v) => v.impact === 'serious' || v.impact === 'critical')
-      .map((v) => `${v.id} (${v.nodes.length})`),
+      .map((v) => `${v.id} (${v.nodes.length}) ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join(' | ')}`),
     [],
   )
 
@@ -475,9 +523,11 @@ try {
   check('half an hour on the day, neutrally labelled', /Time together/.test(dayWithModule), true)
 
   console.log('\nand what the calendar file does not')
+  await openSheet()
   const exported = page.waitForEvent('download', { timeout: 10000 })
-  await page.getByRole('button', { name: /Send today to my calendar/ }).click()
+  await sheet().getByRole('button', { name: /Send today to my calendar/ }).click()
   const icsFile = await exported
+  await closeSheet()
   const icsText = await readFile(await icsFile.path(), 'utf8')
   /* The one thing on that screen that leaves the device by design. Everything
      about this module stays on one device on purpose, and an export carrying it
@@ -497,12 +547,15 @@ try {
   check('and gone from the day', /Time together/.test(await dayText()), false)
 
   console.log('\ntaking it back off')
-  await page.getByRole('button', { name: 'Remove school run' }).click()
+  await openSheet()
+  await sheet().getByRole('button', { name: 'Remove school run' }).click()
   await page.waitForTimeout(400)
-  await page.getByRole('button', { name: 'Remove work' }).click()
+  await sheet().getByRole('button', { name: 'Remove work' }).click()
   await page.waitForTimeout(500)
+  check('the editor says so', /Nothing fixed yet/.test(await sheetText()), true)
+  await closeSheet()
   const afterRemove = await dayText()
-  check('the anchor is gone', /Nothing fixed yet/.test(afterRemove), true)
+  check('the anchor is gone', /Nothing on it yet/.test(afterRemove), true)
   check('and the day is whole again', /16h free/.test(afterRemove), true)
 
   console.log('\nToday, with a day that holds nothing')

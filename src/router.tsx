@@ -116,6 +116,23 @@ const inboxRoute = createRoute({
   ),
 })
 
+/**
+ * The sheet that shapes the day lives in the URL as `?edit`, for the reason the
+ * open message does on `/inbox`: the back button closes it instead of leaving
+ * the day, and a reload lands where you were.
+ */
+const dayRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/day',
+  validateSearch: (search: Record<string, unknown>): { edit?: true } =>
+    search.edit === true || search.edit === 'true' ? { edit: true } : {},
+  component: () => (
+    <React.Suspense fallback={<RouteFallback />}>
+      <DayPage />
+    </React.Suspense>
+  ),
+})
+
 export const router = createRouter({
   /* A cross-fade between screens on navigation — the small thing that reads as
      "app", not "web page". The transition is defined in index.css and is a
@@ -124,7 +141,7 @@ export const router = createRouter({
   scrollRestoration: true,
   routeTree: rootRoute.addChildren([
     lazyRoute('/', TodayPage),
-    lazyRoute('/day', DayPage),
+    dayRoute,
     lazyRoute('/day/intake', DayIntakePage),
     lazyRoute('/intimacy', IntimacyPage),
     lazyRoute('/planner', PlannerPage),

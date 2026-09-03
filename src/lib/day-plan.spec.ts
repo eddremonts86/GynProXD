@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { buildDay, formatMinutes, freeMinutes, weekdayOf, type DayInput } from './day-plan'
+import {
+  buildDay,
+  formatMinutes,
+  freeMinutes,
+  lanesFor,
+  nowState,
+  weekdayOf,
+  type DayInput,
+  type DaySlot,
+} from './day-plan'
 import type { Anchor, LifeProfile } from './life-profile'
 
 /**
@@ -479,5 +488,119 @@ describe('formatMinutes', () => {
 
   it('does not print a negative day', () => {
     expect(formatMinutes(-30)).toBe('0m')
+  })
+})
+
+describe('lanesFor, so two things at once sit side by side', () => {
+  const slot = (start: string, end: string, label = start): DaySlot => ({
+    start,
+    end,
+    kind: 'anchor',
+    label,
+  })
+
+  it('gives everything one lane when nothing overlaps', () => {
+    expect(lanesFor([slot('09:00', '10:00'), slot('11:00', '12:00')])).toEqual([
+      { lane: 0, lanes: 1 },
+      { lane: 0, lanes: 1 },
+    ])
+  })
+
+  it('puts a block inside another one beside it, not on top of it', () => {
+    // "recojo niños 16:30" inside "Trabajo 09:00 to 17:00". Drawn naively the
+    // shorter one vanishes, which is exactly what the list was hiding.
+    expect(lanesFor([slot('09:00', '17:00'), slot('16:30', '17:00')])).toEqual([
+      { lane: 0, lanes: 2 },
+      { lane: 1, lanes: 2 },
+    ])
+  })
+
+  it('reuses a lane once the block in it has ended', () => {
+    // A 09-12, B 11-13, C 12-14: C starts as A ends, so it takes A lane.
+    expect(lanesFor([slot('09:00', '12:00'), slot('11:00', '13:00'), slot('12:00', '14:00')])).toEqual([
+      { lane: 0, lanes: 2 },
+      { lane: 1, lanes: 2 },
+      { lane: 0, lanes: 2 },
+    ])
+  })
+
+  it('sizes each cluster on its own', () => {
+    // Two overlapping in the morning, one alone in the evening: the evening
+    // block should be full width, not squeezed to half by a morning it never
+    // met.
+    const lanes = lanesFor([slot('09:00', '10:00'), slot('09:30', '10:30'), slot('19:00', '20:00')])
+    expect(lanes[2]).toEqual({ lane: 0, lanes: 1 })
+    expect(lanes[0].lanes).toBe(2)
+  })
+
+  it('answers by position, however the input was ordered', () => {
+    const lanes = lanesFor([slot('16:30', '17:00'), slot('09:00', '17:00')])
+    expect(lanes[1]).toEqual({ lane: 0, lanes: 2 })
+    expect(lanes[0]).toEqual({ lane: 1, lanes: 2 })
+  })
+
+  it('leaves a slot it cannot read in lane zero on its own', () => {
+    expect(lanesFor([slot('bad', '10:00')])).toEqual([{ lane: 0, lanes: 1 }])
+  })
+})
+
+describe('nowState, for the one tile that says where the day is', () => {
+  const p = profile({ anchors: [anchor()] })
+  const plan = buildDay(
+    { date: MONDAY, profile: p, training: { label: 'Push', minutes: 90 } },
+    NOW,
+  )
+  const min = (clock: string) => {
+    const [h, m] = clock.split(':').map(Number)
+    return h * 60 + m
+  }
+
+  it('means nothing on a day that is not today', () => {
+    expect(nowState(plan, p, min('10:00'), false)).toEqual({ kind: 'other', until: null })
+  })
+
+  it('is before the day until the alarm', () => {
+    expect(nowState(plan, p, min('06:00'), true)).toEqual({ kind: 'before', until: min('07:00') })
+  })
+
+  it('is after the day once bedtime has passed', () => {
+    expect(nowState(plan, p, min('23:30'), true)).toEqual({ kind: 'after', until: null })
+  })
+
+  it('is inside a block, and says which and until when', () => {
+    expect(nowState(plan, p, min('10:00'), true)).toEqual({
+      kind: 'in',
+      label: 'work',
+      until: min('17:00'),
+    })
+  })
+
+  it('names the more specific block when two overlap, and ends with the last', () => {
+    const nested = profile({
+      anchors: [anchor({ id: 'a' }), anchor({ id: 'b', label: 'school run', start: '16:30', end: '17:00' })],
+    })
+    const plan2 = buildDay({ date: MONDAY, profile: nested }, NOW)
+    expect(nowState(plan2, nested, min('16:45'), true)).toMatchObject({
+      kind: 'in',
+      label: 'school run',
+      until: min('17:00'),
+    })
+  })
+
+  it('is free between blocks, and says what comes next', () => {
+    /* Session was placed 17:00-18:30, so 08:00 is free until work. */
+    expect(nowState(plan, p, min('08:00'), true)).toEqual({
+      kind: 'free',
+      label: 'work',
+      until: min('09:00'),
+    })
+  })
+
+  it('is free until bed when nothing else is coming', () => {
+    expect(nowState(plan, p, min('20:00'), true)).toEqual({
+      kind: 'free',
+      label: undefined,
+      until: min('23:00'),
+    })
   })
 })
