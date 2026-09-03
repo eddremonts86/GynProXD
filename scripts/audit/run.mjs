@@ -59,6 +59,7 @@ const GROUPS = {
     'gym-programme-boundary',
     'aurora-contrast',
     'a11y-sweep',
+    'lighthouse-sweep',
     'verify-all',
     'walk',
   ],
