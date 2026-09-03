@@ -51,7 +51,14 @@ function freePort() {
   })
 }
 
-export async function startSandbox({ port } = {}) {
+/**
+ * `env` reaches the server process, for the hooks that read one.
+ *
+ * The billing hooks refuse to exist without `STRIPE_*`, which is right in
+ * production and would make them untestable here: a walk cannot prove a
+ * signature check on a route that answers 503 before it looks at the body.
+ */
+export async function startSandbox({ port, env } = {}) {
   const pinned = Number(process.env.PB_PROBE_PORT ?? 0)
   port = port ?? (pinned > 0 ? pinned : await freePort())
   const base = `http://127.0.0.1:${port}`
@@ -72,7 +79,7 @@ export async function startSandbox({ port } = {}) {
     binary,
     ['serve', '--http', `127.0.0.1:${port}`, '--dir', data,
      '--hooksDir', path.join(dir, 'pb_hooks'), '--migrationsDir', path.join(dir, 'pb_migrations')],
-    { stdio: 'ignore' },
+    { stdio: 'ignore', env: { ...process.env, ...(env ?? {}) } },
   )
 
   const api = async (method, route, body, token) => {
