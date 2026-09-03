@@ -11,9 +11,7 @@ import type {
   WeeklyPlan,
   Workout,
 } from '../lib/types'
-import { generatedExercises } from '../data/exercises-generated'
-import { populateByIdCache } from '../lib/exercises'
-import { wgerExercises } from '../data/exercises-wger-generated'
+import { exerciseById, populateByIdCache } from '../lib/exercise-cache'
 import { INTENSITY_SETS } from '../lib/intensity'
 import { todayIso } from '../lib/dates'
 import { withRecordIds } from '../lib/records'
@@ -95,8 +93,6 @@ interface GymState {
 }
 
 const today = todayIso
-
-populateByIdCache([...generatedExercises, ...wgerExercises])
 
 /**
  * The store is memory-only. Persistence lives in lib/profiles: each profile's
@@ -183,8 +179,7 @@ export const useGym = create<GymState>()((set, get) => ({
 
       addExercise: (e) =>
         set((s) => {
-          if (s.customExercises.some((x) => x.id === e.id)) return s
-          if (generatedExercises.some((x) => x.id === e.id)) return s
+          if (exerciseById(e.id)) return s
           const next = [...s.customExercises, e]
           populateByIdCache([e])
           return { customExercises: next }
@@ -356,8 +351,7 @@ export const useGym = create<GymState>()((set, get) => ({
               ? (d.exercises as Exercise[])
               : undefined
           if (customs) {
-            const merged = [...generatedExercises, ...customs]
-            populateByIdCache(merged)
+            populateByIdCache(customs)
           }
           set({
             workouts: d.workouts as Workout[],
@@ -500,8 +494,6 @@ export const useGym = create<GymState>()((set, get) => ({
       },
 }))
 
-populateByIdCache([...generatedExercises, ...wgerExercises])
-
 /** The persisted slice of the store: user data, nothing derived. */
 export interface GymSnapshot {
   customExercises: Exercise[]
@@ -558,6 +550,6 @@ export function hydrateGym(snapshot: Partial<GymSnapshot> | null | undefined): v
     fitnessTest: snapshot?.fitnessTest ?? null,
     story: snapshot?.story ?? null,
   }
-  populateByIdCache([...generatedExercises, ...wgerExercises, ...next.customExercises])
+  populateByIdCache(next.customExercises)
   useGym.setState(next)
 }

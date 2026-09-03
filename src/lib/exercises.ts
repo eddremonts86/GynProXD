@@ -1,9 +1,10 @@
 import { generatedExercises } from '../data/exercises-generated'
 import { wgerExercises } from '../data/exercises-wger-generated'
 import { artworkRank } from './images'
+import { populateByIdCache } from './exercise-cache'
 import type { Exercise, LoggedExercise, SetEntry, Workout } from './types'
 
-const byIdCache = new Map<string, Exercise>()
+export { exerciseById, populateByIdCache } from './exercise-cache'
 
 /**
  * Everything a member can browse, search or put in a session: the bundled
@@ -59,14 +60,6 @@ export function libraryOrder(exercises: Exercise[]): Exercise[] {
   return [...exercises].sort(
     (a, b) => (rank.get(a.id) ?? 2) - (rank.get(b.id) ?? 2) || a.name.localeCompare(b.name),
   )
-}
-
-export function populateByIdCache(exercises: Exercise[]) {
-  for (const e of exercises) byIdCache.set(e.id, e)
-}
-
-export function exerciseById(id: string): Exercise | undefined {
-  return byIdCache.get(id)
 }
 
 export function lastPerformance(
@@ -167,3 +160,5 @@ export const BODYWEIGHT_EQUIPMENT = new Set(['bodyweight'])
 export function isBodyweight(exercise: Exercise | undefined): boolean {
   return !!exercise && BODYWEIGHT_EQUIPMENT.has(exercise.equipment)
 }
+
+populateByIdCache([...generatedExercises, ...wgerExercises])
