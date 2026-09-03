@@ -39,6 +39,7 @@ import {
   type BroadcastScope,
 } from '@/components/broadcast-audience'
 import { GymBrand, GymJoinCode, GymRequests, OperatorRoster } from '@/components/gym-operator-tools'
+import { GymBilling } from '@/components/gym-billing'
 import { DURATION_LABELS, formatShortDate, pluralize } from '../lib/labels'
 import { todayIso } from '../lib/dates'
 import { generatedExercises } from '../data/exercises-generated'
@@ -371,6 +372,11 @@ export function GymDesk({
    */
   const [desk, setDesk] = useState<DeskRow[]>([])
   const deskSize = desk.length || 1
+    /* Whether this account is the one Stripe bills. From the desk the panel
+       already loads: its rows carry `isOwner`, and the sync link says which of
+       them is us. Not from the profile, which knows nothing about the server. */
+    const myUserId = readSyncLink(profileId)?.userId ?? null
+    const iAmOwner = desk.some((p) => p.isOwner && p.id === myUserId)
   const nameOf = (authorId: string) =>
     desk.find((p) => `srv-${p.id}` === authorId || p.id === authorId)?.email ?? null
   const [reachWindow, setReachWindow] = useState<ReachWindowKey>('d30')
@@ -735,6 +741,9 @@ export function GymDesk({
             count: members.length,
           },
           ...(broadcast ? [] : [{ value: 'requests', label: 'Requests' }]),
+          /* Only the owner is billed, so only the owner gets the tab. An empty
+             one would read as a broken feature rather than an absent one. */
+          ...(broadcast || !iAmOwner ? [] : [{ value: 'billing', label: 'Billing' }]),
         ]}
       >
         <TabPanel value="compose" className="flex flex-col gap-6">
@@ -1545,6 +1554,10 @@ export function GymDesk({
 
         <TabPanel value="menu">
           <MenuEditor gym={gym} profileId={profileId} />
+        </TabPanel>
+
+        <TabPanel value="billing" className="flex flex-col gap-4">
+          <GymBilling plan={plan} />
         </TabPanel>
 
         <TabPanel value="members" className="flex flex-col gap-4">

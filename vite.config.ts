@@ -183,5 +183,18 @@ export default defineConfig(({ mode }) => {
       devOptions: { enabled: false },
     }),
   ],
+  /**
+   * The suite is this checkout's own `src`, and nothing else.
+   *
+   * Other sessions open git worktrees under `.claude/worktrees/`, each a full
+   * copy of the repository with its own specs. Vitest globs the whole tree by
+   * default, so `pnpm test` was quietly running 536 tests from another branch
+   * alongside this one's: a gate that can fail for a change nobody here made,
+   * and a green that says nothing about this branch.
+   */
+  test: {
+    include: ['src/**/*.spec.ts'],
+    exclude: ['**/node_modules/**', '.claude/**', 'dist/**'],
+  },
 }
 })

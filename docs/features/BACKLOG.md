@@ -110,10 +110,20 @@ Stripe test API, which returned a session and stored the customer.
   fleet's shared BuilderHunt account. enForma has its own products inside it,
   which keeps them apart, but it should have its own account before anybody is
   charged for real.
-- **A button.** Nothing in the UI calls `/api/enforma/billing/checkout`: the
-  route exists, is proved, and is reachable, and the panel still shows what
-  somebody provisioned by hand. That is the next honest step, and it is small
-  now that the hard half is done.
+- ~~A button.~~ **Built.** `/gym` has a Billing tab, offered to the owner only,
+  which says what the gym pays and hands off to Stripe. It offers only what the
+  gym does not already have, because a button whose honest label is "pay twice"
+  should not exist. No card field appears anywhere in this product.
+
+  The lookup key travels and the server resolves the Stripe price id, so the
+  client cannot name a price and editing an amount in Stripe needs no release
+  here. On a shared account that also means one project cannot be pointed at
+  another's price.
+
+  `test-billing-button.mjs` clicks it against the real Stripe test API and
+  catches the navigation at the network rather than following it: Stripe's page
+  is Stripe's to test. It skips loudly without a key, so CI runs the offline
+  `billing-boundary` and this one runs on a machine that has one.
 
 ## 4. The gym applications queue is still hands-on
 
