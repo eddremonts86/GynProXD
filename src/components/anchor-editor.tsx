@@ -63,10 +63,12 @@ function daysLabel(days: readonly DayOfWeek[]): string {
 
 export function AnchorEditor({
   anchors,
+  onAdd,
   onSave,
   onRemove,
 }: {
   anchors: readonly Anchor[]
+  onAdd: (anchor: Omit<Anchor, 'id'>) => void
   onSave: (anchor: Anchor) => void
   onRemove: (id: string) => void
 }) {
@@ -83,7 +85,9 @@ export function AnchorEditor({
     if (!draft) return
     setTried(true)
     if (anchorProblems(draft).length > 0) return
-    onSave({ ...draft, id: draft.id ?? `anchor-${Date.now().toString(36)}` } as Anchor)
+    const { id, ...rest } = draft
+    if (id) onSave({ ...rest, id })
+    else onAdd(rest)
     setDraft(null)
     setTried(false)
   }

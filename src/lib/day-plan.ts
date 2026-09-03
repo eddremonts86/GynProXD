@@ -203,14 +203,22 @@ export function buildDay(input: DayInput, now = new Date()): DayPlan {
      particular hour and taking it before the session would let half an hour of
      lunch push a ninety minute session out of the only gap that held it. */
   if (input.training && input.training.minutes > 0) {
-    put('training', input.training.minutes, input.training.label, input.training.ref, {
-      mode: 'largest',
-    })
+    /* An hour they named beats the biggest hole. Still only among gaps the
+       session actually fits, so a preference cannot squeeze it into forty
+       minutes; it decides where among the possible, not whether. */
+    const wanted = minutesOf(profile.trainAt ?? '')
+    put(
+      'training',
+      input.training.minutes,
+      input.training.label,
+      input.training.ref,
+      wanted === null ? { mode: 'largest' } : { mode: 'near', at: wanted },
+    )
   }
   if (input.plate) {
     put('meal', MEAL_MINUTES, input.plate.label, input.plate.ref, {
       mode: 'near',
-      at: minutesOf(MEAL_HOUR)!,
+      at: minutesOf(profile.mealAt ?? '') ?? minutesOf(MEAL_HOUR)!,
     })
   }
   if (input.challenge) {

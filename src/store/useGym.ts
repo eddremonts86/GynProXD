@@ -91,6 +91,15 @@ interface GymState {
    */
   lifeProfile: LifeProfile | null
   updateLifeProfile: (patch: Partial<Omit<LifeProfile, 'updatedAt'>>) => void
+  /**
+   * A new anchor, whose id this mints.
+   *
+   * The id used to be invented by whichever component was saving, which was
+   * two components doing the same thing slightly differently and a lint rule
+   * pointing out that one of them was doing it during a render. A store is
+   * where a new row gets its identity everywhere else in this file.
+   */
+  addAnchor: (anchor: Omit<Anchor, 'id'>) => string
   saveAnchor: (anchor: Anchor) => void
   removeAnchor: (id: string) => void
   story: StoryProgress | null
@@ -135,8 +144,22 @@ export const useGym = create<GymState>()((set, get) => ({
             updatedAt: new Date().toISOString(),
           },
         })),
-      /* Upsert by id, so the editor can save a new anchor and an edited one
-         through the same call and never has to know which it is holding. */
+      addAnchor: (anchor) => {
+        const id = `anchor-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`
+        set((s) => {
+          const base = s.lifeProfile ?? emptyLifeProfile()
+          return {
+            lifeProfile: {
+              ...base,
+              anchors: [...base.anchors, { ...anchor, id }],
+              updatedAt: new Date().toISOString(),
+            },
+          }
+        })
+        return id
+      },
+      /* Upsert by id, so the editor can save an edited anchor without knowing
+         whether it is still there. New ones go through `addAnchor`. */
       saveAnchor: (anchor) =>
         set((s) => {
           const base = s.lifeProfile ?? emptyLifeProfile()

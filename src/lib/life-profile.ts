@@ -35,15 +35,23 @@ export interface LifeProfile {
   /** `HH:MM`. Absent falls back to WAKE_DEFAULT. */
   wake?: string
   sleep?: string
-  /** Everything they typed, verbatim, the way `OnboardingInput.constraints` is. */
-  notes?: string
   /**
-   * Answers to the question bank, by question id. Absent means unanswered,
-   * which is not the same as no. Phase 3 fills this; nothing reads it yet.
+   * The hour they would rather train.
+   *
+   * Absent is not "no opinion recorded", it is "put it wherever it fits", and
+   * that is the better default: somebody who has not said should get the
+   * biggest hole in their day rather than an arbitrary hour. Set, it becomes a
+   * preference the placer aims at and still only among gaps the session fits.
    */
-  answers?: Record<string, string>
-  /** ISO timestamp of the explicit yes, per sensitivity tier. Phase 3. */
-  consent?: { personal?: string; intimate?: string }
+  trainAt?: string
+  /** The hour their main meal wants to be near. Absent falls back to MEAL_HOUR. */
+  mealAt?: string
+  /**
+   * Everything they typed about their week, verbatim, the way
+   * `OnboardingInput.constraints` is. The only channel for what the fields
+   * above cannot hold, and what the companion reads.
+   */
+  notes?: string
   updatedAt: string
 }
 

@@ -35,11 +35,13 @@ export const PRO_FEATURES = [
 export type ProFeature = (typeof PRO_FEATURES)[number]
 
 /**
- * What is actually built. One entry, and it earned it.
+ * What is actually built. Two entries, and they earned it.
  *
  * `day-plan` is `/day`: the anchors somebody enters, and the session, plate and
- * challenge day arranged around them. Everything else on the list above is
- * still a name.
+ * challenge day arranged around them. `companion` is `/day/intake`: a paragraph
+ * about somebody's week read into proposed anchors, by regexes always and by a
+ * model when the server has one, with nothing saved until it is tapped.
+ * Everything else on the list above is still a name.
  *
  * Each feature joins this set in the phase that finishes it, which is why the
  * gate and the copy cannot drift apart: one set, read by both. The failure it
@@ -48,7 +50,7 @@ export type ProFeature = (typeof PRO_FEATURES)[number]
  * behind it existed, and the fix was to take the card away rather than to tick
  * it. A `BUILT` set is that lesson written down where it cannot be forgotten.
  */
-const BUILT = new Set<ProFeature>(['day-plan'])
+const BUILT = new Set<ProFeature>(['day-plan', 'companion'])
 
 export function isBuilt(feature: ProFeature): boolean {
   return BUILT.has(feature)

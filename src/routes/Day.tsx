@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { ArrowRight } from '@phosphor-icons/react'
-import { useNavigate } from '@tanstack/react-router'
-import { PageHeader, Section } from '@/ui/PageHeader'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { PageHeader, Section, SECTION_ACTION } from '@/ui/PageHeader'
 import { Panel } from '@/ui/Panel'
 import { Input } from '@/ui/Input'
 import { Button } from '@/ui/Button'
@@ -13,7 +13,7 @@ import { useDayPlates } from '@/lib/use-day-plates'
 import { useDayPlan } from '@/lib/use-day-plan'
 import { todayIso } from '@/lib/dates'
 import { formatLongDate } from '@/lib/labels'
-import { formatMinutes, freeMinutes, type SlotKind } from '@/lib/day-plan'
+import { formatMinutes, freeMinutes, MEAL_HOUR, type SlotKind } from '@/lib/day-plan'
 import { SLEEP_DEFAULT, WAKE_DEFAULT } from '@/lib/life-profile'
 
 /**
@@ -44,6 +44,7 @@ function UnplacedNote({ what }: { what: Exclude<SlotKind, 'anchor'> }) {
 function DayPlanner() {
   const navigate = useNavigate()
   const updateLifeProfile = useGym((s) => s.updateLifeProfile)
+  const addAnchor = useGym((s) => s.addAnchor)
   const saveAnchor = useGym((s) => s.saveAnchor)
   const removeAnchor = useGym((s) => s.removeAnchor)
 
@@ -116,8 +117,45 @@ function DayPlanner() {
         </Panel>
       </Section>
 
-      <Section title="Hours you do not choose" hint={`${profile.anchors.length}`}>
-        <AnchorEditor anchors={profile.anchors} onSave={saveAnchor} onRemove={removeAnchor} />
+      <Section title="Hours you would rather">
+        <Panel padding="lg" className="flex flex-col gap-3">
+          <div className="grid grid-cols-2 gap-3">
+            <Input
+              label="Train around"
+              type="time"
+              hint="Empty means wherever it fits best"
+              value={profile.trainAt ?? ''}
+              onChange={(e) => updateLifeProfile({ trainAt: e.target.value })}
+            />
+            <Input
+              label="Main meal around"
+              type="time"
+              value={profile.mealAt ?? MEAL_HOUR}
+              onChange={(e) => updateLifeProfile({ mealAt: e.target.value })}
+            />
+          </div>
+          <p className="max-w-[58ch] text-2xs text-ink-3">
+            Preferences, not rules. A session still goes where it fits: naming an hour decides
+            where among the gaps that hold it, never whether.
+          </p>
+        </Panel>
+      </Section>
+
+      <Section
+        title="Hours you do not choose"
+        hint={`${profile.anchors.length}`}
+        action={
+          <Link to="/day/intake" className={SECTION_ACTION}>
+            Describe it instead
+          </Link>
+        }
+      >
+        <AnchorEditor
+          anchors={profile.anchors}
+          onAdd={addAnchor}
+          onSave={saveAnchor}
+          onRemove={removeAnchor}
+        />
       </Section>
     </div>
   )

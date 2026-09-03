@@ -4,12 +4,14 @@
  * `day-plan.spec.ts` proves the arithmetic exhaustively and cannot see a
  * screen. This walks the three things it has no access to:
  *
- *   the gate    /day refuses an account that has not paid, and opens for one
- *               that has, without a reload, because the entitlement lands in
- *               the session store rather than in a page load
- *   the form    an anchor entered by hand survives into the day
- *   the day     the timeline draws the anchor and names the free time around
- *               it, and the header's free total moves with it
+ *   the gate      /day refuses an account that has not paid, and opens for one
+ *                 that has, without a reload, because the entitlement lands in
+ *                 the session store rather than in a page load
+ *   the form      an anchor entered by hand survives into the day
+ *   the day       the timeline draws the anchor and names the free time around
+ *                 it, and the header's free total moves with it
+ *   the companion a paragraph becomes proposals, the guesses are labelled as
+ *                 guesses, and nothing is saved until it is tapped
  *
  * The last one is the whole feature in one assertion. Everything else on that
  * screen comes from somewhere else in the app; what this phase added is the
@@ -182,9 +184,67 @@ try {
   check('carries one line into the day', /No session today/.test(today), true)
   check('with the free total on it', /8h free/.test(today), true)
 
-  console.log('\ntaking it back off')
+  console.log('\nthe companion')
+  await page.goto(`${BASE}/day/intake`, { waitUntil: 'networkidle' })
+  await page.getByRole('heading', { name: 'Describe your week', level: 1 }).waitFor({ timeout: 10000 })
+  const intake = await dayText()
+  /* No coach is configured against a sandbox, so the sentence has to be the
+     one that promises nothing leaves. The point of `where()` living in one
+     place is that this sentence and the request cannot disagree. */
+  check('says where the words go, before the box is used', /Nothing you type here is sent anywhere/.test(intake), true)
+  check('and nothing is proposed before it is asked', /What it read/.test(intake), false)
+
+  await page.getByLabel('Describe your week').fill(
+    'I work 09:00 to 17:00, the school run is at 08:15, and I get the train home 17:30 to 18:15',
+  )
+  await page.getByRole('button', { name: /Read it|Reading/ }).click()
+  await page.waitForTimeout(1200)
+  const readOut = await dayText()
+  check('reads the three things out of one paragraph', /What it read/.test(readOut), true)
+  check('read on this device, with no coach behind it', /read on this device/.test(readOut), true)
+  /* The labels, not just the presence of a row. "school run is" and "get train
+     home" both shipped once and read badly on a screen somebody opens every
+     morning. */
+  check('names the school run cleanly', /school run\b/.test(readOut), true)
+  check('and the train, without the verb that got to it', /train home/.test(readOut), true)
+  check('with no copula left on the end', /school run is/.test(readOut), false)
+  /* The work hours are already on the profile from the form above, so that
+     proposal is filtered rather than offered twice. */
+  check('does not offer back an hour already on the day', await page.getByRole('button', { name: 'Keep' }).count(), 2)
+  check('labels what it worked out rather than quoted', /Worked out/.test(readOut), true)
+  check('and says nothing is saved until it is kept', /Nothing here is saved until you keep it/.test(readOut), true)
+  await page.screenshot({ path: path.join(SHOTS, 'day-intake.png'), fullPage: false })
+
+  console.log('\nkeeping one of them')
+  await page.getByRole('button', { name: 'Keep' }).first().click()
+  await page.waitForTimeout(400)
+  check('one fewer to decide about', await page.getByRole('button', { name: 'Keep' }).count(), 1)
+  check('and it says so', /1 hour kept/.test(await dayText()), true)
+
+  console.log('\ndiscarding the other')
+  await page.getByRole('button', { name: /^Discard / }).first().click()
+  await page.waitForTimeout(400)
+  check('nothing left to decide', await page.getByRole('button', { name: 'Keep' }).count(), 0)
+
+  console.log('\nwhat reached the day')
   await page.goto(`${BASE}/day`, { waitUntil: 'networkidle' })
   await page.getByRole('heading', { name: 'Your day', level: 1 }).waitFor({ timeout: 10000 })
+  const afterIntake = await dayText()
+  check('the kept hour is on it', /school run/.test(afterIntake), true)
+  check('the discarded one is not', /train home/.test(afterIntake), false)
+  check('two anchors now', await page.getByRole('button', { name: /^Remove / }).count(), 2)
+
+  console.log('\nan hour they would rather train')
+  /* Work 09:00-17:00 leaves 07:00-08:15 (the school run now takes 08:15),
+     and 17:00-23:00. Without a preference a 90 minute session takes the
+     evening; asked for the morning it cannot fit, so it stays in the evening. */
+  await page.getByLabel('Train around').fill('20:00')
+  await page.waitForTimeout(400)
+  check('the preference is held', await page.getByLabel('Train around').inputValue(), '20:00')
+
+  console.log('\ntaking it back off')
+  await page.getByRole('button', { name: 'Remove school run' }).click()
+  await page.waitForTimeout(400)
   await page.getByRole('button', { name: 'Remove work' }).click()
   await page.waitForTimeout(500)
   const afterRemove = await dayText()

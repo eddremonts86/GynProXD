@@ -127,6 +127,45 @@ describe('the training session', () => {
   })
 })
 
+describe('an hour they would rather train', () => {
+  it('is aimed at when they have named one', () => {
+    // Work 09:00-17:00 leaves 07:00-09:00 and 17:00-23:00. Without a
+    // preference the session takes the evening, because it is the bigger hole.
+    const p = profile({ anchors: [anchor()], trainAt: '07:00' })
+    const plan = buildDay({ date: MONDAY, profile: p, training: { label: 'Push', minutes: 90 } }, NOW)
+    expect(at('training', plan)).toEqual(['07:00-08:30'])
+  })
+
+  it('cannot squeeze a session into a gap too short for it', () => {
+    // A preference decides where among the possible, never whether. The
+    // morning holds two hours; a two and a half hour session has to go in the
+    // evening whatever anybody would prefer.
+    const p = profile({ anchors: [anchor()], trainAt: '07:00' })
+    const plan = buildDay({ date: MONDAY, profile: p, training: { label: 'Long one', minutes: 150 } }, NOW)
+    expect(at('training', plan)).toEqual(['17:00-19:30'])
+  })
+
+  it('falls back to the biggest hole when the hour makes no sense', () => {
+    const p = profile({ anchors: [anchor()], trainAt: 'after work' })
+    const plan = buildDay({ date: MONDAY, profile: p, training: { label: 'Push', minutes: 90 } }, NOW)
+    expect(at('training', plan)).toEqual(['17:00-18:30'])
+  })
+})
+
+describe('an hour they would rather eat', () => {
+  it('moves the plate off the default', () => {
+    const p = profile({ mealAt: '19:30' })
+    const plan = buildDay({ date: MONDAY, profile: p, plate: { label: 'Chicken creole' } }, NOW)
+    expect(at('meal', plan)).toEqual(['19:30-20:00'])
+  })
+
+  it('ignores rubbish and keeps the default', () => {
+    const p = profile({ mealAt: 'whenever' })
+    const plan = buildDay({ date: MONDAY, profile: p, plate: { label: 'Chicken creole' } }, NOW)
+    expect(at('meal', plan)).toEqual(['13:00-13:30'])
+  })
+})
+
 describe('the plate', () => {
   it('lands as near to the middle of the day as the free time allows', () => {
     const plan = day({ plate: { label: 'Chicken creole', ref: 'r1' } })
