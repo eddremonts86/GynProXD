@@ -112,7 +112,7 @@ function Module() {
         ) : (
           <Panel padding="none" className="divide-y divide-line">
             {shown.map((activity) => (
-              <article key={activity.id} className="flex flex-col gap-2 p-4">
+              <article key={activity.id} className="flex flex-col gap-2 px-5 py-4">
                 <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
                   <h3 className="text-sm font-medium text-ink">{activity.name}</h3>
                   <Tag tone="outline">{EFFORT_LABELS[activity.effort]}</Tag>

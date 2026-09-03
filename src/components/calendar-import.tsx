@@ -178,7 +178,7 @@ export function CalendarImport({
 
       {found && (
         <Panel padding="none" className="divide-y divide-line">
-          <div className="flex flex-wrap items-center justify-between gap-3 p-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
             <span className="text-sm text-ink">
               {found.length === 1 ? '1 event found' : `${found.length} events found`}
             </span>
@@ -197,7 +197,7 @@ export function CalendarImport({
           {found.map((event, index) => (
             <label
               key={`${event.date}-${event.start}-${index}`}
-              className="flex min-h-11 cursor-pointer items-center gap-3 p-3"
+              className="flex min-h-12 cursor-pointer items-center gap-3 px-5 py-3.5"
             >
               <input
                 type="checkbox"
@@ -218,7 +218,7 @@ export function CalendarImport({
             </label>
           ))}
 
-          <div className="flex flex-wrap items-center gap-3 p-3">
+          <div className="flex flex-wrap items-center gap-3 px-5 py-4">
             <Button variant="primary" onClick={commit}>
               Add the ticked ones
             </Button>

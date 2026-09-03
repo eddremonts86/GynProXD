@@ -177,15 +177,17 @@ function Block({ placed, index, still }: { placed: Placed; index: number; still:
         </span>
       </span>
       {!compact && (
-        <span className="num text-2xs">{`${slot.start} to ${slot.end}`}</span>
+        <span className="num truncate text-2xs">{`${slot.start} to ${slot.end}`}</span>
       )}
     </>
   )
 
   const face = cn(
-    'absolute inset-0 flex flex-col justify-between overflow-hidden rounded-md px-2.5 ring-1 ring-inset',
+    'absolute inset-0 flex flex-col justify-between overflow-hidden rounded-md ring-1 ring-inset',
     'transition-[filter] duration-150 hover:brightness-[1.06] active:scale-[0.99]',
-    tiny ? 'py-0.5' : 'py-1.5',
+    /* A quarter-hour block keeps its text on one line; anything taller gets the
+       full inset, because text against the edge of a box reads as an error. */
+    tiny ? 'px-3 py-0.5' : 'px-3.5 py-2',
     PAINT[slot.kind],
   )
   const style = {
@@ -267,7 +269,7 @@ export function DayTimeline({
           return (
             <li
               key={`gap-${gap.start}`}
-              className="num pointer-events-none absolute right-2 -translate-y-1/2 text-2xs text-ink-3"
+              className="num pointer-events-none absolute right-4 -translate-y-1/2 text-2xs text-ink-3"
               style={{ top: (gap.start - window.start) * PX_PER_MIN + gapHeight / 2 }}
             >
               {formatMinutes(gap.end - gap.start)} free

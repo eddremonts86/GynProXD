@@ -110,7 +110,7 @@ export function AnchorEditor({
       {anchors.length > 0 && (
         <Panel padding="none" className="divide-y divide-line">
           {anchors.map((anchor) => (
-            <div key={anchor.id} className="flex items-center gap-3 p-3">
+            <div key={anchor.id} className="flex items-center gap-3 px-5 py-4">
               <button
                 type="button"
                 onClick={() => {

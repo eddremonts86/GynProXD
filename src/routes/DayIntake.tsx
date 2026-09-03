@@ -57,7 +57,7 @@ function ProposalRow({
   ].filter(Boolean)
 
   return (
-    <div className="flex flex-wrap items-center gap-3 p-3">
+    <div className="flex flex-wrap items-center gap-3 px-5 py-4">
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
           <span className="truncate text-sm font-medium text-ink">{proposal.label}</span>

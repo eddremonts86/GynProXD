@@ -1,3 +1,4 @@
+import { Textarea } from '@/components/ui/textarea'
 import type { ReactNode } from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -603,11 +604,10 @@ function ExerciseForm({
             label="Instructions, one step per line"
             problem={touched ? problems.instructions : undefined}
           >
-            <textarea
+            <Textarea
               value={form.instructions}
               onChange={(e) => set('instructions', e.target.value)}
               rows={6}
-              className="w-full rounded-md border border-line bg-surface px-3 py-2 text-sm text-ink transition-colors duration-150 focus:border-brand focus:outline-none"
             />
           </Field>
 
