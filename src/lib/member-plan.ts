@@ -35,20 +35,20 @@ export const PRO_FEATURES = [
 export type ProFeature = (typeof PRO_FEATURES)[number]
 
 /**
- * What is actually built. Empty, today, and that is the honest answer.
+ * What is actually built. One entry, and it earned it.
  *
- * This branch builds the entitlement and nothing that sits behind it: an
- * account can be Pro and there is not yet a single screen the status unlocks.
- * Each feature is added here by the phase that finishes it, which is why the
- * gate and the copy cannot drift apart: one set, read by both.
+ * `day-plan` is `/day`: the anchors somebody enters, and the session, plate and
+ * challenge day arranged around them. Everything else on the list above is
+ * still a name.
  *
- * The failure this prevents is specific and has happened once already in this
- * codebase, to a gym. `second-rooms` sat on the Plus card as a shipped feature
- * while nothing behind it existed, and the fix was to take the card away rather
- * than to tick it. A `BUILT` set is that lesson written down where it cannot be
- * forgotten.
+ * Each feature joins this set in the phase that finishes it, which is why the
+ * gate and the copy cannot drift apart: one set, read by both. The failure it
+ * prevents is specific and has happened once already in this codebase, to a
+ * gym. `second-rooms` sat on the Plus card as a shipped feature while nothing
+ * behind it existed, and the fix was to take the card away rather than to tick
+ * it. A `BUILT` set is that lesson written down where it cannot be forgotten.
  */
-const BUILT = new Set<ProFeature>([])
+const BUILT = new Set<ProFeature>(['day-plan'])
 
 export function isBuilt(feature: ProFeature): boolean {
   return BUILT.has(feature)

@@ -1,5 +1,6 @@
 import type { ActiveChallenge } from './challenge'
 import type { FitnessTestResult } from './fitness-test'
+import type { LifeProfile } from './life-profile'
 import type { StoryProgress } from './story'
 import type {
   BodyweightEntry,
@@ -34,6 +35,7 @@ export const COLLECTIONS = [
   'profileDetails',
   'fitnessTest',
   'story',
+  'lifeProfile',
 ] as const
 
 export type Collection = (typeof COLLECTIONS)[number]
@@ -56,6 +58,7 @@ export const ORDER: Record<Collection, 'newest-first' | 'oldest-first' | 'single
   profileDetails: 'single',
   fitnessTest: 'single',
   story: 'single',
+  lifeProfile: 'single',
 }
 
 export interface RecordMeta {
@@ -138,6 +141,8 @@ export function recordsFromSnapshot(snapshot: GymSnapshot): LiveRecord[] {
   if (snapshot.fitnessTest)
     rows.push({ collection: 'fitnessTest', id: SINGLETON_ID, value: snapshot.fitnessTest })
   if (snapshot.story) rows.push({ collection: 'story', id: SINGLETON_ID, value: snapshot.story })
+  if (snapshot.lifeProfile)
+    rows.push({ collection: 'lifeProfile', id: SINGLETON_ID, value: snapshot.lifeProfile })
   return rows
 }
 
@@ -214,6 +219,7 @@ export function snapshotFromRecords(records: readonly LoadedRecord[]): GymSnapsh
     profileDetails: single<ProfileDetails>(rows('profileDetails')),
     fitnessTest: single<FitnessTestResult>(rows('fitnessTest')),
     story: single<StoryProgress>(rows('story')),
+    lifeProfile: single<LifeProfile>(rows('lifeProfile')),
     activeWorkout: null,
   }
 }

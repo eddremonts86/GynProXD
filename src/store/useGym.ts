@@ -19,6 +19,7 @@ import { todayIso } from '../lib/dates'
 import { withRecordIds } from '../lib/records'
 import type { ActiveChallenge, Challenge } from '../lib/challenge'
 import type { FitnessTestResult } from '../lib/fitness-test'
+import { emptyLifeProfile, type Anchor, type LifeProfile } from '../lib/life-profile'
 import type { StoryProgress, TrackId } from '../lib/story'
 
 export const DAYS: DayOfWeek[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
@@ -83,6 +84,15 @@ interface GymState {
   challenges: ActiveChallenge[]
   fitnessTest: FitnessTestResult | null
   setFitnessTest: (result: FitnessTestResult | null) => void
+  /**
+   * The hours somebody does not control. Input, not a derivation: the day plan
+   * is computed from this every time it is drawn, so there is nothing else to
+   * keep in step and nothing to merge but the anchors themselves.
+   */
+  lifeProfile: LifeProfile | null
+  updateLifeProfile: (patch: Partial<Omit<LifeProfile, 'updatedAt'>>) => void
+  saveAnchor: (anchor: Anchor) => void
+  removeAnchor: (id: string) => void
   story: StoryProgress | null
   startStory: (programId: string) => void
   leaveStory: () => void
@@ -115,6 +125,38 @@ export const useGym = create<GymState>()((set, get) => ({
       story: null,
 
       setFitnessTest: (result) => set({ fitnessTest: result }),
+
+      lifeProfile: null,
+      updateLifeProfile: (patch) =>
+        set((s) => ({
+          lifeProfile: {
+            ...(s.lifeProfile ?? emptyLifeProfile()),
+            ...patch,
+            updatedAt: new Date().toISOString(),
+          },
+        })),
+      /* Upsert by id, so the editor can save a new anchor and an edited one
+         through the same call and never has to know which it is holding. */
+      saveAnchor: (anchor) =>
+        set((s) => {
+          const base = s.lifeProfile ?? emptyLifeProfile()
+          const anchors = base.anchors.some((a) => a.id === anchor.id)
+            ? base.anchors.map((a) => (a.id === anchor.id ? anchor : a))
+            : [...base.anchors, anchor]
+          return { lifeProfile: { ...base, anchors, updatedAt: new Date().toISOString() } }
+        }),
+      removeAnchor: (id) =>
+        set((s) =>
+          s.lifeProfile
+            ? {
+                lifeProfile: {
+                  ...s.lifeProfile,
+                  anchors: s.lifeProfile.anchors.filter((a) => a.id !== id),
+                  updatedAt: new Date().toISOString(),
+                },
+              }
+            : {},
+        ),
 
       /* One story at a time: two parallel narratives would be two streaks
          competing, which is how both get abandoned. */
@@ -514,6 +556,7 @@ export interface GymSnapshot {
   challenges: ActiveChallenge[]
   fitnessTest: FitnessTestResult | null
   story: StoryProgress | null
+  lifeProfile: LifeProfile | null
 }
 
 export const EMPTY_SNAPSHOT: GymSnapshot = {
@@ -527,6 +570,7 @@ export const EMPTY_SNAPSHOT: GymSnapshot = {
   challenges: [],
   fitnessTest: null,
   story: null,
+  lifeProfile: null,
 }
 
 export function snapshotGym(state: GymState = useGym.getState()): GymSnapshot {
@@ -541,6 +585,7 @@ export function snapshotGym(state: GymState = useGym.getState()): GymSnapshot {
     challenges: state.challenges,
     fitnessTest: state.fitnessTest,
     story: state.story,
+    lifeProfile: state.lifeProfile,
   }
 }
 
@@ -557,6 +602,7 @@ export function hydrateGym(snapshot: Partial<GymSnapshot> | null | undefined): v
     challenges: snapshot?.challenges ?? [],
     fitnessTest: snapshot?.fitnessTest ?? null,
     story: snapshot?.story ?? null,
+    lifeProfile: snapshot?.lifeProfile ?? null,
   }
   populateByIdCache([...generatedExercises, ...wgerExercises, ...next.customExercises])
   useGym.setState(next)

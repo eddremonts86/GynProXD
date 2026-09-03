@@ -49,6 +49,7 @@ const StoryPage = React.lazy(() =>
 const FitnessTestPage = React.lazy(() =>
   import('./routes/FitnessTest').then((m) => ({ default: m.FitnessTestPage })),
 )
+const DayPage = React.lazy(() => import('./routes/Day').then((m) => ({ default: m.DayPage })))
 
 const rootRoute = createRootRoute({
   component: AppShell,
@@ -117,6 +118,7 @@ export const router = createRouter({
   scrollRestoration: true,
   routeTree: rootRoute.addChildren([
     lazyRoute('/', TodayPage),
+    lazyRoute('/day', DayPage),
     lazyRoute('/planner', PlannerPage),
     lazyRoute('/challenges', ChallengesPage),
     lazyRoute('/story', StoryPage),

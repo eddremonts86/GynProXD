@@ -15,12 +15,17 @@ import {
  * revenue that was never charged and a feature that cannot be taken back.
  */
 describe('proAllows', () => {
-  it('refuses every feature while nothing is built', () => {
-    // This is the state of this branch on purpose: the entitlement exists and
-    // no screen sits behind it yet. When a phase ships, its name joins BUILT
-    // and this expectation changes with it, which is the point of asserting it.
-    for (const feature of PRO_FEATURES) {
+  it('gives a built feature to a paying account and to nobody else', () => {
+    expect(proAllows(true, 'day-plan')).toBe(true)
+    expect(proAllows(false, 'day-plan')).toBe(false)
+  })
+
+  it('refuses everything still unbuilt, paid or not', () => {
+    // These four are names on a list. When a phase finishes one it joins BUILT
+    // and moves to the test above, which is the point of asserting it here.
+    for (const feature of ['companion', 'calendar', 'culture', 'intimacy'] as const) {
       expect(proAllows(true, feature)).toBe(false)
+      expect(proAllows(false, feature)).toBe(false)
     }
   })
 
@@ -41,11 +46,12 @@ describe('proAllows', () => {
 })
 
 describe('anythingBuilt', () => {
-  it('says there is nothing to sell yet', () => {
+  it('says there is something to sell now', () => {
     // A price with no feature behind it is the one thing the copy must not
-    // print. This guard is what lets the subscription panel exist before the
-    // first Pro screen does.
-    expect(anythingBuilt()).toBe(false)
+    // print. This guard is what let the subscription panel exist before the
+    // first Pro screen did, and what flips its wording now that one does.
+    expect(anythingBuilt()).toBe(true)
+    expect(PRO_FEATURES.filter(isBuilt)).toEqual(['day-plan'])
   })
 })
 

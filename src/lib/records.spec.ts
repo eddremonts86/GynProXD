@@ -52,6 +52,61 @@ describe('recordsFromSnapshot', () => {
   })
 })
 
+describe('the life profile', () => {
+  it('round-trips through a store and back', () => {
+    // It is a singleton like `story` and it carries a list inside it, which is
+    // the combination worth checking: an array nested in a single row does not
+    // get the per-row merge the top-level collections do, so it has to survive
+    // as one value or not at all.
+    hydrateGym(EMPTY_SNAPSHOT)
+    const store = useGym.getState()
+    store.updateLifeProfile({ wake: '06:30', sleep: '22:30' })
+    useGym.getState().saveAnchor({
+      id: 'work',
+      label: 'work',
+      days: ['mon', 'tue', 'wed', 'thu', 'fri'],
+      start: '09:00',
+      end: '17:00',
+      kind: 'work',
+    })
+    useGym.getState().saveAnchor({
+      id: 'school',
+      label: 'school run',
+      days: ['mon', 'fri'],
+      start: '08:15',
+      end: '08:45',
+      kind: 'care',
+    })
+
+    const live = snapshotGym()
+    const rebuilt = roundTrip(live)
+    expect(rebuilt.lifeProfile).toEqual(live.lifeProfile)
+    expect(rebuilt.lifeProfile?.anchors.map((a) => a.id)).toEqual(['work', 'school'])
+    expect(rebuilt.lifeProfile?.wake).toBe('06:30')
+  })
+
+  it('edits an anchor in place rather than adding a second one', () => {
+    hydrateGym(EMPTY_SNAPSHOT)
+    const anchor = {
+      id: 'work',
+      label: 'work',
+      days: ['mon' as const],
+      start: '09:00',
+      end: '17:00',
+      kind: 'work' as const,
+    }
+    useGym.getState().saveAnchor(anchor)
+    useGym.getState().saveAnchor({ ...anchor, end: '15:00' })
+    expect(useGym.getState().lifeProfile?.anchors).toEqual([{ ...anchor, end: '15:00' }])
+  })
+
+  it('is absent from the rows until somebody fills it in', () => {
+    // An empty singleton must not become a row, or every profile on the server
+    // grows one the moment this code ships.
+    expect(recordsFromSnapshot(EMPTY_SNAPSHOT)).toEqual([])
+  })
+})
+
 describe('snapshotFromRecords', () => {
   it('rebuilds every collection in the order the app already showed', () => {
     const snapshot: GymSnapshot = {

@@ -5,7 +5,7 @@ import { Panel } from '@/ui/Panel'
 import { activeProfile } from '@/lib/profiles'
 import { anythingBuilt } from '@/lib/member-plan'
 import { proStateOf, refreshEntitlement, type ProState } from '@/lib/entitlement'
-import { readSyncLink } from '@/lib/sync'
+import { useSession } from '@/store/useSession'
 
 /**
  * What this account is subscribed to, next to sync because that is where an
@@ -58,11 +58,21 @@ function describe(state: ProState): { label: string; detail: string } {
 
 export function ProSection() {
   const profileId = activeProfile()?.id ?? null
+  /**
+   * Whether there is an account comes from the session store, not from
+   * localStorage. Reading it straight off disk was correct and silent: nothing
+   * re-renders on a localStorage write, so creating an account in the panel
+   * above left this one still telling somebody to go and create one.
+   *
+   * The subscription state itself is still read from the cache on each render,
+   * because the two things that change it both already cause one: `recheck`
+   * below, and an unlock, which remounts the screen.
+   */
+  const link = useSession((s) => s.linked)
   const [busy, setBusy] = useState(false)
   const [, forceRender] = useState(0)
 
   if (!profileId) return null
-  const link = readSyncLink(profileId)
   const state = proStateOf(profileId)
   const { label, detail } = describe(state)
 
