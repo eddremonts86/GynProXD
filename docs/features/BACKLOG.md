@@ -87,15 +87,33 @@ hour ago are all refused; a real event moves the plan and the cap; cancelling
 leaves the gym standing. The checkout route was also exercised against the real
 Stripe test API, which returned a session and stored the customer.
 
+### What is configured, in test mode
+
+- **Products and prices**, read from `PRICES` in `src/lib/gym-plan.ts` so they
+  cannot drift from the page: `enf_sub_base`, `enf_sub_plus`,
+  `enf_sub_enterprise`, each with a monthly EUR price whose **lookup key** is
+  what `utils/billing.js` matches on. Lookup keys rather than price ids, because
+  a price id changes the day somebody edits an amount and a lookup key does not.
+- **A webhook endpoint of its own**, `we_1UBW9dF…`, pointing at
+  `https://enforma-sync.eduardoinerarte.dk/api/enforma/billing/webhook` and
+  subscribed to the three `customer.subscription.*` events. Separate from
+  BuilderHunt's endpoint in the same account, so one project's events are not
+  another's problem.
+- **`STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` on the sync app** in
+  Coolify. Verified from outside afterwards: the webhook answers 400 to an
+  unsigned body rather than 503, and a real Stripe test event was delivered and
+  accepted with `pending_webhooks: 0`.
+
 ### Still to do
 
-- **Live keys and a live webhook.** Everything above is `sk_test`. The account
-  currently in use is the fleet's shared BuilderHunt test account; enForma has
-  its own products in it (`enf_sub_*`) but should have its own account before
-  anybody is charged.
-- **A button.** There is no UI that calls `/api/enforma/billing/checkout` yet:
-  the route exists and is proved, and the gym panel still shows what a person
-  provisioned by hand.
+- **A live account, and live keys.** All of the above is `sk_test` on the
+  fleet's shared BuilderHunt account. enForma has its own products inside it,
+  which keeps them apart, but it should have its own account before anybody is
+  charged for real.
+- **A button.** Nothing in the UI calls `/api/enforma/billing/checkout`: the
+  route exists, is proved, and is reachable, and the panel still shows what
+  somebody provisioned by hand. That is the next honest step, and it is small
+  now that the hard half is done.
 
 ## 4. The gym applications queue is still hands-on
 
