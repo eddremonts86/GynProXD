@@ -40,6 +40,7 @@ const GROUPS = {
     'scheduled-boundary',
     'operators-boundary',
     'branding-boundary',
+    'pro-boundary',
   ],
   screens: [
     'test-gate',
