@@ -574,7 +574,11 @@ try {
    * of <main>, so `dayText` never sees it and `sheetText` sees only it. That
    * separation is the redesign: the screen is the day, the forms are a drawer.
    */
-  const sheet = () => page.getByRole('dialog')
+  /* By name, because Apple's ways-in dialog is a second dialog nested inside
+     this one and an unqualified `getByRole('dialog')` resolves to both — even
+     while the inner one is closing, since it stays in the DOM for its
+     animation. */
+  const sheet = () => page.getByRole('dialog', { name: 'Shape your day' })
   const sheetText = async () => (await sheet().innerText()).replace(/\s+/g, ' ').trim()
   const openSheet = async () => {
     if ((await sheet().count()) > 0 && (await sheet().isVisible())) return
@@ -1143,23 +1147,55 @@ try {
 
   console.log('\nan iCloud calendar, over CalDAV')
   await openSheet()
-  const appleBefore = await sheetText()
+  /**
+   * Apple's two ways in live in a dialog opened from its panel, and each is a
+   * `<details>` that starts folded except the recommended one. So a walk has to
+   * open the dialog and then unfold the way it is about — which is the whole
+   * point of the arrangement: a member reads one explanation, not both.
+   */
+  const applePanel = () => sheet().getByRole('group', { name: 'Apple Calendar' })
+  /* By accessible name, not by text: the sheet contains the button that opens
+     this dialog, so a `hasText` filter matches the sheet as well and `.first()`
+     picks the wrong one. The title gives the dialog its name; the sheet's is
+     "Shape your day". */
+  const ways = () => page.getByRole('dialog', { name: 'Connect Apple Calendar' })
+  const openWays = async () => {
+    if ((await ways().count()) > 0 && (await ways().first().isVisible())) return
+    await applePanel()
+      .getByRole('button', { name: /Connect Apple Calendar|Add the other way in/ })
+      .click()
+    await ways().first().waitFor({ timeout: 8000 })
+    await page.waitForTimeout(400)
+  }
+  const passwordWay = () => ways().first().getByRole('region', { name: 'Connect iCloud with a generated password' })
+  const unfoldPassword = async () => {
+    await openWays()
+    if (await passwordWay().isVisible().catch(() => false)) return
+    await ways().first().getByText(/An app-specific password/).first().click()
+    await passwordWay().waitFor({ timeout: 8000 })
+  }
+
+  await unfoldPassword()
+  const appleBefore = (await passwordWay().innerText()).replace(/\s+/g, ' ').trim()
   check('says what an app-specific password is not',
     /not the same as your Apple ID password|app-specific password you\s*make yourself/i.test(appleBefore), true)
   check('and that Apple is where it is revoked', /Apple is where you revoke it/.test(appleBefore), true)
 
   /* The wrong password first: somebody typing their Apple ID password has to be
      told now rather than have it stored and fail on the first read. */
-  await sheet().getByLabel('Apple ID').fill('diary@icloud.test')
-  await sheet().getByLabel('App-specific password').fill('my-normal-password')
-  await sheet().getByRole('button', { name: 'Connect Apple Calendar' }).click()
-  await sheet().getByText(/iCloud refused that/).waitFor({ timeout: 15000 })
+  await passwordWay().getByLabel('Apple ID').fill('diary@icloud.test')
+  await passwordWay().getByLabel('App-specific password').fill('my-normal-password')
+  await passwordWay().getByRole('button', { name: 'Connect Apple Calendar' }).click()
+  /* The refusal is reported on the panel behind, beside the calendar it is
+     about, rather than inside a dialog the member may already have closed. */
+  await applePanel().getByText(/iCloud refused that/).waitFor({ timeout: 15000 })
   check('a password iCloud refuses is not stored',
     (await pb.api('GET', "/api/collections/calendar_links/records?filter=provider='apple'", undefined, pb.su)).json.totalItems, 0)
 
-  await sheet().getByLabel('App-specific password').fill(APP_PASSWORD)
-  await sheet().getByRole('button', { name: 'Connect Apple Calendar' }).click()
-  await sheet().getByRole('button', { name: 'Read it again' }).last().waitFor({ timeout: 20000 })
+  await unfoldPassword()
+  await passwordWay().getByLabel('App-specific password').fill(APP_PASSWORD)
+  await passwordWay().getByRole('button', { name: 'Connect Apple Calendar' }).click()
+  await applePanel().getByRole('button', { name: 'Read it again' }).last().waitFor({ timeout: 20000 })
   const appleOn = await sheetText()
   check('the Apple ID is shown back', /diary@icloud\.test/.test(appleOn), true)
   check('discovery ran, principal then home then the listing',
@@ -1189,24 +1225,36 @@ try {
    * with the loopback permission set, which is the worst case.
    */
   await openSheet()
-  const subPanel = () => sheet().getByRole('group', { name: 'Apple Calendar' })
-  const subSection = () => subPanel().getByRole('region', { name: 'Subscribe to a published calendar' })
+  const subPanel = applePanel
+  const subSection = () => ways().first().getByRole('region', { name: 'Subscribe to a published calendar' })
   const subText = async () => (await subSection().innerText()).replace(/\s+/g, ' ').trim()
 
+  await openWays()
+  const bothWays = (await ways().first().innerText()).replace(/\s+/g, ' ')
   check('the published link is offered first, above the password',
-    /A published link[^]*?An app-specific password/.test((await subPanel().innerText()).replace(/\s+/g, ' ')), true)
+    /A published link[^]*?An app-specific password/.test(bothWays), true)
+  check('and both summaries are on screen, so neither is hidden',
+    /A published link/.test(bothWays) && /An app-specific password/.test(bothWays), true)
   const subBefore = await subText()
   check('it says there is no password', /no password/.test(subBefore), true)
   check('and says the link is not protected, which is the trade',
     /anyone who gets hold of it can read that calendar/.test(subBefore), true)
   check('and where to turn it on', /Public Calendar/.test(subBefore), true)
+  check('and that a family calendar has no such switch',
+    /family calendar[^]*?has no switch anywhere/.test(subBefore), true)
 
   const paste = async (value) => {
+    await openWays()
     const field = subSection().getByLabel('Calendar link')
     await field.fill(value)
     await subSection().getByRole('button', { name: /Subscribe to this calendar/ }).click()
-    await page.waitForTimeout(1200)
-    return (await subSection().innerText()).replace(/\s+/g, ' ').trim()
+    await page.waitForTimeout(1500)
+    /* A refusal keeps the dialog open and says why; a success closes it and the
+       panel behind carries the result. */
+    const inDialog = (await ways().count()) > 0 && (await ways().first().isVisible())
+    return inDialog
+      ? (await subSection().innerText()).replace(/\s+/g, ' ').trim()
+      : (await subPanel().innerText()).replace(/\s+/g, ' ').trim()
   }
 
   /* The address every cloud keeps its credentials behind. Refused by the route
@@ -1230,7 +1278,7 @@ try {
    * `calendar-url.spec.ts`, against the shipped function.
    */
   const good = await paste(`${publishedBase}/published.ics`)
-  check('the calendar is subscribed', /Read it again/.test(good), true)
+  check('the calendar is subscribed, and the dialog got out of the way', /Read it again/.test(good), true)
   check('and it is named by the calendar itself', /Trabajo publicado/.test(good), true)
   check('the address is never shown back', /published\.ics|127\.0\.0\.1/.test(good), false)
   /* Twice: once to check the address before storing it, which is what catches
@@ -1259,9 +1307,10 @@ try {
      at the source and there is nothing to tell us. */
   published.gone = true
   await openSheet()
-  await subSection().getByRole('button', { name: /Read it again/ }).click()
+  const attached = () => subPanel().getByRole('region', { name: 'A published calendar' })
+  await attached().getByRole('button', { name: /Read it again/ }).click()
   await page.waitForTimeout(1500)
-  const stopped = await subText()
+  const stopped = (await subPanel().innerText()).replace(/\s+/g, ' ').trim()
   check('the screen says it is no longer published', /no longer published/.test(stopped), true)
   check('and says what to do about it, which is not what a revoked password needs',
     /Publish it again where it lives, or paste a new link/.test(stopped), true)
@@ -1285,7 +1334,7 @@ try {
   check('and it is the same calendar', /Trabajo publicado/.test(again), true)
 
   console.log('\nputting the subscription away')
-  await subSection().getByRole('button', { name: 'Disconnect' }).click()
+  await attached().getByRole('button', { name: 'Disconnect' }).click()
   await page.waitForTimeout(1200)
   check('the row is gone',
     (await pb.api('GET', '/api/collections/calendar_links/records?filter=' + encodeURIComponent('provider = "url"'), undefined, pb.su)).json.totalItems, 0)
@@ -1367,20 +1416,23 @@ try {
   await page.waitForTimeout(2000)
   check('the hours it put on the day are gone with it', /16:00 to 17:00/.test(await dayText()), false)
   check("and Google's, which is still connected, are not", /19:00 to 20:00/.test(await dayText()), true)
-  /* Connected again, so the section below has something to disconnect. */
+  /* Connected again, so the section below has something to disconnect. Through
+     the dialog, which is where the form is. */
   await openSheet()
-  await sheet().getByLabel('Apple ID').fill('diary@icloud.test')
-  await sheet().getByLabel('App-specific password').fill(APP_PASSWORD)
-  await sheet().getByRole('button', { name: 'Connect Apple Calendar' }).click()
-  await sheet().getByRole('button', { name: 'Read it again' }).last().waitFor({ timeout: 20000 })
+  await unfoldPassword()
+  await passwordWay().getByLabel('Apple ID').fill('diary@icloud.test')
+  await passwordWay().getByLabel('App-specific password').fill(APP_PASSWORD)
+  await passwordWay().getByRole('button', { name: 'Connect Apple Calendar' }).click()
+  await applePanel().getByRole('button', { name: 'Read it again' }).last().waitFor({ timeout: 20000 })
   await closeSheet()
   check('and it comes back when it is connected again', /16:00 to 17:00/.test(await dayText()), true)
 
   console.log('\ndisconnecting one of them')
   await openSheet()
-  /* The Apple panel is the second of the two, so its buttons are the last. */
-  await sheet().getByRole('button', { name: 'Disconnect' }).last().click()
-  await sheet().getByRole('button', { name: 'Connect Apple Calendar' }).waitFor({ timeout: 15000 })
+  /* Within Apple's own panel, so "the last Disconnect on the sheet" stops being
+     a thing to reason about. */
+  await applePanel().getByRole('button', { name: 'Disconnect' }).last().click()
+  await applePanel().getByRole('button', { name: 'Connect Apple Calendar' }).waitFor({ timeout: 15000 })
   check('its row is gone', (await pb.api('GET', "/api/collections/calendar_links/records?filter=provider='apple'", undefined, pb.su)).json.totalItems, 0)
   check("and Google's is not", (await pb.api('GET', "/api/collections/calendar_links/records?filter=provider='google'", undefined, pb.su)).json.totalItems, 1)
   await closeSheet()
