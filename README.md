@@ -54,6 +54,15 @@ three weeks become busy blocks on the member's own device, with titles left
 behind unless they ask for them. Disconnecting deletes the row and tells Google
 to revoke it. Google's verification for a sensitive scope is a person's job.
 
+Apple Calendar needs nothing beyond that 32-character `CALENDAR_SECRET`: iCloud
+has no OAuth, so a member generates an app-specific password at
+appleid.apple.com and types it in, the server verifies it with one `PROPFIND`
+before storing it sealed, and reads the next three weeks over CalDAV. That read
+relays the raw iCalendar to the device, which parses it with the same reader the
+file import uses, because resolving a recurrence rule into wall-clock hours
+needs a timezone database the browser has and the server does not. Revoking is
+one click in their Apple ID.
+
 `TICKETMASTER_API_KEY` on the same server turns on the strip under `/day`:
 ticketed events within 25 km of a cell the device rounds its position to, or
 around a city typed by hand, cached per cell for six hours. A tap puts one on

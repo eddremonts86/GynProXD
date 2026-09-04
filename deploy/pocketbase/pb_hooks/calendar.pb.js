@@ -130,17 +130,44 @@ routerAdd('GET', '/api/enforma/calendar/google/callback', (e) => {
   return back('connected')
 })
 
+/**
+ * What this account has connected, per provider.
+ *
+ * One row per provider, so the answer is a map rather than a boolean: a member
+ * may have Google on one calendar and iCloud on another, and the screen draws
+ * both blocks whatever the other one says. `connected` stays at the top level
+ * as "any of them", because that is what the older client asked for and a
+ * client that has not been reloaded should keep working.
+ */
 routerAdd('GET', '/api/enforma/calendar/status', (e) => {
   if (!e.auth) return e.json(401, { message: 'Sign in first.' })
-  const { linkFor } = require(`${__hooks}/utils/google_calendar.js`)
-  const row = linkFor(e.app, e.auth.id)
-  if (!row) return e.json(200, { connected: false })
-  const synced = String(row.get('last_synced') || '')
+  const one = (provider) => {
+    let row = null
+    try {
+      row = e.app.findFirstRecordByFilter('calendar_links', 'owner = {:o} && provider = {:p}', {
+        o: e.auth.id,
+        p: provider,
+      })
+    } catch {
+      return { connected: false }
+    }
+    const synced = String(row.get('last_synced') || '')
+    return {
+      connected: true,
+      account: String(row.get('account') || ''),
+      lastSynced: synced === '' ? null : synced,
+    }
+  }
+  const google = one('google')
+  const apple = one('apple')
   return e.json(200, {
-    connected: true,
-    provider: 'google',
-    account: String(row.get('account') || ''),
-    lastSynced: synced === '' ? null : synced,
+    connected: google.connected || apple.connected,
+    provider: google.connected ? 'google' : apple.connected ? 'apple' : null,
+    /* Kept flat as well as nested, so the fields the first version answered
+       with still mean what they meant. */
+    account: google.connected ? google.account : apple.account || '',
+    lastSynced: google.connected ? google.lastSynced : apple.lastSynced || null,
+    providers: { google: google, apple: apple },
   })
 })
 
@@ -244,9 +271,20 @@ routerAdd('GET', '/api/enforma/calendar/busy', (e) => {
  */
 routerAdd('POST', '/api/enforma/calendar/disconnect', (e) => {
   if (!e.auth) return e.json(401, { message: 'Sign in first.' })
-  const { envConfig, linkFor } = require(`${__hooks}/utils/google_calendar.js`)
-  const row = linkFor(e.app, e.auth.id)
-  if (!row) return e.json(200, { connected: false })
+  const { envConfig } = require(`${__hooks}/utils/google_calendar.js`)
+  /* Which one, defaulting to Google: that is what the route meant when it was
+     the only provider and what a client that has not reloaded still means. */
+  const asked = e.request.url.query().get('provider')
+  const provider = asked === 'apple' ? 'apple' : 'google'
+  let row = null
+  try {
+    row = e.app.findFirstRecordByFilter('calendar_links', 'owner = {:o} && provider = {:p}', {
+      o: e.auth.id,
+      p: provider,
+    })
+  } catch {
+    return e.json(200, { connected: false })
+  }
 
   const cfg = envConfig()
   let token = ''
@@ -260,7 +298,12 @@ routerAdd('POST', '/api/enforma/calendar/disconnect', (e) => {
   } catch {
     return e.json(500, { message: 'It could not be forgotten. Try again.' })
   }
-  if (cfg && token) {
+  /**
+   * Only Google gets told. An app-specific password is revoked by the member in
+   * their own Apple ID settings and there is no endpoint to ask; deleting the
+   * row is the whole of what this server can do, and the screen says so.
+   */
+  if (provider === 'google' && cfg && token) {
     try {
       $http.send({
         url: cfg.tokenBase.replace(/\/+$/, '') + '/revoke',

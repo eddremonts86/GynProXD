@@ -101,15 +101,24 @@ justification for the scope, and a video demonstrating the flow. Until it
 passes, the connection works for up to 100 users behind an unverified-app
 warning, which is enough to test with and not enough to launch on.
 
-## 7. Apple Calendar
+## 7. Apple Calendar — done
 
-The largest thing left unbuilt, and it was asked for by name.
+Built and walked. CalDAV, an app-specific password the member generates in
+their Apple ID settings and types in, verified with one `PROPFIND` before it is
+stored, on the `calendar_links` table with `provider` set to `apple`. Two
+providers can be attached at once and one pull never touches the other's
+blocks.
 
-CalDAV, an app-specific password the member creates in their Apple ID settings
-and types in, verified immediately with one `PROPFIND`, then polled. It goes on
-the `calendar_links` table that already exists, with `provider` set to `apple`,
-and the events land as the same busy blocks Google's do. There is no OAuth and
-there are no webhooks; this is the worse sign-up and the same result.
+The one decision worth knowing: the server relays the raw iCalendar and the
+device parses it with the reader the file import already uses. Expanding
+recurrences server-side would have forced UTC on the answer, and turning UTC
+into wall-clock hours across a three-week window that may contain a
+daylight-saving change needs a timezone database the browser has and that
+process does not.
+
+It needs no configuration of its own. The 32-character `CALENDAR_SECRET` from
+item 2 is the only thing it wants, and `/api/enforma/capabilities` reports the
+two providers separately so a server can offer one and not the other.
 
 ## 8. The +18 library, connected
 

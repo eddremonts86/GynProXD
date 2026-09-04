@@ -1,6 +1,9 @@
 import { accountBase } from './account-base'
 import { activeAuthHeader } from './sync'
-import type { BusyBlock } from './life-profile'
+import { parseIcs } from './ics'
+import { IMPORT_DAYS, type BusyBlock } from './life-profile'
+import { todayIso } from './dates'
+import { isoPlusDays } from './day-window'
 
 /**
  * The account's connected calendar, from this device's point of view.
@@ -13,13 +16,35 @@ import type { BusyBlock } from './life-profile'
  * The shapes are checked rather than trusted, the same way `nearby-events.ts`
  * checks the events route. A block whose times are not clock times is dropped
  * rather than drawn on somebody's day at an hour that does not exist.
+ *
+ * ## The two providers answer differently, on purpose
+ *
+ * Google's route hands back busy blocks: its API returns every instance with
+ * its own UTC offset, so the server can turn them into wall-clock hours and be
+ * right across a daylight-saving change.
+ *
+ * Apple's hands back raw `VCALENDAR` text, because CalDAV does not. Expanding
+ * recurrences server-side would force UTC on the answer, and turning UTC into
+ * somebody's wall clock needs the timezone database this device has and that
+ * process does not. So the recurrence rules arrive as written and `parseIcs`
+ * resolves them here — the same parser, with the same decisions about all-day
+ * events and free-marked hours, that has read picked files since v1.
  */
+
+export type CalendarProvider = 'google' | 'apple'
 
 export interface CalendarStatus {
   connected: boolean
   account: string
   lastSynced: string | null
 }
+
+export interface CalendarStatuses {
+  google: CalendarStatus
+  apple: CalendarStatus
+}
+
+const NOT_CONNECTED: CalendarStatus = { connected: false, account: '', lastSynced: null }
 
 export type CalendarFailure =
   | 'no-account'
@@ -28,6 +53,8 @@ export type CalendarFailure =
   | 'not-connected'
   | 'withdrawn'
   | 'unreachable'
+  /** Apple only: the Apple ID or the app-specific password was not accepted. */
+  | 'rejected'
 
 export type PullResult =
   | { ok: true; blocks: Omit<BusyBlock, 'id'>[] }
@@ -62,23 +89,40 @@ export function validateBlocks(raw: unknown): Omit<BusyBlock, 'id'>[] | null {
   return out
 }
 
-export async function calendarStatus(): Promise<CalendarStatus> {
+function oneStatus(raw: unknown): CalendarStatus {
+  if (!raw || typeof raw !== 'object') return NOT_CONNECTED
+  const row = raw as Record<string, unknown>
+  return {
+    connected: row.connected === true,
+    account: typeof row.account === 'string' ? row.account : '',
+    lastSynced: typeof row.lastSynced === 'string' ? row.lastSynced : null,
+  }
+}
+
+/**
+ * What each provider says about itself.
+ *
+ * A server too old to answer per provider sends the flat shape it always did,
+ * which is read as Google's, because Google was the only one it could have
+ * meant.
+ */
+export async function calendarStatuses(): Promise<CalendarStatuses> {
   const at = endpoint()
-  if (!at) return { connected: false, account: '', lastSynced: null }
+  if (!at) return { google: NOT_CONNECTED, apple: NOT_CONNECTED }
   try {
     const res = await fetch(`${at.base}/api/enforma/calendar/status`, {
       headers: at.headers,
       signal: AbortSignal.timeout(8000),
     })
-    if (!res.ok) return { connected: false, account: '', lastSynced: null }
+    if (!res.ok) return { google: NOT_CONNECTED, apple: NOT_CONNECTED }
     const body = (await res.json()) as Record<string, unknown>
-    return {
-      connected: body.connected === true,
-      account: typeof body.account === 'string' ? body.account : '',
-      lastSynced: typeof body.lastSynced === 'string' ? body.lastSynced : null,
+    const providers = body.providers as Record<string, unknown> | undefined
+    if (providers) {
+      return { google: oneStatus(providers.google), apple: oneStatus(providers.apple) }
     }
+    return { google: oneStatus(body), apple: NOT_CONNECTED }
   } catch {
-    return { connected: false, account: '', lastSynced: null }
+    return { google: NOT_CONNECTED, apple: NOT_CONNECTED }
   }
 }
 
@@ -109,6 +153,97 @@ export async function calendarConnectUrl(): Promise<{ url: string } | { why: Cal
   }
 }
 
+/**
+ * The window the Apple read covers, as `parseIcs` wants it: the same three
+ * weeks the server asked iCloud for and the same the file import reads.
+ */
+export function icsWindow(today = todayIso()): { from: string; to: string } {
+  return { from: today, to: isoPlusDays(today, IMPORT_DAYS, today) }
+}
+
+/** Whatever the relayed iCalendar text holds, as busy blocks. Exported for its tests. */
+export function blocksFromIcs(
+  texts: readonly string[],
+  keepTitles: boolean,
+  today = todayIso(),
+): Omit<BusyBlock, 'id'>[] {
+  const window = icsWindow(today)
+  const out: Omit<BusyBlock, 'id'>[] = []
+  const seen = new Set<string>()
+  for (const text of texts) {
+    for (const event of parseIcs(text, window)) {
+      const key = `${event.date}|${event.start}|${event.end}`
+      if (seen.has(key)) continue
+      seen.add(key)
+      const label = keepTitles ? event.title.replace(/\s+/g, ' ').trim().slice(0, 60) : ''
+      out.push({
+        date: event.date,
+        start: event.start,
+        end: event.end,
+        source: 'apple',
+        ...(label ? { label } : {}),
+      })
+    }
+  }
+  out.sort((a, b) => a.date.localeCompare(b.date) || a.start.localeCompare(b.start))
+  return out
+}
+
+/**
+ * Connects an iCloud calendar, verified before it is stored.
+ *
+ * The password is an app-specific one the member generated in their Apple ID
+ * settings, which is the only kind iCloud accepts here. It goes straight to
+ * their own server over TLS and is sealed there; nothing keeps it on this
+ * device, not even for the length of the session.
+ */
+export async function connectApple(
+  appleId: string,
+  password: string,
+): Promise<{ ok: true; account: string } | { ok: false; why: CalendarFailure }> {
+  const at = endpoint()
+  if (!at) return { ok: false, why: 'no-account' }
+  try {
+    const res = await fetch(`${at.base}/api/enforma/calendar/apple/connect`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...at.headers },
+      body: JSON.stringify({ appleId: appleId.trim(), password: password.trim() }),
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    })
+    if (res.status === 503) return { ok: false, why: 'unavailable' }
+    if (res.status === 403) return { ok: false, why: 'refused' }
+    if (res.status === 400 || res.status === 401) return { ok: false, why: 'rejected' }
+    if (!res.ok) return { ok: false, why: 'unreachable' }
+    const body = (await res.json()) as { account?: unknown }
+    return { ok: true, account: typeof body.account === 'string' ? body.account : appleId }
+  } catch {
+    return { ok: false, why: 'unreachable' }
+  }
+}
+
+/** The next three weeks of the connected iCloud calendars, as busy blocks. */
+export async function pullApple(keepTitles: boolean): Promise<PullResult> {
+  const at = endpoint()
+  if (!at) return { ok: false, why: 'no-account' }
+  try {
+    const res = await fetch(`${at.base}/api/enforma/calendar/apple/ics`, {
+      headers: at.headers,
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    })
+    if (res.status === 503) return { ok: false, why: 'unavailable' }
+    if (res.status === 401 || res.status === 403) return { ok: false, why: 'refused' }
+    if (res.status === 404) return { ok: false, why: 'not-connected' }
+    if (res.status === 409) return { ok: false, why: 'withdrawn' }
+    if (!res.ok) return { ok: false, why: 'unreachable' }
+    const body = (await res.json()) as { ics?: unknown }
+    if (!Array.isArray(body.ics)) return { ok: false, why: 'unreachable' }
+    const texts = body.ics.filter((text): text is string => typeof text === 'string')
+    return { ok: true, blocks: blocksFromIcs(texts, keepTitles) }
+  } catch {
+    return { ok: false, why: 'unreachable' }
+  }
+}
+
 export async function pullCalendar(keepTitles: boolean): Promise<PullResult> {
   const at = endpoint()
   if (!at) return { ok: false, why: 'no-account' }
@@ -130,11 +265,11 @@ export async function pullCalendar(keepTitles: boolean): Promise<PullResult> {
   }
 }
 
-export async function disconnectCalendar(): Promise<boolean> {
+export async function disconnectCalendar(provider: CalendarProvider = 'google'): Promise<boolean> {
   const at = endpoint()
   if (!at) return false
   try {
-    const res = await fetch(`${at.base}/api/enforma/calendar/disconnect`, {
+    const res = await fetch(`${at.base}/api/enforma/calendar/disconnect?provider=${provider}`, {
       method: 'POST',
       headers: at.headers,
       signal: AbortSignal.timeout(TIMEOUT_MS),

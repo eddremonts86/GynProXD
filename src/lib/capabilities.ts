@@ -23,8 +23,14 @@ export interface ServerCapabilities {
   recipes: boolean
   /** An events source (a Ticketmaster key) behind /api/enforma/events/near. */
   events: boolean
-  /** A Google client and a key to seal tokens with: /day can connect a calendar. */
-  calendars: boolean
+  /**
+   * Which calendars this server can connect, one flag each.
+   *
+   * Not one boolean: Google needs a registered client and a redirect, Apple
+   * needs nothing but the key that seals what the member types in, so a server
+   * can perfectly well offer one and not the other.
+   */
+  calendars: { google: boolean; apple: boolean }
   /** VAPID public key when the server can deliver Web Push, else null. */
   push: string | null
   /**
@@ -45,13 +51,27 @@ const NONE: ServerCapabilities = {
   coachHost: null,
   recipes: false,
   events: false,
-  calendars: false,
+  calendars: { google: false, apple: false },
   push: null,
   billing: false,
   portal: null,
 }
 
 let caps: ServerCapabilities = load()
+
+/**
+ * Tolerant of both shapes, because a cached answer from before this was a map
+ * is a boolean, and a server that has not been redeployed still sends one.
+ * Either way absent reads as false, like every other flag here.
+ */
+function readCalendars(raw: unknown): { google: boolean; apple: boolean } {
+  if (raw === true) return { google: true, apple: true }
+  if (raw && typeof raw === 'object') {
+    const map = raw as { google?: unknown; apple?: unknown }
+    return { google: map.google === true, apple: map.apple === true }
+  }
+  return { google: false, apple: false }
+}
 
 function load(): ServerCapabilities {
   try {
@@ -63,7 +83,7 @@ function load(): ServerCapabilities {
       coachHost: parsed.coachHost === 'self' ? 'self' : parsed.coachHost === 'external' ? 'external' : null,
       recipes: parsed.recipes === true,
       events: parsed.events === true,
-      calendars: parsed.calendars === true,
+      calendars: readCalendars(parsed.calendars),
       push: typeof parsed.push === 'string' ? parsed.push : null,
       billing: parsed.billing === true,
       portal: typeof parsed.portal === 'string' ? parsed.portal : null,
@@ -107,7 +127,7 @@ export async function refreshCapabilities(server = '/pb'): Promise<void> {
         parsed.coachHost === 'self' ? 'self' : parsed.coachHost === 'external' ? 'external' : null,
       recipes: parsed.recipes === true,
       events: parsed.events === true,
-      calendars: parsed.calendars === true,
+      calendars: readCalendars(parsed.calendars),
       push: typeof parsed.push === 'string' && parsed.push.length > 0 ? parsed.push : null,
       billing: parsed.billing === true,
       portal:

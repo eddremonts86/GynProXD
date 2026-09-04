@@ -213,6 +213,87 @@ const googleServer = http.createServer((req, res) => {
 })
 await new Promise((r) => googleServer.listen(0, '127.0.0.1', r))
 
+/**
+ * iCloud, on loopback: CalDAV with the two-step discovery and one REPORT.
+ *
+ * The password it accepts is the app-specific shape, and anything else gets a
+ * 401, which is the case worth walking: somebody typing their Apple ID password
+ * has to be told, not stored. The listing includes the collections nobody wants
+ * (the home itself, a reminders list, a scheduling inbox) so the filter is
+ * exercised rather than assumed, and the events include a recurrence, an
+ * all-day birthday and an hour the calendar marks free.
+ */
+const icloud = { calls: [], reports: 0, lastAuth: '' }
+const APP_PASSWORD = 'abcd-efgh-ijkl-mnop'
+const icloudServer = http.createServer((req, res) => {
+  let body = ''
+  req.on('data', (d) => (body += d))
+  req.on('end', () => {
+    icloud.calls.push(req.method + ' ' + req.url)
+    icloud.lastAuth = req.headers.authorization ?? ''
+    const expected = 'Basic ' + Buffer.from(`diary@icloud.test:${APP_PASSWORD}`).toString('base64')
+    if (icloud.lastAuth !== expected) {
+      res.writeHead(401, { 'www-authenticate': 'Basic realm="iCloud"' })
+      res.end()
+      return
+    }
+    const xml = (inner) => {
+      res.writeHead(207, { 'content-type': 'application/xml; charset=utf-8' })
+      res.end('<?xml version="1.0" encoding="UTF-8"?><multistatus xmlns="DAV:" xmlns:cal="urn:ietf:params:xml:ns:caldav">' + inner + '</multistatus>')
+    }
+    if (req.method === 'PROPFIND' && req.url === '/') {
+      xml('<response><href>/</href><propstat><prop><current-user-principal><href>/9876/principal/</href></current-user-principal></prop></propstat></response>')
+      return
+    }
+    if (req.method === 'PROPFIND' && req.url === '/9876/principal/') {
+      xml('<response><href>/9876/principal/</href><propstat><prop><cal:calendar-home-set><href>/9876/calendars/</href></cal:calendar-home-set></prop></propstat></response>')
+      return
+    }
+    if (req.method === 'PROPFIND' && req.url === '/9876/calendars/') {
+      const one = (href, name, comps, kind) =>
+        `<response><href>${href}</href><propstat><prop>` +
+        `<resourcetype><collection/>${kind}</resourcetype><displayname>${name}</displayname>` +
+        (comps ? `<cal:supported-calendar-component-set>${comps}</cal:supported-calendar-component-set>` : '') +
+        '</prop></propstat></response>'
+      xml(
+        one('/9876/calendars/', '', '', '') +
+        one('/9876/calendars/home/', 'Home', '<cal:comp name="VEVENT"/>', '<cal:calendar/>') +
+        one('/9876/calendars/tasks/', 'Reminders', '<cal:comp name="VTODO"/>', '<cal:calendar/>') +
+        one('/9876/calendars/inbox/', 'Inbox', '', '<cal:schedule-inbox/>'),
+      )
+      return
+    }
+    if (req.method === 'REPORT') {
+      icloud.reports += 1
+      const at = new Date()
+      const day = (n) => {
+        const d = new Date(at)
+        d.setDate(d.getDate() + n)
+        return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`
+      }
+      const zone = 'Europe/Madrid'
+      const ics = [
+        'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Apple Inc.//iOS 18//EN',
+        'BEGIN:VEVENT', 'UID:a1', 'SUMMARY:Fisioterapeuta',
+        `DTSTART;TZID=${zone}:${day(0)}T160000`, `DTEND;TZID=${zone}:${day(0)}T170000`, 'END:VEVENT',
+        'BEGIN:VEVENT', 'UID:a2', 'SUMMARY:Cumpleanos de alguien',
+        `DTSTART;VALUE=DATE:${day(1)}`, `DTEND;VALUE=DATE:${day(2)}`, 'END:VEVENT',
+        'BEGIN:VEVENT', 'UID:a3', 'SUMMARY:Fuera de la oficina', 'TRANSP:TRANSPARENT',
+        `DTSTART;TZID=${zone}:${day(0)}T100000`, `DTEND;TZID=${zone}:${day(0)}T110000`, 'END:VEVENT',
+        'END:VCALENDAR',
+      ].join('\r\n')
+      res.writeHead(207, { 'content-type': 'application/xml; charset=utf-8' })
+      res.end('<?xml version="1.0"?><multistatus xmlns="DAV:" xmlns:cal="urn:ietf:params:xml:ns:caldav">' +
+        `<response><href>/9876/calendars/home/a.ics</href><propstat><prop><cal:calendar-data>${ics.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</cal:calendar-data></prop></propstat></response>` +
+        '</multistatus>')
+      return
+    }
+    res.writeHead(404)
+    res.end()
+  })
+})
+await new Promise((r) => icloudServer.listen(0, '127.0.0.1', r))
+
 /* The redirect URI has to name the sandbox, and the sandbox has to be told the
    redirect URI, so the port is chosen before either exists. */
 const pbPort = await new Promise((resolve) => {
@@ -238,6 +319,7 @@ const pb = await startSandbox({
     GOOGLE_API_BASE_URL: googleBase,
     APP_BASE_URL: BASE,
     CALENDAR_SECRET: 'walk-calendar-secret-32-chars-ok!'.slice(0, 32),
+    CALDAV_BASE_URL: `http://127.0.0.1:${icloudServer.address().port}`,
   },
 })
 const browser = await chromium.launch()
@@ -707,6 +789,84 @@ try {
   await closeSheet()
   check('and the day it shaped is its own again', /19:00 to 20:00/.test(await dayText()), false)
 
+  console.log('\nan iCloud calendar, over CalDAV')
+  await openSheet()
+  const appleBefore = await sheetText()
+  check('says what an app-specific password is not',
+    /not the same as your Apple ID password|app-specific password you\s*make yourself/i.test(appleBefore), true)
+  check('and that Apple is where it is revoked', /Apple is where you revoke it/.test(appleBefore), true)
+
+  /* The wrong password first: somebody typing their Apple ID password has to be
+     told now rather than have it stored and fail on the first read. */
+  await sheet().getByLabel('Apple ID').fill('diary@icloud.test')
+  await sheet().getByLabel('App-specific password').fill('my-normal-password')
+  await sheet().getByRole('button', { name: 'Connect Apple Calendar' }).click()
+  await sheet().getByText(/iCloud refused that/).waitFor({ timeout: 15000 })
+  check('a password iCloud refuses is not stored',
+    (await pb.api('GET', "/api/collections/calendar_links/records?filter=provider='apple'", undefined, pb.su)).json.totalItems, 0)
+
+  await sheet().getByLabel('App-specific password').fill(APP_PASSWORD)
+  await sheet().getByRole('button', { name: 'Connect Apple Calendar' }).click()
+  await sheet().getByRole('button', { name: 'Read it again' }).last().waitFor({ timeout: 20000 })
+  const appleOn = await sheetText()
+  check('the Apple ID is shown back', /diary@icloud\.test/.test(appleOn), true)
+  check('discovery ran, principal then home then the listing',
+    icloud.calls.filter((c) => c.startsWith('PROPFIND')).length >= 3, true)
+  check('and only the calendar that holds events was reported on',
+    icloud.calls.filter((c) => c.startsWith('REPORT')).every((c) => c.includes('/calendars/home/')), true)
+
+  /* The titles switch is one decision about this device rather than one per
+     provider, and it was turned on in the Google section above. So the title
+     arrives on the Apple blocks too, which is the switch being shared rather
+     than a default being wrong. The next check is where that is asserted. */
+  await closeSheet()
+  const withApple = await dayText()
+  check('the appointment is on the day, at its local hour', /16:00 to 17:00/.test(withApple), true)
+  check('with the title, because the switch was already on', /Fisioterapeuta/.test(withApple), true)
+  check('the all-day birthday is not on it', /Cumpleanos/.test(withApple), false)
+  check('nor the hour iCloud marks free', /Fuera de la oficina/.test(withApple), false)
+
+  console.log('\ntwo calendars at once')
+  /* Google was disconnected at the end of its own section, so it is connected
+     again here: two providers on one account is the thing worth proving, and
+     one pull must not touch the other's blocks. */
+  await openSheet()
+  await sheet().getByRole('button', { name: 'Connect Google Calendar' }).click()
+  await page.waitForURL(/\/day\?calendar=connected/, { timeout: 20000 })
+  await sheet().waitFor({ timeout: 10000 })
+  await sheet().getByText(/diary@enforma\.test/).waitFor({ timeout: 20000 })
+  check('the Apple one survived the round trip through Google',
+    /diary@icloud\.test/.test(await sheetText()), true)
+  const bothRows = await pb.api('GET', '/api/collections/calendar_links/records', undefined, pb.su)
+  check('two rows, one per provider', bothRows.json.totalItems, 2)
+  check('and neither holds the password as typed',
+    bothRows.json.items.every((row) => row.secret !== APP_PASSWORD && row.secret.length > 0), true)
+  await closeSheet()
+  const both = await dayText()
+  check("iCloud's hour is still on the day", /16:00 to 17:00/.test(both), true)
+  check("and Google's is on it too", /19:00 to 20:00/.test(both), true)
+
+  console.log('\ndisconnecting one of them')
+  await openSheet()
+  /* The Apple panel is the second of the two, so its buttons are the last. */
+  await sheet().getByRole('button', { name: 'Disconnect' }).last().click()
+  await sheet().getByRole('button', { name: 'Connect Apple Calendar' }).waitFor({ timeout: 15000 })
+  check('its row is gone', (await pb.api('GET', "/api/collections/calendar_links/records?filter=provider='apple'", undefined, pb.su)).json.totalItems, 0)
+  check("and Google's is not", (await pb.api('GET', "/api/collections/calendar_links/records?filter=provider='google'", undefined, pb.su)).json.totalItems, 1)
+  await closeSheet()
+  const afterApple = await dayText()
+  check('the hour it put on the day went with it', /16:00 to 17:00/.test(afterApple), false)
+  check("and Google's stayed", /19:00 to 20:00/.test(afterApple), true)
+
+  /* And Google goes too, so the sections below see the day the way they were
+     written to see it: no calendar attached and nothing on it but the anchors. */
+  await openSheet()
+  await sheet().getByRole('button', { name: 'Disconnect' }).first().click()
+  await sheet().getByRole('button', { name: 'Connect Google Calendar' }).waitFor({ timeout: 15000 })
+  await closeSheet()
+  check('with both gone, the day keeps none of their hours',
+    /19:00 to 20:00|16:00 to 17:00/.test(await dayText()), false)
+
   console.log('\nan event the gym published')
   /**
    * Seeded into the device bus rather than published through the gym panel,
@@ -1017,6 +1177,7 @@ try {
   coach.close()
   ticketmaster.close()
   googleServer.close()
+  icloudServer.close()
 }
 
 console.log(failures === 0 ? '\nall clear\n' : `\n${failures} failed\n`)

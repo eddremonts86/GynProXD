@@ -73,12 +73,18 @@ routerAdd('GET', '/api/enforma/capabilities', (e) => {
      * route refuses rather than storing a live token in the clear, and a button
      * that cannot work should not be drawn.
      */
-    calendars: !!(
-      $os.getenv('GOOGLE_CLIENT_ID') &&
-      $os.getenv('GOOGLE_CLIENT_SECRET') &&
-      $os.getenv('GOOGLE_REDIRECT_URI') &&
-      String($os.getenv('CALENDAR_SECRET') || '').length === 32
-    ),
+    calendars: {
+      google: !!(
+        $os.getenv('GOOGLE_CLIENT_ID') &&
+        $os.getenv('GOOGLE_CLIENT_SECRET') &&
+        $os.getenv('GOOGLE_REDIRECT_URI') &&
+        String($os.getenv('CALENDAR_SECRET') || '').length === 32
+      ),
+      /* Apple needs no client registration of any kind: the credential is an
+         app-specific password the member makes themselves, so the sealing key
+         is the only thing that has to exist here. */
+      apple: String($os.getenv('CALENDAR_SECRET') || '').length === 32,
+    },
     /* Stripe's own hosted portal, where cancelling happens. A configured URL
        rather than a route of ours: cancelling is legally theirs to get right. */
     portal: $os.getenv('STRIPE_PORTAL_URL') || null,

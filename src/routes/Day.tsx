@@ -78,7 +78,7 @@ function DayPlanner() {
      that is where the connection they just made is, and an unexplained return
      to a day that has changed is worse than a drawer. */
   const calendar = useCalendarLink(
-    (blocks) => syncCalendarBusy(blocks, today),
+    (blocks, source) => syncCalendarBusy(blocks, today, source),
     cameBack === 'connected',
   )
   const nearby = useNearbyEvents(profile, updateLifeProfile)

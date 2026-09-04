@@ -125,13 +125,18 @@ interface GymState {
    * there has to disappear, neither of which a merge can do. Blocks from a
    * file somebody picked are still theirs to keep or forget.
    */
-  syncCalendarBusy: (blocks: readonly Omit<BusyBlock, 'id'>[], today: string) => number
+  syncCalendarBusy: (
+    blocks: readonly Omit<BusyBlock, 'id'>[],
+    today: string,
+    source: 'google' | 'apple',
+  ) => number
   /**
    * Forgets the blocks a file put there, and only those.
    *
    * A connected calendar is forgotten by disconnecting it, which is a different
-   * button in a different place saying a different thing. Wiping both from one
-   * of them would take away something the member did not ask about.
+   * button in a different place saying a different thing. Wiping any of them
+   * from one of the others would take away something the member did not ask
+   * about.
    */
   clearBusy: () => void
   story: StoryProgress | null
@@ -222,20 +227,23 @@ export const useGym = create<GymState>()((set, get) => ({
         })
         return added
       },
-      syncCalendarBusy: (blocks, today) => {
+      syncCalendarBusy: (blocks, today, source) => {
         let kept = 0
         set((s) => {
           const base = s.lifeProfile ?? emptyLifeProfile()
-          const others = (base.busy ?? []).filter((b) => b.source !== 'google' && b.date >= today)
+          /* Only this provider's blocks are replaced. The other one's, and
+             anything a file put there, are not this pull's to touch. */
+          const others = (base.busy ?? []).filter((b) => b.source !== source && b.date >= today)
           const mine: BusyBlock[] = []
           const seen = new Set<string>()
+          const prefix = source === 'apple' ? 'ical' : 'gcal'
           for (const block of blocks) {
             if (block.date < today) continue
             const key = `${block.date}|${block.start}|${block.end}`
             if (seen.has(key)) continue
             if (others.length + mine.length >= MAX_BUSY) break
             seen.add(key)
-            mine.push({ ...block, source: 'google', id: `gcal-${block.date}-${block.start.replace(':', '')}-${mine.length}` })
+            mine.push({ ...block, source, id: `${prefix}-${block.date}-${block.start.replace(':', '')}-${mine.length}` })
           }
           kept = mine.length
           const next = [...others, ...mine].sort(
