@@ -79,25 +79,30 @@ register, no photography, no video, age-affirmed and off by default.
 
 It goes third rather than later because the reply takes days and everything
 downstream of it waits: if the answer is no, the module moves to its own
-account or the company moves processor, and the illustration commission in the
-next item is priced against a different set of terms.
+account or the company moves processor.
 
-## 4. Commission the twenty illustrations
+## 4. The twenty illustrations — dropped
 
-Already in motion. `docs/intimacy-illustrations.md` is the brief to send for
-quotes: twenty drawings, flat vector, 1200x900 WebP named by entry id, what has
-to be visible in each, and the licence to buy.
+The illustration slot is out of the design: no `art` field, no frame, no
+`public/intimacy/`, no brief. `docs/intimacy-illustrations.md` is deleted and
+`ATTRIBUTION.md` no longer reserves a section. The cards are text.
 
-Longest lead time on this list after Google's verification, so it runs in
-parallel with everything below. The three routes to price, in rough order of
-cost, are in the brief. The middle one — a generative model corrected by an
-illustrator — has to be confirmed in writing vendor by vendor first, because
-most image APIs forbid sexual content in their terms even for non-explicit
-anatomical work.
+Why, after the slot was built for them: the three routes in the old brief all
+closed. A generative model was tried on the real entries and MiniMax `image-01`
+refused four of eleven requests outright and sanitised the rest — separate
+chairs instead of one arrangement, invented rooms, one figure where there were
+two — which is the stand-in artwork the module's own rule forbids. Freely
+licensed material does not intersect the twenty: Wikimedia's *Sex positions*
+category holds three CC0 files and all three are typology charts, the
+public-domain volume is historical erotic art with no props and no clinical
+geometry, and the only set whose arrangements match ours is CC BY-SA, so any
+edit of it would come back share-alike with attribution. That leaves one
+illustrator at a fixed fee, which is not being paid for right now.
 
-Nothing in the code waits on this. The frame, the alt text field, the
-attribution section and the file naming all exist; the first delivered file is
-one asset and four lines.
+The empty frame was a defensible ship state and this is the other one: the
+paragraph beside each entry already carries the arrangement in words, which is
+what the module is actually for. If the drawings are ever commissioned, the
+twenty per-entry references written during this attempt are the brief.
 
 ## 5. Privacy policy and terms
 

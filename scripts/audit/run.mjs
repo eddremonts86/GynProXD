@@ -47,6 +47,7 @@ const GROUPS = {
     'test-gate',
     'test-profiles',
     'test-session',
+    'test-two-devices',
     'test-onboarding',
     'test-gym-flow',
     'test-banner-menu',

@@ -128,19 +128,6 @@ attribution for end users.
   not currently apply; revisit if that changes. Attribution is given here,
   in the app's About section and under the cards themselves.
 
-## Intimate activity illustrations (none yet)
-
-- **What**: nothing, today. Every entry in `src/data/intimacy.ts` carries an
-  `art` field and all twenty are `null`; the cards draw an empty frame rather
-  than a stand-in.
-- **When there are some**: they are commissioned drawings, not stock and not
-  photographs, and each one arrives with a `credit` and a `licence` on its own
-  entry. That is what gets copied into this section and into the app's About
-  screen. The brief, including the licence to ask for and why photography is
-  not an option here, is `docs/intimacy-illustrations.md`.
-- Files live in `public/intimacy/` and are redistributed with the app, so the
-  licence has to permit that before a file is committed.
-
 ## Fonts
 
 - **Geist / Geist Mono** — Vercel, OFL 1.1.

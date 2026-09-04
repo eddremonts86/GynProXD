@@ -23,27 +23,12 @@
  * invitation, nothing is described for arousal, and there is no imagery. That
  * line is not squeamishness — it is what keeps this inside a payment
  * processor's acceptable use and inside what the rest of this product sounds
- * like. `docs/intimacy-illustrations.md` draws the same line for the drawings.
+ * like.
  *
  * The one genuinely useful thing here is `avoidWith` and `suits`. A person with
  * a bad lower back or six months pregnant has the same question about this as
  * about a deadlift, and nowhere sensible to ask it. That is the feature; the
  * list of arrangements is the vehicle.
- *
- * ## The illustration slot
- *
- * Every entry carries an `art` field and today every one of them is `null`.
- * That is deliberate and it is not an oversight: the drawings are commissioned
- * work that has not been commissioned yet, and `docs/intimacy-illustrations.md`
- * is the brief that says what one has to be. The slot exists so that the
- * screen, the alt text, the attribution and the file naming are all decided
- * before anybody is paid to draw anything — and so that adding the first
- * illustration is one line here and a file in `public/intimacy/`.
- *
- * Drawings, not photographs, and that is a business constraint rather than a
- * preference: photographs of real people in sexual positions are adult content
- * under Stripe's restricted-business terms, and this product bills through
- * Stripe. `docs/plans/2026-09-03-life-plan-v2.md` prices the alternative.
  *
  * ## Effort, and the number this deliberately does not print
  *
@@ -137,27 +122,6 @@ export const POSTURE_LABELS: Record<Posture, string> = {
   standing: 'Standing',
 }
 
-/**
- * A commissioned drawing, once there is one.
- *
- * `alt` is written with the illustration rather than derived from the name,
- * because a description of a drawing is not the same sentence as a description
- * of the arrangement, and somebody using a screen reader is owed the first one.
- * `credit` and `licence` exist so that the attribution is captured at the
- * moment the file arrives instead of reconstructed later from an invoice.
- */
-export interface Illustration {
-  /** A file in `public/intimacy/`, named `<id>.webp`. See the brief. */
-  file: string
-  alt: string
-  credit: string
-  licence: string
-}
-
-/** Where the files live once they exist, and the shape they are drawn to. */
-export const ART_DIR = '/intimacy/'
-export const ART_ASPECT = 4 / 3
-
 export interface IntimateActivity {
   id: string
   /** Descriptive rather than colloquial, and the same in both languages. */
@@ -177,8 +141,6 @@ export interface IntimateActivity {
   suits: Limitation[]
   /** One practical line. Never medical, never a claim about anybody's body. */
   note?: string
-  /** The drawing, or null while there is not one. See the file header. */
-  art: Illustration | null
 }
 
 /**
@@ -209,7 +171,6 @@ export const INTIMATE_ACTIVITIES: IntimateActivity[] = [
     avoidWith: [],
     suits: ['knees', 'lower-back', 'hips', 'wrists', 'pregnancy', 'limited-mobility'],
     note: 'A pillow under the lower knee takes the last of the load off the hip.',
-    art: null,
   },
   {
     id: 'spooning',
@@ -223,7 +184,6 @@ export const INTIMATE_ACTIVITIES: IntimateActivity[] = [
     avoidWith: [],
     suits: ['lower-back', 'knees', 'shoulders', 'pregnancy', 'limited-mobility'],
     note: 'The most forgiving arrangement for a back that objects to being flexed.',
-    art: null,
   },
   {
     id: 'side-crossed',
@@ -237,7 +197,6 @@ export const INTIMATE_ACTIVITIES: IntimateActivity[] = [
     avoidWith: ['hips'],
     suits: ['lower-back', 'knees', 'shoulders', 'neck', 'pregnancy'],
     note: 'Finding the angle takes a minute of shuffling, which is better done before than during.',
-    art: null,
   },
   {
     id: 'supine-receiving',
@@ -251,7 +210,6 @@ export const INTIMATE_ACTIVITIES: IntimateActivity[] = [
     avoidWith: ['pregnancy'],
     suits: ['knees', 'hips', 'limited-mobility'],
     note: 'Late in pregnancy, lying flat on the back is usually uncomfortable; the side arrangements are the alternative.',
-    art: null,
   },
   {
     id: 'prone-supported',
@@ -265,7 +223,6 @@ export const INTIMATE_ACTIVITIES: IntimateActivity[] = [
     avoidWith: ['pregnancy', 'neck'],
     suits: ['knees', 'hips', 'wrists', 'limited-mobility'],
     note: 'Turning the head to alternate sides is what keeps the neck out of it over a longer stretch.',
-    art: null,
   },
   {
     id: 'supine-legs-supported',
@@ -279,7 +236,6 @@ export const INTIMATE_ACTIVITIES: IntimateActivity[] = [
     avoidWith: ['hips', 'lower-back', 'pregnancy'],
     suits: ['knees', 'wrists', 'neck'],
     note: 'How far the legs come up is the whole variable, and they do not have to come up far.',
-    art: null,
   },
   {
     id: 'supine-above',
@@ -293,7 +249,6 @@ export const INTIMATE_ACTIVITIES: IntimateActivity[] = [
     avoidWith: ['knees', 'hips'],
     suits: ['lower-back', 'shoulders', 'wrists'],
     note: 'The person underneath does very little, which is the point of it for a sore back.',
-    art: null,
   },
   {
     id: 'reclined-supported',
@@ -307,7 +262,6 @@ export const INTIMATE_ACTIVITIES: IntimateActivity[] = [
     avoidWith: ['knees'],
     suits: ['lower-back', 'shoulders', 'wrists', 'neck'],
     note: 'Half upright is kinder to a neck than flat and kinder to a back than sitting straight.',
-    art: null,
   },
   {
     id: 'seated-facing',
@@ -321,7 +275,6 @@ export const INTIMATE_ACTIVITIES: IntimateActivity[] = [
     avoidWith: ['knees'],
     suits: ['lower-back', 'limited-mobility', 'pregnancy'],
     note: 'A chair with a back to lean against turns this into one of the least demanding options.',
-    art: null,
   },
   {
     id: 'seated-supported',
@@ -335,7 +288,6 @@ export const INTIMATE_ACTIVITIES: IntimateActivity[] = [
     avoidWith: ['knees'],
     suits: ['shoulders', 'wrists', 'lower-back'],
     note: 'A cushion behind the lower back turns a wall from tolerable into comfortable.',
-    art: null,
   },
   {
     id: 'seated-one-behind',
@@ -349,7 +301,6 @@ export const INTIMATE_ACTIVITIES: IntimateActivity[] = [
     avoidWith: [],
     suits: ['knees', 'lower-back', 'wrists', 'neck', 'limited-mobility'],
     note: 'A chair with arms gives both people something to push against, which is most of the effort gone.',
-    art: null,
   },
   {
     id: 'edge-of-bed',
@@ -363,7 +314,6 @@ export const INTIMATE_ACTIVITIES: IntimateActivity[] = [
     avoidWith: ['knees'],
     suits: ['lower-back', 'shoulders', 'wrists', 'limited-mobility'],
     note: 'The height of the bed does the work; a low bed puts all of it back into the standing knees.',
-    art: null,
   },
   {
     id: 'kneeling-forward',
@@ -377,7 +327,6 @@ export const INTIMATE_ACTIVITIES: IntimateActivity[] = [
     avoidWith: ['knees', 'wrists'],
     suits: ['lower-back', 'pregnancy'],
     note: 'Forearms rather than hands keeps the wrists out of it entirely.',
-    art: null,
   },
   {
     id: 'kneeling-facing',
@@ -391,7 +340,6 @@ export const INTIMATE_ACTIVITIES: IntimateActivity[] = [
     avoidWith: ['knees', 'hips'],
     suits: ['lower-back', 'wrists', 'neck'],
     note: 'A folded blanket under both pairs of knees changes this more than anything else on the list.',
-    art: null,
   },
   {
     id: 'leaning-support',
@@ -405,7 +353,6 @@ export const INTIMATE_ACTIVITIES: IntimateActivity[] = [
     avoidWith: ['lower-back', 'limited-mobility'],
     suits: ['knees', 'wrists', 'neck'],
     note: 'The support wants to be high enough that the back stays long rather than folded.',
-    art: null,
   },
   {
     id: 'standing-braced',
@@ -419,7 +366,6 @@ export const INTIMATE_ACTIVITIES: IntimateActivity[] = [
     avoidWith: ['knees', 'hips', 'lower-back', 'limited-mobility'],
     suits: ['wrists'],
     note: 'The most demanding of these on the legs, and the one a tired pair of quads will notice.',
-    art: null,
   },
   {
     id: 'kneeling-supporting',
@@ -433,7 +379,6 @@ export const INTIMATE_ACTIVITIES: IntimateActivity[] = [
     avoidWith: ['knees', 'lower-back', 'hips', 'pregnancy'],
     suits: ['wrists', 'neck'],
     note: 'A folded blanket under the kneeling pair of knees is what makes it holdable for more than a moment.',
-    art: null,
   },
   {
     id: 'supine-above-feet',
@@ -447,7 +392,6 @@ export const INTIMATE_ACTIVITIES: IntimateActivity[] = [
     avoidWith: ['knees', 'hips', 'limited-mobility'],
     suits: ['lower-back', 'shoulders', 'wrists', 'neck'],
     note: 'A deep squat held for any length of time is a leg exercise; the same arrangement on the shins is not.',
-    art: null,
   },
   {
     id: 'standing-leg-raised',
@@ -461,7 +405,6 @@ export const INTIMATE_ACTIVITIES: IntimateActivity[] = [
     avoidWith: ['hips', 'knees', 'limited-mobility'],
     suits: ['wrists', 'neck'],
     note: 'The height of whatever the foot goes on is the whole difficulty; a low step asks far less of the hip.',
-    art: null,
   },
   {
     id: 'standing-supported',
@@ -475,6 +418,5 @@ export const INTIMATE_ACTIVITIES: IntimateActivity[] = [
     avoidWith: ['lower-back', 'knees', 'hips', 'shoulders', 'wrists', 'limited-mobility', 'pregnancy'],
     suits: [],
     note: 'The most demanding arrangement on this list by a distance, and the wall is not optional.',
-    art: null,
   },
 ]

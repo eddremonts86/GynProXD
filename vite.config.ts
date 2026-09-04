@@ -36,8 +36,19 @@ export default defineConfig(({ mode }) => {
   /**
    * The AI coach's key lives in .env.local (gitignored) and never reaches the
    * browser: the dev/preview server proxies /api/minimax and injects the
-   * Authorization header on its side. Without a key the proxy is absent and
-   * the app falls back to the deterministic generator.
+   * Authorization header on its side.
+   *
+   * Without a key *this* proxy is absent, and a second rule below sends the
+   * same path to the sync server instead, so dev behaves like production and
+   * the server answers 503 honestly when it has no key either. Worth saying
+   * here rather than only there: "the proxy is absent" read as "the path is
+   * unhandled", and a 502 from it was mistaken for a bug in this file when it
+   * was PocketBase not running.
+   *
+   * The key's presence also decides `__AI_COACH__`, which is what the day
+   * reading uses to choose between this proxy and the account's own server —
+   * so a build made with a key in scope talks to the real vendor, and the
+   * screens walks need one made without.
    */
   const aiProxy: Record<string, ProxyOptions> | undefined = env.MINIMAX_API_KEY
     ? {
