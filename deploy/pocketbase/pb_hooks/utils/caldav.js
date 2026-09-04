@@ -186,6 +186,25 @@ function calendarData(xml) {
   for (const blob of blobs) {
     const text = firstTag(blob, 'calendar-data')
     if (!text) continue
+    /**
+     * iCloud wraps the body in `<![CDATA[ … ]]>`, and what is inside is then
+     * not escaped at all. Leaving the wrapper on hands the device an iCalendar
+     * whose first line is `<![CDATA[BEGIN:VCALENDAR` and whose last carries a
+     * trailing `]]>`. The reader survives it, because it looks for
+     * `BEGIN:VEVENT` line by line — but it is not iCalendar any more, and the
+     * next thing to key on the envelope rather than the events would break on
+     * a file that looks fine in every test that uses an escaped fixture.
+     *
+     * Unescaping is skipped for a CDATA section on purpose: inside one, `&lt;`
+     * means those four characters and turning it into `<` would corrupt a
+     * description that happens to contain it.
+     */
+    const cdata = /^\s*<!\[CDATA\[([\s\S]*?)\]\]>\s*$/.exec(text)
+    if (cdata) {
+      const inside = cdata[1].trim()
+      if (/BEGIN:VCALENDAR/i.test(inside)) out.push(inside)
+      continue
+    }
     const ical = text
       .replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>')

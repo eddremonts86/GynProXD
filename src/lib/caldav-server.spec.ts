@@ -146,6 +146,40 @@ const LISTING = `<?xml version="1.0" encoding="UTF-8"?>
   </response>
 </multistatus>`
 
+describe('the iCalendar bodies', () => {
+  const wrap = (inner: string) =>
+    `<multistatus><response><propstat><prop><cal:calendar-data>${inner}</cal:calendar-data></prop></propstat></response></multistatus>`
+
+  it('unwraps the CDATA iCloud actually sends, leaving real iCalendar', () => {
+    /* What caldav.icloud.com returns: the body inside a CDATA section, which
+       means it is not escaped either. Left on, the first line reads
+       `<![CDATA[BEGIN:VCALENDAR` and the last carries a trailing `]]>`. */
+    const out = dav.calendarData(
+      wrap('<![CDATA[BEGIN:VCALENDAR\r\nBEGIN:VEVENT\r\nSUMMARY:A & B <tag>\r\nEND:VEVENT\r\nEND:VCALENDAR]]>'),
+    )
+    expect(out).toHaveLength(1)
+    expect(out[0].startsWith('BEGIN:VCALENDAR')).toBe(true)
+    expect(out[0].endsWith('END:VCALENDAR')).toBe(true)
+    /* Inside a CDATA section those characters are already themselves, so
+       unescaping would have corrupted a summary that contains an ampersand. */
+    expect(out[0]).toContain('SUMMARY:A & B <tag>')
+  })
+
+  it('still unescapes a server that escapes instead of wrapping', () => {
+    const out = dav.calendarData(
+      wrap('BEGIN:VCALENDAR&#13;&#10;BEGIN:VEVENT&#13;&#10;SUMMARY:A &amp; B&#13;&#10;END:VEVENT&#13;&#10;END:VCALENDAR'),
+    )
+    expect(out).toHaveLength(1)
+    expect(out[0]).toContain('SUMMARY:A & B')
+  })
+
+  it('refuses anything that is not an iCalendar', () => {
+    expect(dav.calendarData(wrap('<![CDATA[not a calendar]]>'))).toEqual([])
+    expect(dav.calendarData(wrap(''))).toEqual([])
+    expect(dav.calendarData('nonsense')).toEqual([])
+  })
+})
+
 describe('discovery', () => {
   it('finds the principal and the calendar home through whatever prefixes were used', () => {
     expect(dav.principalHref(PRINCIPAL)).toBe('/1234567890/principal/')
