@@ -78,6 +78,24 @@ Environment for the compose (set as Coolify env vars on this service):
 | `PB_SUPERUSER_EMAIL` / `PB_SUPERUSER_PASSWORD` | push | the sender reads subscriptions and the bus privileged |
 | `MINIMAX_API_KEY` (+ optional `MINIMAX_BASE_URL`) | pocketbase | the AI coach route, auth-gated |
 | `FATSECRET_CLIENT_ID` / `FATSECRET_CLIENT_SECRET` | pocketbase | tops up the recipe catalogue, auth-gated. FatSecret only issues tokens to whitelisted IPs: add this host's egress IP in their console |
+| `TICKETMASTER_API_KEY` | pocketbase | what is on near a member, under `/day`. Free Consumer Key from a Discovery API app at developer.ticketmaster.com. Absent key, absent strip, by design |
+| `CALENDAR_SECRET` | pocketbase | **exactly 32 characters.** Seals every stored calendar credential at rest. Without it every calendar route refuses to connect anybody rather than holding a live token in the clear. Changing it makes every connected calendar reconnect |
+| `APP_BASE_URL` | pocketbase | where a consent screen sends the member back to |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` / `GOOGLE_REDIRECT_URI` | pocketbase | Google Calendar, scope `calendar.events.readonly`. The redirect must be listed in the Cloud console |
+| `GOOGLE_WATCH_ADDRESS` | pocketbase | optional, and the whole of the push: the public HTTPS address of `/api/enforma/calendar/google/notify`. Google pushes only to a domain verified in its Cloud project, so unset is a supported state |
+| `MICROSOFT_CLIENT_ID` / `MICROSOFT_CLIENT_SECRET` / `MICROSOFT_REDIRECT_URI` | pocketbase | Microsoft Calendar over Graph, `Calendars.Read` and `offline_access`. No sensitive-scope verification to wait for |
+| `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | pocketbase | billing. A server with the key and not the secret must not be trusted to write a plan: the secret is what separates Stripe reporting a subscription from somebody claiming one |
+| `STRIPE_PORTAL_URL` | pocketbase | Stripe's own hosted portal, where cancelling happens |
+
+**A variable the compose does not name never reaches the process.** Coolify's
+environment variables feed compose interpolation, and a service receives only
+what its own `environment:` block lists — there is no `env_file:` here. A key
+set in Coolify and missing from `docker-compose.yml` reads exactly like a key
+that does not work: `/api/enforma/capabilities` keeps answering false and the
+obvious suspicion is the key. Adding a `$os.getenv` to a hook means adding a
+line to that block. Every variable in this table is wired; the walks prove the
+features, not the wiring, so this is the one thing to check by hand after
+adding a var.
 
 The coach is capped at **20 calls per account per rolling 24 hours**, counted
 over the `coach_usage` rows the proxy already writes. An account over the limit
