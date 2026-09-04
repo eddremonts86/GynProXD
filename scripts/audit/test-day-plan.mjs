@@ -819,6 +819,47 @@ try {
   await main().getByRole('button', { name: 'Look there' }).click()
   await main().getByText('Fake Quartet').first().waitFor({ timeout: 15000 })
   check('a typed city goes as a city, lower-cased', /city=lisboa/.test(tm.lastUrl), true)
+
+  console.log('\nanother day than this one')
+  /* The whole point of storing a fortnight of events and three weeks of
+     calendar: being able to look at the day they land on. The away match is
+     three days out, which is where it has to appear and where it has to not. */
+  /* The strip's cards are list items, not articles: the articles on this app
+     belong to the intimate activity module. */
+  const matchCard = main().locator('li').filter({ hasText: 'Away match' })
+  await matchCard.getByRole('button', { name: 'Add to my day' }).click()
+  await page.waitForTimeout(400)
+  check('a match three days out is not on today', /18:30 to 20:30/.test(await dayText()), false)
+  check('and today cannot step backwards',
+    await main().getByRole('button', { name: 'The day before' }).isDisabled(), true)
+
+  for (let i = 0; i < 3; i += 1) {
+    await main().getByRole('button', { name: 'The day after' }).click()
+    await page.waitForTimeout(400)
+  }
+  const thirdDay = await dayText()
+  /* The hours, not the name: the name is also on the card in the strip below,
+     which is on screen whichever day is drawn. */
+  check('three days on, it is on that day at its hour', /18:30 to 20:30/.test(thirdDay), true)
+  check("and today's own events are not", /Salsa night/.test(thirdDay), false)
+  check('the day is in the URL, so a reload lands here', /[?&]d=\d{4}-\d{2}-\d{2}/.test(page.url()), true)
+  /* "Now" means nothing on a day that is not today, and the tile says the free
+     total instead of counting down to something. */
+  check('and nothing pretends to be live on it', /until bed|left, ends/.test(thirdDay), false)
+  check('the tile gives the total instead', /across the day/.test(thirdDay), true)
+
+  await page.reload({ waitUntil: 'networkidle' })
+  await page.getByRole('heading', { name: 'Your day', level: 1 }).waitFor({ timeout: 10000 })
+  check('which it does', /18:30 to 20:30/.test(await dayText()), true)
+
+  await main().getByRole('button', { name: 'Today', exact: true }).click()
+  await page.waitForTimeout(400)
+  const backToday = await dayText()
+  check('and Today comes back', /18:30 to 20:30/.test(backToday), false)
+  /* And the URL drops the day rather than carrying `?d=<today>` around, so the
+     address of today stays the address everything else links to. */
+  check('and the day comes out of the URL with it', /[?&]d=/.test(page.url()), false)
+
   await main().getByRole('button', { name: 'Somewhere else' }).click()
   await page.waitForTimeout(300)
 

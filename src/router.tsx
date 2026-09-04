@@ -125,16 +125,28 @@ const dayRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/day',
   /**
-   * Two words this screen answers to. `edit` opens the sheet, so the back
-   * button closes it. `calendar` is what Google's redirect brings back, and it
-   * is read once and then dropped from the URL: it says what just happened, not
+   * Three words this screen answers to. `edit` opens the sheet, so the back
+   * button closes it. `d` is which day is drawn, so a day other than today
+   * survives a reload and can be linked to. `calendar` is what Google's
+   * redirect brings back, and it is read once: it says what just happened, not
    * what the screen is.
+   *
+   * `d` is only checked for shape here. Whether it is a day this screen will
+   * draw is `clampDay`'s question, and it is asked in the component because the
+   * answer depends on what day it is now — which a route definition evaluated
+   * once at start-up cannot know.
    */
-  validateSearch: (search: Record<string, unknown>): { edit?: true; calendar?: string } => {
-    const out: { edit?: true; calendar?: string } = {}
+  validateSearch: (search: Record<string, unknown>): {
+    edit?: true
+    calendar?: string
+    d?: string
+  } => {
+    const out: { edit?: true; calendar?: string; d?: string } = {}
     if (search.edit === true || search.edit === 'true') out.edit = true
     const word = search.calendar
     if (typeof word === 'string' && /^[a-z]{1,20}$/.test(word)) out.calendar = word
+    const day = search.d
+    if (typeof day === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(day)) out.d = day
     return out
   },
   component: () => (

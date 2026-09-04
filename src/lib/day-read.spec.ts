@@ -23,6 +23,11 @@ const gaps: Span[] = [
 describe('buildDayPrompt', () => {
   const prompt = buildDayPrompt(plan, emptyLifeProfile(), gaps)
 
+  it('names the day it is reading, which is not always today', () => {
+    expect(prompt).toContain('The day is Thu 3 Sept')
+    expect(prompt).not.toContain('Today is')
+  })
+
   it('lists every block with what kind of thing it is', () => {
     expect(prompt).toContain('- 09:00 to 17:00: Trabajo (fixed hours)')
     expect(prompt).toContain('- 18:00 to 19:00: Lower body (the training session)')

@@ -97,7 +97,7 @@ export function buildDayPrompt(
   if (profile.mealAt) would.push(`eat the main meal around ${profile.mealAt}`)
   const missing = plan.unplaced.length > 0 ? plan.unplaced.join(', ') : 'nothing'
 
-  return `Read one person's day and say what it allows. Today is ${formatLongDate(plan.date)}. They are up at ${wake} and in bed by ${sleep}.
+  return `Read one person's day and say what it allows. The day is ${formatLongDate(plan.date)}. They are up at ${wake} and in bed by ${sleep}.
 
 On the day, in order:
 ${plan.slots.length > 0 ? plan.slots.map(slotLine).join('\n') : '- nothing fixed'}
