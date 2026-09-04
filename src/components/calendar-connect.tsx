@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/dialog'
 import { formatShortDate } from '@/lib/labels'
 import type { CalendarLink, LinkState } from '@/hooks/use-calendar-link'
+import type { CalendarFailure, CalendarStatus } from '@/lib/calendar-link'
 
 /**
  * Connecting a real calendar, and what that costs, in the same panel.
@@ -100,7 +101,7 @@ function Connected({
   onDisconnect,
   busy,
 }: {
-  state: Extract<LinkState, { kind: 'connected' }>
+  state: { status: CalendarStatus; pulled?: number | null }
   label: string
   keepTitles: boolean
   onKeepTitles: (next: boolean) => void
@@ -115,7 +116,7 @@ function Connected({
         <span className="text-sm text-ink">{state.status.account || label}</span>
         <span className="num text-2xs text-ink-3">{whenSynced(state.status.lastSynced)}</span>
       </div>
-      {state.pulled !== null && <Pulled count={state.pulled} />}
+      {state.pulled != null && <Pulled count={state.pulled} />}
       <Titles on={keepTitles} onChange={onKeepTitles} />
       <div className="flex flex-wrap items-center gap-2">
         <Button variant="secondary" onClick={onRefresh} disabled={busy}>
@@ -128,6 +129,44 @@ function Connected({
       </div>
     </>
   )
+}
+
+/**
+ * Failures that another go could get past.
+ *
+ * The distinction decides what the panel offers, and getting it the other way
+ * round is worse than either: a network that dropped wants "read it again", and
+ * a credential the provider stopped accepting wants the consent screen — a
+ * retry button there just fails again, politely, forever.
+ */
+const RETRYABLE = new Set<CalendarFailure>(['unreachable', 'unavailable'])
+
+/**
+ * What a provider is attached to, or nothing.
+ *
+ * `connected` obviously, and a failure that might pass next time — a read that
+ * timed out has not disconnected anything, and dropping back to the connect
+ * form would lose the two buttons that matter and ask for a credential the
+ * server still holds.
+ */
+function attachedTo(state: LinkState): { status: CalendarStatus; pulled?: number | null } | null {
+  if (state.kind === 'connected') return { status: state.status, pulled: state.pulled }
+  if (state.kind === 'failed' && state.status && RETRYABLE.has(state.why)) {
+    return { status: state.status }
+  }
+  return null
+}
+
+/**
+ * Whether there is still a row to get rid of, while the form is on screen.
+ *
+ * A grant somebody revoked at Google leaves the link stored here: the copy says
+ * what it left on the day and that it stays until you reconnect or disconnect,
+ * and until this there was no disconnect to press. Reconnecting had a button
+ * and leaving did not.
+ */
+function stillStored(state: LinkState): boolean {
+  return state.kind === 'failed' && !!state.status && !RETRYABLE.has(state.why)
 }
 
 /**
@@ -156,6 +195,7 @@ function TokenBlock({
   if (!link.offered) return null
   const { state } = link
   const busy = state.kind === 'working' || state.kind === 'checking'
+  const attached = attachedTo(state)
 
   return (
     /* Named, because there are three of these and "Read it again" means a
@@ -166,9 +206,9 @@ function TokenBlock({
         {name}
       </span>
 
-      {state.kind === 'connected' ? (
+      {attached ? (
         <Connected
-          state={state}
+          state={attached}
           label={`A ${name}`}
           keepTitles={keepTitles}
           onKeepTitles={onKeepTitles}
@@ -195,6 +235,13 @@ function TokenBlock({
 
       {state.kind === 'failed' && (
         <p className="max-w-[58ch] text-sm text-danger">{FAILED[state.why]}</p>
+      )}
+      {stillStored(state) && (
+        <div>
+          <Button variant="dangerQuiet" size="sm" onClick={() => void link.disconnect()} disabled={busy}>
+            Disconnect
+          </Button>
+        </div>
       )}
     </Panel>
   )
@@ -489,7 +536,9 @@ function AppleBlock({
 
   const apple = appleLink.state
   const sub = urlLink.state
-  const attached = apple.kind === 'connected' || sub.kind === 'connected'
+  const attachedApple = attachedTo(apple)
+  const attachedSub = attachedTo(sub)
+  const attached = !!attachedApple || !!attachedSub
   /* A failure belongs beside the thing that failed. Inside the dialog it would
      be behind a click, and after a "read it again" from here the dialog is not
      even open. */
@@ -504,10 +553,10 @@ function AppleBlock({
         Apple Calendar
       </span>
 
-      {sub.kind === 'connected' && (
+      {attachedSub && (
         <div role="region" aria-label="A published calendar">
           <Connected
-            state={sub}
+            state={attachedSub}
             label="A published calendar"
             keepTitles={keepTitles}
             onKeepTitles={onKeepTitles}
@@ -520,10 +569,10 @@ function AppleBlock({
           />
         </div>
       )}
-      {apple.kind === 'connected' && (
+      {attachedApple && (
         <div role="region" aria-label="An iCloud account">
           <Connected
-            state={apple}
+            state={attachedApple}
             label="An iCloud calendar"
             keepTitles={keepTitles}
             onKeepTitles={onKeepTitles}
@@ -553,9 +602,47 @@ function AppleBlock({
           {FAILED[state.why]}
         </p>
       ))}
+      {/* Same as the other providers: a link the server still holds needs a way
+          out even while the dialog is where reconnecting happens. */}
+      {(stillStored(sub) || stillStored(apple)) && (
+        <div className="flex flex-wrap gap-2">
+          {stillStored(sub) && (
+            <Button variant="dangerQuiet" size="sm" onClick={() => void urlLink.disconnect()}>
+              Disconnect the published link
+            </Button>
+          )}
+          {stillStored(apple) && (
+            <Button variant="dangerQuiet" size="sm" onClick={() => void appleLink.disconnect()}>
+              Disconnect iCloud
+            </Button>
+          )}
+        </div>
+      )}
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-lg max-h-[85dvh] overflow-y-auto">
+      {/**
+       * An explicit key, because the siblings above it come and go.
+       *
+       * The error paragraphs and the way-out button appear and disappear with
+       * the state, and React matches unkeyed children by position: a change in
+       * how many render before this one is enough for it to reconcile the
+       * dialog as a different element and remount its whole subtree. That reads
+       * as the form resetting itself mid-typing, and to a driver waiting for a
+       * button to hold still it reads as an element that keeps detaching.
+       */}
+      <Dialog key="apple-ways" open={open} onOpenChange={setOpen}>
+        {/**
+           * `scrollbar-gutter: stable` is not a nicety here.
+           *
+           * A centred dialog with a max height and `overflow-y-auto` oscillates
+           * when its content crosses that height: the scrollbar appears, the
+           * content narrows, the text reflows, the height changes, the scrollbar
+           * goes — and the whole box, translated by half its own height, moves
+           * with it. It reads as a shimmer and it made a submit button
+           * permanently unclickable to Playwright, which waits for an element to
+           * be still and gave up after thirty seconds. Reserving the gutter
+           * settles it.
+           */}
+        <DialogContent className="sm:max-w-lg max-h-[85dvh] overflow-y-scroll [scrollbar-gutter:stable]">
           <DialogHeader>
             <DialogTitle>Connect Apple Calendar</DialogTitle>
             <DialogDescription>

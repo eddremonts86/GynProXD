@@ -1142,6 +1142,11 @@ try {
     /stays until you reconnect or disconnect/.test(withdrawn), true)
   check('the row is kept, so reconnecting is one button rather than a fresh start',
     (await pb.api('GET', "/api/collections/calendar_links/records?filter=provider='google'", undefined, pb.su)).json.totalItems, 1)
+  /* And leaving is a button too. The copy has always said the blocks stay until
+     you reconnect or disconnect; until now only reconnecting had one. */
+  check('and leaving is offered as well as reconnecting',
+    await sheet().getByRole('group', { name: 'Google Calendar' })
+      .getByRole('button', { name: 'Disconnect' }).isVisible(), true)
   await closeSheet()
   check('and what it had already put on the day is still there',
     /19:00 to 20:00/.test(await dayText()), true)
@@ -1195,9 +1200,10 @@ try {
   const passwordWay = () => ways().first().getByRole('region', { name: 'Connect iCloud with a generated password' })
   const unfoldPassword = async () => {
     await openWays()
-    if (await passwordWay().isVisible().catch(() => false)) return
-    await ways().first().getByText(/An app-specific password/).first().click()
-    await passwordWay().waitFor({ timeout: 8000 })
+    if (!(await passwordWay().isVisible().catch(() => false))) {
+      await ways().first().getByText(/An app-specific password/).first().click()
+      await passwordWay().waitFor({ timeout: 8000 })
+    }
   }
 
   await unfoldPassword()
@@ -1344,18 +1350,17 @@ try {
 
   console.log('\npublishing it again')
   /**
-   * Pasting the link again, which is what the screen tells them to do.
-   *
-   * Worth knowing rather than glossing: a failed read drops this panel back to
-   * its form, so the "Read it again" a connected subscription offers is not on
-   * screen at this moment even though the row is still stored and still valid.
-   * Re-pasting is the way back and the copy says so. A retry button that
-   * survives a failure would be kinder, and is not what this walk asserts.
+   * A calendar nobody publishes any more is not a network that dropped, so this
+   * one asks for the link again rather than offering a retry — which is the
+   * distinction the panel now makes. What it does offer is a way out, because
+   * the row is still here.
    */
   published.gone = false
   await openSheet()
+  check('a way out is offered while the form is back',
+    await subPanel().getByRole('button', { name: /Disconnect the published link/ }).isVisible(), true)
   const again = await paste(`${publishedBase}/published.ics`)
-  check('pasting it again is the way back', /Read it again/.test(again), true)
+  check('and pasting it again is the way back', /Read it again/.test(again), true)
   check('and it is the same calendar', /Trabajo publicado/.test(again), true)
 
   console.log('\nputting the subscription away')

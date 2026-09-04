@@ -51,7 +51,17 @@ export type LinkState =
   | { kind: 'disconnected' }
   | { kind: 'connected'; status: CalendarStatus; pulled: number | null }
   | { kind: 'working' }
-  | { kind: 'failed'; why: CalendarFailure }
+  /**
+   * A read that did not get through.
+   *
+   * `status` is what the provider was before it failed, and it is here because
+   * without it the panel falls back to its connect form: a member whose
+   * calendar failed to read would lose the two buttons that matter — read it
+   * again, and disconnect — and the only way back would be re-entering a
+   * credential the server still holds. It is absent for a *connection* that
+   * failed, where there is nothing behind it and the form is the right answer.
+   */
+  | { kind: 'failed'; why: CalendarFailure; status?: CalendarStatus }
 
 export interface ProviderLink {
   state: LinkState
@@ -132,7 +142,7 @@ export function useCalendarLink(
           const result = provider === 'microsoft' ? await pullMicrosoft(false) : await pullCalendar(false)
           if (!alive) return
           if (!result.ok) {
-            put(provider, { kind: 'failed', why: result.why })
+            put(provider, { kind: 'failed', why: result.why, status: answer[provider] })
             continue
           }
           const pulled = onBlocks(result.blocks, provider)
@@ -155,6 +165,11 @@ export function useCalendarLink(
   }, [caps.calendars.google, caps.calendars.apple, caps.calendars.microsoft, caps.calendars.url, justConnected])
 
   const refresh = async (provider: CalendarProvider) => {
+    /* Captured before `working` erases it: a failure below has to hand the
+       panel back something to keep its controls for. */
+    const before = states[provider]
+    const held =
+      before.kind === 'connected' ? before.status : before.kind === 'failed' ? before.status : undefined
     put(provider, { kind: 'working' })
     const result =
       provider === 'apple'
@@ -165,7 +180,7 @@ export function useCalendarLink(
             ? await pullUrl(keepTitles)
             : await pullCalendar(keepTitles)
     if (!result.ok) {
-      put(provider, { kind: 'failed', why: result.why })
+      put(provider, { kind: 'failed', why: result.why, ...(held ? { status: held } : {}) })
       return
     }
     const pulled = onBlocks(result.blocks, provider)
