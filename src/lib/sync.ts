@@ -12,6 +12,7 @@ import {
   toBase64,
   type CipherBlob,
 } from './crypto'
+import { createAutoSync, markApplyingRemote } from './sync-auto'
 import { refreshCapabilities } from './capabilities'
 import { recordKey, type Collection, type RecordMeta } from './records'
 import { listEnvelopes, writeRemoteEnvelope, type EnvelopeRow } from './record-store'
@@ -376,9 +377,17 @@ export async function syncNow(profileId: string): Promise<SyncResult> {
     }
 
     writeSyncLink(profileId, { ...link, cursor, lastSyncAt: new Date().toISOString() })
-    if (pulled > 0) await reloadActiveFromDisk()
-    /* The gym bus rides along, best-effort: training sync never fails on it. */
-    await syncGymBus(profileId, link).catch(() => {})
+    /* Everything below writes to the stores, and none of it is a local change.
+       Unmarked, the rehydrate alone is enough to schedule the next sync, and
+       the next, for as long as the profile is open. */
+    markApplyingRemote(true)
+    try {
+      if (pulled > 0) await reloadActiveFromDisk()
+      /* The gym bus rides along, best-effort: training sync never fails on it. */
+      await syncGymBus(profileId, link).catch(() => {})
+    } finally {
+      markApplyingRemote(false)
+    }
     return { ok: true, pulled, pushed }
   } catch (error) {
     if (error instanceof SyncError) {
@@ -1565,3 +1574,29 @@ export async function publishToServer(
     return null
   }
 }
+
+/* ------------------------------------------------------- automatic sync */
+
+/**
+ * The scheduler that makes a linked account actually stay in sync.
+ *
+ * Here rather than in `sync-auto.ts` because that file is deliberately free of
+ * everything: it takes its clock, its timers and its work, so its spec can
+ * drive four behaviours in a millisecond. This is the half that knows what the
+ * work is.
+ */
+export const autoSync = createAutoSync({
+  run: async (profileId) => {
+    const result = await syncNow(profileId)
+    /* `busy` is not a failure worth backing off from — it means another run was
+       already doing the job, and the scheduler's own flag brings us back. */
+    return { ok: result.ok || result.reason === 'busy' }
+  },
+  linked: (profileId) => {
+    const link = readSyncLink(profileId)
+    return !!link && !!link.token
+  },
+  now: () => Date.now(),
+  schedule: (fn, ms) => window.setTimeout(fn, ms),
+  cancel: (handle) => window.clearTimeout(handle),
+})

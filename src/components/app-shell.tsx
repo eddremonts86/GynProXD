@@ -39,7 +39,8 @@ import { notifyRetestDue, notifyUnread } from '@/lib/notify'
 import { testAgeDays, testIsStale } from '@/lib/fitness-test'
 import { todayIso } from '@/lib/dates'
 import { activeProfile, lockProfile, resumeSession, type ProfileRole, viewerFor } from '@/lib/profiles'
-import { adoptSyncLink, readSyncLink, syncNow } from '@/lib/sync'
+import { adoptSyncLink, autoSync, readSyncLink, syncNow } from '@/lib/sync'
+import { PERIOD_MS } from '@/lib/sync-auto'
 import { refreshCapabilities } from '@/lib/capabilities'
 import { adoptEntitlement, refreshEntitlement } from '@/lib/entitlement'
 import { isBuilt } from '@/lib/member-plan'
@@ -322,6 +323,33 @@ function syncQuietly(profileId: string): void {
   }
 }
 
+/**
+ * The two things a change cannot trigger: time passing, and a tab coming back.
+ *
+ * Changes made here are covered — every store write ends in a save and the save
+ * schedules a sync. What that misses is a device that sat still while another
+ * one wrote something, and a tab that was hidden or offline for an hour. So a
+ * slow heartbeat while the tab is visible, plus a wake when it becomes visible
+ * or the network returns.
+ *
+ * Visible-only on purpose: a hidden tab syncing every five minutes for a day is
+ * somebody's battery, and the moment it is looked at again is covered by the
+ * wake. Returns its own teardown.
+ */
+function watchForSync(profileId: string): () => void {
+  const wake = () => {
+    if (document.visibilityState === 'visible') autoSync.wake(profileId)
+  }
+  const beat = window.setInterval(wake, PERIOD_MS)
+  document.addEventListener('visibilitychange', wake)
+  window.addEventListener('online', wake)
+  return () => {
+    window.clearInterval(beat)
+    document.removeEventListener('visibilitychange', wake)
+    window.removeEventListener('online', wake)
+  }
+}
+
 export function AppShell() {
   const pathname = useRouterState({ select: (s) => s.location.pathname })
   const railHidden = useRailHidden()
@@ -348,6 +376,18 @@ export function AppShell() {
     }
     seenUnread.current = unread.count
   }, [unread, status])
+
+  /**
+   * The heartbeat, for as long as a linked profile is unlocked.
+   *
+   * Keyed on the profile id as well as the status so that switching profiles
+   * moves the watcher rather than leaving one pointed at a locked one.
+   */
+  const linkedProfileId = status === 'unlocked' ? (activeProfile()?.id ?? null) : null
+  useEffect(() => {
+    if (!linkedProfileId) return
+    return watchForSync(linkedProfileId)
+  }, [linkedProfileId])
 
   /* Retest nudge, checked when a profile comes up rather than on a timer:
      a local-first app has no scheduler, and the marker in notify.ts keeps

@@ -666,6 +666,31 @@ try {
   check('is on the day', /work/.test(withWork), true)
   check('at the hours it was given', /09:00 to 17:00/.test(withWork), true)
 
+  console.log('\nand it reaches the server without anybody asking')
+  /**
+   * The thing "Sync now" was hiding.
+   *
+   * A linked account used to sync on unlock and when somebody pressed a button
+   * in Settings → Data, which meant two devices diverged for as long as nobody
+   * went looking. Every store write now schedules one, coalesced and never
+   * overlapping (`lib/sync-auto.ts`), so the hour just added has to appear on
+   * the server on its own.
+   *
+   * Polled rather than waited out: the debounce is a couple of seconds and a
+   * fixed sleep would either be flaky or slower than it needs to be. Nothing
+   * here presses anything.
+   */
+  const pushedRows = async () =>
+    (await pb.api('GET', "/api/collections/records/records?perPage=1&filter=col='lifeProfile'", undefined, pb.su))
+      .json.totalItems
+  let onServer = 0
+  for (let i = 0; i < 30; i++) {
+    onServer = await pushedRows()
+    if (onServer > 0) break
+    await page.waitForTimeout(500)
+  }
+  check('the day it wrote is on the server, with no button pressed', onServer, 1)
+
   console.log('\nand the day around it')
   /* This is the feature: the free time either side, named, with no activity
      invented to fill it. Default window is 07:00 to 23:00. */
