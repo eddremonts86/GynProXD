@@ -66,6 +66,40 @@ export interface BusyBlock {
 export const IMPORT_DAYS = 21
 export const MAX_BUSY = 200
 
+/**
+ * Where "near you" means, remembered so the strip does not ask twice.
+ *
+ * A five kilometre cell from the browser's position, or a city typed by hand,
+ * never both. `label` is what the screen says: "Around you", or the city as
+ * they spelled it. Nothing finer than the cell is ever held.
+ */
+export interface Place {
+  geo?: string
+  city?: string
+  label: string
+}
+
+/**
+ * A ticketed event they added to a day.
+ *
+ * Not a `BusyBlock`: that is time a calendar took, drawn hatched. This is
+ * somewhere they chose to be, drawn as an event with a link to the tickets, and
+ * a commitment in the planner's sense: the session moves around it, never the
+ * other way. `id` is the vendor's, so the same event is not held twice.
+ */
+export interface Outing {
+  id: string
+  label: string
+  /** yyyy-mm-dd, then `HH:MM` twice. */
+  date: string
+  start: string
+  end: string
+  venue?: string
+  /** https only. */
+  url?: string
+}
+export const MAX_OUTINGS = 50
+
 export interface LifeProfile {
   anchors: Anchor[]
   /** Dated busy time, from an imported calendar. See `BusyBlock`. */
@@ -90,6 +124,10 @@ export interface LifeProfile {
    * above cannot hold, and what the companion reads.
    */
   notes?: string
+  /** Where "near you" means. See `Place`. */
+  place?: Place
+  /** Ticketed events they are going to. See `Outing`. */
+  outings?: Outing[]
   updatedAt: string
 }
 

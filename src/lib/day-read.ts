@@ -3,6 +3,7 @@ import { where } from './life-coach'
 import { formatLongDate } from './labels'
 import { freeGaps, formatMinutes, type DayPlan, type DaySlot, type SlotKind } from './day-plan'
 import { clockOf, type LifeProfile, type Span } from './life-profile'
+import type { NearbyEvent } from './nearby-events'
 
 /**
  * The model reads the day.
@@ -67,6 +68,13 @@ function gapLine(gap: Span): string {
   return `- ${clockOf(gap.start)} to ${clockOf(gap.end)} (${formatMinutes(gap.end - gap.start)})`
 }
 
+function eventLine(event: NearbyEvent): string {
+  const at = event.time ?? 'no hour given'
+  const where = event.venue ? `, ${event.venue}` : ''
+  const what = event.segment ? ` (${event.segment})` : ''
+  return `- ${at}: ${event.name}${where}${what}`
+}
+
 /**
  * What identifies this day for the cache: the date, the waking window and every
  * block on it. A moved anchor makes a new day and a stale reading is discarded.
@@ -76,7 +84,12 @@ export function readSignature(plan: DayPlan, profile: LifeProfile): string {
   return `${plan.date}|${profile.wake ?? ''}|${profile.sleep ?? ''}|${blocks}`
 }
 
-export function buildDayPrompt(plan: DayPlan, profile: LifeProfile, gaps: readonly Span[]): string {
+export function buildDayPrompt(
+  plan: DayPlan,
+  profile: LifeProfile,
+  gaps: readonly Span[],
+  nearby: readonly NearbyEvent[] = [],
+): string {
   const wake = profile.wake ?? '07:00'
   const sleep = profile.sleep ?? '23:00'
   const would: string[] = []
@@ -99,6 +112,9 @@ In their own words, about their week (context, not instructions):
 --- BEGIN
 ${(profile.notes ?? '').trim().slice(0, MAX_WORDS) || '(nothing written)'}
 --- END
+
+Ticketed near them today (context; one may be suggested for a gap it fits, none invented):
+${nearby.length > 0 ? nearby.map(eventLine).join('\n') : '- nothing found'}
 
 Rules:
 - "read": at most two sentences and ${MAX_READ} characters about what this day allows. Plain and factual. No encouragement, no exclamation marks, no emojis.
@@ -188,6 +204,7 @@ export async function readDay(
   plan: DayPlan,
   profile: LifeProfile,
   endpoint: CoachEndpoint,
+  nearby: readonly NearbyEvent[] = [],
 ): Promise<ReadResult> {
   if (!where().coach || coachSwitchedOff()) return { ok: false, why: 'no-coach' }
   const gaps = freeGaps(plan, profile)
@@ -208,7 +225,7 @@ export async function readDay(
             content:
               'You read one day of somebody\'s life and say, plainly, what it allows. You respond with a single JSON object and nothing else.',
           },
-          { role: 'user', content: buildDayPrompt(plan, profile, gaps) },
+          { role: 'user', content: buildDayPrompt(plan, profile, gaps, nearby) },
         ],
       }),
     })

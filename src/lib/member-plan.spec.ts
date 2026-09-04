@@ -23,9 +23,14 @@ describe('proAllows', () => {
   })
 
   it('refuses everything still unbuilt, paid or not', () => {
-    // One name left on the list, and `member-plan.ts` says why it may stay
-    // there: there is no source for what the word promises.
-    for (const feature of ['culture'] as const) {
+    // Nothing on the list is unbuilt today: `culture` was the last name
+    // waiting for a source and V2.4 gave it one. The loop is kept rather than
+    // deleted because the rule it checks is what stops a half-finished screen
+    // reaching a paying member, and the next name added to `PRO_FEATURES`
+    // starts life here.
+    const unbuilt = PRO_FEATURES.filter((feature) => !isBuilt(feature))
+    expect(unbuilt).toEqual([])
+    for (const feature of unbuilt) {
       expect(proAllows(true, feature)).toBe(false)
       expect(proAllows(false, feature)).toBe(false)
     }
@@ -57,6 +62,7 @@ describe('anythingBuilt', () => {
       'day-plan',
       'companion',
       'calendar',
+      'culture',
       'intimacy',
     ])
   })

@@ -3,6 +3,7 @@ import { useMessages } from '../store/useMessages'
 import { useSession } from '../store/useSession'
 import { challengeCalendar } from './challenge'
 import { commitmentsOn } from './local-events'
+import { outingsOn } from './nearby-events'
 import { INTIMACY_LABEL, INTIMACY_MINUTES, intimacyVisible } from './intimacy'
 import { viewerFor } from './profiles'
 import { buildDay, weekdayOf, type DayPlan } from './day-plan'
@@ -94,9 +95,12 @@ export function useDayPlan(date: string, plate: DayPlate | null = null): {
      inside `commitmentsOn` rather than a second answer to who a message
      reaches. `profiles.ts` records what it cost the last time six screens each
      worked that out for themselves. */
-  const commitments = profileId
-    ? commitmentsOn(messages, viewerFor(profileId, gym), date)
-    : []
+  const commitments = [
+    ...(profileId ? commitmentsOn(messages, viewerFor(profileId, gym), date) : []),
+    /* And the ticketed events they added themselves, which are commitments in
+       the same sense: an hour they said they would be somewhere. */
+    ...outingsOn(profile.outings ?? [], date),
+  ]
 
   /* Read on every render rather than subscribed to, because the switch lives in
      localStorage on purpose and nothing re-renders on a write to it. The one

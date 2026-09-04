@@ -91,8 +91,45 @@ const coach = http.createServer((req, res) => {
   })
 })
 await new Promise((r) => coach.listen(0, '127.0.0.1', r))
+/**
+ * Ticketmaster, on loopback: three events, one of them today at eight, one with
+ * a day and no hour, one whose ticket link is not https. What the route asked
+ * for is recorded, so the walk can see that a cell went and a coordinate did
+ * not.
+ */
+const tm = { hits: 0, lastUrl: '' }
+const ymd = (offsetDays) => {
+  const at = new Date()
+  at.setDate(at.getDate() + offsetDays)
+  return `${at.getFullYear()}-${String(at.getMonth() + 1).padStart(2, '0')}-${String(at.getDate()).padStart(2, '0')}`
+}
+const ticketmaster = http.createServer((req, res) => {
+  tm.hits += 1
+  tm.lastUrl = req.url
+  res.writeHead(200, { 'content-type': 'application/json' })
+  res.end(JSON.stringify({ _embedded: { events: [
+    { id: 'tm-1', name: 'Fake Quartet', url: 'https://tickets.example/quartet',
+      dates: { start: { localDate: ymd(0), localTime: '20:00:00' } },
+      classifications: [{ segment: { name: 'Music' } }],
+      _embedded: { venues: [{ name: 'The Old Hall', city: { name: 'Barcelona' } }] } },
+    { id: 'tm-2', name: 'All-day fair', url: 'https://tickets.example/fair',
+      dates: { start: { localDate: ymd(1) } },
+      classifications: [{ segment: { name: 'Miscellaneous' } }],
+      _embedded: { venues: [{ name: 'The park' }] } },
+    { id: 'tm-3', name: 'Away match', url: 'http://insecure.example/match',
+      dates: { start: { localDate: ymd(3), localTime: '18:30:00' } },
+      classifications: [{ segment: { name: 'Sports' } }],
+      _embedded: { venues: [{ name: 'The ground', city: { name: 'Barcelona' } }] } },
+  ] } }))
+})
+await new Promise((r) => ticketmaster.listen(0, '127.0.0.1', r))
 const pb = await startSandbox({
-  env: { COACH_API_KEY: 'fake', COACH_BASE_URL: `http://127.0.0.1:${coach.address().port}` },
+  env: {
+    COACH_API_KEY: 'fake',
+    COACH_BASE_URL: `http://127.0.0.1:${coach.address().port}`,
+    TICKETMASTER_API_KEY: 'fake',
+    TICKETMASTER_BASE_URL: `http://127.0.0.1:${ticketmaster.address().port}`,
+  },
 })
 const browser = await chromium.launch()
 
@@ -109,7 +146,13 @@ const grantPro = (args) =>
   })
 
 try {
-  const ctx = await browser.newContext({ viewport: { width: 1280, height: 1000 } })
+  /* A position in Barcelona, granted: the strip rounds it to a cell before it
+     leaves, and the fake vendor's log is where that is checked. */
+  const ctx = await browser.newContext({
+    viewport: { width: 1280, height: 1000 },
+    geolocation: { latitude: 41.3874, longitude: 2.1686 },
+    permissions: ['geolocation'],
+  })
   const page = await ctx.newPage()
   const errors = []
   page.on('pageerror', (e) => errors.push(String(e)))
@@ -548,6 +591,43 @@ try {
   await page.goto(`${BASE}/day`, { waitUntil: 'networkidle' })
   await page.getByRole('heading', { name: 'Your day', level: 1 }).waitFor({ timeout: 10000 })
 
+  console.log('\nwhat is on near them')
+  /* Still on /day from the gym event above, with the salsa night at eight. */
+  const beforeNear = await dayText()
+  check('is offered, and says what leaves the device', /five kilometre cell/.test(beforeNear), true)
+  check('and nothing was asked before anybody tapped', tm.hits, 0)
+  await main().getByRole('button', { name: 'Use my location' }).click()
+  await main().getByText('Fake Quartet').first().waitFor({ timeout: 15000 })
+  check('the cell went, and no coordinate did',
+    /geoPoint=[0-9b-hjkmnp-z]{5}&/.test(tm.lastUrl) && !/lat/.test(tm.lastUrl), true)
+  const near = await dayText()
+  check('the one with no hour cannot be added',
+    await main().getByRole('button', { name: 'Add to my day' }).count(), 2)
+  check('and says so instead', /No time given/.test(near), true)
+  check('an insecure ticket link is dropped',
+    await main().getByRole('link', { name: /^Tickets/ }).count(), 2)
+  await main().getByRole('button', { name: 'Add to my day' }).first().click()
+  await page.waitForTimeout(500)
+  const withOuting = await dayText()
+  check("tonight's is on the day, at its hour, for two hours",
+    /Fake Quartet/.test(withOuting) && /20:00 to 22:00/.test(withOuting), true)
+  check('and the card says so', /On your day/.test(withOuting), true)
+  const asked = tm.hits
+  await page.reload({ waitUntil: 'networkidle' })
+  await main().getByText('Fake Quartet').first().waitFor({ timeout: 15000 })
+  check('a reload is answered from the cache', tm.hits, asked)
+  check('and the outing survived it', /On your day/.test(await dayText()), true)
+  await main().getByRole('button', { name: 'Take it off' }).click()
+  await page.waitForTimeout(400)
+  check('taking it off takes it off the day too', /20:00 to 22:00/.test(await dayText()), false)
+  await main().getByRole('button', { name: 'Somewhere else' }).click()
+  await main().getByLabel('Or a city').fill('Lisboa')
+  await main().getByRole('button', { name: 'Look there' }).click()
+  await main().getByText('Fake Quartet').first().waitFor({ timeout: 15000 })
+  check('a typed city goes as a city, lower-cased', /city=lisboa/.test(tm.lastUrl), true)
+  await main().getByRole('button', { name: 'Somewhere else' }).click()
+  await page.waitForTimeout(300)
+
   console.log('\nthe intimate activity module')
   await page.goto(`${BASE}/settings`, { waitUntil: 'networkidle' })
   await page.getByRole('tab', { name: /^Data/ }).click()
@@ -658,6 +738,7 @@ try {
   await browser.close()
   await pb.stop()
   coach.close()
+  ticketmaster.close()
 }
 
 console.log(failures === 0 ? '\nall clear\n' : `\n${failures} failed\n`)

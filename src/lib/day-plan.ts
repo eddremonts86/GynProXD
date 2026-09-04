@@ -58,6 +58,8 @@ export interface DaySlot {
   ref?: string
   /** The member moved or kept this one on purpose. See `DayPlan`. */
   pinned?: boolean
+  /** Where the tickets are, for an outing. Off the app, in a new tab. */
+  url?: string
 }
 
 export interface DayPlan {
@@ -115,7 +117,7 @@ export interface DayInput {
    * planner that scheduled a session over it would be wrong in the way that
    * ends the relationship.
    */
-  commitments?: readonly { label: string; start: string; end: string; ref?: string }[]
+  commitments?: readonly { label: string; start: string; end: string; ref?: string; url?: string }[]
   /**
    * The intimate activity module, when it is switched on for this device.
    *
@@ -261,6 +263,7 @@ export function buildDay(input: DayInput, now = new Date()): DayPlan {
       kind: 'event',
       label: item.label,
       ref: item.ref,
+      url: item.url,
     })
   }
 

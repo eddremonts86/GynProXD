@@ -48,6 +48,16 @@ describe('buildDayPrompt', () => {
     expect(prompt).toContain('(nothing written)')
   })
 
+  it('names what is on nearby today, as context', () => {
+    const withEvents = buildDayPrompt(plan, emptyLifeProfile(), gaps, [
+      { id: 'tm-1', name: 'Fake Quartet', date: '2026-09-03', time: '20:00', venue: 'The Old Hall', city: 'Barcelona', segment: 'Music', url: '' },
+      { id: 'tm-2', name: 'All-day fair', date: '2026-09-04', time: null, venue: '', city: '', segment: '', url: '' },
+    ])
+    expect(withEvents).toContain('- 20:00: Fake Quartet, The Old Hall (Music)')
+    expect(withEvents).toContain('- no hour given: All-day fair')
+    expect(prompt).toContain('- nothing found')
+  })
+
   it('asks for the shape it will validate', () => {
     expect(prompt).toContain('{"read":"...","gaps":[{"start":"07:00","end":"09:00","suggestion":"..."}]}')
   })

@@ -1,7 +1,7 @@
 import { useState, useSyncExternalStore } from 'react'
-import { activeProfile } from '@/lib/profiles'
+import { accountBase } from '@/lib/account-base'
 import { serverCapabilities, subscribeCapabilities } from '@/lib/capabilities'
-import { activeAuthHeader, readSyncLink } from '@/lib/sync'
+import { activeAuthHeader } from '@/lib/sync'
 import { where } from '@/lib/life-coach'
 import {
   readDay,
@@ -12,6 +12,7 @@ import {
   type ReadFailure,
 } from '@/lib/day-read'
 import type { DayPlan } from '@/lib/day-plan'
+import type { NearbyEvent } from '@/lib/nearby-events'
 import type { LifeProfile } from '@/lib/life-profile'
 
 /**
@@ -39,14 +40,17 @@ function coachEndpoint(): CoachEndpoint | null {
   const headers = activeAuthHeader()
   if (!headers) return null
   if (__AI_COACH__) return { url: '/api/minimax/chat/completions', headers }
-  const id = activeProfile()?.id
-  const link = id ? readSyncLink(id) : null
-  if (!link) return null
-  const base = link.server.trim().replace(/\/+$/, '') || '/pb'
+  const base = accountBase()
+  if (!base) return null
   return { url: `${base}/api/minimax/chat/completions`, headers }
 }
 
-export function useDayRead(plan: DayPlan, profile: LifeProfile) {
+export function useDayRead(
+  plan: DayPlan,
+  profile: LifeProfile,
+  /** What is on nearby today, for the prompt. Not part of the day's signature. */
+  nearby: readonly NearbyEvent[] = [],
+) {
   const signature = readSignature(plan, profile)
   const [held, setHeld] = useState<{ signature: string; state: ReadState } | null>(null)
 
@@ -67,7 +71,7 @@ export function useDayRead(plan: DayPlan, profile: LifeProfile) {
       return
     }
     setHeld({ signature, state: { kind: 'busy' } })
-    const result = await readDay(plan, profile, endpoint)
+    const result = await readDay(plan, profile, endpoint, nearby)
     setHeld({
       signature,
       state: result.ok ? { kind: 'done', read: result.read } : { kind: 'failed', why: result.why },

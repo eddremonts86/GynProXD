@@ -46,6 +46,11 @@ In production the key sits on the sync server as `COACH_API_KEY`, with
 reads a Pro member's day on `/day` when they ask it to, and says on screen
 whether their day leaves the building. See `.env.example`.
 
+`TICKETMASTER_API_KEY` on the same server turns on the strip under `/day`:
+ticketed events within 25 km of a cell the device rounds its position to, or
+around a city typed by hand, cached per cell for six hours. A tap puts one on
+the day as an outing, and the reading above hears about what is on tonight.
+
 ## Features
 
 - **Plan builder.** Describe your situation in free text ("40 years old, 140kg,

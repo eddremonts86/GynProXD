@@ -45,22 +45,16 @@ export const PRO_FEATURES = [
   'companion',
   'calendar',
   /**
-   * Local culture, and the reason it is still a name.
+   * Local culture: what is on near somebody, from the one public source that
+   * still answers a "near here, next two weeks" question. Ticketmaster's
+   * Discovery API, behind our own route with a six hour cache per five
+   * kilometre cell, so a city of members costs one call an afternoon. The
+   * strip under the day says "ticketed" because that is what it is: a venue's
+   * own calendar with no ticket office is still not in it, and Facebook and
+   * Eventbrite closed their event search years ago.
    *
-   * A gym on the platform publishes events, and the day planner reads the ones
-   * a member has said yes to — but that is the gym they already train at
-   * telling them about its own class, which is an improvement to `day-plan`
-   * rather than a feature somebody would pay separately for.
-   *
-   * What this word promises is what is on in somebody's town, and there is no
-   * source for that. A venue's own calendar cannot be fetched from a browser
-   * (no CORS headers on anybody's `.ics`) and fetching it server-side is a
-   * route that will retrieve an arbitrary URL on our behalf, which is a
-   * security boundary rather than a convenience. A curated per-area list is the
-   * remaining option and it is a content business with a person in it.
-   *
-   * So the card stays untickable until there is a source. `second-rooms` is the
-   * precedent: it left the Plus list rather than being marked built.
+   * Earlier this word had no source at all and stayed untickable on purpose,
+   * the way `second-rooms` left the Plus list rather than being marked built.
    */
   'culture',
   'intimacy',
@@ -69,7 +63,7 @@ export const PRO_FEATURES = [
 export type ProFeature = (typeof PRO_FEATURES)[number]
 
 /**
- * What is actually built. Four entries.
+ * What is actually built. Five entries.
  *
  * `day-plan` is `/day`: the anchors somebody enters, and the session, plate and
  * challenge day arranged around them. `companion` is `/day/intake`: a paragraph
@@ -83,8 +77,10 @@ export type ProFeature = (typeof PRO_FEATURES)[number]
  * streak and no calorie figure. It is off until somebody turns it on in
  * Settings, and that switch never leaves the device.
  *
- * `culture` is still a name, and its entry above says at length why reading the
- * gym bus into the day did not earn it.
+ * `culture` is the strip under `/day`: ticketed events within 25 km of a cell
+ * the device rounds its position to, or around a city typed by hand, with a
+ * tap that puts one on the day as an outing. Its entry above says what it is
+ * not.
  *
  * Each feature joins this set in the phase that finishes it, which is why the
  * gate and the copy cannot drift apart: one set, read by both. The failure it
@@ -93,7 +89,7 @@ export type ProFeature = (typeof PRO_FEATURES)[number]
  * behind it existed, and the fix was to take the card away rather than to tick
  * it. A `BUILT` set is that lesson written down where it cannot be forgotten.
  */
-const BUILT = new Set<ProFeature>(['day-plan', 'companion', 'calendar', 'intimacy'])
+const BUILT = new Set<ProFeature>(['day-plan', 'companion', 'calendar', 'culture', 'intimacy'])
 
 export function isBuilt(feature: ProFeature): boolean {
   return BUILT.has(feature)

@@ -62,6 +62,8 @@ routerAdd('GET', '/api/enforma/capabilities', (e) => {
      * built, so nobody is asked for money before there is something behind it.
      */
     billing: !!$os.getenv('STRIPE_SECRET_KEY'),
+    /* A Ticketmaster key: what is on near a member, behind /api/enforma/events/near. */
+    events: !!$os.getenv('TICKETMASTER_API_KEY'),
     /* Stripe's own hosted portal, where cancelling happens. A configured URL
        rather than a route of ours: cancelling is legally theirs to get right. */
     portal: $os.getenv('STRIPE_PORTAL_URL') || null,

@@ -196,7 +196,17 @@ function Block({ placed, index, still }: { placed: Placed; index: number; still:
       className="absolute"
       style={style}
     >
-      {href ? (
+      {slot.url ? (
+        /* An outing opens its tickets, off the app. */
+        <a
+          href={slot.url}
+          target="_blank"
+          rel="noreferrer"
+          className={cn(face, 'text-inherit no-underline')}
+        >
+          {body}
+        </a>
+      ) : href ? (
         <Link {...href} className={cn(face, 'text-inherit no-underline')}>
           {body}
         </Link>

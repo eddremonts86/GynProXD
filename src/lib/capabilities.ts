@@ -21,6 +21,8 @@ export interface ServerCapabilities {
    */
   coachHost: CoachHost | null
   recipes: boolean
+  /** An events source (a Ticketmaster key) behind /api/enforma/events/near. */
+  events: boolean
   /** VAPID public key when the server can deliver Web Push, else null. */
   push: string | null
   /**
@@ -40,6 +42,7 @@ const NONE: ServerCapabilities = {
   coach: false,
   coachHost: null,
   recipes: false,
+  events: false,
   push: null,
   billing: false,
   portal: null,
@@ -56,6 +59,7 @@ function load(): ServerCapabilities {
       coach: parsed.coach === true,
       coachHost: parsed.coachHost === 'self' ? 'self' : parsed.coachHost === 'external' ? 'external' : null,
       recipes: parsed.recipes === true,
+      events: parsed.events === true,
       push: typeof parsed.push === 'string' ? parsed.push : null,
       billing: parsed.billing === true,
       portal: typeof parsed.portal === 'string' ? parsed.portal : null,
@@ -98,6 +102,7 @@ export async function refreshCapabilities(server = '/pb'): Promise<void> {
       coachHost:
         parsed.coachHost === 'self' ? 'self' : parsed.coachHost === 'external' ? 'external' : null,
       recipes: parsed.recipes === true,
+      events: parsed.events === true,
       push: typeof parsed.push === 'string' && parsed.push.length > 0 ? parsed.push : null,
       billing: parsed.billing === true,
       portal:

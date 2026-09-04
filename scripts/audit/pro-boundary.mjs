@@ -142,6 +142,13 @@ try {
   check('with no date to cache', (await me(member.token)).json?.proUntil, null)
   check('an anonymous caller gets nothing', (await me(undefined)).status, 401)
 
+  console.log('\nwhat is on nearby, before paying')
+  /* Refused before the vendor key is looked at, which is what makes this
+     provable on a sandbox that has none. */
+  const near = (token, query) => api('GET', `/api/enforma/events/near${query}`, undefined, token)
+  check('a member without Pro is refused', (await near(member.token, '?geo=ezs42')).status, 403)
+  check('and so is nobody at all', (await near(undefined, '?geo=ezs42')).status, 401)
+
   console.log('\nwhat a member can write on their own row')
   /* The whole reason this file exists: `id = @request.auth.id` already lets
      them PATCH this record, so the refusal has to come from the hook. */
@@ -270,6 +277,11 @@ try {
   check('writes a date about a month out', afterGrant.until.slice(0, 7), inMonths(1).slice(0, 7))
   check('and says where it came from', afterGrant.source, 'grant')
   check('the account is now told it is Pro', (await me(member.token)).json?.pro, true)
+  check('and may ask what is on nearby, as far as a keyless sandbox lets it',
+    (await near(member.token, '?geo=ezs42')).status, 503)
+  check('with a cell or a city required first', (await near(member.token, '')).status, 400)
+  check('and a coordinate refused as neither',
+    (await near(member.token, '?geo=41.39,2.17')).status, 400)
   check('and is given the date to cache', typeof (await me(member.token)).json?.proUntil, 'string')
 
   console.log('\ntopping up early')

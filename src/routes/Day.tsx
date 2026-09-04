@@ -9,7 +9,10 @@ import { DayNowTile } from '@/components/day-now-tile'
 import { DayReadPanel } from '@/components/day-read'
 import { DaySheet } from '@/components/day-sheet'
 import { DayTimeline } from '@/components/day-timeline'
+import { NearbyEvents } from '@/components/nearby-events'
 import { useDayRead } from '@/hooks/use-day-read'
+import { useNearbyEvents } from '@/hooks/use-nearby-events'
+import { outingFrom, withOuting, type NearbyEvent } from '@/lib/nearby-events'
 import { useGym } from '@/store/useGym'
 import { useDayPlates } from '@/lib/use-day-plates'
 import { useDayPlan } from '@/lib/use-day-plan'
@@ -56,8 +59,17 @@ function DayPlanner() {
 
   const free = freeMinutes(plan, profile)
   const hasAnything = plan.slots.length > 0
-  const reading = useDayRead(plan, profile)
+  const nearby = useNearbyEvents(profile, updateLifeProfile)
+  const nearbyToday =
+    nearby.state.kind === 'done' ? nearby.state.events.filter((e) => e.date === date) : []
+  const reading = useDayRead(plan, profile, nearbyToday)
   const notes = reading.state.kind === 'done' ? reading.state.read.notes : []
+  const addOuting = (event: NearbyEvent) => {
+    const outing = outingFrom(event)
+    if (outing) updateLifeProfile({ outings: withOuting(profile.outings ?? [], outing, date) })
+  }
+  const removeOuting = (id: string) =>
+    updateLifeProfile({ outings: (profile.outings ?? []).filter((o) => o.id !== id) })
   const openSheet = () => void navigate({ to: '/day', search: { edit: true } })
   const closeSheet = () => void navigate({ to: '/day', search: {} })
 
@@ -127,6 +139,21 @@ function DayPlanner() {
           <DayTimeline plan={plan} profile={profile} isToday notes={notes} />
         </div>
       </div>
+
+      {/* Under the day, full width: what is on near them, and a tap puts one on
+          the day above as an outing. Absent on a server with no source. */}
+      <NearbyEvents
+        state={nearby.state}
+        place={nearby.place}
+        offered={nearby.offered}
+        outings={profile.outings ?? []}
+        onLocate={nearby.locate}
+        onCity={nearby.lookAround}
+        onForget={nearby.forget}
+        onRetry={nearby.retry}
+        onAdd={addOuting}
+        onRemove={removeOuting}
+      />
 
       <DaySheet
         open={edit === true}
