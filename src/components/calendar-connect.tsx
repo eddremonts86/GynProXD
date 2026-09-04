@@ -291,10 +291,40 @@ function AppleBlock({
                   and paste it below. It starts with webcal://
                 </li>
               </ol>
+              {/**
+               * Apple's own guides rather than pictures of them.
+               *
+               * Their support pages carry screenshots and those are Apple's:
+               * copying them into this repository, or hotlinking their CDN from
+               * a product, is redistributing somebody else's material — and it
+               * goes stale the day they redesign. A link costs one tap, shows
+               * the current screenshots in context, and is right forever.
+               */}
               <p className="max-w-[62ch] text-2xs text-ink-3">
-                Only a calendar you own in iCloud can be published. One that somebody shared with
-                you, a holiday calendar, or one kept On My iPhone or On My Mac has no Public Calendar
-                switch at all — for those, use an app-specific password below, or the calendar file.
+                Apple shows it with pictures, on their side:{' '}
+                {[
+                  ['iPhone', 'https://support.apple.com/guide/iphone/share-icloud-calendars-iph7613c4fb/ios'],
+                  ['Mac', 'https://support.apple.com/guide/calendar/share-icloud-calendars-icl32362/mac'],
+                  ['iCloud.com', 'https://support.apple.com/guide/icloud/share-a-calendar-mm6b1a9479/icloud'],
+                ].map(([label, href], i) => (
+                  <span key={href}>
+                    {i > 0 ? ' · ' : ''}
+                    <a href={href} target="_blank" rel="noreferrer" className="text-ink-2 underline">
+                      {label}
+                    </a>
+                  </span>
+                ))}
+              </p>
+              <p className="max-w-[62ch] text-2xs text-ink-3">
+                <span className="text-ink-2">Only a calendar you own can be published</span>, and the
+                panel that opens is what tells you which one you have. A calendar of your own says
+                Share Calendar and carries the Public Calendar switch. A <span className="text-ink-2">
+                family calendar</span> says so instead, lists the people it is already shared with,
+                names its owner, and has no switch anywhere — iCloud lets nobody but the owner
+                publish one. A holiday calendar, one somebody else shared with you, and one kept On
+                My iPhone or On My Mac are the same story. For any of those, use an app-specific
+                password below, or the calendar file. The names appear in your device&apos;s
+                language.
               </p>
               <form
                 className="flex flex-col gap-3"
