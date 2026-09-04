@@ -868,7 +868,17 @@ try {
     [],
   )
 
-  console.log('\nthe filter, which is the feature')
+  console.log('\nthe place the illustrations will go')
+  /* Nothing is drawn yet, and the honest state is an empty frame per card
+     rather than a stand-in drawing or a collapsed layout. Both halves are
+     asserted: the frames are there, and no image is. */
+  check('every card keeps the space for one', await main().getByText('Illustration to come').count(),
+    await page.getByRole('article').count())
+  check('and nothing was drawn to fill it', await main().locator('img').count(), 0)
+  check('the screen says so once, rather than sixteen times',
+    (await dayText()).match(/The illustrations are being drawn/g)?.length ?? 0, 1)
+
+  console.log('\nthe search, which is the feature')
   const before = await page.getByRole('article').count()
   await page.getByRole('button', { name: 'Knees' }).click()
   await page.waitForTimeout(300)
@@ -876,6 +886,38 @@ try {
   check('naming a limitation shortens the list', after < before, true)
   check('and says how many were left out', /left out/.test(await dayText()), true)
   check('but never to nothing', after > 0, true)
+
+  /* A second axis narrows again: across axes the chips are requirements. */
+  await page.getByRole('button', { name: 'Light', exact: true }).click()
+  await page.waitForTimeout(300)
+  const andLight = await page.getByRole('article').count()
+  check('a second axis narrows it further', andLight <= after, true)
+  /* The cards, not the page: "Vigorous" is also the label on a chip that is
+     still sitting there unpressed, and asserting over the whole screen would
+     have been a test of the filter row rather than of the filter. */
+  const cardText = async () =>
+    (await page.getByRole('article').allInnerTexts()).join(' ').replace(/\s+/g, ' ')
+  const lightOnly = await cardText()
+  check('and what is left is all light',
+    /Light/.test(lightOnly) && !/Moderate|Vigorous/.test(lightOnly), true)
+
+  await page.getByRole('button', { name: 'Clear it' }).first().click()
+  await page.waitForTimeout(300)
+  check('clearing it puts the whole library back', await page.getByRole('article').count(), before)
+
+  await page.getByLabel('Search').fill('pillow')
+  await page.waitForTimeout(300)
+  const searched = await page.getByRole('article').count()
+  check('typing a word somebody would type finds something', searched > 0, true)
+  check('and not everything', searched < before, true)
+  await page.getByLabel('Search').fill('trampoline')
+  await page.waitForTimeout(300)
+  check('a word that is in none of them finds none', await page.getByRole('article').count(), 0)
+  check('and offers a way back rather than a dead end',
+    /Nothing matches all of that/.test(await dayText()), true)
+  await main().getByRole('button', { name: 'Clear it' }).last().click()
+  await page.waitForTimeout(300)
+  check('which works', await page.getByRole('article').count(), before)
 
   console.log('\nwhat the day does with it')
   await page.goto(`${BASE}/day`, { waitUntil: 'networkidle' })

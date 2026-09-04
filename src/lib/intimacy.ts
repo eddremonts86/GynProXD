@@ -1,8 +1,5 @@
-import {
-  INTIMATE_ACTIVITIES,
-  type IntimateActivity,
-  type Limitation,
-} from '../data/intimacy'
+import { INTIMATE_ACTIVITIES, type IntimateActivity, type Limitation } from '../data/intimacy'
+import { searchActivities } from './intimacy-search'
 
 /**
  * The intimate activity module: who may see it, and what it shows them.
@@ -105,15 +102,18 @@ export function intimacyVisible(pro: boolean, state = intimacyState()): boolean 
 /**
  * The activities that suit a body working around these things.
  *
- * Filtering rather than warning, because a warning on eight cards is eight
+ * Filtering rather than warning, because a warning on sixteen cards is sixteen
  * warnings nobody reads. What is filtered out is listed by count on the screen
  * so nobody wonders whether the list is broken.
+ *
+ * One line over `searchActivities` now that the screen searches on more than
+ * this. Kept as its own name because this is the question the rest of the
+ * product asks — "what will not hurt" — and because the guarantee its tests
+ * hold, that no single limitation empties the library, is about the content
+ * rather than about the search.
  */
 export function activitiesFor(limitations: readonly Limitation[]): IntimateActivity[] {
-  if (limitations.length === 0) return INTIMATE_ACTIVITIES
-  return INTIMATE_ACTIVITIES.filter(
-    (activity) => !activity.avoidWith.some((l) => limitations.includes(l)),
-  )
+  return searchActivities({ limitations })
 }
 
 /** How many were left out, so the screen can say so rather than just shrink. */
