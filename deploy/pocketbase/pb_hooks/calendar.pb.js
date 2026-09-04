@@ -468,3 +468,20 @@ cronAdd('calendarWatchRenew', '23 * * * *', () => {
     console.log('[calendar] channels', JSON.stringify(result))
   }
 })
+
+/**
+ * The same renewal, on demand and for superusers only.
+ *
+ * `recipes.pb.js` pairs its nightly cron with exactly this route and for the
+ * same two reasons: a scheduled job nobody can trigger is a job nobody can
+ * test, and the one operational question about channels — "are they being
+ * replaced?" — should be answerable without waiting for the top of an hour.
+ *
+ * It reports what it did rather than what it found, so a run that renewed
+ * nothing is distinguishable from a server that holds no watch address at all.
+ */
+routerAdd('POST', '/api/enforma/calendar/channels/renew', (e) => {
+  if (!e.hasSuperuserAuth()) return e.json(403, { message: 'Superusers only.' })
+  const { renewAll } = require(`${__hooks}/utils/google_watch.js`)
+  return e.json(200, renewAll(e.app, Date.now()))
+})

@@ -61,7 +61,10 @@ push to a domain verified in the Cloud project — so leaving it unset is a
 supported state, not a broken one, and the member keeps the "Read it again"
 they always had. A notification carries no events: the server writes a date,
 and the day re-reads once when the screen next opens. Channels are renewed
-hourly by a cron and closed when a calendar is disconnected.
+hourly by a cron and closed when a calendar is disconnected;
+`POST /api/enforma/calendar/channels/renew` runs the same pass on demand for a
+superuser, which is how "are channels being replaced?" gets answered without
+waiting for the top of an hour.
 
 Apple Calendar needs nothing beyond that 32-character `CALENDAR_SECRET`: iCloud
 has no OAuth, so a member generates an app-specific password at

@@ -993,6 +993,45 @@ try {
   await page.waitForTimeout(2500)
   check('a reload with no news reads nothing', google.eventCalls, quiet)
 
+  console.log('\nreplacing a channel before it lapses')
+  /**
+   * The renewal, driven through the superuser route the cron shares.
+   *
+   * A channel that lapses is the failure with no error anywhere to notice: the
+   * calendar simply stops saying anything and the member is back to pressing a
+   * button without being told. So the expiry is dragged into the past — which
+   * is what a week of uptime does on its own — and the replacement is walked
+   * rather than reasoned about.
+   */
+  const linkId = (await pb.api('GET', '/api/collections/calendar_links/records', undefined, pb.su))
+    .json.items[0].id
+  const firstChannel = google.channel.id
+  const stopsBefore = google.stopped.length
+  await pb.api('PATCH', `/api/collections/calendar_links/records/${linkId}`,
+    { channel_expires: new Date(Date.now() - 60_000).toISOString() }, pb.su)
+  const renewed = await pb.api('POST', '/api/enforma/calendar/channels/renew', undefined, pb.su)
+  check('the renewal reports one channel replaced', renewed.json.renewed, 1)
+  check('and Google was asked for a new one', google.channel.id !== firstChannel, true)
+  check('the one it replaced was closed, so nothing pushes twice',
+    google.stopped.length, stopsBefore + 1)
+
+  /* The new id is what the row now holds, which is the half that makes an old
+     channel's notifications worthless even though its signature still checks. */
+  check('a notification for the channel that was replaced is dropped',
+    await notify({ channel: firstChannel }), 200)
+  check('and left no news', await newsAt(), null)
+  check('while one for the channel that replaced it is news', await notify(), 200)
+  check('which it is', typeof (await newsAt()), 'string')
+
+  /* Answered, so the sections below start from a quiet row. */
+  await pb.api('GET', '/api/enforma/calendar/busy', undefined, memberToken)
+  check('and reading it clears the news again', await newsAt(), null)
+
+  const notDue = await pb.api('POST', '/api/enforma/calendar/channels/renew', undefined, pb.su)
+  check('a channel with time left on it is not touched', notDue.json.renewed, 0)
+  check('and the renewal is not offered to anybody but a superuser',
+    (await pb.api('POST', '/api/enforma/calendar/channels/renew', undefined, memberToken)).status, 403)
+
   console.log('\na grant somebody took away')
   /* Revoked in their Google account rather than here, which is the case no
      walk covered: the row is still ours, the refresh token is not, and the

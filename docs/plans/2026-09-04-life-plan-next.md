@@ -187,7 +187,10 @@ apart.
 Built and walked. Google opens a channel when the calendar is connected, says
 "this calendar changed" at `/api/enforma/calendar/google/notify`, and the day
 re-reads once as the screen next opens. A cron renews channels hourly and a
-disconnect closes one.
+disconnect closes one; `POST /api/enforma/calendar/channels/renew` runs the same
+pass for a superuser, which is what let the renewal be walked rather than
+reasoned about — the pattern is `recipes.pb.js`, which pairs its nightly cron
+with exactly such a route.
 
 **The notification carries no events, which is the whole reason it is cheap
 enough to want.** The server writes a date on the link; the device does the
