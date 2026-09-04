@@ -160,10 +160,19 @@ function eventCalendars(xml) {
     const type = firstTag(response, 'resourcetype')
     if (!/<(?:[A-Za-z0-9_.-]+:)?calendar[\s/>]/i.test(type)) continue
     const components = firstTag(response, 'supported-calendar-component-set')
-    /* A collection that does not say is taken at its word only when it says
-       nothing at all: iCloud always says, and one that lists components
-       without VEVENT is a reminders list. */
-    if (components && !/name="VEVENT"/i.test(components)) continue
+    /**
+     * A collection that does not say is taken at its word only when it says
+     * nothing at all: iCloud always says, and one that lists components
+     * without VEVENT is a reminders list.
+     *
+     * **The quoting is not ours to choose.** iCloud writes the attribute with
+     * single quotes — `<comp name='VTODO' xmlns='...'/>` — and XML says that is
+     * the same as double. Matching only double quotes dropped every calendar a
+     * real account has, and answered with an empty list rather than an error,
+     * so the day stayed blank and nothing anywhere said why. The walk's fake
+     * used double quotes and agreed with the bug for as long as it existed.
+     */
+    if (components && !/name\s*=\s*['"]?VEVENT\b/i.test(components)) continue
     out.push({ href: href, name: firstTag(response, 'displayname') })
     if (out.length >= MAX_CALENDARS) break
   }

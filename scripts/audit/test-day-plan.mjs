@@ -322,7 +322,13 @@ const icloudServer = http.createServer((req, res) => {
         '</prop></propstat></response>'
       xml(
         one('/9876/calendars/', '', '', '') +
-        one('/9876/calendars/home/', 'Home', '<cal:comp name="VEVENT"/>', '<cal:calendar/>') +
+        /* Single quotes on the component name, because that is what iCloud
+           writes: `<comp name='VEVENT' .../>`. This fake used double quotes and
+           agreed with a bug that dropped every calendar a real account has —
+           the connection succeeded, the read answered `{"ics":[]}`, and the day
+           stayed blank with nothing to explain it. Keep one of each so both
+           spellings stay covered. */
+        one('/9876/calendars/home/', 'Home', "<cal:comp name='VEVENT'/>", '<cal:calendar/>') +
         one('/9876/calendars/tasks/', 'Reminders', '<cal:comp name="VTODO"/>', '<cal:calendar/>') +
         one('/9876/calendars/inbox/', 'Inbox', '', '<cal:schedule-inbox/>'),
       )

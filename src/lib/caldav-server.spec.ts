@@ -169,6 +169,70 @@ describe('discovery', () => {
     expect(found[0].name).toBe('Home')
   })
 
+  /**
+   * The shape a real iCloud account answers in, which is not the shape this
+   * file's other fixture uses.
+   *
+   * Two differences, and the second one was a bug for as long as the fake
+   * agreed with it: iCloud declares `DAV:` as the *default* namespace with no
+   * prefix anywhere, and it writes the component name with **single quotes** —
+   * `<comp name='VEVENT' .../>`. XML says that is the same as double. A filter
+   * matching only `name="VEVENT"` therefore dropped every calendar a real
+   * account has and answered `{"ics":[]}` with a 200, so a connected calendar
+   * put nothing on the day and nothing anywhere said why.
+   *
+   * Copied from what caldav.icloud.com actually sent on 2026-09-04, with the
+   * account number and the names changed.
+   */
+  const ICLOUD_REAL = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<multistatus xmlns="DAV:">
+  <response xmlns="DAV:">
+    <href>/10000000000/calendars/</href>
+    <propstat><prop>
+      <resourcetype xmlns="DAV:"><collection/></resourcetype>
+      <displayname xmlns="DAV:">Someone</displayname>
+    </prop><status>HTTP/1.1 200 OK</status></propstat>
+  </response>
+  <response xmlns="DAV:">
+    <href>/10000000000/calendars/171A912A-05AA-44D1-8539-2F76AA147B29/</href>
+    <propstat><prop>
+      <resourcetype xmlns="DAV:"><collection/><calendar xmlns="urn:ietf:params:xml:ns:caldav"/></resourcetype>
+      <displayname xmlns="DAV:">Recordatorios</displayname>
+      <supported-calendar-component-set xmlns="urn:ietf:params:xml:ns:caldav"><comp name='VTODO' xmlns='urn:ietf:params:xml:ns:caldav'/></supported-calendar-component-set>
+    </prop><status>HTTP/1.1 200 OK</status></propstat>
+  </response>
+  <response xmlns="DAV:">
+    <href>/10000000000/calendars/home/</href>
+    <propstat><prop>
+      <resourcetype xmlns="DAV:"><collection/><calendar xmlns="urn:ietf:params:xml:ns:caldav"/></resourcetype>
+      <displayname xmlns="DAV:">Casa</displayname>
+      <supported-calendar-component-set xmlns="urn:ietf:params:xml:ns:caldav"><comp name='VEVENT' xmlns='urn:ietf:params:xml:ns:caldav'/></supported-calendar-component-set>
+    </prop><status>HTTP/1.1 200 OK</status></propstat>
+  </response>
+</multistatus>`
+
+  it("accepts the single quotes iCloud writes, and still refuses a reminders list", () => {
+    const found = dav.eventCalendars(ICLOUD_REAL)
+    expect(found.map((c) => c.href)).toEqual(['/10000000000/calendars/home/'])
+    expect(found[0].name).toBe('Casa')
+  })
+
+  it('does not care how the attribute is quoted, or whether it is', () => {
+    const one = (comp: string) =>
+      dav.eventCalendars(
+        '<multistatus><response><href>/c/</href><propstat><prop>' +
+          '<resourcetype><collection/><cal:calendar/></resourcetype><displayname>C</displayname>' +
+          `<cal:supported-calendar-component-set>${comp}</cal:supported-calendar-component-set>` +
+          '</prop></propstat></response></multistatus>',
+      ).length
+    expect(one("<comp name='VEVENT'/>")).toBe(1)
+    expect(one('<comp name="VEVENT"/>')).toBe(1)
+    expect(one('<comp name = \'VEVENT\' />')).toBe(1)
+    /* And the ones that must still be refused. */
+    expect(one("<comp name='VTODO'/>")).toBe(0)
+    expect(one("<comp name='VEVENTLIKE'/>")).toBe(0)
+  })
+
   it('is bounded, so one account with a hundred calendars cannot spend all afternoon', () => {
     const many = Array.from({ length: 40 }, (_, i) =>
       `<response><href>/c/${i}/</href><propstat><prop>` +
