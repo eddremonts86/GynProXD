@@ -8,8 +8,10 @@ import { Input } from '@/ui/Input'
 import { Tag } from '@/ui/Tag'
 import { EmptyState } from '@/ui/EmptyState'
 import { ProGate } from '@/components/pro-gate'
+import { IntimacyArt } from '@/components/intimacy-art'
 import { intimacyLimitations, intimacyState, setIntimacyLimitations } from '@/lib/intimacy'
 import {
+  anyArt,
   excludedBy,
   isEmptyQuery,
   pickForDay,
@@ -51,6 +53,10 @@ import { cn } from '@/lib/utils'
  *                 than motivational.
  *   no counts     nothing is totalled, so there is nothing to be behind on.
  *   no calories   the citation in `data/intimacy.ts` says why.
+ *
+ * Illustrations are commissioned work that has not been commissioned, so the
+ * cards carry an empty frame rather than a stand-in drawing. `IntimacyArt` says
+ * why an empty frame beats no frame.
  *
  * **What is working around is remembered; the rest of the query is not.** The
  * effort, the posture and the words typed are a lens on a list and take a tap
@@ -116,13 +122,16 @@ function Chosen({
   note?: string
 }) {
   return (
-    <article className="flex flex-col gap-2">
-      <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-        <h3 className="text-sm font-medium text-ink">{activity.name}</h3>
-        <Tag tone="outline">{EFFORT_LABELS[activity.effort]}</Tag>
-      </span>
-      {note && <p className="max-w-[62ch] text-sm text-ink-2">{note}</p>}
-      <p className="max-w-[68ch] text-2xs text-ink-3">{activity.description}</p>
+    <article className="flex flex-col gap-3 sm:flex-row">
+      <IntimacyArt activity={activity} />
+      <div className="flex min-w-0 flex-col gap-2">
+        <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+          <h3 className="text-sm font-medium text-ink">{activity.name}</h3>
+          <Tag tone="outline">{EFFORT_LABELS[activity.effort]}</Tag>
+        </span>
+        {note && <p className="max-w-[62ch] text-sm text-ink-2">{note}</p>}
+        <p className="max-w-[68ch] text-2xs text-ink-3">{activity.description}</p>
+      </div>
     </article>
   )
 }
@@ -141,6 +150,7 @@ function Module() {
   const [query, setQuery] = useState<ActivityQuery>(() => ({ limitations: intimacyLimitations() }))
   const shown = searchActivities(query)
   const hidden = excludedBy(query)
+  const drawn = anyArt()
   const today = todayIso()
   const forToday = pickForDay(today, query.limitations ?? [])
   const destination = where()
@@ -321,6 +331,12 @@ function Module() {
       )}
 
       <Section title="Arrangements" hint={`${shown.length}`}>
+        {!drawn && (
+          <p className="max-w-[62ch] text-2xs text-ink-3">
+            The illustrations are being drawn. Until they arrive each card keeps the space for
+            one rather than showing something approximate.
+          </p>
+        )}
         {shown.length === 0 ? (
           <EmptyState
             title="Nothing matches all of that"
@@ -334,34 +350,37 @@ function Module() {
         ) : (
           <Panel padding="none" className="divide-y divide-line">
             {shown.map((activity) => (
-              <article key={activity.id} className="flex flex-col gap-2 px-5 py-4">
-                <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                  <h3 className="text-sm font-medium text-ink">{activity.name}</h3>
-                  <Tag tone="outline">{EFFORT_LABELS[activity.effort]}</Tag>
-                  <span className="num text-2xs text-ink-3">{EFFORT_METS[activity.effort]}</span>
-                </span>
-                <p className="max-w-[68ch] text-sm text-ink-2">{activity.description}</p>
-                {activity.note && (
-                  <p className="max-w-[68ch] text-2xs text-ink-3">{activity.note}</p>
-                )}
-                <span className="flex flex-wrap items-center gap-1.5">
-                  {activity.postures.map((posture) => (
-                    <Tag key={posture} tone="neutral">
-                      {POSTURE_LABELS[posture]}
-                    </Tag>
-                  ))}
-                  <Tag tone="neutral">{activity.facing ? 'Facing' : 'Not facing'}</Tag>
-                </span>
-                {activity.avoidWith.length > 0 && (
+              <article key={activity.id} className="flex flex-col gap-3 px-5 py-4 sm:flex-row">
+                <IntimacyArt activity={activity} />
+                <div className="flex min-w-0 flex-col gap-2">
+                  <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                    <h3 className="text-sm font-medium text-ink">{activity.name}</h3>
+                    <Tag tone="outline">{EFFORT_LABELS[activity.effort]}</Tag>
+                    <span className="num text-2xs text-ink-3">{EFFORT_METS[activity.effort]}</span>
+                  </span>
+                  <p className="max-w-[68ch] text-sm text-ink-2">{activity.description}</p>
+                  {activity.note && (
+                    <p className="max-w-[68ch] text-2xs text-ink-3">{activity.note}</p>
+                  )}
                   <span className="flex flex-wrap items-center gap-1.5">
-                    <span className="text-2xs text-ink-3">Hard on</span>
-                    {activity.avoidWith.map((l) => (
-                      <Tag key={l} tone="neutral">
-                        {LIMITATION_LABELS[l]}
+                    {activity.postures.map((posture) => (
+                      <Tag key={posture} tone="neutral">
+                        {POSTURE_LABELS[posture]}
                       </Tag>
                     ))}
+                    <Tag tone="neutral">{activity.facing ? 'Facing' : 'Not facing'}</Tag>
                   </span>
-                )}
+                  {activity.avoidWith.length > 0 && (
+                    <span className="flex flex-wrap items-center gap-1.5">
+                      <span className="text-2xs text-ink-3">Hard on</span>
+                      {activity.avoidWith.map((l) => (
+                        <Tag key={l} tone="neutral">
+                          {LIMITATION_LABELS[l]}
+                        </Tag>
+                      ))}
+                    </span>
+                  )}
+                </div>
               </article>
             ))}
           </Panel>

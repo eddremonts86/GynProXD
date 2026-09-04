@@ -132,6 +132,11 @@ export function pickForDay(
   return pool[hash % pool.length]
 }
 
+/** Whether the library has any drawings yet, for the one line above the list. */
+export function anyArt(all: readonly IntimateActivity[] = INTIMATE_ACTIVITIES): boolean {
+  return all.some((activity) => activity.art !== null)
+}
+
 /** Whether anything at all is being asked, for the "clear it" affordance. */
 export function isEmptyQuery(query: ActivityQuery): boolean {
   return (

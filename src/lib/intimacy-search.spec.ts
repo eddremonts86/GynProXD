@@ -147,6 +147,16 @@ describe('the library itself', () => {
     expect(searchActivities({ facing: false }).length).toBeGreaterThanOrEqual(FLOOR)
   })
 
+  it('has an illustration slot on every entry and no illustration in any of them', () => {
+    /* Both halves matter. The slot is what makes adding the first drawing a
+       one-line change; the emptiness is the honest state until one is
+       commissioned, and this test is what would notice a stand-in appearing. */
+    for (const activity of INTIMATE_ACTIVITIES) {
+      expect(activity).toHaveProperty('art')
+      expect(activity.art).toBeNull()
+    }
+  })
+
   it('has unique ids, which the file names will depend on', () => {
     const ids = INTIMATE_ACTIVITIES.map((a) => a.id)
     expect(new Set(ids).size).toBe(ids.length)
