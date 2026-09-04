@@ -49,6 +49,13 @@ const StoryPage = React.lazy(() =>
 const FitnessTestPage = React.lazy(() =>
   import('./routes/FitnessTest').then((m) => ({ default: m.FitnessTestPage })),
 )
+const DayPage = React.lazy(() => import('./routes/Day').then((m) => ({ default: m.DayPage })))
+const DayIntakePage = React.lazy(() =>
+  import('./routes/DayIntake').then((m) => ({ default: m.DayIntakePage })),
+)
+const IntimacyPage = React.lazy(() =>
+  import('./routes/Intimacy').then((m) => ({ default: m.IntimacyPage })),
+)
 
 const rootRoute = createRootRoute({
   component: AppShell,
@@ -109,6 +116,46 @@ const inboxRoute = createRoute({
   ),
 })
 
+/**
+ * The sheet that shapes the day lives in the URL as `?edit`, for the reason the
+ * open message does on `/inbox`: the back button closes it instead of leaving
+ * the day, and a reload lands where you were.
+ */
+const dayRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/day',
+  /**
+   * Three words this screen answers to. `edit` opens the sheet, so the back
+   * button closes it. `d` is which day is drawn, so a day other than today
+   * survives a reload and can be linked to. `calendar` is what Google's
+   * redirect brings back, and it is read once: it says what just happened, not
+   * what the screen is.
+   *
+   * `d` is only checked for shape here. Whether it is a day this screen will
+   * draw is `clampDay`'s question, and it is asked in the component because the
+   * answer depends on what day it is now — which a route definition evaluated
+   * once at start-up cannot know.
+   */
+  validateSearch: (search: Record<string, unknown>): {
+    edit?: true
+    calendar?: string
+    d?: string
+  } => {
+    const out: { edit?: true; calendar?: string; d?: string } = {}
+    if (search.edit === true || search.edit === 'true') out.edit = true
+    const word = search.calendar
+    if (typeof word === 'string' && /^[a-z]{1,20}$/.test(word)) out.calendar = word
+    const day = search.d
+    if (typeof day === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(day)) out.d = day
+    return out
+  },
+  component: () => (
+    <React.Suspense fallback={<RouteFallback />}>
+      <DayPage />
+    </React.Suspense>
+  ),
+})
+
 export const router = createRouter({
   /* A cross-fade between screens on navigation — the small thing that reads as
      "app", not "web page". The transition is defined in index.css and is a
@@ -117,6 +164,9 @@ export const router = createRouter({
   scrollRestoration: true,
   routeTree: rootRoute.addChildren([
     lazyRoute('/', TodayPage),
+    dayRoute,
+    lazyRoute('/day/intake', DayIntakePage),
+    lazyRoute('/intimacy', IntimacyPage),
     lazyRoute('/planner', PlannerPage),
     lazyRoute('/challenges', ChallengesPage),
     lazyRoute('/story', StoryPage),

@@ -12,6 +12,8 @@ import {
   toBase64,
   type CipherBlob,
 } from './crypto'
+import { createAutoSync, markApplyingRemote } from './sync-auto'
+import { refreshCapabilities } from './capabilities'
 import { recordKey, type Collection, type RecordMeta } from './records'
 import { listEnvelopes, writeRemoteEnvelope, type EnvelopeRow } from './record-store'
 import {
@@ -26,6 +28,7 @@ import {
   setActiveGymName,
 } from './profiles'
 import { useMessages, type PublishInput } from '../store/useMessages'
+import { useSession } from '../store/useSession'
 import { useMenus } from '../store/useMenus'
 import {
   clearResponseDirty,
@@ -95,13 +98,46 @@ export function readSyncLink(profileId: string): SyncLink | null {
   }
 }
 
+/**
+ * Tells the session store whether the active profile has an account.
+ *
+ * The link itself lives in localStorage, which nothing re-renders on. Two
+ * panels on the Settings screen read it, and before this existed only the one
+ * that wrote it found out it had changed: creating an account left the
+ * subscription panel underneath still telling somebody to go and create one.
+ *
+ * Guarded on the profile being the active one, the same way `setActiveGymName`
+ * is: a write for a profile that has since been locked must not relabel the
+ * next one.
+ */
+function publishLinked(profileId: string, linked: boolean): void {
+  if (useSession.getState().profileId === profileId) {
+    useSession.getState().refreshMeta({ linked })
+  }
+}
+
 function writeSyncLink(profileId: string, link: SyncLink): void {
+  /* A new server is a new set of capabilities. The shell probes them on
+     unlock, but an account created or signed into after that would have left
+     the app believing whatever the previous server, or no server, had said,
+     until the next unlock. Cursor updates hit the same server and skip this. */
+  const before = readSyncLink(profileId)
   localStorage.setItem(linkKey(profileId), JSON.stringify(link))
+  publishLinked(profileId, true)
+  if (!before || before.server !== link.server) void refreshCapabilities(link.server)
 }
 
 /** Forgets the account on this device. Local rows stay exactly as they are. */
 export function unlinkSync(profileId: string): void {
   localStorage.removeItem(linkKey(profileId))
+  publishLinked(profileId, false)
+}
+
+/** What this device already knows, applied on unlock before anybody is asked. */
+export function adoptSyncLink(profileId: string): boolean {
+  const linked = readSyncLink(profileId) !== null
+  publishLinked(profileId, linked)
+  return linked
 }
 
 export function normalizeServer(input: string): string {
@@ -341,9 +377,17 @@ export async function syncNow(profileId: string): Promise<SyncResult> {
     }
 
     writeSyncLink(profileId, { ...link, cursor, lastSyncAt: new Date().toISOString() })
-    if (pulled > 0) await reloadActiveFromDisk()
-    /* The gym bus rides along, best-effort: training sync never fails on it. */
-    await syncGymBus(profileId, link).catch(() => {})
+    /* Everything below writes to the stores, and none of it is a local change.
+       Unmarked, the rehydrate alone is enough to schedule the next sync, and
+       the next, for as long as the profile is open. */
+    markApplyingRemote(true)
+    try {
+      if (pulled > 0) await reloadActiveFromDisk()
+      /* The gym bus rides along, best-effort: training sync never fails on it. */
+      await syncGymBus(profileId, link).catch(() => {})
+    } finally {
+      markApplyingRemote(false)
+    }
     return { ok: true, pulled, pushed }
   } catch (error) {
     if (error instanceof SyncError) {
@@ -1530,3 +1574,29 @@ export async function publishToServer(
     return null
   }
 }
+
+/* ------------------------------------------------------- automatic sync */
+
+/**
+ * The scheduler that makes a linked account actually stay in sync.
+ *
+ * Here rather than in `sync-auto.ts` because that file is deliberately free of
+ * everything: it takes its clock, its timers and its work, so its spec can
+ * drive four behaviours in a millisecond. This is the half that knows what the
+ * work is.
+ */
+export const autoSync = createAutoSync({
+  run: async (profileId) => {
+    const result = await syncNow(profileId)
+    /* `busy` is not a failure worth backing off from — it means another run was
+       already doing the job, and the scheduler's own flag brings us back. */
+    return { ok: result.ok || result.reason === 'busy' }
+  },
+  linked: (profileId) => {
+    const link = readSyncLink(profileId)
+    return !!link && !!link.token
+  },
+  now: () => Date.now(),
+  schedule: (fn, ms) => window.setTimeout(fn, ms),
+  cancel: (handle) => window.clearTimeout(handle),
+})

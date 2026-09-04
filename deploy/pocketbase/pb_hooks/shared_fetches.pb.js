@@ -49,6 +49,54 @@ routerAdd('GET', '/api/enforma/capabilities', (e) => {
       hasCatalogue ||
       !!($os.getenv('FATSECRET_CLIENT_ID') && $os.getenv('FATSECRET_CLIENT_SECRET')),
     push: $os.getenv('VAPID_PUBLIC_KEY') || null,
+    /**
+     * Whether this server can actually take a card.
+     *
+     * The key is the whole test, because the price ids are not configured here:
+     * `utils/billing.js` holds an allowlist of Stripe *lookup keys* and the
+     * checkout resolves the id from Stripe at the time. A client that could
+     * name a price id could name any price in the account, which on a shared
+     * account is another project's.
+     *
+     * The client shows the button only when this is true AND a Pro feature is
+     * built, so nobody is asked for money before there is something behind it.
+     */
+    billing: !!$os.getenv('STRIPE_SECRET_KEY'),
+    /* A Ticketmaster key: what is on near a member, behind /api/enforma/events/near. */
+    events: !!$os.getenv('TICKETMASTER_API_KEY'),
+    /**
+     * Whether a member can connect a real calendar here.
+     *
+     * All four, because three of them is a connection that fails halfway: the
+     * client pair to ask Google with, the redirect Google was told about, and
+     * the key that seals the refresh token at rest. Without the last one the
+     * route refuses rather than storing a live token in the clear, and a button
+     * that cannot work should not be drawn.
+     */
+    calendars: {
+      google: !!(
+        $os.getenv('GOOGLE_CLIENT_ID') &&
+        $os.getenv('GOOGLE_CLIENT_SECRET') &&
+        $os.getenv('GOOGLE_REDIRECT_URI') &&
+        String($os.getenv('CALENDAR_SECRET') || '').length === 32
+      ),
+      /* Apple needs no client registration of any kind: the credential is an
+         app-specific password the member makes themselves, so the sealing key
+         is the only thing that has to exist here. */
+      apple: String($os.getenv('CALENDAR_SECRET') || '').length === 32,
+      /* A published address needs no registration either, and no account: the
+         sealing key is all it wants, because the address is what gets sealed. */
+      url: String($os.getenv('CALENDAR_SECRET') || '').length === 32,
+      microsoft: !!(
+        $os.getenv('MICROSOFT_CLIENT_ID') &&
+        $os.getenv('MICROSOFT_CLIENT_SECRET') &&
+        $os.getenv('MICROSOFT_REDIRECT_URI') &&
+        String($os.getenv('CALENDAR_SECRET') || '').length === 32
+      ),
+    },
+    /* Stripe's own hosted portal, where cancelling happens. A configured URL
+       rather than a route of ours: cancelling is legally theirs to get right. */
+    portal: $os.getenv('STRIPE_PORTAL_URL') || null,
   })
 })
 

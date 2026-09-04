@@ -1,0 +1,5 @@
+# Where the intimate activity illustrations go, once there are any.
+#
+# One WebP per entry in src/data/intimacy.ts, named <id>.webp, 1200x900.
+# The brief is docs/intimacy-illustrations.md. Nothing is served from here
+# until a file exists and the entry's `art` field names it.

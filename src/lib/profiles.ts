@@ -23,6 +23,7 @@ import { withRecordIds } from './records'
 import type { ProfileDetails } from './types'
 import { EMPTY_SNAPSHOT, hydrateGym, snapshotGym, useGym, type GymSnapshot } from '../store/useGym'
 import { useSession } from '../store/useSession'
+import { isApplyingRemote } from './sync-auto'
 
 /**
  * Local profiles. Each person on this device gets their own encrypted store:
@@ -385,11 +386,39 @@ async function readSnapshot(
   return { snapshot, cache }
 }
 
+/**
+ * Whether anything in this batch of changes came from the person using the app.
+ *
+ * A pull rehydrates the store, so the subscription below fires for changes
+ * nobody made here. Those still have to be persisted — they are what the other
+ * device wrote — but syncing them back is a loop. Recorded at subscribe time,
+ * which is the only moment the answer is knowable.
+ */
+let localChangePending = false
+
 function scheduleSave(): void {
+  if (!isApplyingRemote()) localChangePending = true
   if (saveTimer !== null) window.clearTimeout(saveTimer)
   saveTimer = window.setTimeout(() => {
     saveTimer = null
-    void persistNow()
+    void persistNow().then(() => {
+      /**
+       * And then tell the other devices, if there are any.
+       *
+       * Every mutation in the app arrives here — the store is the only way
+       * anything changes and this is subscribed to it — so this one line is
+       * what turns a linked account from "syncs when asked" into one that
+       * syncs. It is imported lazily because `sync.ts` imports this module,
+       * and a static import either way round is a cycle.
+       *
+       * The scheduler behind it coalesces, refuses to overlap, and goes quiet
+       * after a failure; see `sync-auto.ts`. Nothing here waits for it and
+       * nothing here reports it.
+       */
+      if (!activeId || !localChangePending) return
+      localChangePending = false
+      void import('./sync').then(({ autoSync }) => autoSync.changed(activeId as string))
+    })
   }, 400)
 }
 
@@ -528,6 +557,11 @@ export async function lockProfile(): Promise<void> {
   unsubscribe = null
   document.removeEventListener('visibilitychange', flushOnHide)
   window.removeEventListener('pagehide', flushOnPageHide)
+  /* A scheduled sync outliving the profile it was for would run with no key and
+     no rows to read. The final `persistNow` above is what makes dropping it
+     safe: whatever it was going to push is already on disk, and the next unlock
+     syncs. */
+  void import('./sync').then(({ autoSync }) => autoSync.stop())
   activeKey = null
   activeId = null
   activeCache = emptyCache()

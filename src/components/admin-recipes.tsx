@@ -1,3 +1,4 @@
+import { Textarea } from '@/components/ui/textarea'
 import type { ReactNode } from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { MagnifyingGlass, PencilSimple, Plus, Trash, WarningCircle } from '@phosphor-icons/react'
@@ -348,20 +349,18 @@ function RecipeForm({
               label="Ingredients, one per line"
               problem={touched ? problems.ingredients : undefined}
             >
-              <textarea
+              <Textarea
                 rows={5}
                 value={form.ingredients}
                 onChange={(e) => set('ingredients', e.target.value)}
-                className="w-full rounded-lg border border-line bg-surface p-3 text-sm text-ink focus:border-line-strong focus:outline-none"
               />
             </Field>
 
             <Field label="Method, one step per line" problem={touched ? problems.directions : undefined}>
-              <textarea
+              <Textarea
                 rows={6}
                 value={form.directions}
                 onChange={(e) => set('directions', e.target.value)}
-                className="w-full rounded-lg border border-line bg-surface p-3 text-sm text-ink focus:border-line-strong focus:outline-none"
               />
             </Field>
 

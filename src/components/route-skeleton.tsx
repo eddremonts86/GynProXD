@@ -1,4 +1,5 @@
-function Bar({ className }: { className: string }) {
+/** One placeholder line. Exported so a panel can be its own skeleton. */
+export function Bar({ className }: { className: string }) {
   return <div className={`rounded-md bg-surface-2 ${className}`} />
 }
 

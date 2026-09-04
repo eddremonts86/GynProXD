@@ -78,6 +78,25 @@ Environment for the compose (set as Coolify env vars on this service):
 | `PB_SUPERUSER_EMAIL` / `PB_SUPERUSER_PASSWORD` | push | the sender reads subscriptions and the bus privileged |
 | `MINIMAX_API_KEY` (+ optional `MINIMAX_BASE_URL`) | pocketbase | the AI coach route, auth-gated |
 | `FATSECRET_CLIENT_ID` / `FATSECRET_CLIENT_SECRET` | pocketbase | tops up the recipe catalogue, auth-gated. FatSecret only issues tokens to whitelisted IPs: add this host's egress IP in their console |
+| `TICKETMASTER_API_KEY` | pocketbase | what is on near a member, under `/day`. Free Consumer Key from a Discovery API app at developer.ticketmaster.com. Absent key, absent strip, by design |
+| `CALENDAR_SECRET` | pocketbase | **exactly 32 characters.** Seals every stored calendar credential at rest. Without it every calendar route refuses to connect anybody rather than holding a live token in the clear. Changing it makes every connected calendar reconnect |
+| `APP_BASE_URL` | pocketbase | where a consent screen sends the member back to |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` / `GOOGLE_REDIRECT_URI` | pocketbase | Google Calendar, scope `calendar.events.readonly`. The redirect must be listed in the Cloud console |
+| `GOOGLE_WATCH_ADDRESS` | pocketbase | optional, and the whole of the push: the public HTTPS address of `/api/enforma/calendar/google/notify`. Google pushes only to a domain verified in its Cloud project, so unset is a supported state |
+| `MICROSOFT_CLIENT_ID` / `MICROSOFT_CLIENT_SECRET` / `MICROSOFT_REDIRECT_URI` | pocketbase | Microsoft Calendar over Graph, `Calendars.Read` and `offline_access`. No sensitive-scope verification to wait for |
+| `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | pocketbase | billing. A server with the key and not the secret must not be trusted to write a plan: the secret is what separates Stripe reporting a subscription from somebody claiming one |
+| `STRIPE_PORTAL_URL` | pocketbase | Stripe's own hosted portal, where cancelling happens |
+| `CALENDAR_URL_ALLOW_LOCAL` | pocketbase | **leave empty.** Lets a published-calendar subscription fetch loopback, for the walks only. Loopback and nothing else — private ranges, other IP literals and the cloud metadata address stay refused with it set |
+
+**A variable the compose does not name never reaches the process.** Coolify's
+environment variables feed compose interpolation, and a service receives only
+what its own `environment:` block lists — there is no `env_file:` here. A key
+set in Coolify and missing from `docker-compose.yml` reads exactly like a key
+that does not work: `/api/enforma/capabilities` keeps answering false and the
+obvious suspicion is the key. Adding a `$os.getenv` to a hook means adding a
+line to that block. Every variable in this table is wired; the walks prove the
+features, not the wiring, so this is the one thing to check by hand after
+adding a var.
 
 The coach is capped at **20 calls per account per rolling 24 hours**, counted
 over the `coach_usage` rows the proxy already writes. An account over the limit
@@ -122,6 +141,33 @@ unzip -oq pb.zip
 
 `pnpm dev` proxies `/pb` there (override with `POCKETBASE_URL` in `.env.local`),
 so the in-app default server address `/pb` just works.
+
+**That command starts a server with no configuration at all**, which is worth
+saying because nothing complains: the coach, the events strip, every calendar
+and billing are all simply absent, and `/api/enforma/capabilities` is the only
+thing that will tell you. For a local server that has them, keep the values in
+`.local/dev.env` and start with a script beside it:
+
+```bash
+bash deploy/pocketbase/.local/serve-dev.sh
+curl -s localhost:8090/api/enforma/capabilities | python3 -m json.tool
+```
+
+Neither file is tracked — `.local/` is ignored — so this is a recipe rather
+than a checked-in config. What the script does that matters: it sources
+`dev.env` for the laptop-only values, and reads `STRIPE_*` and the superuser
+password from the fleet `.env` at launch so those secrets are never copied into
+this tree. Values in that file carry inline `# comments`, which have to be
+stripped or Stripe is handed a key with a sentence attached and rejects it.
+
+`CALENDAR_SECRET` is the one to generate rather than invent: exactly 32
+characters, `openssl rand -hex 16`. Apple needs nothing else, so a real iCloud
+calendar can be connected on a laptop with an app-specific password. Google and
+Microsoft need OAuth apps whose redirect is
+`http://localhost:3015/pb/api/enforma/calendar/<provider>/callback`. The Google
+push cannot be exercised locally at all — Google only pushes to a public HTTPS
+address on a domain verified in its Cloud project — which is why the walk drives
+the whole channel against a fake instead.
 
 ## What the server can and cannot see
 

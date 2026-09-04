@@ -15,6 +15,7 @@ import {
   ListMagnifyingGlass,
   ShieldCheck,
   Storefront,
+  SunHorizon,
   Trophy,
 } from '@phosphor-icons/react'
 import type { Icon } from '@phosphor-icons/react'
@@ -38,8 +39,11 @@ import { notifyRetestDue, notifyUnread } from '@/lib/notify'
 import { testAgeDays, testIsStale } from '@/lib/fitness-test'
 import { todayIso } from '@/lib/dates'
 import { activeProfile, lockProfile, resumeSession, type ProfileRole, viewerFor } from '@/lib/profiles'
-import { readSyncLink, syncNow } from '@/lib/sync'
+import { adoptSyncLink, autoSync, readSyncLink, syncNow } from '@/lib/sync'
+import { PERIOD_MS } from '@/lib/sync-auto'
 import { refreshCapabilities } from '@/lib/capabilities'
+import { adoptEntitlement, refreshEntitlement } from '@/lib/entitlement'
+import { isBuilt } from '@/lib/member-plan'
 import { SignOut } from '@phosphor-icons/react'
 import { IconButton } from '@/ui/Button'
 import { Avatar } from '@/ui/Avatar'
@@ -61,6 +65,22 @@ const NAV: NavItem[] = [
   { label: 'Recipes', to: '/recipes', icon: ForkKnife, owns: ['/recipe'] },
   { label: 'History', to: '/history', icon: ChartLineUp },
 ]
+
+/**
+ * The day planner, for accounts that have it.
+ *
+ * On the rail only, and that asymmetry is deliberate rather than an oversight.
+ * The bottom bar is six `flex-1` items at 375px, which is already tight enough
+ * that "Challenges" is one character from wrapping; a seventh would clip the
+ * labels for every member to serve a paid minority. On a phone the way in is
+ * the line Today carries, which is where somebody already is in the morning.
+ */
+const DAY_ITEM: NavItem = { label: 'Your day', to: '/day', icon: SunHorizon }
+
+function railNav(pro: boolean): NavItem[] {
+  if (!pro || !isBuilt('day-plan')) return NAV
+  return [NAV[0], DAY_ITEM, ...NAV.slice(1)]
+}
 
 const PANEL_ITEM: Partial<Record<ProfileRole, { label: string; to: string; icon: Icon }>> = {
   gym: { label: 'Gym panel', to: '/gym', icon: Storefront },
@@ -160,6 +180,7 @@ function isActive(item: NavItem, pathname: string): boolean {
 }
 
 function DesktopRail({ pathname }: { pathname: string }) {
+  const pro = useSession((s) => s.pro)
   if (useRailHidden()) return null
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col lg:flex">
@@ -177,7 +198,7 @@ function DesktopRail({ pathname }: { pathname: string }) {
       </div>
 
       <nav aria-label="Main" className="flex flex-1 flex-col gap-0.5 px-3">
-        {NAV.map((item) => {
+        {railNav(pro).map((item) => {
           const active = isActive(item, pathname)
           return (
             <Link
@@ -287,11 +308,46 @@ function ProfileFooter() {
 
 /* Linked profiles catch up in the background on unlock; failures stay quiet
    here because Settings → Data shows them where they can be acted on. The
-   capability probe rides along so coach/recipe copy tells today's truth. */
+   capability probe rides along so coach/recipe copy tells today's truth.
+   Entitlement is adopted from cache first and then asked about: a paying
+   member's screens have to be there on the first frame, not after a round
+   trip that may not complete. */
 function syncQuietly(profileId: string): void {
+  adoptSyncLink(profileId)
+  adoptEntitlement(profileId)
   const link = readSyncLink(profileId)
   void refreshCapabilities(link?.server ?? '/pb')
-  if (link) void syncNow(profileId)
+  if (link) {
+    void refreshEntitlement(profileId)
+    void syncNow(profileId)
+  }
+}
+
+/**
+ * The two things a change cannot trigger: time passing, and a tab coming back.
+ *
+ * Changes made here are covered — every store write ends in a save and the save
+ * schedules a sync. What that misses is a device that sat still while another
+ * one wrote something, and a tab that was hidden or offline for an hour. So a
+ * slow heartbeat while the tab is visible, plus a wake when it becomes visible
+ * or the network returns.
+ *
+ * Visible-only on purpose: a hidden tab syncing every five minutes for a day is
+ * somebody's battery, and the moment it is looked at again is covered by the
+ * wake. Returns its own teardown.
+ */
+function watchForSync(profileId: string): () => void {
+  const wake = () => {
+    if (document.visibilityState === 'visible') autoSync.wake(profileId)
+  }
+  const beat = window.setInterval(wake, PERIOD_MS)
+  document.addEventListener('visibilitychange', wake)
+  window.addEventListener('online', wake)
+  return () => {
+    window.clearInterval(beat)
+    document.removeEventListener('visibilitychange', wake)
+    window.removeEventListener('online', wake)
+  }
 }
 
 export function AppShell() {
@@ -320,6 +376,18 @@ export function AppShell() {
     }
     seenUnread.current = unread.count
   }, [unread, status])
+
+  /**
+   * The heartbeat, for as long as a linked profile is unlocked.
+   *
+   * Keyed on the profile id as well as the status so that switching profiles
+   * moves the watcher rather than leaving one pointed at a locked one.
+   */
+  const linkedProfileId = status === 'unlocked' ? (activeProfile()?.id ?? null) : null
+  useEffect(() => {
+    if (!linkedProfileId) return
+    return watchForSync(linkedProfileId)
+  }, [linkedProfileId])
 
   /* Retest nudge, checked when a profile comes up rather than on a timer:
      a local-first app has no scheduler, and the marker in notify.ts keeps

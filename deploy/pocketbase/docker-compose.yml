@@ -25,6 +25,65 @@ services:
       # Seeds the superuser on boot; the push service uses the same pair.
       PB_SUPERUSER_EMAIL: ${PB_SUPERUSER_EMAIL:-}
       PB_SUPERUSER_PASSWORD: ${PB_SUPERUSER_PASSWORD:-}
+      #
+      # ── Everything below is here because a variable this block does not name
+      # never reaches the process, however carefully it was set.
+      #
+      # Coolify's environment variables feed compose *interpolation*: they land
+      # in a `.env` beside this file and substitute into `${...}`. A service
+      # only receives what its own `environment:` lists, and there is no
+      # `env_file:` here on purpose — the list is the documentation of what this
+      # server can be configured to do.
+      #
+      # So a key set in Coolify and absent from this block reads as a key that
+      # does not work: `/api/enforma/capabilities` keeps answering false, the
+      # feature stays invisible, and the obvious suspicion is the key. Three
+      # whole features shipped that way — events, all three calendars and
+      # billing — because the hooks that read these were added without this
+      # half. Adding a `$os.getenv` to a hook means adding a line here.
+      #
+      # What is on near a member. Absent key, absent strip, by design.
+      TICKETMASTER_API_KEY: ${TICKETMASTER_API_KEY:-}
+      TICKETMASTER_BASE_URL: ${TICKETMASTER_BASE_URL:-}
+      #
+      # The calendars. `CALENDAR_SECRET` must be exactly 32 characters and is
+      # what seals every stored credential at rest: without it the routes
+      # refuse to connect anybody rather than holding a live token in the clear.
+      # `APP_BASE_URL` is where a consent screen sends the member back to.
+      CALENDAR_SECRET: ${CALENDAR_SECRET:-}
+      APP_BASE_URL: ${APP_BASE_URL:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-}
+      # Optional, and the whole of the push: the public HTTPS address of
+      # /api/enforma/calendar/google/notify. Google pushes only to a domain
+      # verified in its Cloud project, so unset is a supported state — the
+      # member keeps "Read it again" and no channel is opened.
+      GOOGLE_WATCH_ADDRESS: ${GOOGLE_WATCH_ADDRESS:-}
+      MICROSOFT_CLIENT_ID: ${MICROSOFT_CLIENT_ID:-}
+      MICROSOFT_CLIENT_SECRET: ${MICROSOFT_CLIENT_SECRET:-}
+      MICROSOFT_REDIRECT_URI: ${MICROSOFT_REDIRECT_URI:-}
+      #
+      # Vendor addresses, empty in production and pointed at fakes on loopback
+      # by the walks. Empty is falsy in the hooks, which then use the real host.
+      GOOGLE_AUTH_BASE_URL: ${GOOGLE_AUTH_BASE_URL:-}
+      GOOGLE_TOKEN_BASE_URL: ${GOOGLE_TOKEN_BASE_URL:-}
+      GOOGLE_API_BASE_URL: ${GOOGLE_API_BASE_URL:-}
+      MICROSOFT_AUTH_BASE_URL: ${MICROSOFT_AUTH_BASE_URL:-}
+      MICROSOFT_API_BASE_URL: ${MICROSOFT_API_BASE_URL:-}
+      CALDAV_BASE_URL: ${CALDAV_BASE_URL:-}
+      # Walks only, and loopback only. See the README: there is nothing on a
+      # production server's loopback a member should be able to ask it to fetch.
+      CALENDAR_URL_ALLOW_LOCAL: ${CALENDAR_URL_ALLOW_LOCAL:-}
+      #
+      # Billing. The webhook secret is what makes an unsigned body somebody
+      # claiming a subscription rather than Stripe reporting one, so a server
+      # with the key and not the secret is one that must not be trusted to
+      # write a plan. `STRIPE_PORTAL_URL` is Stripe's own hosted portal, where
+      # cancelling happens, because cancelling is legally theirs to get right.
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      STRIPE_PORTAL_URL: ${STRIPE_PORTAL_URL:-}
     volumes:
       - pb_data:/pb/pb_data
     healthcheck:

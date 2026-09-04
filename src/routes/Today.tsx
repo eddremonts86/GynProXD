@@ -32,6 +32,7 @@ import { NumberField } from '../ui/NumberField'
 import { ExerciseThumb } from '../ui/ExerciseThumb'
 import { PageHeader, Section } from '../ui/PageHeader'
 import { EmptyState } from '../ui/EmptyState'
+import { DayNext } from '@/components/day-next'
 import { ExercisePicker } from '@/components/exercise-picker'
 import { ExerciseOfTheDay } from '@/components/exercise-of-the-day'
 import { SetPlan } from '@/components/set-plan'
@@ -298,6 +299,10 @@ function TodayOverview({
   return (
     <div className="flex flex-col gap-8">
       <PageHeader title="Today" description={formatLongDate(todayIso())} />
+
+      {/* One line for Pro accounts, and the way into /day on a phone, where
+          the bottom bar has no room for a seventh item. */}
+      <DayNext />
 
       {fitnessTest && testIsStale(fitnessTest, todayIso()) && (
         <p className="flex flex-wrap items-center gap-1.5 text-2xs text-ink-3">

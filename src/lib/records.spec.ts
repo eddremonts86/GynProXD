@@ -52,6 +52,105 @@ describe('recordsFromSnapshot', () => {
   })
 })
 
+describe('the life profile', () => {
+  it('round-trips through a store and back', () => {
+    // It is a singleton like `story` and it carries a list inside it, which is
+    // the combination worth checking: an array nested in a single row does not
+    // get the per-row merge the top-level collections do, so it has to survive
+    // as one value or not at all.
+    hydrateGym(EMPTY_SNAPSHOT)
+    const store = useGym.getState()
+    store.updateLifeProfile({ wake: '06:30', sleep: '22:30' })
+    useGym.getState().saveAnchor({
+      id: 'work',
+      label: 'work',
+      days: ['mon', 'tue', 'wed', 'thu', 'fri'],
+      start: '09:00',
+      end: '17:00',
+      kind: 'work',
+    })
+    useGym.getState().saveAnchor({
+      id: 'school',
+      label: 'school run',
+      days: ['mon', 'fri'],
+      start: '08:15',
+      end: '08:45',
+      kind: 'care',
+    })
+
+    const live = snapshotGym()
+    const rebuilt = roundTrip(live)
+    expect(rebuilt.lifeProfile).toEqual(live.lifeProfile)
+    expect(rebuilt.lifeProfile?.anchors.map((a) => a.id)).toEqual(['work', 'school'])
+    expect(rebuilt.lifeProfile?.wake).toBe('06:30')
+  })
+
+  it('edits an anchor in place rather than adding a second one', () => {
+    hydrateGym(EMPTY_SNAPSHOT)
+    const anchor = {
+      id: 'work',
+      label: 'work',
+      days: ['mon' as const],
+      start: '09:00',
+      end: '17:00',
+      kind: 'work' as const,
+    }
+    useGym.getState().saveAnchor(anchor)
+    useGym.getState().saveAnchor({ ...anchor, end: '15:00' })
+    expect(useGym.getState().lifeProfile?.anchors).toEqual([{ ...anchor, end: '15:00' }])
+  })
+
+  it('prunes what is past and refuses a duplicate on import', () => {
+    // The profile is one synced row with arrays inside it, so the pruning is a
+    // fact about the record rather than about a screen. Yesterday's meetings
+    // are weight it should not carry on every sync for the life of the account.
+    hydrateGym(EMPTY_SNAPSHOT)
+    const block = (date: string, start: string) => ({
+      date,
+      start,
+      end: '15:00',
+      source: 'ics' as const,
+    })
+    const added = useGym.getState().importBusy(
+      [block('2026-09-01', '14:00'), block('2026-09-20', '14:00'), block('2026-09-21', '09:00')],
+      '2026-09-10',
+    )
+    expect(added).toBe(2)
+    expect(useGym.getState().lifeProfile?.busy?.map((b) => b.date)).toEqual([
+      '2026-09-20',
+      '2026-09-21',
+    ])
+
+    /* The same file again adds nothing, which is what makes importing twice
+       harmless rather than doubling somebody's week. */
+    expect(useGym.getState().importBusy([block('2026-09-20', '14:00')], '2026-09-10')).toBe(0)
+    expect(useGym.getState().lifeProfile?.busy).toHaveLength(2)
+  })
+
+  it('drops the imported blocks on request and keeps the anchors', () => {
+    hydrateGym(EMPTY_SNAPSHOT)
+    useGym.getState().addAnchor({
+      label: 'work',
+      days: ['mon'],
+      start: '09:00',
+      end: '17:00',
+      kind: 'work',
+    })
+    useGym
+      .getState()
+      .importBusy([{ date: '2026-09-20', start: '14:00', end: '15:00', source: 'ics' }], '2026-09-10')
+    useGym.getState().clearBusy()
+    expect(useGym.getState().lifeProfile?.busy).toEqual([])
+    expect(useGym.getState().lifeProfile?.anchors).toHaveLength(1)
+  })
+
+  it('is absent from the rows until somebody fills it in', () => {
+    // An empty singleton must not become a row, or every profile on the server
+    // grows one the moment this code ships.
+    expect(recordsFromSnapshot(EMPTY_SNAPSHOT)).toEqual([])
+  })
+})
+
 describe('snapshotFromRecords', () => {
   it('rebuilds every collection in the order the app already showed', () => {
     const snapshot: GymSnapshot = {

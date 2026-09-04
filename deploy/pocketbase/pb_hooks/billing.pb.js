@@ -15,10 +15,12 @@
  */
 
 /**
- * Start a subscription. The owner of a gym, and nobody else.
+ * Start a subscription: a gym one, or a member one.
  *
- * An operator who is not the owner is refused for the same reason they cannot
- * change the roster: the account belongs to whoever moves first otherwise.
+ * A gym subscription is the owner of a gym and nobody else, for the same reason
+ * they alone can change the roster: the account belongs to whoever moves first
+ * otherwise. A member subscription has no such test — the thing being billed is
+ * the account itself, and every signed-in account is one.
  */
 routerAdd('POST', '/api/enforma/billing/checkout', (e) => {
   if (!e.auth) return e.json(401, { message: 'Sign in first.' })
@@ -29,11 +31,13 @@ routerAdd('POST', '/api/enforma/billing/checkout', (e) => {
   const body = e.requestInfo().body || {}
   const lookup = String(body.price || '')
   const { entitlementFor, gymsOwnedBy } = require(`${__hooks}/utils/billing.js`)
-  if (!entitlementFor(lookup)) return e.json(400, { message: 'Unknown price.' })
+  const wanted = entitlementFor(lookup)
+  if (!wanted) return e.json(400, { message: 'Unknown price.' })
 
-  /* Owning a gym is the thing being billed, so it is also the thing that
-     authorises the checkout. No gym, no subscription to start. */
-  if (gymsOwnedBy(e.app, e.auth.id).length === 0) {
+  /* Owning a gym is the thing being billed on a gym plan, so it is also the
+     thing that authorises that checkout. A member subscription bills the
+     account, and being signed in is the whole test. */
+  if (wanted.kind === 'gym' && gymsOwnedBy(e.app, e.auth.id).length === 0) {
     return e.json(403, { message: 'Only the owner of a gym can start a subscription.' })
   }
 
@@ -87,8 +91,9 @@ routerAdd('POST', '/api/enforma/billing/checkout', (e) => {
         ['customer', customer],
         ['line_items[0][price]', priceId],
         ['line_items[0][quantity]', '1'],
-        ['success_url', origin + '/gym?billing=done'],
-        ['cancel_url', origin + '/gym?billing=cancelled'],
+        /* Back to the screen the subscription is about. */
+        ['success_url', origin + (wanted.kind === 'member' ? '/settings' : '/gym') + '?billing=done'],
+        ['cancel_url', origin + (wanted.kind === 'member' ? '/settings' : '/gym') + '?billing=cancelled'],
         ['subscription_data[metadata][enforma_user]', e.auth.id],
         ['subscription_data[metadata][lookup]', lookup],
       ]),
@@ -119,7 +124,9 @@ routerAdd('POST', '/api/enforma/billing/webhook', (e) => {
   const secret = $os.getenv('STRIPE_WEBHOOK_SECRET')
   if (!secret) return e.json(503, { message: 'No billing on this server.' })
 
-  const { signatureOk, entitlementFor, isLapsed, gymsOwnedBy } = require(`${__hooks}/utils/billing.js`)
+  const { signatureOk, entitlementFor, isLapsed, periodEndOf, gymsOwnedBy } = require(
+    `${__hooks}/utils/billing.js`,
+  )
 
   /* The raw bytes, not a re-serialised object: the signature covers the body
      Stripe sent, and JSON.stringify of a parsed copy is a different string. */
@@ -154,6 +161,42 @@ routerAdd('POST', '/api/enforma/billing/webhook', (e) => {
 
   const status = String(object.status || '')
   const lookup = String(meta.lookup || '')
+  const entitlement = entitlementFor(lookup)
+
+  /**
+   * A member subscription, which buys a date rather than a plan.
+   *
+   * Handled before the gym branches because it shares none of them: there is no
+   * plan to set, no cap to raise, and nothing to take away when it lapses.
+   * `pro_until` already says when it runs out, so a cancellation needs no
+   * action at all — clearing the date would take back days somebody paid for,
+   * and Stripe cancels at period end by default.
+   *
+   * Idempotent by construction, which is why there is no ledger here: the date
+   * is *set* to what the subscription says it is paid to, so the same event
+   * applied twice leaves the same state. A ledger only earns its keep when the
+   * handler adds rather than sets.
+   */
+  if (entitlement && entitlement.kind === 'member') {
+    owner.set('billing_status', status || 'canceled')
+    owner.set('stripe_subscription', String(object.id || ''))
+    if (type === 'customer.subscription.deleted' || isLapsed(status)) {
+      e.app.save(owner)
+      return e.json(200, { ok: true, applied: 'member lapsed, date left to expire' })
+    }
+    const end = periodEndOf(object)
+    if (!end) {
+      /* Recorded and not guessed at. A member whose date we could not read
+         keeps the one they had, and somebody can see the status that says so. */
+      e.app.save(owner)
+      return e.json(200, { ok: true, note: 'no period end on the subscription' })
+    }
+    owner.set('pro_until', new Date(end * 1000).toISOString().replace('T', ' '))
+    owner.set('pro_source', 'stripe')
+    e.app.save(owner)
+    return e.json(200, { ok: true, applied: 'member pro' })
+  }
+
   const gyms = gymsOwnedBy(e.app, userId)
 
   if (type === 'customer.subscription.deleted' || isLapsed(status)) {
@@ -169,7 +212,6 @@ routerAdd('POST', '/api/enforma/billing/webhook', (e) => {
     return e.json(200, { ok: true, applied: 'lapsed' })
   }
 
-  const entitlement = entitlementFor(lookup)
   if (!entitlement) {
     owner.set('billing_status', status)
     e.app.save(owner)
