@@ -141,6 +141,33 @@ unzip -oq pb.zip
 `pnpm dev` proxies `/pb` there (override with `POCKETBASE_URL` in `.env.local`),
 so the in-app default server address `/pb` just works.
 
+**That command starts a server with no configuration at all**, which is worth
+saying because nothing complains: the coach, the events strip, every calendar
+and billing are all simply absent, and `/api/enforma/capabilities` is the only
+thing that will tell you. For a local server that has them, keep the values in
+`.local/dev.env` and start with a script beside it:
+
+```bash
+bash deploy/pocketbase/.local/serve-dev.sh
+curl -s localhost:8090/api/enforma/capabilities | python3 -m json.tool
+```
+
+Neither file is tracked — `.local/` is ignored — so this is a recipe rather
+than a checked-in config. What the script does that matters: it sources
+`dev.env` for the laptop-only values, and reads `STRIPE_*` and the superuser
+password from the fleet `.env` at launch so those secrets are never copied into
+this tree. Values in that file carry inline `# comments`, which have to be
+stripped or Stripe is handed a key with a sentence attached and rejects it.
+
+`CALENDAR_SECRET` is the one to generate rather than invent: exactly 32
+characters, `openssl rand -hex 16`. Apple needs nothing else, so a real iCloud
+calendar can be connected on a laptop with an app-specific password. Google and
+Microsoft need OAuth apps whose redirect is
+`http://localhost:3015/pb/api/enforma/calendar/<provider>/callback`. The Google
+push cannot be exercised locally at all — Google only pushes to a public HTTPS
+address on a domain verified in its Cloud project — which is why the walk drives
+the whole channel against a fake instead.
+
 ## What the server can and cannot see
 
 Training rows arrive as plaintext merge metadata (owner, collection, record
