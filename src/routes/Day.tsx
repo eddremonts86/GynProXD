@@ -10,6 +10,7 @@ import { DayReadPanel } from '@/components/day-read'
 import { DaySheet } from '@/components/day-sheet'
 import { DayTimeline } from '@/components/day-timeline'
 import { NearbyEvents } from '@/components/nearby-events'
+import { useCalendarLink } from '@/hooks/use-calendar-link'
 import { useDayRead } from '@/hooks/use-day-read'
 import { useNearbyEvents } from '@/hooks/use-nearby-events'
 import { outingFrom, withOuting, type NearbyEvent } from '@/lib/nearby-events'
@@ -44,12 +45,13 @@ const NOTES: Record<PlacedKind, string> = {
 
 function DayPlanner() {
   const navigate = useNavigate()
-  const { edit } = useSearch({ from: '/day' })
+  const { edit, calendar: cameBack } = useSearch({ from: '/day' })
   const updateLifeProfile = useGym((s) => s.updateLifeProfile)
   const addAnchor = useGym((s) => s.addAnchor)
   const saveAnchor = useGym((s) => s.saveAnchor)
   const removeAnchor = useGym((s) => s.removeAnchor)
   const importBusy = useGym((s) => s.importBusy)
+  const syncCalendarBusy = useGym((s) => s.syncCalendarBusy)
   const clearBusy = useGym((s) => s.clearBusy)
 
   const [date] = useState(todayIso())
@@ -59,6 +61,13 @@ function DayPlanner() {
 
   const free = freeMinutes(plan, profile)
   const hasAnything = plan.slots.length > 0
+  /* The sheet opens by itself when somebody lands back from Google, because
+     that is where the connection they just made is, and an unexplained return
+     to a day that has changed is worse than a drawer. */
+  const calendar = useCalendarLink(
+    (blocks) => syncCalendarBusy(blocks, date),
+    cameBack === 'connected',
+  )
   const nearby = useNearbyEvents(profile, updateLifeProfile)
   const nearbyToday =
     nearby.state.kind === 'done' ? nearby.state.events.filter((e) => e.date === date) : []
@@ -71,6 +80,7 @@ function DayPlanner() {
   const removeOuting = (id: string) =>
     updateLifeProfile({ outings: (profile.outings ?? []).filter((o) => o.id !== id) })
   const openSheet = () => void navigate({ to: '/day', search: { edit: true } })
+  const backFromGoogle = typeof cameBack === 'string'
   const closeSheet = () => void navigate({ to: '/day', search: {} })
 
   return (
@@ -156,7 +166,7 @@ function DayPlanner() {
       />
 
       <DaySheet
-        open={edit === true}
+        open={edit === true || backFromGoogle}
         onClose={closeSheet}
         date={date}
         plan={plan}
@@ -167,6 +177,7 @@ function DayPlanner() {
         onRemoveAnchor={removeAnchor}
         onImportBusy={(blocks) => importBusy(blocks, date)}
         onClearBusy={clearBusy}
+        calendar={calendar}
       />
     </div>
   )

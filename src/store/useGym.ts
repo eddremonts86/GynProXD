@@ -116,6 +116,23 @@ interface GymState {
    * on every sync for the rest of the account's life.
    */
   importBusy: (blocks: readonly Omit<BusyBlock, 'id'>[], today: string) => number
+  /**
+   * The connected calendar's answer, mirrored rather than merged.
+   *
+   * Every `google` block is replaced by what the pull returned and everything
+   * else is left where it is. That is the difference between a connection and
+   * an import: a meeting moved in Google has to move here, and one deleted
+   * there has to disappear, neither of which a merge can do. Blocks from a
+   * file somebody picked are still theirs to keep or forget.
+   */
+  syncCalendarBusy: (blocks: readonly Omit<BusyBlock, 'id'>[], today: string) => number
+  /**
+   * Forgets the blocks a file put there, and only those.
+   *
+   * A connected calendar is forgotten by disconnecting it, which is a different
+   * button in a different place saying a different thing. Wiping both from one
+   * of them would take away something the member did not ask about.
+   */
   clearBusy: () => void
   story: StoryProgress | null
   startStory: (programId: string) => void
@@ -205,10 +222,39 @@ export const useGym = create<GymState>()((set, get) => ({
         })
         return added
       },
+      syncCalendarBusy: (blocks, today) => {
+        let kept = 0
+        set((s) => {
+          const base = s.lifeProfile ?? emptyLifeProfile()
+          const others = (base.busy ?? []).filter((b) => b.source !== 'google' && b.date >= today)
+          const mine: BusyBlock[] = []
+          const seen = new Set<string>()
+          for (const block of blocks) {
+            if (block.date < today) continue
+            const key = `${block.date}|${block.start}|${block.end}`
+            if (seen.has(key)) continue
+            if (others.length + mine.length >= MAX_BUSY) break
+            seen.add(key)
+            mine.push({ ...block, source: 'google', id: `gcal-${block.date}-${block.start.replace(':', '')}-${mine.length}` })
+          }
+          kept = mine.length
+          const next = [...others, ...mine].sort(
+            (a, b) => a.date.localeCompare(b.date) || a.start.localeCompare(b.start),
+          )
+          return { lifeProfile: { ...base, busy: next, updatedAt: new Date().toISOString() } }
+        })
+        return kept
+      },
       clearBusy: () =>
         set((s) =>
           s.lifeProfile
-            ? { lifeProfile: { ...s.lifeProfile, busy: [], updatedAt: new Date().toISOString() } }
+            ? {
+                lifeProfile: {
+                  ...s.lifeProfile,
+                  busy: (s.lifeProfile.busy ?? []).filter((b) => b.source !== 'ics'),
+                  updatedAt: new Date().toISOString(),
+                },
+              }
             : {},
         ),
       removeAnchor: (id) =>

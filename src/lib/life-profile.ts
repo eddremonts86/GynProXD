@@ -52,7 +52,15 @@ export interface BusyBlock {
   start: string
   end: string
   label?: string
-  source: 'ics'
+  /**
+   * Which door it came in by.
+   *
+   * `ics` is a file somebody picked, added to whatever is already there.
+   * `google` is a connected calendar, which is a mirror rather than an import:
+   * a pull replaces every `google` block and leaves the rest alone, because the
+   * calendar is the truth and a meeting that was moved there has to move here.
+   */
+  source: 'ics' | 'google'
 }
 
 /**

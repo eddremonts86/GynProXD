@@ -46,6 +46,14 @@ In production the key sits on the sync server as `COACH_API_KEY`, with
 reads a Pro member's day on `/day` when they ask it to, and says on screen
 whether their day leaves the building. See `.env.example`.
 
+`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI` and a
+32-character `CALENDAR_SECRET` let a member connect Google Calendar from
+`/day`. The scope is `calendar.events.readonly`; the refresh token is sealed
+with that key and written to a collection the API serves to nobody; the next
+three weeks become busy blocks on the member's own device, with titles left
+behind unless they ask for them. Disconnecting deletes the row and tells Google
+to revoke it. Google's verification for a sensitive scope is a person's job.
+
 `TICKETMASTER_API_KEY` on the same server turns on the strip under `/day`:
 ticketed events within 25 km of a cell the device rounds its position to, or
 around a city typed by hand, cached per cell for six hours. A tap puts one on

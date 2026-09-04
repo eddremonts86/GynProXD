@@ -23,6 +23,8 @@ export interface ServerCapabilities {
   recipes: boolean
   /** An events source (a Ticketmaster key) behind /api/enforma/events/near. */
   events: boolean
+  /** A Google client and a key to seal tokens with: /day can connect a calendar. */
+  calendars: boolean
   /** VAPID public key when the server can deliver Web Push, else null. */
   push: string | null
   /**
@@ -43,6 +45,7 @@ const NONE: ServerCapabilities = {
   coachHost: null,
   recipes: false,
   events: false,
+  calendars: false,
   push: null,
   billing: false,
   portal: null,
@@ -60,6 +63,7 @@ function load(): ServerCapabilities {
       coachHost: parsed.coachHost === 'self' ? 'self' : parsed.coachHost === 'external' ? 'external' : null,
       recipes: parsed.recipes === true,
       events: parsed.events === true,
+      calendars: parsed.calendars === true,
       push: typeof parsed.push === 'string' ? parsed.push : null,
       billing: parsed.billing === true,
       portal: typeof parsed.portal === 'string' ? parsed.portal : null,
@@ -103,6 +107,7 @@ export async function refreshCapabilities(server = '/pb'): Promise<void> {
         parsed.coachHost === 'self' ? 'self' : parsed.coachHost === 'external' ? 'external' : null,
       recipes: parsed.recipes === true,
       events: parsed.events === true,
+      calendars: parsed.calendars === true,
       push: typeof parsed.push === 'string' && parsed.push.length > 0 ? parsed.push : null,
       billing: parsed.billing === true,
       portal:

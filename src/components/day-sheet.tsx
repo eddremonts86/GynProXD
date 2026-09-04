@@ -10,7 +10,9 @@ import {
 import { Input } from '@/ui/Input'
 import { SECTION_ACTION } from '@/ui/PageHeader'
 import { AnchorEditor } from '@/components/anchor-editor'
+import { CalendarConnect } from '@/components/calendar-connect'
 import { CalendarImport } from '@/components/calendar-import'
+import type { LinkState } from '@/hooks/use-calendar-link'
 import type { DayPlan } from '@/lib/day-plan'
 import { MEAL_HOUR } from '@/lib/day-plan'
 import {
@@ -55,6 +57,7 @@ export function DaySheet({
   onRemoveAnchor,
   onImportBusy,
   onClearBusy,
+  calendar,
 }: {
   open: boolean
   onClose: () => void
@@ -67,6 +70,15 @@ export function DaySheet({
   onRemoveAnchor: (id: string) => void
   onImportBusy: (blocks: readonly Omit<BusyBlock, 'id'>[]) => number
   onClearBusy: () => void
+  calendar: {
+    state: LinkState
+    offered: boolean
+    keepTitles: boolean
+    setKeepTitles: (next: boolean) => void
+    connect: () => void
+    refresh: () => void
+    disconnect: () => void
+  }
 }) {
   return (
     <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
@@ -141,7 +153,19 @@ export function DaySheet({
           />
         </Group>
 
-        <Group title="From a calendar">
+        <Group title="Your calendar">
+          <CalendarConnect
+            state={calendar.state}
+            offered={calendar.offered}
+            keepTitles={calendar.keepTitles}
+            onKeepTitles={calendar.setKeepTitles}
+            onConnect={calendar.connect}
+            onRefresh={calendar.refresh}
+            onDisconnect={calendar.disconnect}
+          />
+        </Group>
+
+        <Group title={calendar.offered ? 'Or a calendar file' : 'From a calendar'}>
           <CalendarImport
             busy={profile.busy ?? []}
             plan={plan}

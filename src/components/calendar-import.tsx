@@ -48,6 +48,10 @@ export function CalendarImport({
   const [imported, setImported] = useState<number | null>(null)
   const [problem, setProblem] = useState<string | null>(null)
 
+  /* Only what a file put there. A connected calendar's blocks live in the same
+     array and are not this screen's to count or to forget. */
+  const fromFile = busy.filter((block) => block.source === 'ics')
+
   const windowEnd = (() => {
     const at = new Date(`${today}T00:00:00`)
     at.setDate(at.getDate() + IMPORT_DAYS)
@@ -156,10 +160,10 @@ export function CalendarImport({
               Send today to my calendar
             </Button>
           )}
-          {busy.length > 0 && (
+          {fromFile.length > 0 && (
             <Button variant="dangerQuiet" size="sm" onClick={onClear}>
               <Trash size={16} />
-              Forget {busy.length} imported
+              Forget {fromFile.length} imported
             </Button>
           )}
         </div>

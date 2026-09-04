@@ -64,6 +64,21 @@ routerAdd('GET', '/api/enforma/capabilities', (e) => {
     billing: !!$os.getenv('STRIPE_SECRET_KEY'),
     /* A Ticketmaster key: what is on near a member, behind /api/enforma/events/near. */
     events: !!$os.getenv('TICKETMASTER_API_KEY'),
+    /**
+     * Whether a member can connect a real calendar here.
+     *
+     * All four, because three of them is a connection that fails halfway: the
+     * client pair to ask Google with, the redirect Google was told about, and
+     * the key that seals the refresh token at rest. Without the last one the
+     * route refuses rather than storing a live token in the clear, and a button
+     * that cannot work should not be drawn.
+     */
+    calendars: !!(
+      $os.getenv('GOOGLE_CLIENT_ID') &&
+      $os.getenv('GOOGLE_CLIENT_SECRET') &&
+      $os.getenv('GOOGLE_REDIRECT_URI') &&
+      String($os.getenv('CALENDAR_SECRET') || '').length === 32
+    ),
     /* Stripe's own hosted portal, where cancelling happens. A configured URL
        rather than a route of ours: cancelling is legally theirs to get right. */
     portal: $os.getenv('STRIPE_PORTAL_URL') || null,

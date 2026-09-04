@@ -124,8 +124,19 @@ const inboxRoute = createRoute({
 const dayRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/day',
-  validateSearch: (search: Record<string, unknown>): { edit?: true } =>
-    search.edit === true || search.edit === 'true' ? { edit: true } : {},
+  /**
+   * Two words this screen answers to. `edit` opens the sheet, so the back
+   * button closes it. `calendar` is what Google's redirect brings back, and it
+   * is read once and then dropped from the URL: it says what just happened, not
+   * what the screen is.
+   */
+  validateSearch: (search: Record<string, unknown>): { edit?: true; calendar?: string } => {
+    const out: { edit?: true; calendar?: string } = {}
+    if (search.edit === true || search.edit === 'true') out.edit = true
+    const word = search.calendar
+    if (typeof word === 'string' && /^[a-z]{1,20}$/.test(word)) out.calendar = word
+    return out
+  },
   component: () => (
     <React.Suspense fallback={<RouteFallback />}>
       <DayPage />

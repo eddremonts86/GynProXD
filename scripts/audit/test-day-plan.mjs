@@ -30,6 +30,7 @@
  */
 import { spawn } from 'node:child_process'
 import http from 'node:http'
+import net from 'node:net'
 import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
@@ -123,12 +124,120 @@ const ticketmaster = http.createServer((req, res) => {
   ] } }))
 })
 await new Promise((r) => ticketmaster.listen(0, '127.0.0.1', r))
+
+/**
+ * Google, on loopback: the consent screen, the token endpoint, the calendar and
+ * the revoke, all of it fake and all of it in the shape the real one answers in.
+ *
+ * The consent screen redirects straight back rather than asking anything, which
+ * is the one thing a walk cannot drive. Everything after that is the real code
+ * path: the signed state, the code exchange, the refresh token sealed into a
+ * collection nothing can read, a fresh access token per pull, and the events
+ * normalised into busy blocks.
+ *
+ * The calendar answers with four events chosen to be argued about: one at seven
+ * this evening that should reach the day, one this person declined, one all-day
+ * birthday, and one the calendar itself marks free. Only the first blocks time.
+ */
+const google = { tokenCalls: 0, eventCalls: 0, revoked: false, lastAuthUrl: '' }
+/* RS256 in the header and a nonsense signature: the callback parses this
+   without verifying it, and a parser that is handed `alg: none` is entitled to
+   refuse it outright. What Google sends is RS256, so that is what the fake
+   sends. */
+const jwt = (claims) => {
+  const part = (o) => Buffer.from(JSON.stringify(o)).toString('base64url')
+  return `${part({ alg: 'RS256', typ: 'JWT', kid: 'fake' })}.${part(claims)}.${Buffer.from('not-a-real-signature').toString('base64url')}`
+}
+const googleServer = http.createServer((req, res) => {
+  const url = new URL(req.url, 'http://127.0.0.1')
+  if (url.pathname === '/o/oauth2/v2/auth') {
+    google.lastAuthUrl = req.url
+    const back = new URL(url.searchParams.get('redirect_uri'))
+    back.searchParams.set('code', 'fake-auth-code')
+    back.searchParams.set('state', url.searchParams.get('state') ?? '')
+    res.writeHead(302, { location: back.toString() })
+    res.end()
+    return
+  }
+  if (url.pathname === '/token') {
+    google.tokenCalls += 1
+    let body = ''
+    req.on('data', (d) => (body += d))
+    req.on('end', () => {
+      const refreshing = /grant_type=refresh_token/.test(body)
+      res.writeHead(200, { 'content-type': 'application/json' })
+      res.end(JSON.stringify({
+        access_token: 'fake-access-token',
+        expires_in: 3599,
+        ...(refreshing
+          ? {}
+          : {
+              refresh_token: 'fake-refresh-token',
+              id_token: jwt({ email: 'diary@enforma.test', exp: 4102444800 }),
+            }),
+      }))
+    })
+    return
+  }
+  if (url.pathname === '/revoke') {
+    google.revoked = true
+    res.writeHead(200, { 'content-type': 'application/json' })
+    res.end('{}')
+    return
+  }
+  if (url.pathname.startsWith('/calendar/v3/')) {
+    google.eventCalls += 1
+    const at = new Date()
+    const day = `${at.getFullYear()}-${String(at.getMonth() + 1).padStart(2, '0')}-${String(at.getDate()).padStart(2, '0')}`
+    /* The offset this machine is actually in, so "19:00 local" is 19:00 on the
+       day the app draws rather than an hour adrift in CI. */
+    const mins = -at.getTimezoneOffset()
+    const sign = mins < 0 ? '-' : '+'
+    const off = `${sign}${String(Math.floor(Math.abs(mins) / 60)).padStart(2, '0')}:${String(Math.abs(mins) % 60).padStart(2, '0')}`
+    res.writeHead(200, { 'content-type': 'application/json' })
+    res.end(JSON.stringify({ items: [
+      { summary: 'Dentist, from the diary', status: 'confirmed',
+        start: { dateTime: `${day}T19:00:00${off}` }, end: { dateTime: `${day}T20:00:00${off}` } },
+      { summary: 'A meeting I said no to', status: 'confirmed',
+        attendees: [{ self: true, responseStatus: 'declined' }],
+        start: { dateTime: `${day}T11:00:00${off}` }, end: { dateTime: `${day}T12:00:00${off}` } },
+      { summary: "Someone's birthday", status: 'confirmed',
+        start: { date: day }, end: { date: day } },
+      { summary: 'Out of office, but free', status: 'confirmed', transparency: 'transparent',
+        start: { dateTime: `${day}T14:00:00${off}` }, end: { dateTime: `${day}T15:00:00${off}` } },
+    ] }))
+    return
+  }
+  res.writeHead(404)
+  res.end()
+})
+await new Promise((r) => googleServer.listen(0, '127.0.0.1', r))
+
+/* The redirect URI has to name the sandbox, and the sandbox has to be told the
+   redirect URI, so the port is chosen before either exists. */
+const pbPort = await new Promise((resolve) => {
+  const probe = net.createServer()
+  probe.listen(0, '127.0.0.1', () => {
+    const { port } = probe.address()
+    probe.close(() => resolve(port))
+  })
+})
+const googleBase = `http://127.0.0.1:${googleServer.address().port}`
 const pb = await startSandbox({
+  port: pbPort,
   env: {
     COACH_API_KEY: 'fake',
     COACH_BASE_URL: `http://127.0.0.1:${coach.address().port}`,
     TICKETMASTER_API_KEY: 'fake',
     TICKETMASTER_BASE_URL: `http://127.0.0.1:${ticketmaster.address().port}`,
+    GOOGLE_CLIENT_ID: 'fake.apps.googleusercontent.com',
+    GOOGLE_CLIENT_SECRET: 'fake-client-secret',
+    GOOGLE_REDIRECT_URI: `http://127.0.0.1:${pbPort}/api/enforma/calendar/google/callback`,
+    GOOGLE_AUTH_BASE_URL: googleBase,
+    GOOGLE_TOKEN_BASE_URL: googleBase,
+    GOOGLE_API_BASE_URL: googleBase,
+    APP_BASE_URL: BASE,
+    CALENDAR_SECRET: 'walk-calendar-secret-32-chars-ok!'.slice(0, 32),
   },
 })
 const browser = await chromium.launch()
@@ -513,6 +622,91 @@ try {
   check('the block is gone', /Dentist/.test(cleared), false)
   check('and the anchors are not', /school run/.test(cleared), true)
 
+  console.log('\na calendar somebody connected')
+  await openSheet()
+  const beforeConnect = await sheetText()
+  check('says what the server will hold, before anything is connected',
+    /a key that can read your calendar until you disconnect it/.test(beforeConnect), true)
+  check('and that it may only read', /it may only read, it never writes/.test(beforeConnect), true)
+  await sheet().getByRole('button', { name: 'Connect Google Calendar' }).click()
+  /* Out to the consent screen, back through the callback, and into the day.
+     Reported rather than thrown: a connection that stops halfway should name
+     where it stopped, not time out with an empty log. */
+  const landed = await page
+    .waitForURL(/\/day\?calendar=connected/, { timeout: 20000 })
+    .then(() => 'connected')
+    .catch(async () => `stopped at ${page.url()} saying: ${(await sheetText().catch(() => '')).slice(0, 240)}`)
+  check('the consent screen sends them back connected', landed, 'connected')
+  await sheet().waitFor({ timeout: 10000 })
+  /* Connected is "Read it again exists": the panel only offers to re-read a
+     calendar it believes is attached. Reported with what the panel actually
+     says, so a connection that half-landed names itself. */
+  const settled = await sheet()
+    .getByRole('button', { name: 'Read it again' })
+    .waitFor({ timeout: 15000 })
+    .then(() => 'connected')
+    .catch(async () => `panel says: ${(await sheetText()).replace(/^.*Your calendar/s, '').slice(0, 260)}`)
+  check('and the panel says the calendar is attached', settled, 'connected')
+  check('the account it belongs to is shown back', /diary@enforma\.test/.test(await sheetText()), true)
+  check('the scope asked for was read-only',
+    /calendar\.events\.readonly/.test(google.lastAuthUrl) && !/calendar\.events&/.test(google.lastAuthUrl), true)
+  check('and offline, so it can be read again tomorrow',
+    /access_type=offline/.test(google.lastAuthUrl), true)
+  check('the diary was read once', google.eventCalls, 1)
+  await closeSheet()
+  const withDiary = await dayText()
+  check('the evening appointment is on the day', /19:00 to 20:00/.test(withDiary), true)
+  check('with no title, because titles are off by default',
+    /Dentist, from the diary/.test(withDiary), false)
+  check('the birthday is not', /birthday/i.test(withDiary), false)
+  check('nor the one they declined', /said no to/.test(withDiary), false)
+  check('nor the hour the calendar itself calls free', /Out of office/.test(withDiary), false)
+
+  console.log('\nasking for the titles')
+  await openSheet()
+  await sheet().getByRole('switch', { name: 'Keep the titles' }).click()
+  await sheet().getByRole('button', { name: 'Read it again' }).click()
+  await page.waitForTimeout(1500)
+  check('a second read costs a second token', google.tokenCalls >= 3, true)
+  await closeSheet()
+  check('and the title is on the day now', /Dentist, from the diary/.test(await dayText()), true)
+
+  console.log('\nwhat the connection never hands back')
+  /* The account's own token, taken from where the app keeps it, so the next
+     three questions are asked as the member rather than as a superuser. */
+  const memberToken = await page.evaluate(() => {
+    for (let i = 0; i < localStorage.length; i += 1) {
+      const key = localStorage.key(i)
+      if (!key || !key.startsWith('forma-sync-')) continue
+      try {
+        const parsed = JSON.parse(localStorage.getItem(key))
+        if (parsed && typeof parsed.token === 'string' && parsed.token) return parsed.token
+      } catch {
+        /* Not a link. */
+      }
+    }
+    return null
+  })
+  check('the walk is holding the account it is asking as', typeof memberToken, 'string')
+  const linkRow = await pb.api('GET', '/api/collections/calendar_links/records', undefined, memberToken)
+  check('a member cannot list the collection holding it', linkRow.status >= 400, true)
+  const stored = await pb.api('GET', '/api/collections/calendar_links/records', undefined, pb.su)
+  check('the superuser sees one row', stored.json.totalItems, 1)
+  check('and what it holds is not the token Google sent',
+    stored.json.items[0].secret !== 'fake-refresh-token' && stored.json.items[0].secret.length > 0, true)
+  const status = await pb.api('GET', '/api/enforma/calendar/status', undefined, memberToken)
+  check('status names the account and no secret',
+    JSON.stringify(status.json).includes('fake-refresh-token'), false)
+
+  console.log('\ndisconnecting')
+  await openSheet()
+  await sheet().getByRole('button', { name: 'Disconnect' }).click()
+  await sheet().getByRole('button', { name: 'Connect Google Calendar' }).waitFor({ timeout: 10000 })
+  check('Google was told to forget it too', google.revoked, true)
+  check('the row is gone', (await pb.api('GET', '/api/collections/calendar_links/records', undefined, pb.su)).json.totalItems, 0)
+  await closeSheet()
+  check('and the day it shaped is its own again', /19:00 to 20:00/.test(await dayText()), false)
+
   console.log('\nan event the gym published')
   /**
    * Seeded into the device bus rather than published through the gym panel,
@@ -739,6 +933,7 @@ try {
   await pb.stop()
   coach.close()
   ticketmaster.close()
+  googleServer.close()
 }
 
 console.log(failures === 0 ? '\nall clear\n' : `\n${failures} failed\n`)
