@@ -84,6 +84,9 @@ routerAdd('GET', '/api/enforma/capabilities', (e) => {
          app-specific password the member makes themselves, so the sealing key
          is the only thing that has to exist here. */
       apple: String($os.getenv('CALENDAR_SECRET') || '').length === 32,
+      /* A published address needs no registration either, and no account: the
+         sealing key is all it wants, because the address is what gets sealed. */
+      url: String($os.getenv('CALENDAR_SECRET') || '').length === 32,
       microsoft: !!(
         $os.getenv('MICROSOFT_CLIENT_ID') &&
         $os.getenv('MICROSOFT_CLIENT_SECRET') &&

@@ -4,11 +4,13 @@ import {
   calendarConnectUrl,
   calendarStatuses,
   connectApple,
+  connectCalendarUrl,
   disconnectCalendar,
   keepTitlesStored,
   pullApple,
   pullCalendar,
   pullMicrosoft,
+  pullUrl,
   setKeepTitlesStored,
   type CalendarFailure,
   type CalendarProvider,
@@ -60,7 +62,7 @@ export interface ProviderLink {
 
 type States = Record<CalendarProvider, LinkState>
 
-const PROVIDERS: readonly CalendarProvider[] = ['google', 'apple', 'microsoft']
+const PROVIDERS: readonly CalendarProvider[] = ['google', 'apple', 'microsoft', 'url']
 
 export function useCalendarLink(
   onBlocks: (blocks: readonly Omit<BusyBlock, 'id'>[], source: CalendarProvider) => number,
@@ -72,6 +74,7 @@ export function useCalendarLink(
     google: { kind: 'checking' },
     apple: { kind: 'checking' },
     microsoft: { kind: 'checking' },
+    url: { kind: 'checking' },
   })
   const [keepTitles, setKeepTitlesState] = useState(keepTitlesStored)
   const setKeepTitles = (keep: boolean) => {
@@ -149,7 +152,7 @@ export function useCalendarLink(
     /* `onBlocks` is a store action and stable; including it would re-run this
        on every render of the screen that owns it. */
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [caps.calendars.google, caps.calendars.apple, caps.calendars.microsoft, justConnected])
+  }, [caps.calendars.google, caps.calendars.apple, caps.calendars.microsoft, caps.calendars.url, justConnected])
 
   const refresh = async (provider: CalendarProvider) => {
     put(provider, { kind: 'working' })
@@ -158,7 +161,9 @@ export function useCalendarLink(
         ? await pullApple(keepTitles)
         : provider === 'microsoft'
           ? await pullMicrosoft(keepTitles)
-          : await pullCalendar(keepTitles)
+          : provider === 'url'
+            ? await pullUrl(keepTitles)
+            : await pullCalendar(keepTitles)
     if (!result.ok) {
       put(provider, { kind: 'failed', why: result.why })
       return
@@ -215,6 +220,33 @@ export function useCalendarLink(
     })
   }
 
+  /**
+   * A published address, verified and read in one go.
+   *
+   * The same shape as Apple's connect: there is no consent screen to leave for,
+   * so the first read happens here rather than on a return leg.
+   */
+  const subscribeTo = async (url: string) => {
+    put('url', { kind: 'working' })
+    const answer = await connectCalendarUrl(url)
+    if (!answer.ok) {
+      put('url', { kind: 'failed', why: answer.why })
+      return
+    }
+    const result = await pullUrl(keepTitles)
+    if (!result.ok) {
+      put('url', { kind: 'failed', why: result.why })
+      return
+    }
+    const pulled = onBlocks(result.blocks, 'url')
+    const after = await calendarStatuses()
+    put('url', {
+      kind: 'connected',
+      status: after?.url ?? { connected: true, account: answer.name, lastSynced: null, changed: null },
+      pulled,
+    })
+  }
+
   return {
     keepTitles,
     setKeepTitles,
@@ -238,6 +270,13 @@ export function useCalendarLink(
       connect: connectAppleWith,
       refresh: () => refresh('apple'),
       disconnect: () => disconnect('apple'),
+    },
+    url: {
+      state: states.url,
+      offered: caps.calendars.url,
+      connect: subscribeTo,
+      refresh: () => refresh('url'),
+      disconnect: () => disconnect('url'),
     },
     /** Whether the group is worth drawing at all. */
     offered: PROVIDERS.some((provider) => caps.calendars[provider]),

@@ -86,6 +86,7 @@ Environment for the compose (set as Coolify env vars on this service):
 | `MICROSOFT_CLIENT_ID` / `MICROSOFT_CLIENT_SECRET` / `MICROSOFT_REDIRECT_URI` | pocketbase | Microsoft Calendar over Graph, `Calendars.Read` and `offline_access`. No sensitive-scope verification to wait for |
 | `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | pocketbase | billing. A server with the key and not the secret must not be trusted to write a plan: the secret is what separates Stripe reporting a subscription from somebody claiming one |
 | `STRIPE_PORTAL_URL` | pocketbase | Stripe's own hosted portal, where cancelling happens |
+| `CALENDAR_URL_ALLOW_LOCAL` | pocketbase | **leave empty.** Lets a published-calendar subscription fetch loopback, for the walks only. Loopback and nothing else — private ranges, other IP literals and the cloud metadata address stay refused with it set |
 
 **A variable the compose does not name never reaches the process.** Coolify's
 environment variables feed compose interpolation, and a service receives only

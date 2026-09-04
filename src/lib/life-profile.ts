@@ -61,7 +61,7 @@ export interface BusyBlock {
    * and leaves the others alone, because the calendar is the truth and a
    * meeting that was moved there has to move here.
    */
-  source: 'ics' | 'google' | 'apple' | 'microsoft'
+  source: 'ics' | 'google' | 'apple' | 'microsoft' | 'url'
 }
 
 /**

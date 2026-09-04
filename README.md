@@ -66,6 +66,17 @@ hourly by a cron and closed when a calendar is disconnected;
 superuser, which is how "are channels being replaced?" gets answered without
 waiting for the top of an hour.
 
+A **published calendar** needs nothing beyond that same `CALENDAR_SECRET`, and
+it is the way in that asks a member for no password at all: iCloud, Google and
+Outlook all publish a calendar as a `webcal://` link, and pasting one subscribes
+to that calendar and nothing else. The address is sealed like any other
+credential and no route returns it, because a published link is a bearer token
+wearing a path — anyone who has it can read that calendar, which the screen says
+before anybody pastes one. The server fetches it, so the address is validated
+first: no IP literals, no private ranges, no plain http, and the cloud metadata
+endpoint that every SSRF starts with is refused by name in
+`utils/calendar_url.js`.
+
 Apple Calendar needs nothing beyond that 32-character `CALENDAR_SECRET`: iCloud
 has no OAuth, so a member generates an app-specific password at
 appleid.apple.com and types it in, the server verifies it with one `PROPFIND`

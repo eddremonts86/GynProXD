@@ -366,6 +366,61 @@ const icloudServer = http.createServer((req, res) => {
 await new Promise((r) => icloudServer.listen(0, '127.0.0.1', r))
 
 /**
+ * A published calendar, on loopback: the way in that asks for no password.
+ *
+ * Three events chosen to be argued about, the same three the file reader is
+ * tested on, because a subscription goes through that reader: one that blocks
+ * time, one all-day, and one the calendar itself marks free.
+ *
+ * It also answers a web page at `/notacalendar`, which is the mistake a member
+ * actually makes — pasting the link to the page that shows a calendar rather
+ * than the calendar's own address.
+ */
+/* 12:15 and 13:15 on purpose: every other fake in this file puts something on
+   the hour at 16:00, 19:00, 14:00, 11:00 or 10:00, and a block the day already
+   had from another provider would make "did the subscription's block go"
+   unanswerable. Late evening was tried first and is outside the window the day
+   draws. */
+const published = { reads: 0, gone: false }
+const publishedServer = http.createServer((req, res) => {
+  const url = new URL(req.url, 'http://127.0.0.1')
+  if (url.pathname === '/notacalendar') {
+    res.writeHead(200, { 'content-type': 'text/html' })
+    res.end('<!doctype html><title>My calendar</title><p>Sign in to see it.</p>')
+    return
+  }
+  if (url.pathname !== '/published.ics') {
+    res.writeHead(404)
+    res.end()
+    return
+  }
+  if (published.gone) {
+    /* What iCloud answers once somebody stops publishing it. */
+    res.writeHead(404)
+    res.end()
+    return
+  }
+  published.reads += 1
+  const at = new Date()
+  const day = `${at.getFullYear()}${String(at.getMonth() + 1).padStart(2, '0')}${String(at.getDate()).padStart(2, '0')}`
+  /* Floating local times, with no offset and no Z. iCalendar allows exactly
+     three forms — floating, UTC with a `Z`, or a `TZID` parameter — and a
+     `+0200` glued to the end is none of them. This fake had one for a while and
+     the events silently reached nothing. */
+  res.writeHead(200, { 'content-type': 'text/calendar' })
+  res.end(
+    'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//fake//EN\r\n' +
+    'X-WR-CALNAME:Trabajo publicado\r\n' +
+    `BEGIN:VEVENT\r\nUID:p1\r\nSUMMARY:Published meeting\r\nDTSTART:${day}T121500\r\nDTEND:${day}T124500\r\nEND:VEVENT\r\n` +
+    `BEGIN:VEVENT\r\nUID:p2\r\nSUMMARY:A published birthday\r\nDTSTART;VALUE=DATE:${day}\r\nDTEND;VALUE=DATE:${day}\r\nEND:VEVENT\r\n` +
+    `BEGIN:VEVENT\r\nUID:p3\r\nSUMMARY:Published but free\r\nTRANSP:TRANSPARENT\r\nDTSTART:${day}T131500\r\nDTEND:${day}T134500\r\nEND:VEVENT\r\n` +
+    'END:VCALENDAR\r\n',
+  )
+})
+await new Promise((r) => publishedServer.listen(0, '127.0.0.1', r))
+const publishedBase = `http://127.0.0.1:${publishedServer.address().port}`
+
+/**
  * Microsoft, on loopback: the consent screen, the token endpoint and one
  * calendarView.
  *
@@ -470,6 +525,11 @@ const pb = await startSandbox({
        Google has verified; here it is the route itself, which is the only part
        the code cares about. */
     GOOGLE_WATCH_ADDRESS: `http://127.0.0.1:${pbPort}/api/enforma/calendar/google/notify`,
+    /* Lets the subscription fetch the fake published calendar above, which is
+       on loopback. It permits loopback and nothing else — every private range,
+       every other IP literal and the cloud metadata address stay refused with
+       it set, which `calendar-url.spec.ts` is what proves. */
+    CALENDAR_URL_ALLOW_LOCAL: '1',
     APP_BASE_URL: BASE,
     CALENDAR_SECRET: 'walk-calendar-secret-32-chars-ok!'.slice(0, 32),
     CALDAV_BASE_URL: `http://127.0.0.1:${icloudServer.address().port}`,
@@ -1118,6 +1178,120 @@ try {
   check('the all-day birthday is not on it', /Cumpleanos/.test(withApple), false)
   check('nor the hour iCloud marks free', /Fuera de la oficina/.test(withApple), false)
 
+  console.log('\na published calendar, with no password at all')
+  /**
+   * The easy way into iCloud, walked as a member does it.
+   *
+   * The refusals come first and they are the point: this route makes the server
+   * fetch an address a signed-in member chose, which is a door onto everything
+   * the server can reach and the caller cannot. `calendar-url.spec.ts` proves
+   * the rule on the shipped file; this proves the route is actually using it,
+   * with the loopback permission set, which is the worst case.
+   */
+  await openSheet()
+  const subPanel = () => sheet().getByRole('group', { name: 'Apple Calendar' })
+  const subSection = () => subPanel().getByRole('region', { name: 'Subscribe to a published calendar' })
+  const subText = async () => (await subSection().innerText()).replace(/\s+/g, ' ').trim()
+
+  check('the published link is offered first, above the password',
+    /A published link[^]*?An app-specific password/.test((await subPanel().innerText()).replace(/\s+/g, ' ')), true)
+  const subBefore = await subText()
+  check('it says there is no password', /no password/.test(subBefore), true)
+  check('and says the link is not protected, which is the trade',
+    /anyone who gets hold of it can read that calendar/.test(subBefore), true)
+  check('and where to turn it on', /Public Calendar/.test(subBefore), true)
+
+  const paste = async (value) => {
+    const field = subSection().getByLabel('Calendar link')
+    await field.fill(value)
+    await subSection().getByRole('button', { name: /Subscribe to this calendar/ }).click()
+    await page.waitForTimeout(1200)
+    return (await subSection().innerText()).replace(/\s+/g, ' ').trim()
+  }
+
+  /* The address every cloud keeps its credentials behind. Refused by the route
+     even though this sandbox is allowed to reach loopback. */
+  const metadata = await paste('https://169.254.169.254/latest/meta-data/')
+  check('the cloud metadata address is refused', /does not look like a published calendar address/.test(metadata), true)
+  const neighbour = await paste('https://pocketbase:8090/a.ics')
+  check('and so is a container on our own network', /does not look like a published calendar address/.test(neighbour), true)
+  const page404 = await paste(`${publishedBase}/notacalendar`)
+  check('a link to a web page is refused, and says how it differs',
+    /something that is not a calendar/.test(page404), true)
+  check('nothing was stored by any of the three',
+    (await pb.api('GET', '/api/collections/calendar_links/records?filter=' + encodeURIComponent('provider = "url"'), undefined, pb.su)).json.totalItems, 0)
+
+  /**
+   * And the one that works, over plain http on loopback.
+   *
+   * Not the `webcal://` spelling here, even though that is what every provider
+   * hands out: `webcal://` is https wearing a hat and is rewritten to https,
+   * which this fake does not speak. That rewrite is where it belongs, in
+   * `calendar-url.spec.ts`, against the shipped function.
+   */
+  const good = await paste(`${publishedBase}/published.ics`)
+  check('the calendar is subscribed', /Read it again/.test(good), true)
+  check('and it is named by the calendar itself', /Trabajo publicado/.test(good), true)
+  check('the address is never shown back', /published\.ics|127\.0\.0\.1/.test(good), false)
+  /* Twice: once to check the address before storing it, which is what catches
+     a mistake while the member is still looking at the field, and once for the
+     first read. Only at subscribe time. */
+  check('it was read to be checked, then read', published.reads, 2)
+  const storedUrl = (await pb.api('GET', '/api/collections/calendar_links/records?filter=' + encodeURIComponent('provider = "url"'), undefined, pb.su)).json.items[0]
+  check('the superuser sees a row whose secret is not the address',
+    !!storedUrl && String(storedUrl.secret || '').indexOf('published.ics') === -1
+      && String(storedUrl.secret || '').length > 0, true)
+  const subToken = memberToken
+  check('and a member cannot list the collection it is in',
+    (await pb.api('GET', '/api/collections/calendar_links/records', undefined, subToken)).status >= 400, true)
+
+  await closeSheet()
+  const withPublished = await dayText()
+  /* By its title rather than its hours: the titles switch is on by now, and a
+     half-hour block draws its name without rendering the range as its own
+     text — which a check on `12:15 to 12:45` learned the hard way. */
+  check('the published meeting is on the day', /Published meeting/.test(withPublished), true)
+  check('the published birthday is not', /published birthday/i.test(withPublished), false)
+  check('nor the hour it marks free', /Published but free/.test(withPublished), false)
+
+  console.log('\na calendar somebody stopped publishing')
+  /* The failure this way in has that the others do not: the member revokes it
+     at the source and there is nothing to tell us. */
+  published.gone = true
+  await openSheet()
+  await subSection().getByRole('button', { name: /Read it again/ }).click()
+  await page.waitForTimeout(1500)
+  const stopped = await subText()
+  check('the screen says it is no longer published', /no longer published/.test(stopped), true)
+  check('and says what to do about it, which is not what a revoked password needs',
+    /Publish it again where it lives, or paste a new link/.test(stopped), true)
+  await closeSheet()
+  check('and what it already put on the day stays', /Published meeting/.test(await dayText()), true)
+
+  console.log('\npublishing it again')
+  /**
+   * Pasting the link again, which is what the screen tells them to do.
+   *
+   * Worth knowing rather than glossing: a failed read drops this panel back to
+   * its form, so the "Read it again" a connected subscription offers is not on
+   * screen at this moment even though the row is still stored and still valid.
+   * Re-pasting is the way back and the copy says so. A retry button that
+   * survives a failure would be kinder, and is not what this walk asserts.
+   */
+  published.gone = false
+  await openSheet()
+  const again = await paste(`${publishedBase}/published.ics`)
+  check('pasting it again is the way back', /Read it again/.test(again), true)
+  check('and it is the same calendar', /Trabajo publicado/.test(again), true)
+
+  console.log('\nputting the subscription away')
+  await subSection().getByRole('button', { name: 'Disconnect' }).click()
+  await page.waitForTimeout(1200)
+  check('the row is gone',
+    (await pb.api('GET', '/api/collections/calendar_links/records?filter=' + encodeURIComponent('provider = "url"'), undefined, pb.su)).json.totalItems, 0)
+  await closeSheet()
+  check('and the day it shaped is its own again', /Published meeting/.test(await dayText()), false)
+
   console.log('\na Microsoft calendar, over Graph')
   await openSheet()
   const msBefore = await sheetText()
@@ -1598,6 +1772,7 @@ try {
   ticketmaster.close()
   googleServer.close()
   icloudServer.close()
+  publishedServer.close()
   microsoftServer.close()
 }
 

@@ -30,7 +30,7 @@ export interface ServerCapabilities {
    * needs nothing but the key that seals what the member types in, so a server
    * can perfectly well offer one and not the other.
    */
-  calendars: { google: boolean; apple: boolean; microsoft: boolean }
+  calendars: { google: boolean; apple: boolean; microsoft: boolean; url: boolean }
   /** VAPID public key when the server can deliver Web Push, else null. */
   push: string | null
   /**
@@ -51,7 +51,7 @@ const NONE: ServerCapabilities = {
   coachHost: null,
   recipes: false,
   events: false,
-  calendars: { google: false, apple: false, microsoft: false },
+  calendars: { google: false, apple: false, microsoft: false, url: false },
   push: null,
   billing: false,
   portal: null,
@@ -65,16 +65,20 @@ let caps: ServerCapabilities = load()
  * Either way absent reads as false, like every other flag here.
  */
 function readCalendars(raw: unknown): ServerCapabilities['calendars'] {
-  if (raw === true) return { google: true, apple: true, microsoft: true }
+  if (raw === true) return { google: true, apple: true, microsoft: true, url: true }
   if (raw && typeof raw === 'object') {
-    const map = raw as { google?: unknown; apple?: unknown; microsoft?: unknown }
+    const map = raw as { google?: unknown; apple?: unknown; microsoft?: unknown; url?: unknown }
     return {
       google: map.google === true,
       apple: map.apple === true,
       microsoft: map.microsoft === true,
+      /* A server that predates the subscription sends no `url` at all, which
+         reads as false and draws no field — the same rule as every other flag
+         here, and the reason an old cached answer stays safe. */
+      url: map.url === true,
     }
   }
-  return { google: false, apple: false, microsoft: false }
+  return { google: false, apple: false, microsoft: false, url: false }
 }
 
 function load(): ServerCapabilities {

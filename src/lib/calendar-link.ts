@@ -31,7 +31,7 @@ import { isoPlusDays } from './day-window'
  * events and free-marked hours, that has read picked files since v1.
  */
 
-export type CalendarProvider = 'google' | 'apple' | 'microsoft'
+export type CalendarProvider = 'google' | 'apple' | 'microsoft' | 'url'
 
 export interface CalendarStatus {
   connected: boolean
@@ -61,6 +61,19 @@ export type CalendarFailure =
   | 'unreachable'
   /** Apple only: the Apple ID or the app-specific password was not accepted. */
   | 'rejected'
+  /** A subscription only: the address is not a published calendar address. */
+  | 'not-an-address'
+  /** A subscription only: it answered, with something that is not a calendar. */
+  | 'not-a-calendar'
+  /** A subscription only: the calendar is bigger than we will read. */
+  | 'too-large'
+  /**
+   * A subscription only: the address is live but the calendar behind it is no
+   * longer published. Not `withdrawn`, which is a credential that stopped being
+   * accepted — here there is no credential, and what the member has to do is
+   * different: publish it again at the source, or paste a new link.
+   */
+  | 'unpublished'
 
 export type PullResult =
   | { ok: true; blocks: Omit<BusyBlock, 'id'>[] }
@@ -160,6 +173,7 @@ export async function calendarStatuses(): Promise<CalendarStatuses | null> {
     google: NOT_CONNECTED,
     apple: NOT_CONNECTED,
     microsoft: NOT_CONNECTED,
+    url: NOT_CONNECTED,
   }
   const at = endpoint()
   if (!at) return none
@@ -176,6 +190,7 @@ export async function calendarStatuses(): Promise<CalendarStatuses | null> {
         google: oneStatus(providers.google),
         apple: oneStatus(providers.apple),
         microsoft: oneStatus(providers.microsoft),
+        url: oneStatus(providers.url),
       }
     }
     return { ...none, google: oneStatus(body) }
@@ -361,6 +376,72 @@ export async function pullCalendar(keepTitles: boolean): Promise<PullResult> {
     const blocks = validateBlocks(await res.json())
     if (!blocks) return { ok: false, why: 'unreachable' }
     return { ok: true, blocks }
+  } catch {
+    return { ok: false, why: 'unreachable' }
+  }
+}
+
+/**
+ * Subscribe to a published calendar by its address.
+ *
+ * The address goes to the server and stays there. It is a credential — anyone
+ * who has it can read that calendar — so it is sealed there like any other and
+ * no route gives it back; what comes back is the calendar's own name, for the
+ * one line the screen shows.
+ */
+export async function connectCalendarUrl(
+  url: string,
+): Promise<{ ok: true; name: string } | { ok: false; why: CalendarFailure }> {
+  const at = endpoint()
+  if (!at) return { ok: false, why: 'no-account' }
+  try {
+    const res = await fetch(`${at.base}/api/enforma/calendar/url/connect`, {
+      method: 'POST',
+      headers: { ...at.headers, 'content-type': 'application/json' },
+      body: JSON.stringify({ url }),
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    })
+    if (res.status === 503) return { ok: false, why: 'unavailable' }
+    if (res.status === 400) return { ok: false, why: 'not-an-address' }
+    if (res.status === 401 || res.status === 404) return { ok: false, why: 'rejected' }
+    if (res.status === 403) return { ok: false, why: 'refused' }
+    if (res.status === 413) return { ok: false, why: 'too-large' }
+    if (res.status === 422) return { ok: false, why: 'not-a-calendar' }
+    if (!res.ok) return { ok: false, why: 'unreachable' }
+    const body = (await res.json()) as { name?: unknown }
+    return { ok: true, name: typeof body.name === 'string' ? body.name : '' }
+  } catch {
+    return { ok: false, why: 'unreachable' }
+  }
+}
+
+/**
+ * The subscribed calendar, narrowed here.
+ *
+ * A published address takes no time-range filter, so the whole file arrives and
+ * `blocksFromIcs` cuts it to the three weeks the day draws — the same reader,
+ * with the same decisions about all-day events and free-marked hours, that has
+ * read picked files since v1.
+ */
+export async function pullUrl(keepTitles: boolean): Promise<PullResult> {
+  const at = endpoint()
+  if (!at) return { ok: false, why: 'no-account' }
+  try {
+    const res = await fetch(`${at.base}/api/enforma/calendar/url/ics`, {
+      headers: at.headers,
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    })
+    if (res.status === 503) return { ok: false, why: 'unavailable' }
+    if (res.status === 401 || res.status === 403) return { ok: false, why: 'refused' }
+    if (res.status === 404) return { ok: false, why: 'not-connected' }
+    if (res.status === 409) return { ok: false, why: 'unpublished' }
+    if (res.status === 413) return { ok: false, why: 'too-large' }
+    if (res.status === 422) return { ok: false, why: 'not-a-calendar' }
+    if (!res.ok) return { ok: false, why: 'unreachable' }
+    const body = (await res.json()) as { ics?: unknown }
+    const texts = Array.isArray(body.ics) ? body.ics.filter((t): t is string => typeof t === 'string') : []
+    if (texts.length === 0) return { ok: false, why: 'unreachable' }
+    return { ok: true, blocks: blocksFromIcs(texts, keepTitles) }
   } catch {
     return { ok: false, why: 'unreachable' }
   }

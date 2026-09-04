@@ -128,7 +128,7 @@ interface GymState {
   syncCalendarBusy: (
     blocks: readonly Omit<BusyBlock, 'id'>[],
     today: string,
-    source: 'google' | 'apple' | 'microsoft',
+    source: 'google' | 'apple' | 'microsoft' | 'url',
   ) => number
   /**
    * Forgets the blocks a file put there, and only those.
@@ -243,7 +243,17 @@ export const useGym = create<GymState>()((set, get) => ({
           const others = (base.busy ?? []).filter((b) => b.source !== source && b.date >= today)
           const mine: BusyBlock[] = []
           const seen = new Set<string>()
-          const prefix = source === 'apple' ? 'ical' : source === 'microsoft' ? 'mscal' : 'gcal'
+          /* Its own prefix per provider, because these ids are identity: a
+             subscription falling through to `gcal` would mint ids that collide
+             with Google's for a member who has both. */
+          const prefix =
+            source === 'apple'
+              ? 'ical'
+              : source === 'microsoft'
+                ? 'mscal'
+                : source === 'url'
+                  ? 'suburl'
+                  : 'gcal'
           for (const block of blocks) {
             if (block.date < today) continue
             const key = `${block.date}|${block.start}|${block.end}`

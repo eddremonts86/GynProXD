@@ -205,15 +205,26 @@ routerAdd('GET', '/api/enforma/calendar/status', (e) => {
   const google = one('google')
   const apple = one('apple')
   const microsoft = one('microsoft')
-  const first = [google, apple, microsoft].find((p) => p.connected)
+  /* A published address, which is nobody's account: it reports the calendar's
+     own name where the others report an email, and never the address. */
+  const url = one('url')
+  const first = [google, apple, microsoft, url].find((p) => p.connected)
   return e.json(200, {
     connected: !!first,
-    provider: google.connected ? 'google' : apple.connected ? 'apple' : microsoft.connected ? 'microsoft' : null,
+    provider: google.connected
+      ? 'google'
+      : apple.connected
+        ? 'apple'
+        : microsoft.connected
+          ? 'microsoft'
+          : url.connected
+            ? 'url'
+            : null,
     /* Kept flat as well as nested, so the fields the first version answered
        with still mean what they meant. */
     account: first ? first.account : '',
     lastSynced: first ? first.lastSynced : null,
-    providers: { google: google, apple: apple, microsoft: microsoft },
+    providers: { google: google, apple: apple, microsoft: microsoft, url: url },
   })
 })
 
@@ -325,7 +336,8 @@ routerAdd('POST', '/api/enforma/calendar/disconnect', (e) => {
   /* Which one, defaulting to Google: that is what the route meant when it was
      the only provider and what a client that has not reloaded still means. */
   const asked = e.request.url.query().get('provider')
-  const provider = asked === 'apple' || asked === 'microsoft' ? asked : 'google'
+  const provider =
+    asked === 'apple' || asked === 'microsoft' || asked === 'url' ? asked : 'google'
   let row = null
   try {
     row = e.app.findFirstRecordByFilter('calendar_links', 'owner = {:o} && provider = {:p}', {

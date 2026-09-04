@@ -72,6 +72,9 @@ services:
       MICROSOFT_AUTH_BASE_URL: ${MICROSOFT_AUTH_BASE_URL:-}
       MICROSOFT_API_BASE_URL: ${MICROSOFT_API_BASE_URL:-}
       CALDAV_BASE_URL: ${CALDAV_BASE_URL:-}
+      # Walks only, and loopback only. See the README: there is nothing on a
+      # production server's loopback a member should be able to ask it to fetch.
+      CALENDAR_URL_ALLOW_LOCAL: ${CALENDAR_URL_ALLOW_LOCAL:-}
       #
       # Billing. The webhook secret is what makes an unsigned body somebody
       # claiming a subscription rather than Stripe reporting one, so a server
