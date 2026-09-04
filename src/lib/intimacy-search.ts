@@ -107,6 +107,31 @@ export function excludedBy(
   return all.length - searchActivities(query, all).length
 }
 
+/**
+ * One arrangement for one day, the same one all day.
+ *
+ * Not random: a suggestion that changed every time the screen was drawn would
+ * read as noise rather than as a suggestion, and somebody who came back to it
+ * after making a cup of tea would find it had moved. The date is hashed into an
+ * index instead, so it is stable through the day, different tomorrow, and needs
+ * nothing stored to be either.
+ *
+ * The pool is whatever survives the limitations named, so this is the one place
+ * the module's own memory reaches the day. An empty pool answers null and the
+ * screen says nothing rather than suggesting something unkind.
+ */
+export function pickForDay(
+  date: string,
+  limitations: readonly Limitation[] = [],
+  all: readonly IntimateActivity[] = INTIMATE_ACTIVITIES,
+): IntimateActivity | null {
+  const pool = searchActivities({ limitations }, all)
+  if (pool.length === 0) return null
+  let hash = 0
+  for (let i = 0; i < date.length; i += 1) hash = (hash * 31 + date.charCodeAt(i)) % 1_000_003
+  return pool[hash % pool.length]
+}
+
 /** Whether the library has any drawings yet, for the one line above the list. */
 export function anyArt(all: readonly IntimateActivity[] = INTIMATE_ACTIVITIES): boolean {
   return all.some((activity) => activity.art !== null)

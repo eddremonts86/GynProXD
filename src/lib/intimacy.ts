@@ -1,4 +1,9 @@
-import { INTIMATE_ACTIVITIES, type IntimateActivity, type Limitation } from '../data/intimacy'
+import {
+  INTIMATE_ACTIVITIES,
+  LIMITATIONS,
+  type IntimateActivity,
+  type Limitation,
+} from '../data/intimacy'
 import { searchActivities } from './intimacy-search'
 
 /**
@@ -46,6 +51,22 @@ import { searchActivities } from './intimacy-search'
 
 const ON_KEY = 'forma-intimacy'
 const AGE_KEY = 'forma-intimacy-18'
+/**
+ * What this body is working around, remembered on this device only.
+ *
+ * The screen used to hold these in component state and say "none of this is
+ * saved", which was true and made the day useless: a half hour on somebody's
+ * Tuesday cannot suggest anything if nothing remembers that their back is the
+ * problem. So it is remembered, and remembered in exactly the place the switch
+ * and the affirmation already live — `localStorage`, outside `records.ts`, so
+ * it is never in an envelope and never on the server.
+ *
+ * That is the same Article 9 reasoning as the rest of this file rather than an
+ * exception to it, and it comes with the two things that make it fair: the
+ * screen says plainly that it is kept and where, and `forgetIntimacy` takes it
+ * with everything else.
+ */
+const LIMITS_KEY = 'forma-intimacy-limits'
 
 export interface IntimacyState {
   /** Whether the module is switched on, on this device. */
@@ -76,6 +97,34 @@ export function intimacyState(): IntimacyState {
   return { on: read(ON_KEY), affirmed: read(AGE_KEY) }
 }
 
+/** What was named on the module's own screen, on this device. Never synced. */
+export function intimacyLimitations(): Limitation[] {
+  try {
+    const raw = localStorage.getItem(LIMITS_KEY)
+    if (!raw) return []
+    const parsed = JSON.parse(raw) as unknown
+    if (!Array.isArray(parsed)) return []
+    /* Filtered against the real list rather than trusted: this is a string
+       somebody could edit, and an unknown value would silently widen the
+       library rather than narrowing it. */
+    return parsed.filter((value): value is Limitation =>
+      (LIMITATIONS as readonly string[]).includes(value as string),
+    )
+  } catch {
+    return []
+  }
+}
+
+export function setIntimacyLimitations(limitations: readonly Limitation[]): void {
+  try {
+    const kept = limitations.filter((l) => (LIMITATIONS as readonly string[]).includes(l))
+    if (kept.length === 0) localStorage.removeItem(LIMITS_KEY)
+    else localStorage.setItem(LIMITS_KEY, JSON.stringify(kept))
+  } catch {
+    /* Private mode: the chips still work for this session. */
+  }
+}
+
 /** Both together, because turning it on without the affirmation is not a state. */
 export function setIntimacyOn(on: boolean): void {
   write(ON_KEY, on)
@@ -92,6 +141,11 @@ export function setIntimacyOn(on: boolean): void {
 export function forgetIntimacy(): void {
   write(ON_KEY, false)
   write(AGE_KEY, false)
+  try {
+    localStorage.removeItem(LIMITS_KEY)
+  } catch {
+    /* Nothing was stored. */
+  }
 }
 
 /** Whether the module should be drawn at all, given the account and the device. */

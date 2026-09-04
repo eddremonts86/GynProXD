@@ -75,6 +75,24 @@ export type Limitation =
   | 'pregnancy'
   | 'limited-mobility'
 
+/**
+ * Every limitation, in the order the screen offers them.
+ *
+ * Here rather than in the screen that used to hold the only copy: the stored
+ * answer is validated against it, the search is offered from it, and a fourth
+ * caller would have made a fourth list.
+ */
+export const LIMITATIONS: readonly Limitation[] = [
+  'knees',
+  'hips',
+  'lower-back',
+  'shoulders',
+  'wrists',
+  'neck',
+  'pregnancy',
+  'limited-mobility',
+]
+
 export const LIMITATION_LABELS: Record<Limitation, string> = {
   knees: 'Knees',
   hips: 'Hips',

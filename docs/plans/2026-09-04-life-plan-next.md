@@ -22,7 +22,7 @@ Verified on the branch as it stands:
 
 | Check | Result |
 |---|---|
-| Unit tests | 835 pass |
+| Unit tests | 846 pass |
 | `run.mjs rules` | 11 of 11 |
 | `run.mjs screens` | 22 of 22 |
 | Lint, types, build | clean |
@@ -120,16 +120,23 @@ It needs no configuration of its own. The 32-character `CALENDAR_SECRET` from
 item 2 is the only thing it wants, and `/api/enforma/capabilities` reports the
 two providers separately so a server can offer one and not the other.
 
-## 8. The +18 library, connected
+## 8. The +18 library, connected — done
 
-The two bullets that were lost when V2.5 was written up as built.
+Built and walked.
 
-- The day's `Time together` slot is a neutral half hour with nothing behind it.
-  It should carry a suggestion from the library, chosen from what the person has
-  said they are working around.
-- Nothing describes or recommends from the library. A model may, on the same
-  terms the anchor parser already works to: ids only, never an invented entry,
-  validated before it reaches a screen.
+- What is being worked around is remembered on the device, beside the switch
+  and the affirmation and never in the synced record, because a half hour on
+  somebody's Tuesday cannot suggest anything if nothing remembers that their
+  back is the problem. The screen says where it is kept; Settings forgets it.
+- `/intimacy` gains "For your half hour today", one arrangement chosen from
+  what survives those limitations, the same all day and different tomorrow.
+- **The day's block keeps its neutral label and leads there instead.** Putting
+  an arrangement's name on the timeline would undo the reason the label is
+  `Time together` in the first place.
+- A model may choose from the library on a tap: the sentence and the ids go
+  out, ids come back, an invented one is dropped. The limitations never
+  travel — they filter the pool before and after — so it cannot put something
+  unkind on screen and never learns what the body is working around.
 
 ## 9. The revoked-grant walk
 

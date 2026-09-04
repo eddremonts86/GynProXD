@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowRight } from '@phosphor-icons/react'
+import { ArrowRight, Sparkle } from '@phosphor-icons/react'
 import { useNavigate } from '@tanstack/react-router'
 import { PageHeader, Section } from '@/ui/PageHeader'
 import { Panel } from '@/ui/Panel'
@@ -9,21 +9,26 @@ import { Tag } from '@/ui/Tag'
 import { EmptyState } from '@/ui/EmptyState'
 import { ProGate } from '@/components/pro-gate'
 import { IntimacyArt } from '@/components/intimacy-art'
-import { intimacyState } from '@/lib/intimacy'
+import { intimacyLimitations, intimacyState, setIntimacyLimitations } from '@/lib/intimacy'
 import {
   anyArt,
   excludedBy,
   isEmptyQuery,
+  pickForDay,
   searchActivities,
   type ActivityQuery,
 } from '@/lib/intimacy-search'
+import { askLibrary, type Suggestion, type SuggestFailure } from '@/lib/intimacy-coach'
+import { where } from '@/lib/life-coach'
+import { todayIso } from '@/lib/dates'
 import {
   EFFORT_LABELS,
   EFFORT_METS,
+  LIMITATIONS,
   LIMITATION_LABELS,
   POSTURE_LABELS,
   type Effort,
-  type Limitation,
+  type IntimateActivity,
   type Posture,
 } from '@/data/intimacy'
 import { cn } from '@/lib/utils'
@@ -53,22 +58,16 @@ import { cn } from '@/lib/utils'
  * cards carry an empty frame rather than a stand-in drawing. `IntimacyArt` says
  * why an empty frame beats no frame.
  *
- * The whole query is held in component state and not saved. It is a lens on a
- * list, it takes a few taps to set again, and saving it would mean storing
- * "this person is working around their hips" next to the fact that they opted
- * into this module.
+ * **What is working around is remembered; the rest of the query is not.** The
+ * effort, the posture and the words typed are a lens on a list and take a tap
+ * to set again. A bad back is not a lens: it is the fact the whole module
+ * exists to answer, the day's half hour cannot suggest anything without it, and
+ * asking for it again every visit would be the kind of forgetfulness that reads
+ * as not listening. It is kept where the switch and the affirmation are kept,
+ * on this device and outside the synced record, the screen says so, and
+ * "forget it" in Settings takes it.
  */
 
-const ALL_LIMITATIONS: Limitation[] = [
-  'knees',
-  'hips',
-  'lower-back',
-  'shoulders',
-  'wrists',
-  'neck',
-  'pregnancy',
-  'limited-mobility',
-]
 const ALL_EFFORTS: Effort[] = ['light', 'moderate', 'vigorous']
 const ALL_POSTURES: Posture[] = ['lying', 'seated', 'kneeling', 'standing']
 
@@ -114,12 +113,61 @@ function Filters({
   )
 }
 
+/** One card, used by the day's suggestion and by anything the coach picks. */
+function Chosen({
+  activity,
+  note,
+}: {
+  activity: IntimateActivity
+  note?: string
+}) {
+  return (
+    <article className="flex flex-col gap-3 sm:flex-row">
+      <IntimacyArt activity={activity} />
+      <div className="flex min-w-0 flex-col gap-2">
+        <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+          <h3 className="text-sm font-medium text-ink">{activity.name}</h3>
+          <Tag tone="outline">{EFFORT_LABELS[activity.effort]}</Tag>
+        </span>
+        {note && <p className="max-w-[62ch] text-sm text-ink-2">{note}</p>}
+        <p className="max-w-[68ch] text-2xs text-ink-3">{activity.description}</p>
+      </div>
+    </article>
+  )
+}
+
+const ASK_FAILED: Record<SuggestFailure, string> = {
+  'no-coach': 'No coach on this server, so this is the local search only.',
+  cap: 'The coach has answered enough times for this account today. It opens again tomorrow.',
+  unreachable: 'The coach could not be reached. The list below is unchanged.',
+  unreadable: 'The answer did not name anything on the list and was not used.',
+  nothing: 'Say what you are after first.',
+}
+
 function Module() {
   const navigate = useNavigate()
-  const [query, setQuery] = useState<ActivityQuery>({})
+  /* The remembered half of the query is read once, on mount. */
+  const [query, setQuery] = useState<ActivityQuery>(() => ({ limitations: intimacyLimitations() }))
   const shown = searchActivities(query)
   const hidden = excludedBy(query)
   const drawn = anyArt()
+  const today = todayIso()
+  const forToday = pickForDay(today, query.limitations ?? [])
+  const destination = where()
+  const [asked, setAsked] = useState<
+    | { kind: 'idle' }
+    | { kind: 'working' }
+    | { kind: 'done'; suggestions: Suggestion[] }
+    | { kind: 'failed'; why: SuggestFailure }
+  >({ kind: 'idle' })
+
+  const ask = async () => {
+    setAsked({ kind: 'working' })
+    const result = await askLibrary(query.text ?? '', query.limitations ?? [])
+    setAsked(
+      result.ok ? { kind: 'done', suggestions: result.suggestions } : { kind: 'failed', why: result.why },
+    )
+  }
 
   const toggleIn = <T,>(list: readonly T[] | undefined, value: T): T[] => {
     const current = list ?? []
@@ -154,13 +202,18 @@ function Module() {
           />
 
           <Filters title="Working around">
-            {ALL_LIMITATIONS.map((limitation) => (
+            {LIMITATIONS.map((limitation) => (
               <Chip
                 key={limitation}
                 on={(query.limitations ?? []).includes(limitation)}
-                onClick={() =>
-                  setQuery({ ...query, limitations: toggleIn(query.limitations, limitation) })
-                }
+                onClick={() => {
+                  const next = toggleIn(query.limitations, limitation)
+                  /* Remembered as it is tapped rather than behind a Save: the
+                     chip is the whole gesture and a second one would be a
+                     form. */
+                  setIntimacyLimitations(next)
+                  setQuery({ ...query, limitations: next })
+                }}
               >
                 {LIMITATION_LABELS[limitation]}
               </Chip>
@@ -208,10 +261,74 @@ function Module() {
           </Filters>
 
           <p className="max-w-[62ch] text-2xs text-ink-3">
-            None of this is saved. It filters the list on this screen and nothing else.
+            What you are working around is kept on this device, so your day can use it. It is never
+            synced and never sent anywhere. Settings is where you forget it. The rest of this is
+            not kept at all.
           </p>
         </Panel>
       </Section>
+
+      {forToday && (
+        <Section title="For your half hour today" hint="one a day">
+          <Panel padding="lg" className="flex flex-col gap-3">
+            <Chosen activity={forToday} note={forToday.note} />
+            <p className="max-w-[62ch] text-2xs text-ink-3">
+              Picked from what is left once you name what you are working around, and the same one
+              all day. Your day shows the half hour, not this.
+            </p>
+          </Panel>
+        </Section>
+      )}
+
+      {destination.coach && (
+        <Section title="Or say what you are after" hint="the coach picks from this list">
+          <Panel padding="lg" className="flex flex-col gap-4">
+            <p className="max-w-[62ch] text-sm text-ink-3">
+              The search above matches words. For a sentence it cannot match, the coach can choose
+              from the list instead. It is sent{' '}
+              {destination.host === 'self'
+                ? 'to a model running on our own hardware, and does not reach a third party.'
+                : 'to our model provider, so write only what you are happy to send.'}{' '}
+              What you are working around is not sent: it filters the list here, before and after.
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                variant="secondary"
+                onClick={() => void ask()}
+                disabled={asked.kind === 'working' || (query.text ?? '').trim() === ''}
+              >
+                <Sparkle size={16} />
+                {asked.kind === 'working' ? 'Choosing' : 'Ask the coach to choose'}
+              </Button>
+              {asked.kind === 'done' && (
+                <Button variant="ghost" size="sm" onClick={() => setAsked({ kind: 'idle' })}>
+                  Clear
+                </Button>
+              )}
+            </div>
+
+            {asked.kind === 'done' &&
+              (asked.suggestions.length === 0 ? (
+                <p className="max-w-[58ch] text-sm text-ink-3">
+                  It found nothing on the list that answers that, which is the answer rather than a
+                  failure.
+                </p>
+              ) : (
+                <ul className="flex list-none flex-col gap-4 p-0">
+                  {asked.suggestions.map((suggestion) => (
+                    <li key={suggestion.activity.id} className="border-t border-line pt-4">
+                      <Chosen activity={suggestion.activity} note={suggestion.reason} />
+                    </li>
+                  ))}
+                </ul>
+              ))}
+
+            {asked.kind === 'failed' && (
+              <p className="max-w-[58ch] text-sm text-ink-3">{ASK_FAILED[asked.why]}</p>
+            )}
+          </Panel>
+        </Section>
+      )}
 
       <Section title="Arrangements" hint={`${shown.length}`}>
         {!drawn && (

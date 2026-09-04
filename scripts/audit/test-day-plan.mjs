@@ -70,7 +70,17 @@ const coach = http.createServer((req, res) => {
     try {
       const { messages } = JSON.parse(body)
       const user = messages.find((m) => m.role === 'user')?.content ?? ''
-      if (/what it allows/.test(user)) {
+      if (/fixed list of \d+ arrangements/.test(user)) {
+        /* Two ids that exist and one that does not, so the walk can see the
+           gate drop the invention. */
+        content = JSON.stringify({
+          picks: [
+            { id: 'spooning', why: 'Neither person carries any weight.' },
+            { id: 'the-wheelbarrow', why: 'Invented, and must not reach a screen.' },
+            { id: 'seated-one-behind', why: 'Almost nothing moves.' },
+          ],
+        })
+      } else if (/what it allows/.test(user)) {
         const gaps = [...user.matchAll(/^- (\d\d:\d\d) to (\d\d:\d\d) \(/gm)].map((m) => ({ start: m[1], end: m[2] }))
         content = JSON.stringify({
           read: 'Work takes the middle — the edges are yours.',
@@ -1090,21 +1100,85 @@ try {
     [],
   )
 
+  /**
+   * The cards in the Arrangements list, and nothing else.
+   *
+   * The day's suggestion and anything the coach picks are `<article>` too,
+   * because that is what they are, so counting every article on the screen was
+   * counting three lists as one.
+   */
+  const cards = () =>
+    main().locator('section').filter({ hasText: 'Arrangements' }).getByRole('article')
+
+  console.log('\nthe half hour on the day, and what is behind it')
+  const chosen = await main().locator('section').filter({ hasText: 'For your half hour today' })
+  check('one arrangement is chosen for today', await chosen.count(), 1)
+  const chosenName = (await chosen.locator('h3').first().innerText()).trim()
+  check('it is named', chosenName.length > 0, true)
+  check('and the screen says the day shows the half hour rather than this',
+    /Your day shows the half hour, not this/.test(await dayText()), true)
+  await page.reload({ waitUntil: 'networkidle' })
+  await page.getByRole('heading', { name: 'Time together', level: 1 }).waitFor({ timeout: 10000 })
+  check('the same one after a reload, because it is the day and not a shuffle',
+    (await main().locator('section').filter({ hasText: 'For your half hour today' }).locator('h3').first().innerText()).trim(),
+    chosenName)
+
+  console.log('\nwhat is being worked around is remembered')
+  await page.getByRole('button', { name: 'Knees' }).click()
+  await page.waitForTimeout(400)
+  const withKnees = await cards().count()
+  await page.reload({ waitUntil: 'networkidle' })
+  await page.getByRole('heading', { name: 'Time together', level: 1 }).waitFor({ timeout: 10000 })
+  check('the chip is still pressed after a reload',
+    await page.getByRole('button', { name: 'Knees' }).getAttribute('aria-pressed'), 'true')
+  check('and the list is still narrowed', await cards().count(), withKnees)
+  check('the screen says where it is kept and that it never leaves',
+    /kept on this device, so your day can use it. It is never\s*synced and never sent anywhere/.test(await dayText()), true)
+  /* And it never reaches the synced record, which is the whole point. */
+  const envelopes = await page.evaluate(() =>
+    Object.keys(localStorage).filter((k) => k.startsWith('forma-intimacy')),
+  )
+  check('it lives beside the switch, outside anything that syncs',
+    envelopes.includes('forma-intimacy-limits'), true)
+
+  console.log('\nasking the coach to choose from the list')
+  await page.getByLabel('Search').fill('something for a night when we are both exhausted')
+  await page.waitForTimeout(300)
+  check('the local search finds nothing for a sentence like that',
+    await cards().count(), 0)
+  const coachPanel = main().locator('section').filter({ hasText: 'Or say what you are after' })
+  check('so the coach is offered', await coachPanel.count(), 1)
+  check('and it says what is sent and what is not',
+    /What you are working around is not sent/.test(await coachPanel.innerText()), true)
+  await coachPanel.getByRole('button', { name: 'Ask the coach to choose' }).click()
+  await coachPanel.getByText('Neither person carries any weight.').waitFor({ timeout: 20000 })
+  const picked = await coachPanel.innerText()
+  check('it named two arrangements from the list', /Side by side, one behind/.test(picked), true)
+  check('and the id it invented reached no screen', /wheelbarrow|Invented/i.test(picked), false)
+
+  await page.getByLabel('Search').fill('')
+  await page.getByRole('button', { name: 'Knees' }).click()
+  await page.waitForTimeout(400)
+
   console.log('\nthe place the illustrations will go')
   /* Nothing is drawn yet, and the honest state is an empty frame per card
      rather than a stand-in drawing or a collapsed layout. Both halves are
      asserted: the frames are there, and no image is. */
-  check('every card keeps the space for one', await main().getByText('Illustration to come').count(),
-    await page.getByRole('article').count())
+  /* Scoped to the list for the same reason the counting is: the day's
+     suggestion and the coach's picks keep a frame each too, which is right and
+     is not what this check is about. */
+  const list = main().locator('section').filter({ hasText: 'Arrangements' })
+  check('every card keeps the space for one', await list.getByText('Illustration to come').count(),
+    await cards().count())
   check('and nothing was drawn to fill it', await main().locator('img').count(), 0)
   check('the screen says so once, rather than once a card',
     (await dayText()).match(/The illustrations are being drawn/g)?.length ?? 0, 1)
 
   console.log('\nthe search, which is the feature')
-  const before = await page.getByRole('article').count()
+  const before = await cards().count()
   await page.getByRole('button', { name: 'Knees' }).click()
   await page.waitForTimeout(300)
-  const after = await page.getByRole('article').count()
+  const after = await cards().count()
   check('naming a limitation shortens the list', after < before, true)
   check('and says how many were left out', /left out/.test(await dayText()), true)
   check('but never to nothing', after > 0, true)
@@ -1112,34 +1186,34 @@ try {
   /* A second axis narrows again: across axes the chips are requirements. */
   await page.getByRole('button', { name: 'Light', exact: true }).click()
   await page.waitForTimeout(300)
-  const andLight = await page.getByRole('article').count()
+  const andLight = await cards().count()
   check('a second axis narrows it further', andLight <= after, true)
   /* The cards, not the page: "Vigorous" is also the label on a chip that is
      still sitting there unpressed, and asserting over the whole screen would
      have been a test of the filter row rather than of the filter. */
   const cardText = async () =>
-    (await page.getByRole('article').allInnerTexts()).join(' ').replace(/\s+/g, ' ')
+    (await cards().allInnerTexts()).join(' ').replace(/\s+/g, ' ')
   const lightOnly = await cardText()
   check('and what is left is all light',
     /Light/.test(lightOnly) && !/Moderate|Vigorous/.test(lightOnly), true)
 
   await page.getByRole('button', { name: 'Clear it' }).first().click()
   await page.waitForTimeout(300)
-  check('clearing it puts the whole library back', await page.getByRole('article').count(), before)
+  check('clearing it puts the whole library back', await cards().count(), before)
 
   await page.getByLabel('Search').fill('pillow')
   await page.waitForTimeout(300)
-  const searched = await page.getByRole('article').count()
+  const searched = await cards().count()
   check('typing a word somebody would type finds something', searched > 0, true)
   check('and not everything', searched < before, true)
   await page.getByLabel('Search').fill('trampoline')
   await page.waitForTimeout(300)
-  check('a word that is in none of them finds none', await page.getByRole('article').count(), 0)
+  check('a word that is in none of them finds none', await cards().count(), 0)
   check('and offers a way back rather than a dead end',
     /Nothing matches all of that/.test(await dayText()), true)
   await main().getByRole('button', { name: 'Clear it' }).last().click()
   await page.waitForTimeout(300)
-  check('which works', await page.getByRole('article').count(), before)
+  check('which works', await cards().count(), before)
 
   console.log('\nwhat the day does with it')
   await page.goto(`${BASE}/day`, { waitUntil: 'networkidle' })
