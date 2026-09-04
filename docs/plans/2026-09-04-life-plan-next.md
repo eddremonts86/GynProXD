@@ -15,22 +15,26 @@ that already exist into features that work.
 
 ## 1. Merge, when the flow is finished
 
-`feat/member-pro`, pushed and not merged. Deliberately waiting: the flow is
-being finished before it lands.
+`feat/member-pro`, pushed and not merged. Item 11 was the last code on this
+list, so the flow it was waiting for is finished.
 
-Verified on the branch as it stands:
+Verified on the branch as it stands, 2026-09-04, after the push channel landed:
 
 | Check | Result |
 |---|---|
-| Unit tests | 856 pass |
+| Unit tests | 861 pass, 68 files |
 | `run.mjs rules` | 11 of 11 |
 | `run.mjs screens` | 22 of 22 |
 | Lint, types, build | clean |
 
-Two of the screens walks (`test-session`, `test-onboarding`) fail with 502s
-unless a sync server sits behind `/pb`. That is the harness, not the product:
-run them with `scripts/audit/sandbox-serve.mjs` and `POCKETBASE_URL` pointed at
-it and both pass.
+The screens walks were run against a built `dist` on port 3016 rather than the
+agent preview pane, which serves the repository root and not a worktree. Both
+`test-session` and `test-onboarding` pass there; they fail with 502s only when
+nothing sits behind `/pb`, which is the harness and not the product.
+
+Everything left on this list above item 7 is somebody's errand rather than a
+commit: two keys and four Stripe prices, one email to Stripe, an illustration
+commission, a privacy policy, and Google's verification.
 
 ## 2. The keys and the prices
 
@@ -178,12 +182,56 @@ it. Each provider panel also gained an accessible name, which the screen reader
 wanted anyway and which the walk needed to tell three "Read it again" buttons
 apart.
 
-## 11. Push from Google, and the cursor
+## 11. Push from Google — done, and the cursor is not coming
 
-Watch channels so a moved meeting appears without being asked for, plus the
-`cursor` column that makes an incremental read possible. They go together or
-neither: today every pull re-reads the whole three-week window, which is why
-no cursor is needed yet.
+Built and walked. Google opens a channel when the calendar is connected, says
+"this calendar changed" at `/api/enforma/calendar/google/notify`, and the day
+re-reads once as the screen next opens. A cron renews channels hourly and a
+disconnect closes one.
+
+**The notification carries no events, which is the whole reason it is cheap
+enough to want.** The server writes a date on the link; the device does the
+reading, because the device is the only thing that holds the member's day. So
+nothing about the privacy story moved: this server still keeps a token and two
+dates.
+
+Three things were settled by walking it rather than by reasoning about it:
+
+- **Two things have to agree before a notification is believed**: the signed
+  token the channel was opened with, which names the account, and the channel id
+  matching the one currently on the row. The second is what makes a rolled
+  channel's notifications useless while its signature is still good.
+- **Everything is answered 200**, including both forgeries. Anything else is
+  retried by Google with a backoff, and there is nothing to retry — saying more
+  would only tell whoever sent it which half of their guess was right.
+- **The `sync` handshake is not news.** Google sends one the moment a channel
+  opens; treating it as a change would have every member pull once for nothing
+  on every renewal.
+
+`GOOGLE_WATCH_ADDRESS` is the only new configuration and it is optional. Google
+pushes only to a domain verified in the Cloud project, which is a separate
+errand from item 6, so a server that has not done it leaves the variable unset:
+no channel, nothing failing, and the member keeps the "Read it again" they had
+before any of this existed.
+
+### The cursor, and why it stays unwritten
+
+This item asked for the `cursor` column too, "both together or neither". Only
+the push was built, and the reason is that a cursor does not fit this design
+rather than that it was too much work.
+
+`syncToken` cannot be combined with `timeMin`, `timeMax` or `orderBy` — the
+three parameters the three-week read is made of — and there is nowhere here to
+apply a delta to: the server stores no events, so the only copy that could be
+patched is the one on the device. `updatedMin` would fit the window, but the
+device replaces its whole mirror for a provider on every read and its blocks
+carry no event ids, so a delta would mean keying the day by Google's ids and
+merging two sets of blocks. That is a change to the day model to save bandwidth
+on a read already capped at 250 events.
+
+It stays unwritten until a read is expensive enough to be worth the merge. The
+reasoning is in `1758900000_calendar_watch.js`, where somebody adding the column
+will look first.
 
 ---
 

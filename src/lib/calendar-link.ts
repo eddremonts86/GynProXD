@@ -37,11 +37,20 @@ export interface CalendarStatus {
   connected: boolean
   account: string
   lastSynced: string | null
+  /**
+   * When the provider last said this calendar changed, with no read since.
+   *
+   * Google only, and only where the server holds a watch channel: it is set by
+   * a notification and cleared by the read that answers it. `null` means there
+   * is nothing outstanding, which is also what a provider that cannot push
+   * always says.
+   */
+  changed: string | null
 }
 
 export type CalendarStatuses = Record<CalendarProvider, CalendarStatus>
 
-const NOT_CONNECTED: CalendarStatus = { connected: false, account: '', lastSynced: null }
+const NOT_CONNECTED: CalendarStatus = { connected: false, account: '', lastSynced: null, changed: null }
 
 export type CalendarFailure =
   | 'no-account'
@@ -127,6 +136,9 @@ function oneStatus(raw: unknown): CalendarStatus {
     connected: row.connected === true,
     account: typeof row.account === 'string' ? row.account : '',
     lastSynced: typeof row.lastSynced === 'string' ? row.lastSynced : null,
+    /* Absent from a server that predates the channel, which reads as "no
+       news" — the same as a server that has one and nothing to report. */
+    changed: typeof row.changed === 'string' && row.changed !== '' ? row.changed : null,
   }
 }
 

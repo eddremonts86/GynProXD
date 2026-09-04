@@ -194,6 +194,17 @@ function envConfig() {
     tokenBase: $os.getenv('GOOGLE_TOKEN_BASE_URL') || 'https://oauth2.googleapis.com',
     apiBase: $os.getenv('GOOGLE_API_BASE_URL') || 'https://www.googleapis.com',
     appBase: String($os.getenv('APP_BASE_URL') || '').replace(/\/+$/, ''),
+    /**
+     * Where Google should push to, or empty.
+     *
+     * Its own variable rather than something derived from `appBase`, because
+     * Google will not push anywhere it has not been told about: the domain has
+     * to be verified in the Cloud project and the address registered with it.
+     * A server that has not done that leaves this unset, and the whole watch
+     * mechanism is then absent rather than failing — the member still has
+     * "Read it again", which is what they had before any of this existed.
+     */
+    watchAddress: String($os.getenv('GOOGLE_WATCH_ADDRESS') || '').trim(),
   }
 }
 
@@ -209,6 +220,101 @@ function linkFor(app, userId) {
   }
 }
 
+/* ── Push: the channel, and when it has to be replaced ─────────────────────── */
+
+/**
+ * How long a channel is asked to live.
+ *
+ * Google decides the real number and answers with it, so this is a request and
+ * `channelExpiry` is the truth. A week rather than the maximum, because a
+ * channel that outlives the grant behind it is a channel that pushes
+ * notifications nothing can act on.
+ */
+const WATCH_TTL_S = 7 * 24 * 60 * 60
+
+/**
+ * How close to expiry a channel gets replaced.
+ *
+ * A day, which is more than the renewal cron needs and enough that a server
+ * asleep or redeploying through the window still catches it. Renewing early
+ * costs one request; renewing late is a calendar that has quietly stopped
+ * telling anybody anything.
+ */
+const RENEW_MARGIN_MS = 24 * 60 * 60 * 1000
+
+function watchUrl(base) {
+  return String(base).replace(/\/+$/, '') + '/calendar/v3/calendars/primary/events/watch'
+}
+
+/**
+ * The channel Google is being asked to open.
+ *
+ * `token` comes back to us in `X-Goog-Channel-Token` on every notification and
+ * is the whole identity of the push: it is a signed state, the same mechanism
+ * the consent screen round trip uses, carrying the account and expiring with
+ * the channel. Google treats it as an opaque string.
+ */
+function watchBody(channelId, address, token, ttlSeconds) {
+  return JSON.stringify({
+    id: String(channelId),
+    type: 'web_hook',
+    address: String(address),
+    token: String(token),
+    params: { ttl: String(ttlSeconds || WATCH_TTL_S) },
+  })
+}
+
+function stopUrl(base) {
+  return String(base).replace(/\/+$/, '') + '/calendar/v3/channels/stop'
+}
+
+/**
+ * Closing a channel takes both ids.
+ *
+ * `resourceId` is Google's and arrives in the watch answer; the id we chose is
+ * not enough on its own, which is why it is a column rather than something
+ * recomputed.
+ */
+function stopBody(channelId, resourceId) {
+  return JSON.stringify({ id: String(channelId), resourceId: String(resourceId) })
+}
+
+/**
+ * When Google says the channel dies, in ms.
+ *
+ * `expiration` arrives as a string of milliseconds since the epoch. An answer
+ * without one is not a reason to refuse the channel — it is a reason to assume
+ * the TTL that was asked for and let the renewal cron correct it.
+ */
+function channelExpiry(json, nowMs, ttlSeconds) {
+  const raw = json && json.expiration
+  const parsed = Number(raw)
+  if (Number.isFinite(parsed) && parsed > nowMs) return parsed
+  return nowMs + (ttlSeconds || WATCH_TTL_S) * 1000
+}
+
+/**
+ * Whether a channel needs opening or replacing.
+ *
+ * No channel at all counts: a link connected while the address was unset, or
+ * one whose watch failed at connect time, is picked up by the same cron rather
+ * than needing its own repair path. So does an expiry that cannot be read —
+ * replacing a channel costs one request and being wrong the other way is a
+ * calendar that has quietly stopped telling anybody anything.
+ *
+ * Plain values rather than a record, so this can be tested without one.
+ * PocketBase renders a date field as `2026-09-04 11:22:33.000Z`, which is not
+ * what `Date` parses, hence the reshaping.
+ */
+function renewDue(channel, expiresAt, nowMs) {
+  if (!String(channel || '')) return true
+  const raw = String(expiresAt || '')
+  if (!raw) return true
+  const at = new Date(raw.replace(' ', 'T').replace(/Z?$/, 'Z')).getTime()
+  if (!Number.isFinite(at)) return true
+  return at - nowMs <= RENEW_MARGIN_MS
+}
+
 module.exports = {
   envConfig,
   linkFor,
@@ -221,4 +327,12 @@ module.exports = {
   eventsUrl,
   blockFrom,
   busyFrom,
+  WATCH_TTL_S,
+  RENEW_MARGIN_MS,
+  watchUrl,
+  watchBody,
+  stopUrl,
+  stopBody,
+  channelExpiry,
+  renewDue,
 }

@@ -2,7 +2,7 @@
 /**
  * A real calendar, read on the member's behalf.
  *
- * Four routes and one rule between them: **the refresh token never leaves this
+ * Five routes and one rule between them: **the refresh token never leaves this
  * process**. It arrives from Google, is sealed with `CALENDAR_SECRET` and
  * written to a collection PocketBase serves to nobody, and from then on it is
  * spent here to mint short-lived access tokens. Nothing any client can call
@@ -14,6 +14,14 @@
  *   GET  /api/enforma/calendar/status          → { connected, account, lastSynced }
  *   GET  /api/enforma/calendar/busy            → the next three weeks, as blocks
  *   POST /api/enforma/calendar/disconnect      → forgets it, and tells Google
+ *   POST /api/enforma/calendar/google/notify   → Google says the calendar moved
+ *
+ * The last one is the only route here with no session behind it and no session
+ * it could have: it is Google talking, not a member. What makes it trustworthy
+ * is the signed token the channel was opened with, plus the channel id matching
+ * the one on the row. What it does is write a date. Nothing about somebody's
+ * calendar is read on the strength of a notification — the device re-reads,
+ * because the device is the only thing that holds their day.
  *
  * `start` is a POST that answers with a URL rather than a redirect, because a
  * redirect would have to carry the caller's token in a query string to know who
@@ -115,6 +123,7 @@ routerAdd('GET', '/api/enforma/calendar/google/callback', (e) => {
     /* No name to show, which is not a reason to fail a connection. */
   }
 
+  let saved = null
   try {
     let row = linkFor(e.app, user.id)
     if (!row) {
@@ -125,9 +134,30 @@ routerAdd('GET', '/api/enforma/calendar/google/callback', (e) => {
     row.set('secret', $security.encrypt(String(payload.refresh_token), cfg.secret))
     row.set('account', account)
     row.set('last_synced', '')
+    row.set('changed_at', '')
     e.app.save(row)
+    saved = row
   } catch {
     return back('failed')
+  }
+
+  /**
+   * Ask Google to push, and do not care much whether it agreed.
+   *
+   * A reconnection lands here too, which is why `openChannel` closes whatever
+   * the row had before opening a new one: the same calendar pushing down two
+   * channels would have every change acted on twice.
+   *
+   * Nothing about the connection depends on this working. A server with no
+   * `GOOGLE_WATCH_ADDRESS`, or a domain Google has not verified, gives a member
+   * a calendar that reads when they ask it to, which is the whole of what this
+   * feature was before the channel existed.
+   */
+  try {
+    const { openChannel } = require(`${__hooks}/utils/google_watch.js`)
+    openChannel(e.app, cfg, saved, Date.now())
+  } catch {
+    /* Connected, unwatched. */
   }
   return back('connected')
 })
@@ -154,10 +184,22 @@ routerAdd('GET', '/api/enforma/calendar/status', (e) => {
       return { connected: false }
     }
     const synced = String(row.get('last_synced') || '')
+    const changed = String(row.get('changed_at') || '')
     return {
       connected: true,
       account: String(row.get('account') || ''),
       lastSynced: synced === '' ? null : synced,
+      /**
+       * There is news: Google said this calendar changed and no read has
+       * answered it yet. The screen that asks for status on the way in reads
+       * this and pulls once, which is the difference between a moved meeting
+       * appearing and a member having to know to press a button.
+       *
+       * A date rather than a boolean because it costs nothing and a stale one
+       * can be argued with. Only Google can set it; the other two answer null
+       * and their panels are identical to what they were.
+       */
+      changed: changed === '' ? null : changed,
     }
   }
   const google = one('google')
@@ -257,6 +299,10 @@ routerAdd('GET', '/api/enforma/calendar/busy', (e) => {
 
   try {
     row.set('last_synced', new Date().toISOString())
+    /* The news has been answered. Cleared after the events are in hand rather
+       than when the request arrived, so a read that failed halfway leaves the
+       change still outstanding and the next screen still pulls. */
+    row.set('changed_at', '')
     e.app.save(row)
   } catch {
     /* Bookkeeping only; the answer matters more. */
@@ -297,6 +343,23 @@ routerAdd('POST', '/api/enforma/calendar/disconnect', (e) => {
   } catch {
     /* Unopenable, and about to be deleted anyway. */
   }
+  /**
+   * Close the channel while the token still works.
+   *
+   * It has to happen before the revoke below and before the row is deleted: a
+   * channel is closed with an access token minted from this refresh token, and
+   * once Google has been told to forget the grant there is nothing left to mint
+   * one with. A channel left open pushes for up to a week at a server that can
+   * no longer attribute the notifications, which is only noise — but it is
+   * noise aimed at somebody who asked to be forgotten.
+   */
+  if (provider === 'google' && cfg) {
+    try {
+      require(`${__hooks}/utils/google_watch.js`).dropChannel(cfg, row)
+    } catch {
+      /* Told nobody. The channel expires on its own. */
+    }
+  }
   try {
     e.app.delete(row)
   } catch {
@@ -322,4 +385,86 @@ routerAdd('POST', '/api/enforma/calendar/disconnect', (e) => {
     }
   }
   return e.json(200, { connected: false })
+})
+
+/**
+ * Google, saying a calendar changed.
+ *
+ * A thin notification: headers and an empty body. It names the channel, echoes
+ * the token the channel was opened with, and says what happened in
+ * `X-Goog-Resource-State`. It carries no events, which is the whole reason this
+ * is cheap enough to want — the answer to it is a date on a row, and the device
+ * does the reading.
+ *
+ * **Two things have to agree before it is believed.** The token must verify
+ * against `CALENDAR_SECRET` and still be inside its window, which is what names
+ * the account; and the channel id must match the one currently on that
+ * account's row, compared in constant time. The second is what makes a
+ * yesterday's channel useless: every renewal replaces the id, so a notification
+ * for a channel that has been rolled is dropped even though its signature is
+ * still good.
+ *
+ * **Always 200.** Google retries anything else with a backoff, and there is
+ * nothing to retry: either this was a notification we could attribute, in which
+ * case it is recorded, or it was not, in which case saying so would only tell
+ * whoever sent it which halves of their guess were right. The one visible
+ * consequence of a forgery that got through would be one extra calendar read on
+ * the member's next screen.
+ */
+routerAdd('POST', '/api/enforma/calendar/google/notify', (e) => {
+  const done = () => e.json(200, { ok: true })
+  const { envConfig } = require(`${__hooks}/utils/google_calendar.js`)
+  const { verifyState } = require(`${__hooks}/utils/oauth_state.js`)
+  const cfg = envConfig()
+  if (!cfg) return done()
+
+  const channel = String(e.request.header.get('X-Goog-Channel-Id') || '')
+  const token = String(e.request.header.get('X-Goog-Channel-Token') || '')
+  const state = String(e.request.header.get('X-Goog-Resource-State') || '')
+  if (!channel || !token) return done()
+
+  const userId = verifyState(token, cfg.secret, Date.now())
+  if (!userId) return done()
+
+  let row = null
+  try {
+    row = e.app.findFirstRecordByFilter('calendar_links', 'owner = {:o} && provider = "google"', {
+      o: userId,
+    })
+  } catch {
+    return done()
+  }
+  if (!$security.equal(String(row.get('channel') || ''), channel)) return done()
+
+  /* `sync` is Google acknowledging the channel, sent once when it opens. It
+     means nothing changed, and treating it as news would have every member
+     pull once for nothing every time a channel is renewed. */
+  if (state === 'sync') return done()
+
+  try {
+    row.set('changed_at', new Date().toISOString())
+    e.app.save(row)
+  } catch {
+    /* Nothing to say to Google about it either way. */
+  }
+  return done()
+})
+
+/**
+ * Channels expire, so something has to replace them.
+ *
+ * Hourly, against a margin a day wide: the work is one request per member whose
+ * channel is nearly gone, most ticks do nothing, and a server that was asleep
+ * or redeploying through the window still catches it on the next one.
+ *
+ * It also picks up links that have no channel at all, which is how a connection
+ * made while `GOOGLE_WATCH_ADDRESS` was unset — or one whose watch failed at
+ * connect time — starts being pushed to without anybody repairing it by hand.
+ */
+cronAdd('calendarWatchRenew', '23 * * * *', () => {
+  const { renewAll } = require(`${__hooks}/utils/google_watch.js`)
+  const result = renewAll($app, Date.now())
+  if (!result.skipped && (result.renewed || result.failed)) {
+    console.log('[calendar] channels', JSON.stringify(result))
+  }
 })

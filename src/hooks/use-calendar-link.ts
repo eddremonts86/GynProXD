@@ -27,12 +27,20 @@ import type { BusyBlock } from '@/lib/life-profile'
  * A pull is never automatic on a timer. It costs a round trip through somebody
  * else's server on the member's behalf, and a day that silently rearranged
  * itself while they were reading it would be worse than one that is a refresh
- * out of date. `?calendar=connected` coming back from a consent screen is the
- * one moment a pull happens without being asked for, because that is exactly
- * what the member just said yes to. Which provider it came back from is not in
- * the URL, so whichever ones report connected and have nothing read yet are the
- * ones read: that is the same set, and it makes the return leg work for both
- * without a second query parameter to keep honest.
+ * out of date. Two moments are not timers, and both read without being asked:
+ *
+ *   `?calendar=connected` coming back from a consent screen, because that is
+ *   exactly what the member just said yes to. Which provider it came back from
+ *   is not in the URL, so whichever ones report connected and have nothing read
+ *   yet are the ones read: that is the same set, and it makes the return leg
+ *   work for both without a second query parameter to keep honest.
+ *
+ *   A provider reporting `changed` — Google, on a server holding a watch
+ *   channel, having been told by Google that the calendar moved. It is news
+ *   rather than a schedule: nothing is fetched unless something actually
+ *   changed, and it is read as this screen opens rather than under somebody
+ *   already looking at it. That is the whole of what the push buys, and it is
+ *   why the notification carries no events — see `calendar.pb.js`.
  */
 
 export type LinkState =
@@ -107,11 +115,16 @@ export function useCalendarLink(
          */
         if (!status.connected) onBlocks([], provider)
       }
-      /* The one automatic read, on the return leg of a consent screen. Apple
-         has no round trip to come back from, so it is never in this set. */
-      if (justConnected) {
-        for (const provider of ['google', 'microsoft'] as const) {
-          if (!caps.calendars[provider] || !answer[provider].connected) continue
+      /* The automatic reads. Apple has no round trip to come back from and no
+         way to be pushed to, so it is never in this set. */
+      const unasked = (['google', 'microsoft'] as const).filter(
+        (provider) =>
+          caps.calendars[provider] &&
+          answer[provider].connected &&
+          (justConnected || answer[provider].changed !== null),
+      )
+      if (unasked.length > 0) {
+        for (const provider of unasked) {
           put(provider, { kind: 'working' })
           const result = provider === 'microsoft' ? await pullMicrosoft(false) : await pullCalendar(false)
           if (!alive) return
@@ -124,7 +137,7 @@ export function useCalendarLink(
           if (!alive) return
           put(provider, {
             kind: 'connected',
-            status: after?.[provider] ?? { connected: true, account: '', lastSynced: null },
+            status: after?.[provider] ?? { connected: true, account: '', lastSynced: null, changed: null },
             pulled,
           })
         }
@@ -152,7 +165,7 @@ export function useCalendarLink(
     }
     const pulled = onBlocks(result.blocks, provider)
     const after = await calendarStatuses()
-    put(provider, { kind: 'connected', status: after?.[provider] ?? { connected: true, account: '', lastSynced: null }, pulled })
+    put(provider, { kind: 'connected', status: after?.[provider] ?? { connected: true, account: '', lastSynced: null, changed: null }, pulled })
   }
 
   const disconnect = async (provider: CalendarProvider) => {
@@ -197,7 +210,7 @@ export function useCalendarLink(
     const after = await calendarStatuses()
     put('apple', {
       kind: 'connected',
-      status: after?.apple ?? { connected: true, account: appleId, lastSynced: null },
+      status: after?.apple ?? { connected: true, account: appleId, lastSynced: null, changed: null },
       pulled,
     })
   }

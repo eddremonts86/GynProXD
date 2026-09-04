@@ -27,6 +27,14 @@ interface Shipped {
   eventsUrl: (base: string, nowMs: number) => string
   blockFrom: (event: unknown) => Block | null
   busyFrom: (json: unknown) => Block[]
+  WATCH_TTL_S: number
+  RENEW_MARGIN_MS: number
+  watchUrl: (base: string) => string
+  watchBody: (channel: string, address: string, token: string, ttl?: number) => string
+  stopUrl: (base: string) => string
+  stopBody: (channel: string, resource: string) => string
+  channelExpiry: (json: unknown, nowMs: number, ttl?: number) => number
+  renewDue: (channel: unknown, expiresAt: unknown, nowMs: number) => boolean
 }
 
 const shipped = { exports: {} as Shipped }
@@ -162,5 +170,62 @@ describe('busyFrom', () => {
     expect(out.map((b) => b.title)).toEqual(['Early', 'Late'])
     expect(google.busyFrom(null)).toEqual([])
     expect(google.busyFrom({ items: 'soon' })).toEqual([])
+  })
+})
+
+/**
+ * The push channel, which is the half that fails quietly.
+ *
+ * A wrong `renewDue` is the expensive one: too eager and every member's channel
+ * is replaced hourly for nothing, too shy and channels lapse and the calendar
+ * stops telling anybody anything with no error anywhere to notice.
+ */
+describe('the watch channel', () => {
+  it('asks for a web hook at our address, carrying the signed token', () => {
+    const body = JSON.parse(google.watchBody('chan-1', 'https://enforma.test/notify', 'u.1.mac'))
+    expect(body).toEqual({
+      id: 'chan-1',
+      type: 'web_hook',
+      address: 'https://enforma.test/notify',
+      token: 'u.1.mac',
+      params: { ttl: String(google.WATCH_TTL_S) },
+    })
+    expect(google.watchUrl('https://www.googleapis.com/')).toBe(
+      'https://www.googleapis.com/calendar/v3/calendars/primary/events/watch',
+    )
+  })
+
+  it('closes a channel with both ids, because ours alone will not do it', () => {
+    expect(JSON.parse(google.stopBody('chan-1', 'res-9'))).toEqual({ id: 'chan-1', resourceId: 'res-9' })
+    expect(google.stopUrl('https://www.googleapis.com')).toBe(
+      'https://www.googleapis.com/calendar/v3/channels/stop',
+    )
+  })
+
+  it("takes Google's expiry when there is one, and assumes the asked-for TTL when not", () => {
+    const now = 1_800_000_000_000
+    expect(google.channelExpiry({ expiration: String(now + 60_000) }, now)).toBe(now + 60_000)
+    /* Already gone, or unreadable: neither is a usable expiry. */
+    expect(google.channelExpiry({ expiration: String(now - 1) }, now)).toBe(now + google.WATCH_TTL_S * 1000)
+    expect(google.channelExpiry({ expiration: 'soon' }, now)).toBe(now + google.WATCH_TTL_S * 1000)
+    expect(google.channelExpiry({}, now)).toBe(now + google.WATCH_TTL_S * 1000)
+  })
+
+  it('renews inside the margin, and leaves a channel with time on it alone', () => {
+    const now = Date.parse('2026-09-04T00:00:00Z')
+    const at = (ms: number) => new Date(now + ms).toISOString().replace('T', ' ').replace('Z', 'Z')
+    expect(google.renewDue('chan', at(google.RENEW_MARGIN_MS + 60_000), now)).toBe(false)
+    expect(google.renewDue('chan', at(google.RENEW_MARGIN_MS - 60_000), now)).toBe(true)
+    expect(google.renewDue('chan', at(-60_000), now)).toBe(true)
+  })
+
+  it('treats a link with no channel, or one it cannot read, as due', () => {
+    const now = Date.parse('2026-09-04T00:00:00Z')
+    /* A connection made while the address was unset, or a watch that failed at
+       connect time. The cron is the only thing that repairs either. */
+    expect(google.renewDue('', '2030-01-01 00:00:00.000Z', now)).toBe(true)
+    expect(google.renewDue(null, null, now)).toBe(true)
+    expect(google.renewDue('chan', '', now)).toBe(true)
+    expect(google.renewDue('chan', 'whenever', now)).toBe(true)
   })
 })

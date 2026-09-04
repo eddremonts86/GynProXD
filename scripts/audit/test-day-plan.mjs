@@ -158,6 +158,13 @@ const google = {
      took away in their Google account fails: `invalid_grant`, 400. Cleared
      again by a fresh code exchange, because that is what reconnecting is. */
   grantWithdrawn: false,
+  /* The push channel, as Google would hold it: what was asked for, and what
+     has been asked to stop. `channel` carries the token the server signed,
+     which is what lets the walk forge a notification exactly as Google sends
+     one — the trust boundary cannot be walked without it. */
+  watchCalls: 0,
+  channel: null,
+  stopped: [],
 }
 /* RS256 in the header and a nonsense signature: the callback parses this
    without verifying it, and a parser that is handed `alg: none` is entitled to
@@ -208,6 +215,39 @@ const googleServer = http.createServer((req, res) => {
     google.revoked = true
     res.writeHead(200, { 'content-type': 'application/json' })
     res.end('{}')
+    return
+  }
+  /* Before the events catch-all below, and deliberately: a channel being
+     opened is not a read of anybody's calendar, and counting it as one would
+     make `eventCalls` mean two different things. */
+  if (url.pathname === '/calendar/v3/calendars/primary/events/watch') {
+    google.watchCalls += 1
+    let body = ''
+    req.on('data', (d) => (body += d))
+    req.on('end', () => {
+      const asked = JSON.parse(body || '{}')
+      google.channel = { id: asked.id, token: asked.token, address: asked.address, ttl: asked.params?.ttl }
+      res.writeHead(200, { 'content-type': 'application/json' })
+      res.end(JSON.stringify({
+        kind: 'api#channel',
+        id: asked.id,
+        resourceId: 'fake-resource-9',
+        resourceUri: 'https://www.googleapis.com/calendar/v3/calendars/primary/events',
+        token: asked.token,
+        expiration: String(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      }))
+    })
+    return
+  }
+  if (url.pathname === '/calendar/v3/channels/stop') {
+    let body = ''
+    req.on('data', (d) => (body += d))
+    req.on('end', () => {
+      google.stopped.push(JSON.parse(body || '{}'))
+      /* What Google answers: no content. */
+      res.writeHead(204)
+      res.end()
+    })
     return
   }
   if (url.pathname.startsWith('/calendar/v3/')) {
@@ -420,6 +460,10 @@ const pb = await startSandbox({
     GOOGLE_AUTH_BASE_URL: googleBase,
     GOOGLE_TOKEN_BASE_URL: googleBase,
     GOOGLE_API_BASE_URL: googleBase,
+    /* The address Google is told to push to. In production this is a domain
+       Google has verified; here it is the route itself, which is the only part
+       the code cares about. */
+    GOOGLE_WATCH_ADDRESS: `http://127.0.0.1:${pbPort}/api/enforma/calendar/google/notify`,
     APP_BASE_URL: BASE,
     CALENDAR_SECRET: 'walk-calendar-secret-32-chars-ok!'.slice(0, 32),
     CALDAV_BASE_URL: `http://127.0.0.1:${icloudServer.address().port}`,
@@ -888,6 +932,67 @@ try {
   check('status names the account and no secret',
     JSON.stringify(status.json).includes('fake-refresh-token'), false)
 
+  console.log('\nGoogle, saying the calendar moved')
+  /**
+   * The push, walked end to end and from the outside.
+   *
+   * The fake Google kept the token the server signed when it opened the
+   * channel, so the walk can send exactly what Google sends: headers, no body,
+   * and a resource state. That is the only way to walk the trust boundary —
+   * the three notifications that must be ignored are indistinguishable from
+   * the real one except in the two things the route actually checks.
+   */
+  const notify = (over = {}) =>
+    fetch(`${pb.base}/api/enforma/calendar/google/notify`, {
+      method: 'POST',
+      headers: {
+        'X-Goog-Channel-Id': over.channel ?? google.channel?.id ?? '',
+        'X-Goog-Channel-Token': over.token ?? google.channel?.token ?? '',
+        'X-Goog-Resource-State': over.state ?? 'exists',
+        'X-Goog-Resource-Id': 'fake-resource-9',
+        'X-Goog-Message-Number': String(over.number ?? 2),
+      },
+    }).then((r) => r.status)
+  const newsAt = async () => {
+    const answer = await pb.api('GET', '/api/enforma/calendar/status', undefined, memberToken)
+    return answer.json.providers.google.changed
+  }
+
+  check('a channel was opened when the calendar was connected', google.watchCalls, 1)
+  check('and Google was told to push at this server',
+    /\/api\/enforma\/calendar\/google\/notify$/.test(google.channel?.address ?? ''), true)
+  check('with a token it can hand back', typeof google.channel?.token, 'string')
+  check('there is no news before anybody says anything', await newsAt(), null)
+
+  /* Google acknowledging the channel. Treated as news it would make every
+     member pull once for nothing on every renewal. */
+  check('the handshake is answered', await notify({ state: 'sync' }), 200)
+  check('and is not news', await newsAt(), null)
+
+  /* The two forgeries. Both are answered 200, because saying anything else
+     tells whoever sent it which half of their guess was right. */
+  check('a notification naming another channel is answered', await notify({ channel: 'not-the-channel' }), 200)
+  check('and is dropped', await newsAt(), null)
+  check('a notification whose token does not verify is answered',
+    await notify({ token: `${'x'.repeat(15)}.${Date.now() + 60000}.forged` }), 200)
+  check('and is dropped', await newsAt(), null)
+
+  check('a real notification is answered', await notify(), 200)
+  const news = await newsAt()
+  check('and is news', typeof news, 'string')
+
+  /* The point of all of it: the day reads the calendar because Google said it
+     moved, without the member knowing to press anything. */
+  const readsBefore = google.eventCalls
+  await page.reload({ waitUntil: 'networkidle' })
+  await page.waitForTimeout(2500)
+  check('the day read the calendar without being asked', google.eventCalls > readsBefore, true)
+  check('and the news is answered, so the next screen does not read again', await newsAt(), null)
+  const quiet = google.eventCalls
+  await page.reload({ waitUntil: 'networkidle' })
+  await page.waitForTimeout(2500)
+  check('a reload with no news reads nothing', google.eventCalls, quiet)
+
   console.log('\na grant somebody took away')
   /* Revoked in their Google account rather than here, which is the case no
      walk covered: the row is still ours, the refresh token is not, and the
@@ -922,6 +1027,11 @@ try {
   await sheet().getByRole('button', { name: 'Disconnect' }).click()
   await sheet().getByRole('button', { name: 'Connect Google Calendar' }).waitFor({ timeout: 10000 })
   check('Google was told to forget it too', google.revoked, true)
+  /* And to stop pushing. It has to happen before the revoke: closing a channel
+     is authorised by an access token minted from the refresh token, and once
+     the grant is gone there is nothing left to mint one with. */
+  check('and to stop pushing at us',
+    google.stopped.some((c) => c.resourceId === 'fake-resource-9'), true)
   check('the row is gone', (await pb.api('GET', '/api/collections/calendar_links/records', undefined, pb.su)).json.totalItems, 0)
   await closeSheet()
   check('and the day it shaped is its own again', /19:00 to 20:00/.test(await dayText()), false)

@@ -54,6 +54,15 @@ three weeks become busy blocks on the member's own device, with titles left
 behind unless they ask for them. Disconnecting deletes the row and tells Google
 to revoke it. Google's verification for a sensitive scope is a person's job.
 
+`GOOGLE_WATCH_ADDRESS` is optional and adds one thing: Google telling the
+server a calendar moved, instead of waiting to be asked. It is the public
+HTTPS address of `/api/enforma/calendar/google/notify`, and Google will only
+push to a domain verified in the Cloud project — so leaving it unset is a
+supported state, not a broken one, and the member keeps the "Read it again"
+they always had. A notification carries no events: the server writes a date,
+and the day re-reads once when the screen next opens. Channels are renewed
+hourly by a cron and closed when a calendar is disconnected.
+
 Apple Calendar needs nothing beyond that 32-character `CALENDAR_SECRET`: iCloud
 has no OAuth, so a member generates an app-specific password at
 appleid.apple.com and types it in, the server verifies it with one `PROPFIND`
