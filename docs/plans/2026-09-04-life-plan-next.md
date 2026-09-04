@@ -138,11 +138,25 @@ Built and walked.
   travel — they filter the pool before and after — so it cannot put something
   unkind on screen and never learns what the body is working around.
 
-## 9. The revoked-grant walk
+## 9. The revoked-grant walk — done
 
-An afternoon. A withdrawn Google grant answers 409 and the screen says to
-connect it again, and no walk exercises that path because the fake Google never
-revokes. Teach it to, and assert the sentence.
+The fake Google can withdraw a grant now: the next refresh fails with
+`invalid_grant`, the way one taken away in somebody's Google account does, and
+a fresh code exchange clears it because that is what reconnecting is.
+
+Walking it settled a question the code had not answered. **The blocks stay.**
+The row is ours and only the credential is gone, so reconnecting is one button
+rather than a fresh start, and what the calendar already put on the day was
+true when it was read. The copy says exactly that: the calendar cannot be read
+again, and what it already put on your days stays until you reconnect or
+disconnect. Deleting it on one refusal would be harsher than the case deserves,
+and the stale-mirror rule still covers the case where the link is genuinely
+gone.
+
+It also caught an inconsistency: the titles switch said "on this device" and
+lived in component state, so a reload forgot it, and the round trip through
+Google's consent screen is a reload. It is stored on the device now, which is
+what it always said.
 
 ## 10. Microsoft Calendar
 

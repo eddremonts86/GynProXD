@@ -32,7 +32,8 @@ const FAILED: Record<
   unavailable: 'This server cannot connect a calendar.',
   refused: 'Part of Pro, and this account is not.',
   'not-connected': 'No calendar is connected to this account.',
-  withdrawn: 'The connection is no longer accepted. Connect it again.',
+  withdrawn:
+    'The connection is no longer accepted, so this calendar cannot be read again. What it already put on your days stays until you reconnect or disconnect.',
   unreachable: 'The calendar could not be reached. Nothing on your day changed.',
   rejected:
     'iCloud refused that. An app-specific password is not the same as your Apple ID password.',

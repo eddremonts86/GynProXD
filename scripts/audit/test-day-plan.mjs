@@ -149,7 +149,16 @@ await new Promise((r) => ticketmaster.listen(0, '127.0.0.1', r))
  * this evening that should reach the day, one this person declined, one all-day
  * birthday, and one the calendar itself marks free. Only the first blocks time.
  */
-const google = { tokenCalls: 0, eventCalls: 0, revoked: false, lastAuthUrl: '' }
+const google = {
+  tokenCalls: 0,
+  eventCalls: 0,
+  revoked: false,
+  lastAuthUrl: '',
+  /* Set by the walk to make the next refresh fail the way a grant somebody
+     took away in their Google account fails: `invalid_grant`, 400. Cleared
+     again by a fresh code exchange, because that is what reconnecting is. */
+  grantWithdrawn: false,
+}
 /* RS256 in the header and a nonsense signature: the callback parses this
    without verifying it, and a parser that is handed `alg: none` is entitled to
    refuse it outright. What Google sends is RS256, so that is what the fake
@@ -175,6 +184,12 @@ const googleServer = http.createServer((req, res) => {
     req.on('data', (d) => (body += d))
     req.on('end', () => {
       const refreshing = /grant_type=refresh_token/.test(body)
+      if (refreshing && google.grantWithdrawn) {
+        res.writeHead(400, { 'content-type': 'application/json' })
+        res.end(JSON.stringify({ error: 'invalid_grant', error_description: 'Token has been expired or revoked.' }))
+        return
+      }
+      if (!refreshing) google.grantWithdrawn = false
       res.writeHead(200, { 'content-type': 'application/json' })
       res.end(JSON.stringify({
         access_token: 'fake-access-token',
@@ -789,6 +804,35 @@ try {
   const status = await pb.api('GET', '/api/enforma/calendar/status', undefined, memberToken)
   check('status names the account and no secret',
     JSON.stringify(status.json).includes('fake-refresh-token'), false)
+
+  console.log('\na grant somebody took away')
+  /* Revoked in their Google account rather than here, which is the case no
+     walk covered: the row is still ours, the refresh token is not, and the
+     screen has to say which. */
+  google.grantWithdrawn = true
+  await openSheet()
+  await sheet().getByRole('button', { name: 'Read it again' }).click()
+  await sheet().getByText(/no longer accepted/).waitFor({ timeout: 20000 })
+  const withdrawn = await sheetText()
+  check('the screen says the calendar cannot be read again',
+    /cannot be read again/.test(withdrawn), true)
+  check('and says what it leaves on the day',
+    /stays until you reconnect or disconnect/.test(withdrawn), true)
+  check('the row is kept, so reconnecting is one button rather than a fresh start',
+    (await pb.api('GET', "/api/collections/calendar_links/records?filter=provider='google'", undefined, pb.su)).json.totalItems, 1)
+  await closeSheet()
+  check('and what it had already put on the day is still there',
+    /19:00 to 20:00/.test(await dayText()), true)
+
+  console.log('\nand reconnecting it')
+  await openSheet()
+  await sheet().getByRole('button', { name: 'Connect Google Calendar' }).click()
+  await page.waitForURL(/\/day\?calendar=connected/, { timeout: 20000 })
+  await sheet().waitFor({ timeout: 10000 })
+  await sheet().getByRole('button', { name: 'Read it again' }).waitFor({ timeout: 20000 })
+  check('reads again on the new grant', /no longer accepted/.test(await sheetText()), false)
+  await closeSheet()
+  check('and the day still holds the hour', /19:00 to 20:00/.test(await dayText()), true)
 
   console.log('\ndisconnecting')
   await openSheet()

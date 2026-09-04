@@ -61,6 +61,37 @@ export type PullResult =
   | { ok: false; why: CalendarFailure }
 
 const TIMEOUT_MS = 30_000
+
+/**
+ * Whether event titles are kept, on this device.
+ *
+ * The switch says "on this device" and it used to live in component state,
+ * which meant it said one thing and did another: a reload forgot it, and the
+ * round trip through Google's consent screen is a reload. It is a preference
+ * about what this device stores, so it is stored here — `localStorage`, never
+ * synced, because the answer belongs to the device rather than to the account.
+ *
+ * Not sensitive in itself: it says nothing about anybody, only about what they
+ * would rather have written down.
+ */
+const TITLES_KEY = 'forma-calendar-titles'
+
+export function keepTitlesStored(): boolean {
+  try {
+    return localStorage.getItem(TITLES_KEY) === 'yes'
+  } catch {
+    return false
+  }
+}
+
+export function setKeepTitlesStored(keep: boolean): void {
+  try {
+    if (keep) localStorage.setItem(TITLES_KEY, 'yes')
+    else localStorage.removeItem(TITLES_KEY)
+  } catch {
+    /* Private mode: the switch still works for this session. */
+  }
+}
 const CLOCK = /^([01]\d|2[0-3]):([0-5]\d)$/
 const DATE = /^\d{4}-\d{2}-\d{2}$/
 

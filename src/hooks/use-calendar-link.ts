@@ -5,8 +5,10 @@ import {
   calendarStatuses,
   connectApple,
   disconnectCalendar,
+  keepTitlesStored,
   pullApple,
   pullCalendar,
+  setKeepTitlesStored,
   type CalendarFailure,
   type CalendarProvider,
   type CalendarStatus,
@@ -53,7 +55,11 @@ export function useCalendarLink(
 ) {
   const caps = useSyncExternalStore(subscribeCapabilities, serverCapabilities, serverCapabilities)
   const [states, setStates] = useState<States>({ google: { kind: 'checking' }, apple: { kind: 'checking' } })
-  const [keepTitles, setKeepTitles] = useState(false)
+  const [keepTitles, setKeepTitlesState] = useState(keepTitlesStored)
+  const setKeepTitles = (keep: boolean) => {
+    setKeepTitlesStored(keep)
+    setKeepTitlesState(keep)
+  }
 
   const put = (provider: CalendarProvider, state: LinkState) =>
     setStates((current) => ({ ...current, [provider]: state }))
