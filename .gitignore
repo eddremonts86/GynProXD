@@ -43,3 +43,10 @@ scripts/import/out/
 
 # Worktrees other sessions open in here; not this repository's content.
 .claude/worktrees/
+
+# Any parked copy of a secret file. `.env.local` was ignored and
+# `.env.local.aside` was not, so a `git add -A` swept a live API key into a
+# public repository. The glob covers whatever the next parked name turns out
+# to be.
+.env*.aside
+.env.local.*
