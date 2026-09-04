@@ -130,12 +130,21 @@ describe('the library itself', () => {
     expect(searchActivities({ limitations: ['pregnancy', 'knees'] }).length).toBeGreaterThan(0)
   })
 
-  it('leaves something in every posture and both effort extremes', () => {
+  it('has at least five behind every chip on the screen', () => {
+    /* The floor the content has to keep, and the reason there are twenty
+       entries rather than sixteen. A filter that answers with one card reads as
+       broken rather than as selective, so every posture, every effort band and
+       both sides of facing have to offer a choice. This is the test that stops
+       the next entry quietly dropping one of them below it. */
+    const FLOOR = 5
     for (const posture of ['lying', 'seated', 'kneeling', 'standing'] as const) {
-      expect(searchActivities({ postures: [posture] }).length).toBeGreaterThan(0)
+      expect(searchActivities({ postures: [posture] }).length).toBeGreaterThanOrEqual(FLOOR)
     }
-    expect(searchActivities({ effort: ['light'] }).length).toBeGreaterThan(0)
-    expect(searchActivities({ effort: ['vigorous'] }).length).toBeGreaterThan(0)
+    for (const effort of ['light', 'moderate', 'vigorous'] as const) {
+      expect(searchActivities({ effort: [effort] }).length).toBeGreaterThanOrEqual(FLOOR)
+    }
+    expect(searchActivities({ facing: true }).length).toBeGreaterThanOrEqual(FLOOR)
+    expect(searchActivities({ facing: false }).length).toBeGreaterThanOrEqual(FLOOR)
   })
 
   it('has an illustration slot on every entry and no illustration in any of them', () => {

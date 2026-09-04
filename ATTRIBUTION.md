@@ -131,7 +131,7 @@ attribution for end users.
 ## Intimate activity illustrations (none yet)
 
 - **What**: nothing, today. Every entry in `src/data/intimacy.ts` carries an
-  `art` field and all sixteen are `null`; the cards draw an empty frame rather
+  `art` field and all twenty are `null`; the cards draw an empty frame rather
   than a stand-in.
 - **When there are some**: they are commissioned drawings, not stock and not
   photographs, and each one arrives with a `credit` and a `licence` on its own

@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils'
  * matters both ways. Collapsing it would make the list reflow the day art
  * arrives, and reviewing a design whose main visual element is imaginary is how
  * you end up with a card that only works without pictures. A dashed edge and
- * one quiet line are what stop sixteen of them reading as sixteen failures;
+ * one quiet line are what stop twenty of them reading as twenty failures;
  * `docs/intimacy-illustrations.md` is what they are waiting for.
  *
  * No stand-in artwork, ever. This product does not draw something approximate

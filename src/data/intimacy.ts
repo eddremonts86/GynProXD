@@ -157,13 +157,19 @@ export interface IntimateActivity {
 }
 
 /**
- * Sixteen entries, written rather than generated.
+ * Twenty entries, written rather than generated.
  *
- * It was eight, chosen to cover the range of effort. Sixteen covers the range
- * of *posture* as well, which is what the search added: somebody who cannot
- * kneel, cannot stand, or cannot lie flat should each find the list still has
- * something in it. Beyond this a longer list stops being a filter and starts
- * being a catalogue, which is a content decision with a person behind it.
+ * It was eight, chosen to cover the range of effort. Twenty is what it takes
+ * for every filter on the screen to be worth pressing: at least five entries
+ * behind each posture and each effort band, so that somebody who cannot kneel,
+ * cannot stand, cannot lie flat, or only wants something light is offered a
+ * choice rather than the one thing that happens to qualify. A filter that
+ * answers with a single card is a filter that looks broken.
+ *
+ * `intimacy-search.spec.ts` holds that floor, so the next entry added cannot
+ * quietly drop a posture below it. Beyond this a longer list stops being a
+ * filter and starts being a catalogue, which is a content decision with a
+ * person behind it.
  */
 export const INTIMATE_ACTIVITIES: IntimateActivity[] = [
   {
@@ -387,6 +393,62 @@ export const INTIMATE_ACTIVITIES: IntimateActivity[] = [
     avoidWith: ['knees', 'hips', 'lower-back', 'limited-mobility'],
     suits: ['wrists'],
     note: 'The most demanding of these on the legs, and the one a tired pair of quads will notice.',
+    art: null,
+  },
+  {
+    id: 'kneeling-supporting',
+    name: 'Kneeling, one supported astride',
+    description:
+      'One partner kneels upright and takes the other weight across their thighs; the other sits astride, arms around them.',
+    effort: 'vigorous',
+    postures: ['kneeling', 'seated'],
+    facing: true,
+    loads: ['quads', 'glutes', 'core', 'shoulders'],
+    avoidWith: ['knees', 'lower-back', 'hips', 'pregnancy'],
+    suits: ['wrists', 'neck'],
+    note: 'A folded blanket under the kneeling pair of knees is what makes it holdable for more than a moment.',
+    art: null,
+  },
+  {
+    id: 'supine-above-feet',
+    name: 'On the back, above, on the feet',
+    description:
+      'One partner lies on their back; the other crouches astride with both feet flat rather than kneeling, carrying their own weight through the legs.',
+    effort: 'vigorous',
+    postures: ['lying', 'standing'],
+    facing: true,
+    loads: ['quads', 'glutes', 'calves', 'core'],
+    avoidWith: ['knees', 'hips', 'limited-mobility'],
+    suits: ['lower-back', 'shoulders', 'wrists', 'neck'],
+    note: 'A deep squat held for any length of time is a leg exercise; the same arrangement on the shins is not.',
+    art: null,
+  },
+  {
+    id: 'standing-leg-raised',
+    name: 'Standing, facing, one leg supported',
+    description:
+      'Both partners stand facing each other; one raises a foot onto a step, a chair or the edge of a bed, and the other steadies them.',
+    effort: 'vigorous',
+    postures: ['standing'],
+    facing: true,
+    loads: ['quads', 'glutes', 'calves', 'core'],
+    avoidWith: ['hips', 'knees', 'limited-mobility'],
+    suits: ['wrists', 'neck'],
+    note: 'The height of whatever the foot goes on is the whole difficulty; a low step asks far less of the hip.',
+    art: null,
+  },
+  {
+    id: 'standing-supported',
+    name: 'Standing, one carried against a wall',
+    description:
+      'One partner stands and carries the other, who has their back against a wall and their legs around them. The wall takes most of the weight the arms would otherwise hold.',
+    effort: 'vigorous',
+    postures: ['standing'],
+    facing: true,
+    loads: ['quads', 'glutes', 'core', 'shoulders'],
+    avoidWith: ['lower-back', 'knees', 'hips', 'shoulders', 'wrists', 'limited-mobility', 'pregnancy'],
+    suits: [],
+    note: 'The most demanding arrangement on this list by a distance, and the wall is not optional.',
     art: null,
   },
 ]

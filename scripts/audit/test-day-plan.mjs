@@ -875,7 +875,7 @@ try {
   check('every card keeps the space for one', await main().getByText('Illustration to come').count(),
     await page.getByRole('article').count())
   check('and nothing was drawn to fill it', await main().locator('img').count(), 0)
-  check('the screen says so once, rather than sixteen times',
+  check('the screen says so once, rather than once a card',
     (await dayText()).match(/The illustrations are being drawn/g)?.length ?? 0, 1)
 
   console.log('\nthe search, which is the feature')

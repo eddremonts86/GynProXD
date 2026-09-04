@@ -102,7 +102,7 @@ export function intimacyVisible(pro: boolean, state = intimacyState()): boolean 
 /**
  * The activities that suit a body working around these things.
  *
- * Filtering rather than warning, because a warning on sixteen cards is sixteen
+ * Filtering rather than warning, because a warning on twenty cards is twenty
  * warnings nobody reads. What is filtered out is listed by count on the screen
  * so nobody wonders whether the list is broken.
  *

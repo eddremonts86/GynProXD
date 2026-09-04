@@ -10,7 +10,7 @@ is where the files go. Adding the first one is a file plus four lines.
 
 ## What is being drawn
 
-Sixteen illustrations, one per entry in `INTIMATE_ACTIVITIES`. Each shows how
+Twenty illustrations, one per entry in `INTIMATE_ACTIVITIES`. Each shows how
 two adults are arranged: the posture, what is supporting what, and where the
 weight is. They sit beside a paragraph that already describes the arrangement
 in words, so the drawing carries the geometry rather than the explanation.
@@ -32,7 +32,7 @@ is priced in `docs/plans/2026-09-03-life-plan-v2.md`.
 - Anatomical rather than erotic. Nothing explicit is depicted; the framing is
   the same one a clinician's leaflet uses.
 - Neutral, non-specific bodies. Vary body size and skin tone across the set
-  rather than drawing sixteen of the same couple. Nothing that reads as a
+  rather than drawing twenty of the same couple. Nothing that reads as a
   particular gender pairing where the arrangement does not require one.
 - Two flat tones plus one accent, working on both a light `#ecebe8` and a dark
   `#141412` background. Either supply one drawing that works on both, or two
@@ -79,7 +79,7 @@ happen.
 
 Nothing has been ordered. This list is what to price, not a recommendation.
 
-1. **One illustrator, sixteen drawings, fixed fee.** Cheapest per drawing and
+1. **One illustrator, twenty drawings, fixed fee.** Cheapest per drawing and
    the only route that gives one consistent hand across the set. Ask for a
    sample of two before the rest.
 2. **A generative model, then an illustrator to correct and unify.** Most
@@ -88,7 +88,7 @@ Nothing has been ordered. This list is what to price, not a recommendation.
    before it is a plan. If it is allowed, the model does the rough and a
    person makes the set coherent and the props correct.
 3. **Licensing an existing medical or wellness illustration set.** Likely to
-   cover a fraction of the sixteen arrangements, and the ones it covers will
+   cover a fraction of the twenty arrangements, and the ones it covers will
    not match the others in style.
 
 Whatever the route, the acceptance test is the same: hold each drawing beside

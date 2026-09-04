@@ -14,7 +14,7 @@ import {
  * and was unanswerable — "something where nobody has to kneel", "something
  * light", "something facing each other" — so the search is those axes and no
  * more. There is no external source to call: this is a written library of
- * sixteen entries and every field it can be searched on is in it.
+ * twenty entries and every field it can be searched on is in it.
  *
  * Every axis narrows, and an empty axis means "no opinion". Within one axis the
  * values are alternatives (light *or* moderate); across axes they are
