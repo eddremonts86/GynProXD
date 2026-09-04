@@ -17,6 +17,13 @@ import { todayIso } from '../lib/dates'
 import { withRecordIds } from '../lib/records'
 import type { ActiveChallenge, Challenge } from '../lib/challenge'
 import type { FitnessTestResult } from '../lib/fitness-test'
+import {
+  emptyLifeProfile,
+  MAX_BUSY,
+  type Anchor,
+  type BusyBlock,
+  type LifeProfile,
+} from '../lib/life-profile'
 import type { StoryProgress, TrackId } from '../lib/story'
 
 export const DAYS: DayOfWeek[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
@@ -81,6 +88,57 @@ interface GymState {
   challenges: ActiveChallenge[]
   fitnessTest: FitnessTestResult | null
   setFitnessTest: (result: FitnessTestResult | null) => void
+  /**
+   * The hours somebody does not control. Input, not a derivation: the day plan
+   * is computed from this every time it is drawn, so there is nothing else to
+   * keep in step and nothing to merge but the anchors themselves.
+   */
+  lifeProfile: LifeProfile | null
+  updateLifeProfile: (patch: Partial<Omit<LifeProfile, 'updatedAt'>>) => void
+  /**
+   * A new anchor, whose id this mints.
+   *
+   * The id used to be invented by whichever component was saving, which was
+   * two components doing the same thing slightly differently and a lint rule
+   * pointing out that one of them was doing it during a render. A store is
+   * where a new row gets its identity everywhere else in this file.
+   */
+  addAnchor: (anchor: Omit<Anchor, 'id'>) => string
+  saveAnchor: (anchor: Anchor) => void
+  removeAnchor: (id: string) => void
+  /**
+   * Adds imported calendar blocks, dropping what is past and what is already
+   * there, and returns how many were actually new.
+   *
+   * The pruning is here rather than in the import screen because it is a fact
+   * about the record, not about a screen: the profile is one synced row with
+   * arrays inside it, and yesterday's meetings are weight it should not carry
+   * on every sync for the rest of the account's life.
+   */
+  importBusy: (blocks: readonly Omit<BusyBlock, 'id'>[], today: string) => number
+  /**
+   * The connected calendar's answer, mirrored rather than merged.
+   *
+   * Every `google` block is replaced by what the pull returned and everything
+   * else is left where it is. That is the difference between a connection and
+   * an import: a meeting moved in Google has to move here, and one deleted
+   * there has to disappear, neither of which a merge can do. Blocks from a
+   * file somebody picked are still theirs to keep or forget.
+   */
+  syncCalendarBusy: (
+    blocks: readonly Omit<BusyBlock, 'id'>[],
+    today: string,
+    source: 'google' | 'apple' | 'microsoft',
+  ) => number
+  /**
+   * Forgets the blocks a file put there, and only those.
+   *
+   * A connected calendar is forgotten by disconnecting it, which is a different
+   * button in a different place saying a different thing. Wiping any of them
+   * from one of the others would take away something the member did not ask
+   * about.
+   */
+  clearBusy: () => void
   story: StoryProgress | null
   startStory: (programId: string) => void
   leaveStory: () => void
@@ -111,6 +169,121 @@ export const useGym = create<GymState>()((set, get) => ({
       story: null,
 
       setFitnessTest: (result) => set({ fitnessTest: result }),
+
+      lifeProfile: null,
+      updateLifeProfile: (patch) =>
+        set((s) => ({
+          lifeProfile: {
+            ...(s.lifeProfile ?? emptyLifeProfile()),
+            ...patch,
+            updatedAt: new Date().toISOString(),
+          },
+        })),
+      addAnchor: (anchor) => {
+        const id = `anchor-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`
+        set((s) => {
+          const base = s.lifeProfile ?? emptyLifeProfile()
+          return {
+            lifeProfile: {
+              ...base,
+              anchors: [...base.anchors, { ...anchor, id }],
+              updatedAt: new Date().toISOString(),
+            },
+          }
+        })
+        return id
+      },
+      /* Upsert by id, so the editor can save an edited anchor without knowing
+         whether it is still there. New ones go through `addAnchor`. */
+      saveAnchor: (anchor) =>
+        set((s) => {
+          const base = s.lifeProfile ?? emptyLifeProfile()
+          const anchors = base.anchors.some((a) => a.id === anchor.id)
+            ? base.anchors.map((a) => (a.id === anchor.id ? anchor : a))
+            : [...base.anchors, anchor]
+          return { lifeProfile: { ...base, anchors, updatedAt: new Date().toISOString() } }
+        }),
+      importBusy: (blocks, today) => {
+        let added = 0
+        set((s) => {
+          const base = s.lifeProfile ?? emptyLifeProfile()
+          const kept = (base.busy ?? []).filter((b) => b.date >= today)
+          const seen = new Set(kept.map((b) => `${b.date}|${b.start}|${b.end}`))
+          const next = [...kept]
+          for (const block of blocks) {
+            if (block.date < today) continue
+            const key = `${block.date}|${block.start}|${block.end}`
+            if (seen.has(key)) continue
+            if (next.length >= MAX_BUSY) break
+            seen.add(key)
+            next.push({
+              ...block,
+              id: `busy-${block.date}-${block.start.replace(':', '')}-${next.length}`,
+            })
+            added += 1
+          }
+          next.sort((a, b) => a.date.localeCompare(b.date) || a.start.localeCompare(b.start))
+          return { lifeProfile: { ...base, busy: next, updatedAt: new Date().toISOString() } }
+        })
+        return added
+      },
+      syncCalendarBusy: (blocks, today, source) => {
+        let kept = 0
+        /* An empty pull against a provider that has nothing stored is a no-op,
+           not a write: the sheet asks on every opening and a profile touched
+           each time would cost a sync for nothing. */
+        if (blocks.length === 0) {
+          const held = get().lifeProfile?.busy ?? []
+          if (!held.some((b) => b.source === source)) return 0
+        }
+        set((s) => {
+          const base = s.lifeProfile ?? emptyLifeProfile()
+          /* Only this provider's blocks are replaced. The other one's, and
+             anything a file put there, are not this pull's to touch. */
+          const others = (base.busy ?? []).filter((b) => b.source !== source && b.date >= today)
+          const mine: BusyBlock[] = []
+          const seen = new Set<string>()
+          const prefix = source === 'apple' ? 'ical' : source === 'microsoft' ? 'mscal' : 'gcal'
+          for (const block of blocks) {
+            if (block.date < today) continue
+            const key = `${block.date}|${block.start}|${block.end}`
+            if (seen.has(key)) continue
+            if (others.length + mine.length >= MAX_BUSY) break
+            seen.add(key)
+            mine.push({ ...block, source, id: `${prefix}-${block.date}-${block.start.replace(':', '')}-${mine.length}` })
+          }
+          kept = mine.length
+          const next = [...others, ...mine].sort(
+            (a, b) => a.date.localeCompare(b.date) || a.start.localeCompare(b.start),
+          )
+          return { lifeProfile: { ...base, busy: next, updatedAt: new Date().toISOString() } }
+        })
+        return kept
+      },
+      clearBusy: () =>
+        set((s) =>
+          s.lifeProfile
+            ? {
+                lifeProfile: {
+                  ...s.lifeProfile,
+                  busy: (s.lifeProfile.busy ?? []).filter((b) => b.source !== 'ics'),
+                  updatedAt: new Date().toISOString(),
+                },
+              }
+            : {},
+        ),
+      removeAnchor: (id) =>
+        set((s) =>
+          s.lifeProfile
+            ? {
+                lifeProfile: {
+                  ...s.lifeProfile,
+                  anchors: s.lifeProfile.anchors.filter((a) => a.id !== id),
+                  updatedAt: new Date().toISOString(),
+                },
+              }
+            : {},
+        ),
 
       /* One story at a time: two parallel narratives would be two streaks
          competing, which is how both get abandoned. */
@@ -506,6 +679,7 @@ export interface GymSnapshot {
   challenges: ActiveChallenge[]
   fitnessTest: FitnessTestResult | null
   story: StoryProgress | null
+  lifeProfile: LifeProfile | null
 }
 
 export const EMPTY_SNAPSHOT: GymSnapshot = {
@@ -519,6 +693,7 @@ export const EMPTY_SNAPSHOT: GymSnapshot = {
   challenges: [],
   fitnessTest: null,
   story: null,
+  lifeProfile: null,
 }
 
 export function snapshotGym(state: GymState = useGym.getState()): GymSnapshot {
@@ -533,6 +708,7 @@ export function snapshotGym(state: GymState = useGym.getState()): GymSnapshot {
     challenges: state.challenges,
     fitnessTest: state.fitnessTest,
     story: state.story,
+    lifeProfile: state.lifeProfile,
   }
 }
 
@@ -549,6 +725,7 @@ export function hydrateGym(snapshot: Partial<GymSnapshot> | null | undefined): v
     challenges: snapshot?.challenges ?? [],
     fitnessTest: snapshot?.fitnessTest ?? null,
     story: snapshot?.story ?? null,
+    lifeProfile: snapshot?.lifeProfile ?? null,
   }
   populateByIdCache(next.customExercises)
   useGym.setState(next)

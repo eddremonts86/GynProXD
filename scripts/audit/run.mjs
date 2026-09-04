@@ -41,6 +41,7 @@ const GROUPS = {
     'scheduled-boundary',
     'operators-boundary',
     'branding-boundary',
+    'pro-boundary',
   ],
   screens: [
     'test-gate',
@@ -55,6 +56,8 @@ const GROUPS = {
     'test-branding',
     'test-enterprise-apply',
     'test-enterprise-rooms',
+    'test-pro',
+    'test-day-plan',
     'test-billing-button',
     'gym-programme-boundary',
     'aurora-contrast',

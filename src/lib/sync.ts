@@ -12,6 +12,7 @@ import {
   toBase64,
   type CipherBlob,
 } from './crypto'
+import { refreshCapabilities } from './capabilities'
 import { recordKey, type Collection, type RecordMeta } from './records'
 import { listEnvelopes, writeRemoteEnvelope, type EnvelopeRow } from './record-store'
 import {
@@ -26,6 +27,7 @@ import {
   setActiveGymName,
 } from './profiles'
 import { useMessages, type PublishInput } from '../store/useMessages'
+import { useSession } from '../store/useSession'
 import { useMenus } from '../store/useMenus'
 import {
   clearResponseDirty,
@@ -95,13 +97,46 @@ export function readSyncLink(profileId: string): SyncLink | null {
   }
 }
 
+/**
+ * Tells the session store whether the active profile has an account.
+ *
+ * The link itself lives in localStorage, which nothing re-renders on. Two
+ * panels on the Settings screen read it, and before this existed only the one
+ * that wrote it found out it had changed: creating an account left the
+ * subscription panel underneath still telling somebody to go and create one.
+ *
+ * Guarded on the profile being the active one, the same way `setActiveGymName`
+ * is: a write for a profile that has since been locked must not relabel the
+ * next one.
+ */
+function publishLinked(profileId: string, linked: boolean): void {
+  if (useSession.getState().profileId === profileId) {
+    useSession.getState().refreshMeta({ linked })
+  }
+}
+
 function writeSyncLink(profileId: string, link: SyncLink): void {
+  /* A new server is a new set of capabilities. The shell probes them on
+     unlock, but an account created or signed into after that would have left
+     the app believing whatever the previous server, or no server, had said,
+     until the next unlock. Cursor updates hit the same server and skip this. */
+  const before = readSyncLink(profileId)
   localStorage.setItem(linkKey(profileId), JSON.stringify(link))
+  publishLinked(profileId, true)
+  if (!before || before.server !== link.server) void refreshCapabilities(link.server)
 }
 
 /** Forgets the account on this device. Local rows stay exactly as they are. */
 export function unlinkSync(profileId: string): void {
   localStorage.removeItem(linkKey(profileId))
+  publishLinked(profileId, false)
+}
+
+/** What this device already knows, applied on unlock before anybody is asked. */
+export function adoptSyncLink(profileId: string): boolean {
+  const linked = readSyncLink(profileId) !== null
+  publishLinked(profileId, linked)
+  return linked
 }
 
 export function normalizeServer(input: string): string {

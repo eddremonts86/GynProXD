@@ -191,6 +191,16 @@ measure, and pulls in to `82rem` for the sections you read rather than scan. Bel
 active item is a charcoal pill. Sections stack with `gap-8`; metric grids use
 `gap-4` between floating tiles. Full-height surfaces use `min-h-[100dvh]`.
 
+## Insets
+
+Text never sits against the edge of the box that holds it. Inside a card
+(`Panel` at `lg`, `p-5 md:p-6`) a list row carries the same horizontal inset as
+the card, `px-5`, and at least `py-3.5`; `p-3` is for icon buttons, not for
+rows with words in them. A label pinned to an edge (`right-4`, not `right-2`)
+keeps a full step of air. A paragraph field is `Textarea`: `px-4 py-3.5`,
+relaxed leading, never a raw `<textarea>` with its own classes. Text that could
+outgrow its box truncates on one line rather than wrapping into the next row.
+
 ## Motion
 
 Motion confirms state and nothing else: 150ms colour transitions, a 180ms

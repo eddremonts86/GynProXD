@@ -40,6 +40,52 @@ supersets; timelines and safe rates stay computed locally and every movement id
 is validated against the catalogue. No key, a timeout or an invalid response
 all fall back to the built-in deterministic generator.
 
+In production the key sits on the sync server as `COACH_API_KEY`, with
+`COACH_BASE_URL` and `COACH_MODEL` naming any OpenAI-compatible vendor
+(DeepSeek: `https://api.deepseek.com/v1`, `deepseek-chat`). The same coach
+reads a Pro member's day on `/day` when they ask it to, and says on screen
+whether their day leaves the building. See `.env.example`.
+
+`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI` and a
+32-character `CALENDAR_SECRET` let a member connect Google Calendar from
+`/day`. The scope is `calendar.events.readonly`; the refresh token is sealed
+with that key and written to a collection the API serves to nobody; the next
+three weeks become busy blocks on the member's own device, with titles left
+behind unless they ask for them. Disconnecting deletes the row and tells Google
+to revoke it. Google's verification for a sensitive scope is a person's job.
+
+`GOOGLE_WATCH_ADDRESS` is optional and adds one thing: Google telling the
+server a calendar moved, instead of waiting to be asked. It is the public
+HTTPS address of `/api/enforma/calendar/google/notify`, and Google will only
+push to a domain verified in the Cloud project — so leaving it unset is a
+supported state, not a broken one, and the member keeps the "Read it again"
+they always had. A notification carries no events: the server writes a date,
+and the day re-reads once when the screen next opens. Channels are renewed
+hourly by a cron and closed when a calendar is disconnected;
+`POST /api/enforma/calendar/channels/renew` runs the same pass on demand for a
+superuser, which is how "are channels being replaced?" gets answered without
+waiting for the top of an hour.
+
+Apple Calendar needs nothing beyond that 32-character `CALENDAR_SECRET`: iCloud
+has no OAuth, so a member generates an app-specific password at
+appleid.apple.com and types it in, the server verifies it with one `PROPFIND`
+before storing it sealed, and reads the next three weeks over CalDAV. That read
+relays the raw iCalendar to the device, which parses it with the same reader the
+file import uses, because resolving a recurrence rule into wall-clock hours
+needs a timezone database the browser has and the server does not. Revoking is
+one click in their Apple ID.
+
+`MICROSOFT_CLIENT_ID`, `MICROSOFT_CLIENT_SECRET` and `MICROSOFT_REDIRECT_URI`
+add the third calendar, on the same table and the same shape as Google:
+`Calendars.Read` and `offline_access`, no sensitive-scope verification to wait
+for. The device tells it which timezone it is in, because Graph returns naive
+times and a zone name rather than an offset per instance.
+
+`TICKETMASTER_API_KEY` on the same server turns on the strip under `/day`:
+ticketed events within 25 km of a cell the device rounds its position to, or
+around a city typed by hand, cached per cell for six hours. A tap puts one on
+the day as an outing, and the reading above hears about what is on tonight.
+
 ## Features
 
 - **Plan builder.** Describe your situation in free text ("40 years old, 140kg,
@@ -68,6 +114,34 @@ all fall back to the built-in deterministic generator.
   push-server seam).
 - **Local profiles.** Per-person encrypted stores on one device, with a lock
   screen, passphrase-gated unlock and one-time migration of pre-profile data.
+
+### Pro, for members
+
+A subscription on the account, EUR 15 a month, tax added at checkout. What it
+buys is a day rather than more of the gym:
+
+- **Your day.** Tell it the hours you do not choose — work, the commute, the
+  school run — and it arranges the session, the day's plate and the challenge
+  day in what is left. It does not fill the day: free time stays free and what
+  did not fit is said out loud rather than dropped.
+- **Describe your week.** One paragraph read into proposed fixed hours, by
+  regexes always and by the coach when the server has one. Nothing is saved
+  until you tap it, and anything worked out rather than quoted is labelled.
+- **Calendars, as files.** Export from whichever calendar you use and pick the
+  file: it reads three weeks ahead, keeps only what blocks time, and shows the
+  titles without storing them unless you ask. The day exports back out the same
+  way. No OAuth, no token on our server that can read your calendar.
+- **What is on locally.** A gym event you said yes to blocks the time you said
+  yes to. An invitation you have not answered stays in the inbox.
+- **Intimate activity.** Arrangements described plainly and filtered by what
+  your body is working around, which is the useful part. Off until you turn it
+  on, adults only, and the switch never leaves the device. Nothing is recorded,
+  nothing is counted, and no calorie figure is printed because the honest one is
+  far below what magazines claim.
+
+Entitlement is one date on the account, so a device that cannot reach the server
+still knows where it stands, with a fortnight of grace. Paying is Stripe's
+hosted checkout: there is no card field anywhere in this codebase.
 
 ## Exercise imagery & data licensing
 

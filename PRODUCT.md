@@ -25,7 +25,7 @@ Local-first, realistic, hybrid. Unlike cloud trackers that promise miracles, enF
 ## Operating Context
 
 - Web SPA: Vite 8 + React 19 + TypeScript + TanStack Router/Query + Zustand (memory) + Tailwind v4. No backend. Local profiles with passphrase-derived AES-GCM encryption at rest; the old plaintext `gynproxd-v2` store migrates into the first profile. PWA via vite-plugin-pwa (Workbox, jsDelivr image cache).
-- Routes: `/` Today and the live session, `/onboarding` (plan builder), `/generated/$id` (calendar), `/planner` (weekly), `/library` (873), `/history`, `/settings`. Onboarding is reached from empty states and Settings rather than from the navigation, because it is a setup flow rather than a destination.
+- Routes: `/` Today and the live session, `/onboarding` (plan builder), `/generated/$id` (calendar), `/planner` (weekly), `/library`, `/history`, `/settings`, plus the Pro surfaces `/day`, `/day/intake` and `/intimacy`. Onboarding is reached from empty states and Settings rather than from the navigation, because it is a setup flow rather than a destination.
 - Workflows: onboarding → estimation card → generate → calendar → save to planner → start workout from plan → log sets → finish → history.
 - Materials: exercise data from `yuhonas/free-exercise-db` via jsDelivr, RepDB flat illustrations bundled locally, both lazy-loaded. No decorative illustration is generated to stand in for a movement that has none.
 - Rituals: weekly planning, mid-workout logging with rest timer 90s and wake lock.

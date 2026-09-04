@@ -27,6 +27,9 @@ dev-dist
 # saas-review walker evidence (screenshots, local only)
 docs/ui-audit/evidence/
 
+# Worktrees live inside .claude/, which is otherwise tracked.
+.claude/worktrees/
+
 # PocketBase local dev runtime (binary + data)
 deploy/pocketbase/.local/
 pb_data/
