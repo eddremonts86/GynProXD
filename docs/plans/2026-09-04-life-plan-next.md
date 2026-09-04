@@ -15,14 +15,14 @@ that already exist into features that work.
 
 ## 1. Merge, when the flow is finished
 
-`feat/member-pro`, thirteen commits, pushed and not merged. Deliberately
-waiting: the flow is being finished before it lands.
+`feat/member-pro`, pushed and not merged. Deliberately waiting: the flow is
+being finished before it lands.
 
 Verified on the branch as it stands:
 
 | Check | Result |
 |---|---|
-| Unit tests | 815 pass |
+| Unit tests | 835 pass |
 | `run.mjs rules` | 11 of 11 |
 | `run.mjs screens` | 22 of 22 |
 | Lint, types, build | clean |

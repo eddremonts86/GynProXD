@@ -229,6 +229,13 @@ export const useGym = create<GymState>()((set, get) => ({
       },
       syncCalendarBusy: (blocks, today, source) => {
         let kept = 0
+        /* An empty pull against a provider that has nothing stored is a no-op,
+           not a write: the sheet asks on every opening and a profile touched
+           each time would cost a sync for nothing. */
+        if (blocks.length === 0) {
+          const held = get().lifeProfile?.busy ?? []
+          if (!held.some((b) => b.source === source)) return 0
+        }
         set((s) => {
           const base = s.lifeProfile ?? emptyLifeProfile()
           /* Only this provider's blocks are replaced. The other one's, and

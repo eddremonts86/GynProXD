@@ -846,6 +846,27 @@ try {
   check("iCloud's hour is still on the day", /16:00 to 17:00/.test(both), true)
   check("and Google's is on it too", /19:00 to 20:00/.test(both), true)
 
+  console.log('\na mirror of a calendar nobody can check')
+  /* A link deleted anywhere but here — another device, a password revoked in
+     Apple's own settings, a restored backup — has to reach this device too, and
+     the blocks it mirrored have to go with it. Deleted from under the app on
+     purpose, which is the only way to arrange that. */
+  const appleRow = (await pb.api('GET', "/api/collections/calendar_links/records?filter=provider='apple'", undefined, pb.su)).json.items[0]
+  await pb.api('DELETE', `/api/collections/calendar_links/records/${appleRow.id}`, undefined, pb.su)
+  await page.reload({ waitUntil: 'networkidle' })
+  await page.getByRole('heading', { name: 'Your day', level: 1 }).waitFor({ timeout: 10000 })
+  await page.waitForTimeout(2000)
+  check('the hours it put on the day are gone with it', /16:00 to 17:00/.test(await dayText()), false)
+  check("and Google's, which is still connected, are not", /19:00 to 20:00/.test(await dayText()), true)
+  /* Connected again, so the section below has something to disconnect. */
+  await openSheet()
+  await sheet().getByLabel('Apple ID').fill('diary@icloud.test')
+  await sheet().getByLabel('App-specific password').fill(APP_PASSWORD)
+  await sheet().getByRole('button', { name: 'Connect Apple Calendar' }).click()
+  await sheet().getByRole('button', { name: 'Read it again' }).last().waitFor({ timeout: 20000 })
+  await closeSheet()
+  check('and it comes back when it is connected again', /16:00 to 17:00/.test(await dayText()), true)
+
   console.log('\ndisconnecting one of them')
   await openSheet()
   /* The Apple panel is the second of the two, so its buttons are the last. */

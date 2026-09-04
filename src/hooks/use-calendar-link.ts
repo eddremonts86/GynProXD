@@ -63,6 +63,14 @@ export function useCalendarLink(
     void (async () => {
       const answer = await calendarStatuses()
       if (!alive) return
+      if (!answer) {
+        /* Could not ask. Nothing is claimed and nothing is dropped: the blocks
+           on the day stay exactly as they are until somebody can be asked. */
+        for (const provider of ['google', 'apple'] as const) {
+          put(provider, caps.calendars[provider] ? { kind: 'failed', why: 'unreachable' } : { kind: 'off' })
+        }
+        return
+      }
       for (const provider of ['google', 'apple'] as const) {
         if (!caps.calendars[provider]) {
           put(provider, { kind: 'off' })
@@ -73,6 +81,15 @@ export function useCalendarLink(
           provider,
           status.connected ? { kind: 'connected', status, pulled: null } : { kind: 'disconnected' },
         )
+        /**
+         * A provider the account is not connected to keeps no blocks on the
+         * day. They are a mirror of a calendar nobody can check any more, and
+         * a disconnect made elsewhere — another device, a password revoked in
+         * Apple's own settings, an account restored from a backup — has to
+         * reach this device too. Only ever on a real answer, never on a
+         * failure to ask.
+         */
+        if (!status.connected) onBlocks([], provider)
       }
       /* The one automatic read. Google only: it is the return leg of a consent
          screen, and Apple has no round trip to come back from. */
@@ -87,7 +104,11 @@ export function useCalendarLink(
         const pulled = onBlocks(result.blocks, 'google')
         const after = await calendarStatuses()
         if (!alive) return
-        put('google', { kind: 'connected', status: after.google, pulled })
+        put('google', {
+          kind: 'connected',
+          status: after?.google ?? { connected: true, account: '', lastSynced: null },
+          pulled,
+        })
       }
     })()
     return () => {
@@ -107,7 +128,7 @@ export function useCalendarLink(
     }
     const pulled = onBlocks(result.blocks, provider)
     const after = await calendarStatuses()
-    put(provider, { kind: 'connected', status: after[provider], pulled })
+    put(provider, { kind: 'connected', status: after?.[provider] ?? { connected: true, account: '', lastSynced: null }, pulled })
   }
 
   const disconnect = async (provider: CalendarProvider) => {
@@ -150,7 +171,11 @@ export function useCalendarLink(
     }
     const pulled = onBlocks(result.blocks, 'apple')
     const after = await calendarStatuses()
-    put('apple', { kind: 'connected', status: after.apple, pulled })
+    put('apple', {
+      kind: 'connected',
+      status: after?.apple ?? { connected: true, account: appleId, lastSynced: null },
+      pulled,
+    })
   }
 
   return {

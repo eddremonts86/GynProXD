@@ -100,13 +100,19 @@ function oneStatus(raw: unknown): CalendarStatus {
 }
 
 /**
- * What each provider says about itself.
+ * What each provider says about itself, or **null when it could not be asked**.
+ *
+ * The difference matters and it is why this does not fall back to "nothing is
+ * connected". A caller acts on a disconnected provider by dropping the blocks
+ * it mirrored, and doing that because the network was down for a second would
+ * delete somebody's day for no reason. No account is a real answer — nothing
+ * can be connected without one — and a failed request is not an answer at all.
  *
  * A server too old to answer per provider sends the flat shape it always did,
  * which is read as Google's, because Google was the only one it could have
  * meant.
  */
-export async function calendarStatuses(): Promise<CalendarStatuses> {
+export async function calendarStatuses(): Promise<CalendarStatuses | null> {
   const at = endpoint()
   if (!at) return { google: NOT_CONNECTED, apple: NOT_CONNECTED }
   try {
@@ -114,7 +120,7 @@ export async function calendarStatuses(): Promise<CalendarStatuses> {
       headers: at.headers,
       signal: AbortSignal.timeout(8000),
     })
-    if (!res.ok) return { google: NOT_CONNECTED, apple: NOT_CONNECTED }
+    if (!res.ok) return null
     const body = (await res.json()) as Record<string, unknown>
     const providers = body.providers as Record<string, unknown> | undefined
     if (providers) {
@@ -122,7 +128,7 @@ export async function calendarStatuses(): Promise<CalendarStatuses> {
     }
     return { google: oneStatus(body), apple: NOT_CONNECTED }
   } catch {
-    return { google: NOT_CONNECTED, apple: NOT_CONNECTED }
+    return null
   }
 }
 
