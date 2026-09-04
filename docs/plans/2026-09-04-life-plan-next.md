@@ -2,10 +2,13 @@
 
 Status: the working list. Date: 2026-09-04.
 
-`feat/member-pro` is on the remote and not merged. Everything in
+`feat/member-pro` is merged into `dev` (PR #105, 2026-09-04). Everything in
 `2026-09-03-life-plan-v2.md` marked built is built and walked; that document's
 "What is still open" section is the inventory, and this one is the order to do
 it in.
+
+Everything still open on this list is somebody's errand rather than a commit,
+and `dev` is where it is now tracked from.
 
 The order is by what each item unblocks, not by how big it is. Three of the
 first four are minutes of work, and they come first because they turn features
@@ -15,10 +18,10 @@ that already exist into features that work.
 
 ## 1. Merge, when the flow is finished
 
-`feat/member-pro`, pushed and not merged. Item 11 was the last code on this
-list, so the flow it was waiting for is finished.
+Done. Item 11 was the last code on this list, so the flow this was waiting for
+finished and the branch landed on `dev` as PR #105 on 2026-09-04.
 
-Verified on the branch as it stands, 2026-09-04, after the push channel landed:
+Verified on the branch before it merged, after the push channel landed:
 
 | Check | Result |
 |---|---|
@@ -32,9 +35,21 @@ agent preview pane, which serves the repository root and not a worktree. Both
 `test-session` and `test-onboarding` pass there; they fail with 502s only when
 nothing sits behind `/pb`, which is the harness and not the product.
 
-Everything left on this list above item 7 is somebody's errand rather than a
-commit: two keys and four Stripe prices, one email to Stripe, an illustration
-commission, a privacy policy, and Google's verification.
+**One thing this table used to claim that it could not.** CI had never run on
+`feat/member-pro` before the day it merged — the only run on that branch is the
+one that gated the PR. Every earlier "22 of 22" in this file was measured on a
+laptop. The guardian's own verdict, on the merge commit, is the four checks on
+PR #105.
+
+**And one flake worth naming, because it will happen again.** The first CI run
+failed on `lighthouse-sweep` alone: `/` on mobile scored 64 against a floor of
+82, with LCP 4.1s against a 3.8s ceiling. It was runner variance and the re-run
+passed untouched. What ruled out a regression before the re-run was measuring
+the first paint rather than guessing: `dev` pulls 827 KB through `index.html`
+and the branch pulls 841 KB, the same chunks and 1.7% more, while the audit in
+`docs/audit/2026-09-02-production-readiness.md` records 89 and 3.1s for that
+page. Fourteen kilobytes do not cost 25 points. Mobile Lighthouse throttles the
+CPU 4x, so a contended shared runner hits that one metric and nothing else.
 
 ## 2. The keys and the prices
 
