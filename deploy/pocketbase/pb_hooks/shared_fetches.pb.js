@@ -84,6 +84,12 @@ routerAdd('GET', '/api/enforma/capabilities', (e) => {
          app-specific password the member makes themselves, so the sealing key
          is the only thing that has to exist here. */
       apple: String($os.getenv('CALENDAR_SECRET') || '').length === 32,
+      microsoft: !!(
+        $os.getenv('MICROSOFT_CLIENT_ID') &&
+        $os.getenv('MICROSOFT_CLIENT_SECRET') &&
+        $os.getenv('MICROSOFT_REDIRECT_URI') &&
+        String($os.getenv('CALENDAR_SECRET') || '').length === 32
+      ),
     },
     /* Stripe's own hosted portal, where cancelling happens. A configured URL
        rather than a route of ours: cancelling is legally theirs to get right. */

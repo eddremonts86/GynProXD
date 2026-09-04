@@ -31,7 +31,7 @@ import { isoPlusDays } from './day-window'
  * events and free-marked hours, that has read picked files since v1.
  */
 
-export type CalendarProvider = 'google' | 'apple'
+export type CalendarProvider = 'google' | 'apple' | 'microsoft'
 
 export interface CalendarStatus {
   connected: boolean
@@ -39,10 +39,7 @@ export interface CalendarStatus {
   lastSynced: string | null
 }
 
-export interface CalendarStatuses {
-  google: CalendarStatus
-  apple: CalendarStatus
-}
+export type CalendarStatuses = Record<CalendarProvider, CalendarStatus>
 
 const NOT_CONNECTED: CalendarStatus = { connected: false, account: '', lastSynced: null }
 
@@ -102,7 +99,10 @@ function endpoint(): { base: string; headers: Record<string, string> } | null {
 }
 
 /** Whatever survives the gate: dated, clocked, ending after it starts. */
-export function validateBlocks(raw: unknown): Omit<BusyBlock, 'id'>[] | null {
+export function validateBlocks(
+  raw: unknown,
+  source: 'google' | 'microsoft' = 'google',
+): Omit<BusyBlock, 'id'>[] | null {
   const body = raw as { blocks?: unknown } | null
   if (!body || !Array.isArray(body.blocks)) return null
   const out: Omit<BusyBlock, 'id'>[] = []
@@ -115,7 +115,7 @@ export function validateBlocks(raw: unknown): Omit<BusyBlock, 'id'>[] | null {
     if (typeof end !== 'string' || !CLOCK.test(end)) continue
     if (end <= start) continue
     const label = typeof title === 'string' ? title.replace(/\s+/g, ' ').trim().slice(0, 60) : ''
-    out.push({ date, start, end, source: 'google', ...(label ? { label } : {}) })
+    out.push({ date, start, end, source, ...(label ? { label } : {}) })
   }
   return out
 }
@@ -144,8 +144,13 @@ function oneStatus(raw: unknown): CalendarStatus {
  * meant.
  */
 export async function calendarStatuses(): Promise<CalendarStatuses | null> {
+  const none: CalendarStatuses = {
+    google: NOT_CONNECTED,
+    apple: NOT_CONNECTED,
+    microsoft: NOT_CONNECTED,
+  }
   const at = endpoint()
-  if (!at) return { google: NOT_CONNECTED, apple: NOT_CONNECTED }
+  if (!at) return none
   try {
     const res = await fetch(`${at.base}/api/enforma/calendar/status`, {
       headers: at.headers,
@@ -155,26 +160,33 @@ export async function calendarStatuses(): Promise<CalendarStatuses | null> {
     const body = (await res.json()) as Record<string, unknown>
     const providers = body.providers as Record<string, unknown> | undefined
     if (providers) {
-      return { google: oneStatus(providers.google), apple: oneStatus(providers.apple) }
+      return {
+        google: oneStatus(providers.google),
+        apple: oneStatus(providers.apple),
+        microsoft: oneStatus(providers.microsoft),
+      }
     }
-    return { google: oneStatus(body), apple: NOT_CONNECTED }
+    return { ...none, google: oneStatus(body) }
   } catch {
     return null
   }
 }
 
 /**
- * Where to send the browser to say yes to Google.
+ * Where to send the browser to say yes, for a provider that has a consent
+ * screen.
  *
- * A URL rather than a redirect this code follows, because the consent screen is
- * Google's own page and the member has to see the address bar say so. The
- * caller navigates; nothing is stored on the way out.
+ * A URL rather than a redirect this code follows, because the screen is
+ * Google's or Microsoft's own page and the member has to see the address bar
+ * say so. The caller navigates; nothing is stored on the way out.
  */
-export async function calendarConnectUrl(): Promise<{ url: string } | { why: CalendarFailure }> {
+export async function calendarConnectUrl(
+  provider: 'google' | 'microsoft' = 'google',
+): Promise<{ url: string } | { why: CalendarFailure }> {
   const at = endpoint()
   if (!at) return { why: 'no-account' }
   try {
-    const res = await fetch(`${at.base}/api/enforma/calendar/google/start`, {
+    const res = await fetch(`${at.base}/api/enforma/calendar/${provider}/start`, {
       method: 'POST',
       headers: at.headers,
       signal: AbortSignal.timeout(TIMEOUT_MS),
@@ -276,6 +288,46 @@ export async function pullApple(keepTitles: boolean): Promise<PullResult> {
     if (!Array.isArray(body.ics)) return { ok: false, why: 'unreachable' }
     const texts = body.ics.filter((text): text is string => typeof text === 'string')
     return { ok: true, blocks: blocksFromIcs(texts, keepTitles) }
+  } catch {
+    return { ok: false, why: 'unreachable' }
+  }
+}
+
+/**
+ * The zone this device is in, for the one provider that needs telling.
+ *
+ * Graph hands back naive times and a zone name rather than an offset per
+ * instance, so the expansion has to be asked for in the member's own zone or
+ * the hours arrive as UTC. `utils/microsoft_calendar.js` says why that is the
+ * right trade; this is the half of it the browser can answer.
+ */
+function localZone(): string {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+  } catch {
+    return 'UTC'
+  }
+}
+
+/** The next three weeks of the connected Microsoft calendar, as busy blocks. */
+export async function pullMicrosoft(keepTitles: boolean): Promise<PullResult> {
+  const at = endpoint()
+  if (!at) return { ok: false, why: 'no-account' }
+  const params = new URLSearchParams({ tz: localZone() })
+  if (keepTitles) params.set('titles', '1')
+  try {
+    const res = await fetch(`${at.base}/api/enforma/calendar/microsoft/busy?${params}`, {
+      headers: at.headers,
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    })
+    if (res.status === 503) return { ok: false, why: 'unavailable' }
+    if (res.status === 401 || res.status === 403) return { ok: false, why: 'refused' }
+    if (res.status === 404) return { ok: false, why: 'not-connected' }
+    if (res.status === 409) return { ok: false, why: 'withdrawn' }
+    if (!res.ok) return { ok: false, why: 'unreachable' }
+    const blocks = validateBlocks(await res.json(), 'microsoft')
+    if (!blocks) return { ok: false, why: 'unreachable' }
+    return { ok: true, blocks }
   } catch {
     return { ok: false, why: 'unreachable' }
   }

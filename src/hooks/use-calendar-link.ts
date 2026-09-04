@@ -8,6 +8,7 @@ import {
   keepTitlesStored,
   pullApple,
   pullCalendar,
+  pullMicrosoft,
   setKeepTitlesStored,
   type CalendarFailure,
   type CalendarProvider,
@@ -18,17 +19,20 @@ import type { BusyBlock } from '@/lib/life-profile'
 /**
  * The connected calendars, as one screen sees them.
  *
- * Two providers, one state each, and they are independent: a member may have
- * Google attached and iCloud not, or both, and a failure on one says nothing
- * about the other. The status of both is asked for once when the sheet opens
- * and after anything that could change either.
+ * Three providers, one state each, and they are independent: a member may have
+ * Google attached and iCloud not, or all three, and a failure on one says
+ * nothing about the others. The status of each is asked for once when the sheet
+ * opens and after anything that could change any of them.
  *
  * A pull is never automatic on a timer. It costs a round trip through somebody
  * else's server on the member's behalf, and a day that silently rearranged
  * itself while they were reading it would be worse than one that is a refresh
- * out of date. `?calendar=connected` coming back from Google's consent screen
- * is the one moment a pull happens without being asked for, because that is
- * exactly what the member just said yes to.
+ * out of date. `?calendar=connected` coming back from a consent screen is the
+ * one moment a pull happens without being asked for, because that is exactly
+ * what the member just said yes to. Which provider it came back from is not in
+ * the URL, so whichever ones report connected and have nothing read yet are the
+ * ones read: that is the same set, and it makes the return leg work for both
+ * without a second query parameter to keep honest.
  */
 
 export type LinkState =
@@ -48,13 +52,19 @@ export interface ProviderLink {
 
 type States = Record<CalendarProvider, LinkState>
 
+const PROVIDERS: readonly CalendarProvider[] = ['google', 'apple', 'microsoft']
+
 export function useCalendarLink(
   onBlocks: (blocks: readonly Omit<BusyBlock, 'id'>[], source: CalendarProvider) => number,
   /** True the moment the member lands back from Google having said yes. */
   justConnected: boolean,
 ) {
   const caps = useSyncExternalStore(subscribeCapabilities, serverCapabilities, serverCapabilities)
-  const [states, setStates] = useState<States>({ google: { kind: 'checking' }, apple: { kind: 'checking' } })
+  const [states, setStates] = useState<States>({
+    google: { kind: 'checking' },
+    apple: { kind: 'checking' },
+    microsoft: { kind: 'checking' },
+  })
   const [keepTitles, setKeepTitlesState] = useState(keepTitlesStored)
   const setKeepTitles = (keep: boolean) => {
     setKeepTitlesStored(keep)
@@ -72,12 +82,12 @@ export function useCalendarLink(
       if (!answer) {
         /* Could not ask. Nothing is claimed and nothing is dropped: the blocks
            on the day stay exactly as they are until somebody can be asked. */
-        for (const provider of ['google', 'apple'] as const) {
+        for (const provider of PROVIDERS) {
           put(provider, caps.calendars[provider] ? { kind: 'failed', why: 'unreachable' } : { kind: 'off' })
         }
         return
       }
-      for (const provider of ['google', 'apple'] as const) {
+      for (const provider of PROVIDERS) {
         if (!caps.calendars[provider]) {
           put(provider, { kind: 'off' })
           continue
@@ -97,24 +107,27 @@ export function useCalendarLink(
          */
         if (!status.connected) onBlocks([], provider)
       }
-      /* The one automatic read. Google only: it is the return leg of a consent
-         screen, and Apple has no round trip to come back from. */
-      if (caps.calendars.google && answer.google.connected && justConnected) {
-        put('google', { kind: 'working' })
-        const result = await pullCalendar(false)
-        if (!alive) return
-        if (!result.ok) {
-          put('google', { kind: 'failed', why: result.why })
-          return
+      /* The one automatic read, on the return leg of a consent screen. Apple
+         has no round trip to come back from, so it is never in this set. */
+      if (justConnected) {
+        for (const provider of ['google', 'microsoft'] as const) {
+          if (!caps.calendars[provider] || !answer[provider].connected) continue
+          put(provider, { kind: 'working' })
+          const result = provider === 'microsoft' ? await pullMicrosoft(false) : await pullCalendar(false)
+          if (!alive) return
+          if (!result.ok) {
+            put(provider, { kind: 'failed', why: result.why })
+            continue
+          }
+          const pulled = onBlocks(result.blocks, provider)
+          const after = await calendarStatuses()
+          if (!alive) return
+          put(provider, {
+            kind: 'connected',
+            status: after?.[provider] ?? { connected: true, account: '', lastSynced: null },
+            pulled,
+          })
         }
-        const pulled = onBlocks(result.blocks, 'google')
-        const after = await calendarStatuses()
-        if (!alive) return
-        put('google', {
-          kind: 'connected',
-          status: after?.google ?? { connected: true, account: '', lastSynced: null },
-          pulled,
-        })
       }
     })()
     return () => {
@@ -123,11 +136,16 @@ export function useCalendarLink(
     /* `onBlocks` is a store action and stable; including it would re-run this
        on every render of the screen that owns it. */
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [caps.calendars.google, caps.calendars.apple, justConnected])
+  }, [caps.calendars.google, caps.calendars.apple, caps.calendars.microsoft, justConnected])
 
   const refresh = async (provider: CalendarProvider) => {
     put(provider, { kind: 'working' })
-    const result = provider === 'apple' ? await pullApple(keepTitles) : await pullCalendar(keepTitles)
+    const result =
+      provider === 'apple'
+        ? await pullApple(keepTitles)
+        : provider === 'microsoft'
+          ? await pullMicrosoft(keepTitles)
+          : await pullCalendar(keepTitles)
     if (!result.ok) {
       put(provider, { kind: 'failed', why: result.why })
       return
@@ -147,12 +165,12 @@ export function useCalendarLink(
     put(provider, { kind: 'disconnected' })
   }
 
-  /** Google: out to the consent screen. Nothing is stored on the way. */
-  const connectGoogle = async () => {
-    put('google', { kind: 'working' })
-    const answer = await calendarConnectUrl()
+  /** Out to a consent screen. Nothing is stored on the way. */
+  const connectVia = async (provider: 'google' | 'microsoft') => {
+    put(provider, { kind: 'working' })
+    const answer = await calendarConnectUrl(provider)
     if ('why' in answer) {
-      put('google', { kind: 'failed', why: answer.why })
+      put(provider, { kind: 'failed', why: answer.why })
       return
     }
     window.location.assign(answer.url)
@@ -190,9 +208,16 @@ export function useCalendarLink(
     google: {
       state: states.google,
       offered: caps.calendars.google,
-      connect: connectGoogle,
+      connect: () => connectVia('google'),
       refresh: () => refresh('google'),
       disconnect: () => disconnect('google'),
+    },
+    microsoft: {
+      state: states.microsoft,
+      offered: caps.calendars.microsoft,
+      connect: () => connectVia('microsoft'),
+      refresh: () => refresh('microsoft'),
+      disconnect: () => disconnect('microsoft'),
     },
     apple: {
       state: states.apple,
@@ -202,7 +227,7 @@ export function useCalendarLink(
       disconnect: () => disconnect('apple'),
     },
     /** Whether the group is worth drawing at all. */
-    offered: caps.calendars.google || caps.calendars.apple,
+    offered: PROVIDERS.some((provider) => caps.calendars[provider]),
   }
 }
 

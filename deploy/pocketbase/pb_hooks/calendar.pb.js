@@ -37,7 +37,8 @@
 
 routerAdd('POST', '/api/enforma/calendar/google/start', (e) => {
   if (!e.auth) return e.json(401, { message: 'Sign in first.' })
-  const { envConfig, signState, authorizeUrl, STATE_TTL_MS } = require(`${__hooks}/utils/google_calendar.js`)
+  const { envConfig, authorizeUrl } = require(`${__hooks}/utils/google_calendar.js`)
+  const { signState, STATE_TTL_MS } = require(`${__hooks}/utils/oauth_state.js`)
   const { isPro, isPlatformAdmin } = require(`${__hooks}/utils/entitlement.js`)
   if (!(isPlatformAdmin(e.app, e.auth.id) || isPro(e.app, e.auth.id))) {
     return e.json(403, { message: 'Part of Pro.' })
@@ -61,7 +62,8 @@ routerAdd('POST', '/api/enforma/calendar/google/start', (e) => {
  * calendar.
  */
 routerAdd('GET', '/api/enforma/calendar/google/callback', (e) => {
-  const { envConfig, linkFor, verifyState, codeExchangeBody } = require(`${__hooks}/utils/google_calendar.js`)
+  const { envConfig, linkFor, codeExchangeBody } = require(`${__hooks}/utils/google_calendar.js`)
+  const { verifyState } = require(`${__hooks}/utils/oauth_state.js`)
   const { isPro, isPlatformAdmin } = require(`${__hooks}/utils/entitlement.js`)
   const cfg = envConfig()
   const back = (word) => {
@@ -160,14 +162,16 @@ routerAdd('GET', '/api/enforma/calendar/status', (e) => {
   }
   const google = one('google')
   const apple = one('apple')
+  const microsoft = one('microsoft')
+  const first = [google, apple, microsoft].find((p) => p.connected)
   return e.json(200, {
-    connected: google.connected || apple.connected,
-    provider: google.connected ? 'google' : apple.connected ? 'apple' : null,
+    connected: !!first,
+    provider: google.connected ? 'google' : apple.connected ? 'apple' : microsoft.connected ? 'microsoft' : null,
     /* Kept flat as well as nested, so the fields the first version answered
        with still mean what they meant. */
-    account: google.connected ? google.account : apple.account || '',
-    lastSynced: google.connected ? google.lastSynced : apple.lastSynced || null,
-    providers: { google: google, apple: apple },
+    account: first ? first.account : '',
+    lastSynced: first ? first.lastSynced : null,
+    providers: { google: google, apple: apple, microsoft: microsoft },
   })
 })
 
@@ -275,7 +279,7 @@ routerAdd('POST', '/api/enforma/calendar/disconnect', (e) => {
   /* Which one, defaulting to Google: that is what the route meant when it was
      the only provider and what a client that has not reloaded still means. */
   const asked = e.request.url.query().get('provider')
-  const provider = asked === 'apple' ? 'apple' : 'google'
+  const provider = asked === 'apple' || asked === 'microsoft' ? asked : 'google'
   let row = null
   try {
     row = e.app.findFirstRecordByFilter('calendar_links', 'owner = {:o} && provider = {:p}', {
@@ -300,8 +304,9 @@ routerAdd('POST', '/api/enforma/calendar/disconnect', (e) => {
   }
   /**
    * Only Google gets told. An app-specific password is revoked by the member in
-   * their own Apple ID settings and there is no endpoint to ask; deleting the
-   * row is the whole of what this server can do, and the screen says so.
+   * their own Apple ID settings and there is no endpoint to ask, and Microsoft
+   * has no revoke endpoint for a refresh token either; deleting the row is the
+   * whole of what this server can do, and the screens say so.
    */
   if (provider === 'google' && cfg && token) {
     try {

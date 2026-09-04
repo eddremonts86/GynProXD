@@ -1,5 +1,11 @@
 import { useState } from 'react'
-import { AppleLogo, ArrowsClockwise, CalendarCheck, GoogleLogo } from '@phosphor-icons/react'
+import {
+  AppleLogo,
+  ArrowsClockwise,
+  CalendarCheck,
+  GoogleLogo,
+  MicrosoftOutlookLogo,
+} from '@phosphor-icons/react'
 import { Button } from '@/ui/Button'
 import { Input } from '@/ui/Input'
 import { Panel } from '@/ui/Panel'
@@ -109,8 +115,26 @@ function Connected({
   )
 }
 
-function GoogleBlock({ link, keepTitles, onKeepTitles }: {
+/**
+ * Google and Microsoft, which are the same trade in the same words.
+ *
+ * Both are a scoped token that may only read events, held here until the member
+ * disconnects, obtained through the provider's own consent screen. Writing the
+ * panel twice would have been two copies of one paragraph waiting to disagree
+ * with each other.
+ */
+function TokenBlock({
+  link,
+  name,
+  icon,
+  extra,
+  keepTitles,
+  onKeepTitles,
+}: {
   link: CalendarLink['google']
+  name: string
+  icon: React.ReactNode
+  extra?: string
   keepTitles: boolean
   onKeepTitles: (next: boolean) => void
 }) {
@@ -119,16 +143,18 @@ function GoogleBlock({ link, keepTitles, onKeepTitles }: {
   const busy = state.kind === 'working' || state.kind === 'checking'
 
   return (
-    <Panel padding="lg" className="flex flex-col gap-4">
+    /* Named, because there are three of these and "Read it again" means a
+       different calendar in each. A screen reader gets the same benefit. */
+    <Panel padding="lg" role="group" aria-label={name} className="flex flex-col gap-4">
       <span className="flex items-center gap-2 text-sm font-medium text-ink">
-        <GoogleLogo size={18} />
-        Google Calendar
+        {icon}
+        {name}
       </span>
 
       {state.kind === 'connected' ? (
         <Connected
           state={state}
-          label="A Google calendar"
+          label={`A ${name}`}
           keepTitles={keepTitles}
           onKeepTitles={onKeepTitles}
           onRefresh={() => void link.refresh()}
@@ -142,10 +168,11 @@ function GoogleBlock({ link, keepTitles, onKeepTitles }: {
             server keeps a key that can read your calendar until you disconnect it, and nothing
             else: it may only read, it never writes, and event titles stay off your device unless
             you turn them on.
+            {extra ? ` ${extra}` : ''}
           </p>
           <div>
             <Button variant="secondary" onClick={() => void link.connect()} disabled={busy}>
-              {busy ? 'One moment' : 'Connect Google Calendar'}
+              {busy ? 'One moment' : `Connect ${name}`}
             </Button>
           </div>
         </>
@@ -171,7 +198,7 @@ function AppleBlock({ link, keepTitles, onKeepTitles }: {
   const ready = /^[^@\s]+@[^@\s]+$/.test(appleId.trim()) && password.trim().length >= 8
 
   return (
-    <Panel padding="lg" className="flex flex-col gap-4">
+    <Panel padding="lg" role="group" aria-label="Apple Calendar" className="flex flex-col gap-4">
       <span className="flex items-center gap-2 text-sm font-medium text-ink">
         <AppleLogo size={18} />
         Apple Calendar
@@ -255,7 +282,23 @@ export function CalendarConnect({ link }: { link: CalendarLink }) {
   if (!link.offered) return null
   return (
     <div className="flex flex-col gap-3">
-      <GoogleBlock link={link.google} keepTitles={link.keepTitles} onKeepTitles={link.setKeepTitles} />
+      <TokenBlock
+        link={link.google}
+        name="Google Calendar"
+        icon={<GoogleLogo size={18} />}
+        keepTitles={link.keepTitles}
+        onKeepTitles={link.setKeepTitles}
+      />
+      <TokenBlock
+        link={link.microsoft}
+        name="Microsoft Calendar"
+        icon={<MicrosoftOutlookLogo size={18} />}
+        /* The one thing Microsoft needs that the other two do not, said rather
+           than done quietly. */
+        extra="It is also told which timezone you are in, because that is how Microsoft returns the right hours."
+        keepTitles={link.keepTitles}
+        onKeepTitles={link.setKeepTitles}
+      />
       <AppleBlock link={link.apple} keepTitles={link.keepTitles} onKeepTitles={link.setKeepTitles} />
     </div>
   )

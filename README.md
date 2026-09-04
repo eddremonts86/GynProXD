@@ -63,6 +63,12 @@ file import uses, because resolving a recurrence rule into wall-clock hours
 needs a timezone database the browser has and the server does not. Revoking is
 one click in their Apple ID.
 
+`MICROSOFT_CLIENT_ID`, `MICROSOFT_CLIENT_SECRET` and `MICROSOFT_REDIRECT_URI`
+add the third calendar, on the same table and the same shape as Google:
+`Calendars.Read` and `offline_access`, no sensitive-scope verification to wait
+for. The device tells it which timezone it is in, because Graph returns naive
+times and a zone name rather than an offset per instance.
+
 `TICKETMASTER_API_KEY` on the same server turns on the strip under `/day`:
 ticketed events within 25 km of a cell the device rounds its position to, or
 around a city typed by hand, cached per cell for six hours. A tap puts one on

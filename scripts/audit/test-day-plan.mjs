@@ -319,6 +319,84 @@ const icloudServer = http.createServer((req, res) => {
 })
 await new Promise((r) => icloudServer.listen(0, '127.0.0.1', r))
 
+/**
+ * Microsoft, on loopback: the consent screen, the token endpoint and one
+ * calendarView.
+ *
+ * Two things here exist to be argued about. The refresh token **rotates** on
+ * every exchange, the way Microsoft's does and Google's does not, and the fake
+ * refuses a stale one — so a connection that failed to store the new token
+ * would read once and then report itself withdrawn. And the events come back in
+ * whatever zone the `Prefer` header asked for, with the header recorded, so the
+ * walk can see that the device's zone travelled and the hours are local.
+ */
+const microsoft = { tokens: 0, views: 0, lastPrefer: '', refresh: 'ms-refresh-0', rotations: 0 }
+const microsoftServer = http.createServer((req, res) => {
+  const url = new URL(req.url, 'http://127.0.0.1')
+  let body = ''
+  req.on('data', (d) => (body += d))
+  req.on('end', () => {
+    if (url.pathname === '/oauth2/v2.0/authorize') {
+      const back = new URL(url.searchParams.get('redirect_uri'))
+      back.searchParams.set('code', 'ms-code')
+      back.searchParams.set('state', url.searchParams.get('state') ?? '')
+      res.writeHead(302, { location: back.toString() })
+      res.end()
+      return
+    }
+    if (url.pathname === '/oauth2/v2.0/token') {
+      microsoft.tokens += 1
+      const refreshing = /grant_type=refresh_token/.test(body)
+      if (refreshing) {
+        const sent = decodeURIComponent((/refresh_token=([^&]*)/.exec(body) ?? [])[1] ?? '')
+        if (sent !== microsoft.refresh) {
+          /* A stale refresh token is exactly what Microsoft refuses. */
+          res.writeHead(400, { 'content-type': 'application/json' })
+          res.end(JSON.stringify({ error: 'invalid_grant' }))
+          return
+        }
+        microsoft.rotations += 1
+      }
+      microsoft.refresh = `ms-refresh-${microsoft.rotations + 1}`
+      res.writeHead(200, { 'content-type': 'application/json' })
+      res.end(JSON.stringify({
+        access_token: 'ms-access',
+        expires_in: 3599,
+        refresh_token: microsoft.refresh,
+        ...(refreshing ? {} : { id_token: jwt({ preferred_username: 'diary@outlook.test', exp: 4102444800 }) }),
+      }))
+      return
+    }
+    if (url.pathname === '/me/calendarView') {
+      microsoft.views += 1
+      microsoft.lastPrefer = req.headers.prefer ?? ''
+      const at = new Date()
+      const day = (n) => {
+        const d = new Date(at)
+        d.setDate(d.getDate() + n)
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+      }
+      res.writeHead(200, { 'content-type': 'application/json' })
+      res.end(JSON.stringify({ value: [
+        { subject: 'Sprint review', isAllDay: false, isCancelled: false, showAs: 'busy',
+          start: { dateTime: `${day(0)}T14:00:00.0000000`, timeZone: 'Europe/Madrid' },
+          end: { dateTime: `${day(0)}T15:00:00.0000000`, timeZone: 'Europe/Madrid' } },
+        { subject: 'A day off', isAllDay: true, isCancelled: false, showAs: 'free',
+          start: { dateTime: `${day(1)}T00:00:00.0000000` },
+          end: { dateTime: `${day(2)}T00:00:00.0000000` } },
+        { subject: 'One I declined', isAllDay: false, isCancelled: false, showAs: 'busy',
+          responseStatus: { response: 'declined' },
+          start: { dateTime: `${day(0)}T12:00:00.0000000` },
+          end: { dateTime: `${day(0)}T13:00:00.0000000` } },
+      ] }))
+      return
+    }
+    res.writeHead(404)
+    res.end()
+  })
+})
+await new Promise((r) => microsoftServer.listen(0, '127.0.0.1', r))
+
 /* The redirect URI has to name the sandbox, and the sandbox has to be told the
    redirect URI, so the port is chosen before either exists. */
 const pbPort = await new Promise((resolve) => {
@@ -345,6 +423,11 @@ const pb = await startSandbox({
     APP_BASE_URL: BASE,
     CALENDAR_SECRET: 'walk-calendar-secret-32-chars-ok!'.slice(0, 32),
     CALDAV_BASE_URL: `http://127.0.0.1:${icloudServer.address().port}`,
+    MICROSOFT_CLIENT_ID: 'fake-microsoft-client',
+    MICROSOFT_CLIENT_SECRET: 'fake-microsoft-secret',
+    MICROSOFT_REDIRECT_URI: `http://127.0.0.1:${pbPort}/api/enforma/calendar/microsoft/callback`,
+    MICROSOFT_AUTH_BASE_URL: `http://127.0.0.1:${microsoftServer.address().port}`,
+    MICROSOFT_API_BASE_URL: `http://127.0.0.1:${microsoftServer.address().port}`,
   },
 })
 const browser = await chromium.launch()
@@ -880,6 +963,49 @@ try {
   check('the all-day birthday is not on it', /Cumpleanos/.test(withApple), false)
   check('nor the hour iCloud marks free', /Fuera de la oficina/.test(withApple), false)
 
+  console.log('\na Microsoft calendar, over Graph')
+  await openSheet()
+  const msBefore = await sheetText()
+  check('it says the one extra thing it needs',
+    /told which timezone you are in/.test(msBefore), true)
+  await sheet().getByRole('button', { name: 'Connect Microsoft Calendar' }).click()
+  await page.waitForURL(/\/day\?calendar=connected/, { timeout: 20000 })
+  await sheet().waitFor({ timeout: 10000 })
+  await sheet().getByText(/diary@outlook\.test/).waitFor({ timeout: 20000 })
+  check('the account it belongs to is shown back', /diary@outlook\.test/.test(await sheetText()), true)
+  check('the zone the device is in travelled',
+    /outlook\.timezone="[A-Za-z0-9_+\-/]{3,64}"/.test(microsoft.lastPrefer), true)
+  await closeSheet()
+  const withMicrosoft = await dayText()
+  check('the meeting is on the day at the hour Graph returned', /14:00 to 15:00/.test(withMicrosoft), true)
+  check('the day off is not, because the calendar calls it free', /A day off/.test(withMicrosoft), false)
+  check('nor the one they declined', /12:00 to 13:00/.test(withMicrosoft), false)
+
+  console.log('\nthe token Microsoft rotates')
+  /* Microsoft hands back a new refresh token on every exchange and refuses the
+     old one. A connection that did not store it would read once and then say
+     it had been withdrawn, which is the bug this asserts is absent.
+     Addressed by panel rather than by index: three of these are on screen and
+     "Read it again" means a different calendar in each. */
+  const msPanel = () => sheet().getByRole('group', { name: 'Microsoft Calendar' })
+  const rotationsBefore = microsoft.rotations
+  await openSheet()
+  await msPanel().getByRole('button', { name: 'Read it again' }).click()
+  await page.waitForTimeout(2500)
+  check('a second read used the rotated token rather than the first one',
+    microsoft.rotations > rotationsBefore, true)
+  check('and did not report itself withdrawn', /no longer accepted/.test(await msPanel().innerText()), false)
+  await closeSheet()
+  check('the hour is still on the day', /14:00 to 15:00/.test(await dayText()), true)
+
+  console.log('\nputting Microsoft away again')
+  await openSheet()
+  await msPanel().getByRole('button', { name: 'Disconnect' }).click()
+  await msPanel().getByRole('button', { name: 'Connect Microsoft Calendar' }).waitFor({ timeout: 15000 })
+  await closeSheet()
+  check('its hour went with it', /14:00 to 15:00/.test(await dayText()), false)
+  check("and iCloud's did not", /16:00 to 17:00/.test(await dayText()), true)
+
   console.log('\ntwo calendars at once')
   /* Google was disconnected at the end of its own section, so it is connected
      again here: two providers on one account is the thing worth proving, and
@@ -1317,6 +1443,7 @@ try {
   ticketmaster.close()
   googleServer.close()
   icloudServer.close()
+  microsoftServer.close()
 }
 
 console.log(failures === 0 ? '\nall clear\n' : `\n${failures} failed\n`)

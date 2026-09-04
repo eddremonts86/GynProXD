@@ -128,7 +128,7 @@ interface GymState {
   syncCalendarBusy: (
     blocks: readonly Omit<BusyBlock, 'id'>[],
     today: string,
-    source: 'google' | 'apple',
+    source: 'google' | 'apple' | 'microsoft',
   ) => number
   /**
    * Forgets the blocks a file put there, and only those.
@@ -243,7 +243,7 @@ export const useGym = create<GymState>()((set, get) => ({
           const others = (base.busy ?? []).filter((b) => b.source !== source && b.date >= today)
           const mine: BusyBlock[] = []
           const seen = new Set<string>()
-          const prefix = source === 'apple' ? 'ical' : 'gcal'
+          const prefix = source === 'apple' ? 'ical' : source === 'microsoft' ? 'mscal' : 'gcal'
           for (const block of blocks) {
             if (block.date < today) continue
             const key = `${block.date}|${block.start}|${block.end}`

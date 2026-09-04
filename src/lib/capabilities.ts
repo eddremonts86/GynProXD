@@ -30,7 +30,7 @@ export interface ServerCapabilities {
    * needs nothing but the key that seals what the member types in, so a server
    * can perfectly well offer one and not the other.
    */
-  calendars: { google: boolean; apple: boolean }
+  calendars: { google: boolean; apple: boolean; microsoft: boolean }
   /** VAPID public key when the server can deliver Web Push, else null. */
   push: string | null
   /**
@@ -51,7 +51,7 @@ const NONE: ServerCapabilities = {
   coachHost: null,
   recipes: false,
   events: false,
-  calendars: { google: false, apple: false },
+  calendars: { google: false, apple: false, microsoft: false },
   push: null,
   billing: false,
   portal: null,
@@ -64,13 +64,17 @@ let caps: ServerCapabilities = load()
  * is a boolean, and a server that has not been redeployed still sends one.
  * Either way absent reads as false, like every other flag here.
  */
-function readCalendars(raw: unknown): { google: boolean; apple: boolean } {
-  if (raw === true) return { google: true, apple: true }
+function readCalendars(raw: unknown): ServerCapabilities['calendars'] {
+  if (raw === true) return { google: true, apple: true, microsoft: true }
   if (raw && typeof raw === 'object') {
-    const map = raw as { google?: unknown; apple?: unknown }
-    return { google: map.google === true, apple: map.apple === true }
+    const map = raw as { google?: unknown; apple?: unknown; microsoft?: unknown }
+    return {
+      google: map.google === true,
+      apple: map.apple === true,
+      microsoft: map.microsoft === true,
+    }
   }
-  return { google: false, apple: false }
+  return { google: false, apple: false, microsoft: false }
 }
 
 function load(): ServerCapabilities {

@@ -19,36 +19,10 @@ const SCOPE = 'https://www.googleapis.com/auth/calendar.events.readonly'
 const DAYS_AHEAD = 21
 /** How many events one pull may carry. A bound, not a rule. */
 const MAX_EVENTS = 250
-/** How long a signed state is good for: one trip through a consent screen. */
-const STATE_TTL_MS = 10 * 60 * 1000
 
-function base64url(value) {
-  return String(value).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
-}
-
-/**
- * The state that survives the round trip to Google and back.
- *
- * `<userId>.<expiry>.<mac>`, signed with the server's own secret. It carries
- * who started the flow, so the callback does not have to trust a session that
- * may not exist on the redirect, and it expires, so a captured link is not a
- * standing invitation to attach a calendar to somebody's account.
- */
-function signState(userId, expiresAtMs, secret) {
-  const body = String(userId) + '.' + String(expiresAtMs)
-  return body + '.' + base64url($security.hs256(body, secret))
-}
-
-function verifyState(state, secret, nowMs) {
-  const parts = String(state || '').split('.')
-  if (parts.length !== 3) return null
-  const body = parts[0] + '.' + parts[1]
-  const expected = base64url($security.hs256(body, secret))
-  if (!$security.equal(expected, parts[2])) return null
-  const expiresAt = Number(parts[1])
-  if (!Number.isFinite(expiresAt) || expiresAt < nowMs) return null
-  return parts[0]
-}
+/* The signed state moved to `utils/oauth_state.js` when Microsoft became the
+   second OAuth provider: it is the same mechanism for both and it is the one
+   security-relevant function here, so it is shared rather than copied. */
 
 function authorizeUrl(base, clientId, redirectUri, state) {
   const params = [
@@ -241,9 +215,6 @@ module.exports = {
   SCOPE,
   DAYS_AHEAD,
   MAX_EVENTS,
-  STATE_TTL_MS,
-  signState,
-  verifyState,
   authorizeUrl,
   codeExchangeBody,
   refreshBody,

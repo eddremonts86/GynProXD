@@ -6,12 +6,11 @@ import source from '../../deploy/pocketbase/pb_hooks/utils/google_calendar.js?ra
  * loads rather than a copy of it, the way `coach-host.spec.ts` and
  * `nearby-events-server.spec.ts` do.
  *
- * Two things matter here more than the rest. The signed state is the whole
- * identity check on a callback that arrives with no session, so a forged or
- * expired one has to be refused. And an event that does not block time must not
- * become a block: a declined invitation, a birthday, an hour the calendar
- * itself marks free. Getting that wrong empties somebody's day and they never
- * find out why.
+ * What matters here is that an event which does not block time must not become
+ * a block: a declined invitation, a birthday, an hour the calendar itself marks
+ * free. Getting that wrong empties somebody's day and they never find out why.
+ * The signed state that guards the callback moved to `oauth-state.spec.ts` with
+ * the code, when Microsoft became the second provider to need it.
  */
 interface Block {
   date: string
@@ -22,9 +21,6 @@ interface Block {
 interface Shipped {
   SCOPE: string
   DAYS_AHEAD: number
-  STATE_TTL_MS: number
-  signState: (userId: string, expiresAtMs: number, secret: string) => string
-  verifyState: (state: string, secret: string, nowMs: number) => string | null
   authorizeUrl: (base: string, id: string, redirect: string, state: string) => string
   codeExchangeBody: (code: string, id: string, secret: string, redirect: string) => string
   refreshBody: (token: string, id: string, secret: string) => string
@@ -37,54 +33,8 @@ const shipped = { exports: {} as Shipped }
 let google: Shipped
 
 beforeAll(() => {
-  /* `$security` is a runtime global in PocketBase. A stand-in with the same
-     shape is enough here: what is under test is that the state is signed over
-     the body and compared whole, not the strength of an HMAC Go already tests. */
-  ;(globalThis as unknown as { $security: unknown }).$security = {
-    /* No dots in the output: the state is three dot-separated parts, and a MAC
-       carrying one would split into four and be rejected for the wrong reason. */
-    hs256: (data: string, secret: string) =>
-      `mac${data}with${secret}`.replace(/[^a-z0-9]/gi, ''),
-    equal: (a: string, b: string) => a === b,
-  }
   new Function('module', 'exports', source)(shipped, shipped.exports)
   google = shipped.exports
-})
-
-describe('the signed state', () => {
-  const secret = 'x'.repeat(32)
-  const now = Date.UTC(2026, 8, 4, 12, 0, 0)
-
-  it('comes back as the account that started the flow', () => {
-    const state = google.signState('user123', now + 60_000, secret)
-    expect(google.verifyState(state, secret, now)).toBe('user123')
-  })
-
-  it('refuses one signed with another secret', () => {
-    const state = google.signState('user123', now + 60_000, secret)
-    expect(google.verifyState(state, 'y'.repeat(32), now)).toBeNull()
-  })
-
-  it('refuses one whose account was swapped after signing', () => {
-    const state = google.signState('user123', now + 60_000, secret)
-    const forged = state.replace('user123', 'someone-else')
-    expect(google.verifyState(forged, secret, now)).toBeNull()
-  })
-
-  it('refuses one that has expired', () => {
-    const state = google.signState('user123', now - 1, secret)
-    expect(google.verifyState(state, secret, now)).toBeNull()
-  })
-
-  it('refuses nonsense rather than throwing', () => {
-    expect(google.verifyState('', secret, now)).toBeNull()
-    expect(google.verifyState('a.b', secret, now)).toBeNull()
-    expect(google.verifyState('a.b.c.d', secret, now)).toBeNull()
-  })
-
-  it('is good for ten minutes, which is one trip through a consent screen', () => {
-    expect(google.STATE_TTL_MS).toBe(10 * 60 * 1000)
-  })
 })
 
 describe('the URLs', () => {

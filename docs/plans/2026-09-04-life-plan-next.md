@@ -22,7 +22,7 @@ Verified on the branch as it stands:
 
 | Check | Result |
 |---|---|
-| Unit tests | 846 pass |
+| Unit tests | 856 pass |
 | `run.mjs rules` | 11 of 11 |
 | `run.mjs screens` | 22 of 22 |
 | Lint, types, build | clean |
@@ -158,10 +158,25 @@ lived in component state, so a reload forgot it, and the round trip through
 Google's consent screen is a reload. It is stored on the device now, which is
 what it always said.
 
-## 10. Microsoft Calendar
+## 10. Microsoft Calendar — done
 
-Graph, OAuth, the same shape as Google and lighter verification. Cheap once
-item 7 has generalised the table's second provider.
+Built and walked. Graph, `Calendars.Read` and `offline_access`, no
+sensitive-scope verification to wait for. Three providers can be attached at
+once and one pull never touches another's blocks.
+
+Two things it does not share with Google. Graph returns naive times plus a
+timezone name rather than an offset per instance, so the device sends the zone
+it is in and Microsoft does the daylight-saving arithmetic; the zone is
+validated before it goes anywhere near a header. And Microsoft rotates the
+refresh token on every exchange and refuses the old one, so the rotated one is
+stored on each read: missing that would have given a connection that reads once
+and then claims it was withdrawn.
+
+The signed state moved to `utils/oauth_state.js` on the way, because it is the
+one security-relevant function in the calendar code and two providers now need
+it. Each provider panel also gained an accessible name, which the screen reader
+wanted anyway and which the walk needed to tell three "Read it again" buttons
+apart.
 
 ## 11. Push from Google, and the cursor
 
