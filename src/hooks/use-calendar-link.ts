@@ -57,11 +57,16 @@ export function useCalendarLink(
         setState({ kind: 'working' })
         const result = await pullCalendar(false)
         if (!alive) return
-        setState(
-          result.ok
-            ? { kind: 'connected', status, pulled: onBlocks(result.blocks) }
-            : { kind: 'failed', why: result.why },
-        )
+        if (!result.ok) {
+          setState({ kind: 'failed', why: result.why })
+          return
+        }
+        const pulled = onBlocks(result.blocks)
+        /* Asked again rather than reused: the pull is what sets `last_synced`,
+           and the status fetched before it still says "not read yet". */
+        const after = await calendarStatus()
+        if (!alive) return
+        setState({ kind: 'connected', status: after, pulled })
       }
     })()
     return () => {
